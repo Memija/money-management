@@ -1,0 +1,51 @@
+import type { Country } from '../types';
+
+export const countries: Country[] = [
+  { code: 'de', name: 'Germany', flag: '/flags/de.png', supported: true },
+  { code: 'at', name: 'Austria', flag: '/flags/at.png', supported: false },
+  { code: 'ch', name: 'Switzerland', flag: '/flags/ch.png', supported: false },
+  { code: 'fr', name: 'France', flag: '/flags/fr.png', supported: false },
+  { code: 'nl', name: 'Netherlands', flag: '/flags/nl.png', supported: false },
+  { code: 'be', name: 'Belgium', flag: '/flags/be.png', supported: false },
+  { code: 'it', name: 'Italy', flag: '/flags/it.png', supported: false },
+  { code: 'es', name: 'Spain', flag: '/flags/es.png', supported: false },
+  { code: 'pt', name: 'Portugal', flag: '/flags/pt.png', supported: false },
+  { code: 'gb', name: 'United Kingdom', flag: '/flags/gb.png', supported: false },
+  { code: 'ie', name: 'Ireland', flag: '/flags/ie.png', supported: false },
+  { code: 'dk', name: 'Denmark', flag: '/flags/dk.png', supported: false },
+  { code: 'se', name: 'Sweden', flag: '/flags/se.png', supported: false },
+  { code: 'no', name: 'Norway', flag: '/flags/no.png', supported: false },
+  { code: 'fi', name: 'Finland', flag: '/flags/fi.png', supported: false },
+  { code: 'pl', name: 'Poland', flag: '/flags/pl.png', supported: false },
+  { code: 'cz', name: 'Czech Republic', flag: '/flags/cz.png', supported: false },
+  { code: 'hu', name: 'Hungary', flag: '/flags/hu.png', supported: false },
+  { code: 'ro', name: 'Romania', flag: '/flags/ro.png', supported: false },
+  { code: 'bg', name: 'Bulgaria', flag: '/flags/bg.png', supported: false },
+  { code: 'hr', name: 'Croatia', flag: '/flags/hr.png', supported: false },
+  { code: 'si', name: 'Slovenia', flag: '/flags/si.png', supported: false },
+  { code: 'sk', name: 'Slovakia', flag: '/flags/sk.png', supported: false },
+  { code: 'ee', name: 'Estonia', flag: '/flags/ee.png', supported: false },
+  { code: 'lt', name: 'Lithuania', flag: '/flags/lt.png', supported: false },
+  { code: 'lv', name: 'Latvia', flag: '/flags/lv.png', supported: false },
+  { code: 'gr', name: 'Greece', flag: '/flags/gr.png', supported: false },
+  { code: 'cy', name: 'Cyprus', flag: '/flags/cy.png', supported: false },
+  { code: 'mt', name: 'Malta', flag: '/flags/mt.png', supported: false },
+  { code: 'lu', name: 'Luxembourg', flag: '/flags/lu.png', supported: false },
+  { code: 'is', name: 'Iceland', flag: '/flags/is.png', supported: false },
+  { code: 'us', name: 'United States', flag: '/flags/us.png', supported: false },
+  { code: 'ca', name: 'Canada', flag: '/flags/ca.png', supported: false },
+  { code: 'au', name: 'Australia', flag: '/flags/au.png', supported: false },
+  { code: 'jp', name: 'Japan', flag: '/flags/jp.png', supported: false },
+  { code: 'ba', name: 'Bosnia and Herzegovina', flag: '/flags/ba.png', supported: false },
+  { code: 'rs', name: 'Serbia', flag: '/flags/rs.png', supported: false },
+  { code: 'me', name: 'Montenegro', flag: '/flags/me.png', supported: false },
+  { code: 'mk', name: 'North Macedonia', flag: '/flags/mk.png', supported: false },
+  { code: 'al', name: 'Albania', flag: '/flags/al.png', supported: false },
+  { code: 'xk', name: 'Kosovo', flag: '/flags/xk.png', supported: false },
+  { code: 'tr', name: 'Turkey', flag: '/flags/tr.png', supported: false },
+].sort((a, b) => {
+  // Supported countries first, then alphabetical
+  if (a.supported && !b.supported) return -1;
+  if (!a.supported && b.supported) return 1;
+  return a.name.localeCompare(b.name);
+});

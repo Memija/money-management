@@ -1,0 +1,115 @@
+.onboarding-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+  top: -100px;
+  right: -100px;
+}
+
+.ambient-glow-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, transparent 70%);
+  bottom: -50px;
+  left: -100px;
+}
+
+/* ─── Progress Stepper ─── */
+.progress-wrapper {
+  width: 100%;
+  max-width: 520px;
+  margin: 1rem auto 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.progress-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.progress-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-step.active .progress-dot {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.progress-step.completed .progress-dot {
+  background: var(--primary);
+  border-color: transparent;
+  color: white;
+}
+
+.progress-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.progress-step.active .progress-label {
+  color: var(--text-main);
+}
+
+.progress-step.completed .progress-label {
+  color: var(--primary);
+}
+
+.progress-connector {
+  width: 48px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 0.25rem;
+  margin-bottom: 1.2rem;
+  border-radius: 1px;
+  transition: background 0.4s;
+}
+
+.progress-connector.completed {
+  background: var(--primary);
+}
