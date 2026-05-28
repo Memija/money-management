@@ -73,10 +73,10 @@
 }
 
 .progress-step.active .progress-dot {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: radial-gradient(circle at 30% 30%, var(--primary), var(--secondary) 150%);
   border-color: transparent;
   color: white;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
 .progress-step.completed .progress-dot {

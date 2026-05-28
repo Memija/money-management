@@ -52,10 +52,8 @@ export interface TranslationStrings {
   importTransactionsTitle: string;
   importTransactionsSubtitle: string; // contains {institution} placeholder
   importPsd2Notice: string;
-  excelFile: string;
-  excelFileDesc: string;
-  csvFile: string;
-  csvFileDesc: string;
+  spreadsheetFile: string;
+  spreadsheetFileDesc: string;
   pdfStatement: string;
   pdfStatementDesc: string;
   copyPaste: string;
@@ -63,7 +61,8 @@ export interface TranslationStrings {
   chooseDifferentFormat: string;
   dropHere: string;
   dragDropFile: string;
-  orClickToBrowse: string; // contains {accepted} placeholder
+  orClickToBrowse: string;
+  acceptedFormats: string;
   pasteDataPlaceholder: string;
   parseTransactions: string;
   processingData: string;
@@ -74,6 +73,13 @@ export interface TranslationStrings {
   amount: string;
   confirmImport: string;
   moreTransactions: string; // contains {count} placeholder
+  reviewTransactions: string;
+  clearAllTransactionsTitle: string;
+  clearAllTransactionsMessage: string;
+  clearAll: string;
+  cancel: string;
+  done: string;
+  noTransactionsLeft: string;
 
   // Import Review
   importSuccessTitle: string;
@@ -118,4 +124,7 @@ export interface TranslationStrings {
   catSavings: string;
   catTransfers: string;
   catOther: string;
+
+  // Countries
+  countries: Record<string, string>;
 }

@@ -7,4 +7,4 @@ export interface ImportedAccount {
   importedAt: string;
 }
 
-export type ImportMethod = 'excel' | 'csv' | 'pdf' | 'paste';
+export type ImportMethod = 'spreadsheet' | 'pdf' | 'paste';

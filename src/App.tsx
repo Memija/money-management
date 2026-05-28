@@ -1,8 +1,8 @@
 import React from 'react';
 import { AnimatePresence } from 'framer-motion';
-import AppHeader from './components/AppHeader';
-import CountrySelector from './components/CountrySelector';
-import InstitutionSelector from './components/InstitutionSelector';
+import AppHeader from './components/layout/AppHeader';
+import CountrySelector from './components/shared/CountrySelector';
+import InstitutionSelector from './components/shared/InstitutionSelector';
 import TransactionImporter from './components/TransactionImporter';
 import ImportReview from './components/ImportReview';
 import Dashboard from './components/Dashboard';

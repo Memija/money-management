@@ -64,6 +64,30 @@ describe('useAppStore', () => {
     expect(state.currentStep).toBe('review');
   });
 
+  it('should replace existing account when re-importing the same institution (no duplicates)', () => {
+    const firstImport: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: [{ id: 'tx1', date: '2026-01-01', description: 'Old', amount: -10, currency: 'EUR', type: 'expense', institution: 'Chase' }],
+      importedAt: new Date().toISOString(),
+    };
+    const secondImport: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: [{ id: 'tx2', date: '2026-01-02', description: 'New', amount: -20, currency: 'EUR', type: 'expense', institution: 'Chase' }],
+      importedAt: new Date().toISOString(),
+    };
+
+    useAppStore.getState().addImportedAccount(firstImport);
+    useAppStore.getState().addImportedAccount(secondImport);
+
+    const state = useAppStore.getState();
+    // Should still be exactly 1 account, not 2
+    expect(state.importedAccounts).toHaveLength(1);
+    // Should have the latest data
+    expect(state.importedAccounts[0].transactions[0].id).toBe('tx2');
+  });
+
   it('should reset import state', () => {
     // Set some non-initial state
     useAppStore.setState({

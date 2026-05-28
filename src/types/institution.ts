@@ -7,7 +7,8 @@ export type InstitutionCategory =
   | 'landesbank'
   | 'brokerage'
   | 'specialized'
-  | 'payment';
+  | 'payment'
+  | 'other';
 
 export interface FinancialInstitution {
   id: string;

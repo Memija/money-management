@@ -205,8 +205,8 @@ h3 {
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 0.85rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   font-size: 0.85rem;
@@ -216,8 +216,9 @@ h3 {
 }
 
 .back-button:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--dropdown-item-hover);
   color: var(--text-main);
+  border-color: var(--glass-border);
 }
 
 /* Info & Onboarding */
@@ -262,9 +263,9 @@ h3 {
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.25rem;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(99, 102, 241, 0.15));
+  background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
   color: var(--primary);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--card-border);
 }
 
 .onboarding-title {
