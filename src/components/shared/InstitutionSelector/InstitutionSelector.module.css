@@ -125,6 +125,12 @@
   --active-count-bg: rgba(251, 146, 60, 0.2);
 }
 
+.category-tag.active[data-category="other"] {
+  --active-color: #9ca3af;
+  --active-bg: rgba(156, 163, 175, 0.12);
+  --active-count-bg: rgba(156, 163, 175, 0.2);
+}
+
 .category-tag svg {
   flex-shrink: 0;
   opacity: 0.7;
@@ -245,6 +251,11 @@
   color: #fb923c;
 }
 
+.institution-type-badge[data-category="other"] {
+  background: rgba(156, 163, 175, 0.12);
+  color: #9ca3af;
+}
+
 .institution-count {
   font-size: 0.75rem;
   color: var(--text-dim);
@@ -280,6 +291,17 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.institution-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.institution-item-icon.has-logo {
+  background: transparent;
 }
 
 /* Category-based item icon colors */
@@ -326,6 +348,11 @@
 .institution-item-icon[data-category="payment"] {
   background: rgba(251, 146, 60, 0.1);
   color: #fb923c;
+}
+
+.institution-item-icon[data-category="other"] {
+  background: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
 }
 
 .institution-name {

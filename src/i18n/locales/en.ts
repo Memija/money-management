@@ -43,7 +43,7 @@ export const en: TranslationStrings = {
   importTransactionsTitle: 'Import Transactions',
   importTransactionsSubtitle: 'Import your transaction data from {institution}.',
   importPsd2Notice:
-    "Since we are not a registered PSD2 provider, automatic import is not available. Please export your transactions from your bank's online portal and upload them here.",
+    "Connecting directly to your bank requires strict, costly regulatory licenses. Because this is an independently developed app, obtaining them simply isn't financially feasible for us. Instead, you can easily add your transactions by downloading them from your bank's online portal and uploading the file here.",
   spreadsheetFile: 'Excel / CSV File',
   spreadsheetFileDesc: 'Upload .xlsx, .xls or .csv file',
   pdfStatement: 'PDF Statement',
@@ -73,6 +73,10 @@ export const en: TranslationStrings = {
   cancel: 'Cancel',
   done: 'Done',
   noTransactionsLeft: 'No transactions left.',
+
+  filterDatePlaceholder: "Filter Date...",
+  filterPlaceholder: "Filter...",
+  selectDatePlaceholder: "Select date...",
 
   importSuccessTitle: 'Import Successful!',
   importSuccessSubtitle:
@@ -158,5 +162,16 @@ export const en: TranslationStrings = {
     al: "Albania",
     xk: "Kosovo",
     tr: "Turkey",
+  },
+  holidays: {
+    newYear: "New Year's Day",
+    laborDay: "Labor Day",
+    germanUnity: "German Unity Day",
+    christmas1: "Christmas Day",
+    christmas2: "Boxing Day",
+    goodFriday: "Good Friday",
+    easterMonday: "Easter Monday",
+    ascensionDay: "Ascension Day",
+    whitMonday: "Whit Monday",
   },
 };

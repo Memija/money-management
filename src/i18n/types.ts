@@ -80,6 +80,9 @@ export interface TranslationStrings {
   cancel: string;
   done: string;
   noTransactionsLeft: string;
+  filterDatePlaceholder: string;
+  filterPlaceholder: string;
+  selectDatePlaceholder: string;
 
   // Import Review
   importSuccessTitle: string;
@@ -127,4 +130,7 @@ export interface TranslationStrings {
 
   // Countries
   countries: Record<string, string>;
+
+  // Holidays
+  holidays: Record<string, string>;
 }

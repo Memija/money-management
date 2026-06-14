@@ -41,10 +41,11 @@ const categoryIcons: Record<InstitutionCategory, React.ReactNode> = {
   brokerage: <TrendingUp size={14} />,
   specialized: <Leaf size={14} />,
   payment: <Wallet size={14} />,
+  other: <Building2 size={14} />,
 };
 
 /** Map InstitutionCategory to translation key */
-const categoryTranslationKeys: Record<InstitutionCategory, 'catTraditional' | 'catSparkasse' | 'catVolksbank' | 'catDirect' | 'catNeobank' | 'catLandesbank' | 'catBrokerage' | 'catSpecialized' | 'catPayment'> = {
+const categoryTranslationKeys: Record<InstitutionCategory, 'catTraditional' | 'catSparkasse' | 'catVolksbank' | 'catDirect' | 'catNeobank' | 'catLandesbank' | 'catBrokerage' | 'catSpecialized' | 'catPayment' | 'catOther'> = {
   traditional: 'catTraditional',
   sparkasse: 'catSparkasse',
   volksbank: 'catVolksbank',
@@ -54,6 +55,7 @@ const categoryTranslationKeys: Record<InstitutionCategory, 'catTraditional' | 'c
   brokerage: 'catBrokerage',
   specialized: 'catSpecialized',
   payment: 'catPayment',
+  other: 'catOther',
 };
 
 
@@ -214,10 +216,14 @@ const InstitutionSelector: React.FC = () => {
                 >
                   <div className={styles['institution-item-left']}>
                     <div
-                      className={styles['institution-item-icon']}
+                      className={`${styles['institution-item-icon']} ${inst.logo ? styles['has-logo'] : ''}`}
                       data-category={inst.category}
                     >
-                      {typeIcons[inst.type]}
+                      {inst.logo ? (
+                        <img src={inst.logo} alt="" className={styles['institution-logo']} />
+                      ) : (
+                        typeIcons[inst.type]
+                      )}
                     </div>
                     <div>
                       <span className={styles['institution-name']}>{inst.name}</span>

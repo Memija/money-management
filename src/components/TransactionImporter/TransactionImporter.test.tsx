@@ -107,7 +107,7 @@ describe('TransactionImporter', () => {
 
   it('renders initial methods correctly', () => {
     render(<TransactionImporter />);
-    
+
     expect(screen.getByText('Excel / CSV')).toBeInTheDocument();
     expect(screen.getByText('PDF')).toBeInTheDocument();
     expect(screen.getByText('Paste')).toBeInTheDocument();
@@ -115,49 +115,50 @@ describe('TransactionImporter', () => {
 
   it('navigates back to institution selection', () => {
     render(<TransactionImporter />);
-    
+
     fireEvent.click(screen.getByText('Back'));
     expect(mockSetStep).toHaveBeenCalledWith('institution');
   });
 
   it('shows paste area when copy-paste method is selected', () => {
     render(<TransactionImporter />);
-    
+
     fireEvent.click(screen.getByText('Paste'));
     expect(screen.getByPlaceholderText('Paste here')).toBeInTheDocument();
   });
 
   it('parses pasted data correctly', async () => {
     render(<TransactionImporter />);
-    
+
     fireEvent.click(screen.getByText('Paste'));
     const textarea = screen.getByPlaceholderText('Paste here');
-    
+
     // Header + one row
     const csvData = "Date,Description,Amount\n2024-01-01,Lunch,-15.50";
     fireEvent.change(textarea, { target: { value: csvData } });
-    
+
     fireEvent.click(screen.getByText('Parse'));
-    
+
+    // Transaction details are now shown in a modal; the main view shows the count summary
     await waitFor(() => {
-      expect(screen.getByText('Lunch')).toBeInTheDocument();
-      expect(screen.getByText(/15,50/)).toBeInTheDocument();
+      expect(screen.getByText('1')).toBeInTheDocument();
+      expect(screen.getByText(/transactions found/)).toBeInTheDocument();
     });
   });
 
   it('calls addImportedAccount on confirm', async () => {
     render(<TransactionImporter />);
-    
+
     // Select paste and parse some data
     fireEvent.click(screen.getByText('Paste'));
-    fireEvent.change(screen.getByPlaceholderText('Paste here'), { 
-      target: { value: "Date,Description,Amount\n2024-01-01,Test,100" } 
+    fireEvent.change(screen.getByPlaceholderText('Paste here'), {
+      target: { value: "Date,Description,Amount\n2024-01-01,Test,100" }
     });
     fireEvent.click(screen.getByText('Parse'));
-    
+
     await waitFor(() => screen.getByText('Confirm'));
     fireEvent.click(screen.getByText('Confirm'));
-    
+
     expect(mockAddImportedAccount).toHaveBeenCalledWith(expect.objectContaining({
       institutionName: 'Bank A',
       transactions: expect.arrayContaining([
@@ -168,13 +169,13 @@ describe('TransactionImporter', () => {
 
   it('shows error if no transactions found in pasted data', async () => {
     render(<TransactionImporter />);
-    
+
     fireEvent.click(screen.getByText('Paste'));
-    fireEvent.change(screen.getByPlaceholderText('Paste here'), { 
-      target: { value: "Invalid Data" } 
+    fireEvent.change(screen.getByPlaceholderText('Paste here'), {
+      target: { value: "Invalid Data" }
     });
     fireEvent.click(screen.getByText('Parse'));
-    
+
     await waitFor(() => {
       expect(screen.getByText(/No transactions could be parsed\./)).toBeInTheDocument();
     });
@@ -182,16 +183,23 @@ describe('TransactionImporter', () => {
 
   it('allows clearing transactions and going back to method selection', async () => {
     render(<TransactionImporter />);
-    
+
     fireEvent.click(screen.getByText('Paste'));
-    fireEvent.change(screen.getByPlaceholderText('Paste here'), { 
-      target: { value: "Date,Description,Amount\n2024-01-01,Test,100" } 
+    fireEvent.change(screen.getByPlaceholderText('Paste here'), {
+      target: { value: "Date,Description,Amount\n2024-01-01,Test,100" }
     });
     fireEvent.click(screen.getByText('Parse'));
-    
+
+    // Click Clear — this now opens a DeleteConfirmationModal
     await waitFor(() => screen.getByText('Clear'));
     fireEvent.click(screen.getByText('Clear'));
-    
-    expect(screen.getByPlaceholderText('Paste here')).toHaveValue('');
+
+    // Confirm in the deletion modal (button text matches confirmText='Delete')
+    await waitFor(() => screen.getByText('Delete'));
+    fireEvent.click(screen.getByText('Delete'));
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Paste here')).toHaveValue('');
+    });
   });
 });

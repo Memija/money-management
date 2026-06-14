@@ -43,7 +43,7 @@ export const sr: TranslationStrings = {
   importTransactionsTitle: 'Увоз трансакција',
   importTransactionsSubtitle: 'Увезите податке о трансакцијама из {institution}.',
   importPsd2Notice:
-    'Пошто нисмо регистровани PSD2 пружалац, аутоматски увоз није доступан. Молимо извезите трансакције са онлајн портала ваше банке и отпремите их овде.',
+    'Директно повезивање са вашом банком захтева строге и скупе регулаторне лиценце. С обзиром на то да је ово независно развијена апликација, њихово добијање једноставно није финансијски изводљиво за нас. Уместо тога, лако можете додати своје трансакције тако што ћете их преузети са онлајн портала ваше банке и овде отпремити фајл.',
   spreadsheetFile: 'Excel / CSV датотека',
   spreadsheetFileDesc: 'Отпремите .xlsx, .xls или .csv датотеку',
   pdfStatement: 'PDF извод',
@@ -73,6 +73,10 @@ export const sr: TranslationStrings = {
   cancel: 'Откажи',
   done: 'Завршено',
   noTransactionsLeft: 'Нема преосталих трансакција.',
+
+  filterDatePlaceholder: "Филтрирај датум...",
+  filterPlaceholder: "Филтрирај...",
+  selectDatePlaceholder: "Изабери датум...",
 
   importSuccessTitle: 'Увоз успешан!',
   importSuccessSubtitle:
@@ -158,5 +162,16 @@ export const sr: TranslationStrings = {
     al: "Албанија",
     xk: "Косово",
     tr: "Турска",
+  },
+  holidays: {
+    newYear: "Нова година",
+    laborDay: "Празник рада",
+    germanUnity: "Дан немачког јединства",
+    christmas1: "Божић",
+    christmas2: "Божић (2. дан)",
+    goodFriday: "Велики петак",
+    easterMonday: "Ускршњи понедељак",
+    ascensionDay: "Спасовдан",
+    whitMonday: "Духовски понедељак",
   },
 };

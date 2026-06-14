@@ -43,7 +43,7 @@ export const pl: TranslationStrings = {
   importTransactionsTitle: 'Importuj transakcje',
   importTransactionsSubtitle: 'Importuj dane transakcji z {institution}.',
   importPsd2Notice:
-    'Ponieważ nie jesteśmy zarejestrowanym dostawcą PSD2, automatyczny import nie jest dostępny. Wyeksportuj transakcje z portalu internetowego swojego banku i prześlij je tutaj.',
+    'Bezpośrednie połączenie z Twoim bankiem wymaga rygorystycznych, kosztownych licencji regulacyjnych. Ponieważ jest to niezależnie rozwijana aplikacja, ich uzyskanie jest dla nas po prostu niemożliwe z powodów finansowych. Zamiast tego możesz łatwo dodać swoje transakcje, pobierając je z portalu internetowego swojego banku i przesyłając plik tutaj.',
   spreadsheetFile: 'Plik Excel / CSV',
   spreadsheetFileDesc: 'Prześlij plik .xlsx, .xls lub .csv',
   pdfStatement: 'Wyciąg PDF',
@@ -73,6 +73,10 @@ export const pl: TranslationStrings = {
   cancel: 'Anuluj',
   done: 'Gotowe',
   noTransactionsLeft: 'Brak transakcji.',
+
+  filterDatePlaceholder: "Filtruj datę...",
+  filterPlaceholder: "Filtruj...",
+  selectDatePlaceholder: "Wybierz datę...",
 
   importSuccessTitle: 'Import zakończony sukcesem!',
   importSuccessSubtitle:
@@ -158,5 +162,16 @@ export const pl: TranslationStrings = {
     al: "Albania",
     xk: "Kosowo",
     tr: "Turcja",
+  },
+  holidays: {
+    newYear: "Nowy Rok",
+    laborDay: "Święto Pracy",
+    germanUnity: "Dzień Jedności Niemiec",
+    christmas1: "Boże Narodzenie (1. dzień)",
+    christmas2: "Boże Narodzenie (2. dzień)",
+    goodFriday: "Wielki Piątek",
+    easterMonday: "Poniedziałek Wielkanocny",
+    ascensionDay: "Wniebowstąpienie Pańskie",
+    whitMonday: "Zesłanie Ducha Świętego",
   },
 };

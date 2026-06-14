@@ -181,3 +181,9 @@
 .flag-icon-dropdown {
   margin-left: 0;
 }
+
+@media (max-width: 640px) {
+  .app-header-logo-text {
+    display: none;
+  }
+}

@@ -43,7 +43,7 @@ export const id: TranslationStrings = {
   importTransactionsTitle: 'Impor Transaksi',
   importTransactionsSubtitle: 'Impor data transaksi Anda dari {institution}.',
   importPsd2Notice:
-    'Karena kami bukan penyedia PSD2 terdaftar, impor otomatis tidak tersedia. Silakan ekspor transaksi dari portal online bank Anda dan unggah di sini.',
+    'Menghubungkan langsung ke bank Anda memerlukan lisensi peraturan yang ketat dan mahal. Karena ini adalah aplikasi yang dikembangkan secara independen, mendapatkannya tidak memungkinkan bagi kami secara finansial. Sebagai gantinya, Anda dapat dengan mudah menambahkan transaksi dengan mengunduhnya dari portal online bank Anda dan mengunggah filenya di sini.',
   spreadsheetFile: 'File Excel / CSV',
   spreadsheetFileDesc: 'Unggah file .xlsx, .xls atau .csv',
   pdfStatement: 'Laporan PDF',
@@ -73,6 +73,10 @@ export const id: TranslationStrings = {
   cancel: 'Batal',
   done: 'Selesai',
   noTransactionsLeft: 'Tidak ada transaksi tersisa.',
+
+  filterDatePlaceholder: "Filter Tanggal...",
+  filterPlaceholder: "Filter...",
+  selectDatePlaceholder: "Pilih tanggal...",
 
   importSuccessTitle: 'Impor Berhasil!',
   importSuccessSubtitle:
@@ -158,5 +162,16 @@ export const id: TranslationStrings = {
     al: "Albania",
     xk: "Kosovo",
     tr: "Turki",
+  },
+  holidays: {
+    newYear: "Tahun Baru",
+    laborDay: "Hari Buruh",
+    germanUnity: "Hari Persatuan Jerman",
+    christmas1: "Hari Natal",
+    christmas2: "Hari Tinju (Boxing Day)",
+    goodFriday: "Jumat Agung",
+    easterMonday: "Senin Paskah",
+    ascensionDay: "Kenaikan Isa Almasih",
+    whitMonday: "Senin Pentakosta",
   },
 };

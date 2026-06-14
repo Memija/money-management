@@ -1,0 +1,30 @@
+.cancelButton {
+  margin-top: 0;
+  width: auto;
+}
+
+.deleteButton {
+  margin-top: 0;
+  width: auto;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  box-shadow: 0 4px 24px rgba(244, 63, 94, 0.25);
+}
+
+.contentContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.iconContainer {
+  color: #f43f5e;
+  background: rgba(244, 63, 94, 0.1);
+  padding: 0.75rem;
+  border-radius: 50%;
+}
+
+.messageText {
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 0.25rem;
+}

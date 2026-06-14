@@ -1,0 +1,325 @@
+.import-methods-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.import-method-card {
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.import-method-card:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.04);
+  transform: translateY(-2px);
+}
+
+.import-method-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(99, 102, 241, 0.1));
+  color: var(--primary);
+}
+
+.import-method-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.import-method-desc {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 0.15rem;
+}
+
+@media (max-width: 480px) {
+  .import-methods-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Drop Zone ─── */
+.import-upload-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.drop-zone {
+  padding: 3rem 2rem;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--primary);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.drop-zone-icon {
+  color: var(--text-dim);
+}
+
+.drop-zone.drag-over .drop-zone-icon {
+  color: var(--primary);
+}
+
+.drop-zone-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.drop-zone-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.file-name-label {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ─── Paste Area ─── */
+.paste-area-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.paste-textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.paste-textarea:focus {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.paste-textarea::placeholder {
+  color: var(--text-dim);
+}
+
+/* ─── Import Feedback ─── */
+.import-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(244, 63, 94, 0.08);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+  border-radius: var(--radius-sm);
+  color: #fb7185;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
+
+.import-error svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.import-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Preview Section ─── */
+.import-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.import-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.import-preview-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+.success-icon {
+  color: #34d399;
+}
+
+.clear-button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+  border-radius: 6px;
+  color: #fb7185;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-button:hover {
+  background: rgba(244, 63, 94, 0.2);
+}
+
+.preview-table-wrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.preview-table th {
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.preview-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+}
+
+.preview-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.preview-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.preview-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.date-cell {
+  white-space: nowrap;
+  color: var(--text-dim) !important;
+}
+
+.desc-cell {
+  width: 100%;
+  max-width: 0;
+  /* needed for truncate */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.amount-cell {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.positive {
+  color: #34d399 !important;
+}
+
+.negative {
+  color: var(--text-main);
+}
+
+.more-rows {
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid var(--card-border);
+}
+
+.hidden {
+  display: none;
+}
+
+.back-button-aligned {
+  align-self: flex-start;
+}
+
+.drop-zone-formats {
+  margin-top: 0.25rem;
+}
+
+.action-buttons-container {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.no-margin-top {
+  margin-top: 0 !important;
+}

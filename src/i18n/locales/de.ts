@@ -43,7 +43,7 @@ export const de: TranslationStrings = {
   importTransactionsTitle: 'Transaktionen importieren',
   importTransactionsSubtitle: 'Importieren Sie Ihre Transaktionsdaten von {institution}.',
   importPsd2Notice:
-    'Da wir kein registrierter PSD2-Anbieter sind, ist der automatische Import nicht verfügbar. Bitte exportieren Sie Ihre Transaktionen aus dem Online-Portal Ihrer Bank und laden Sie sie hier hoch.',
+    'Eine direkte Verbindung zu Ihrer Bank erfordert strenge, teure behördliche Lizenzen. Da es sich um eine unabhängig entwickelte App handelt, ist die Beschaffung dieser Lizenzen für uns finanziell schlichtweg nicht machbar. Stattdessen können Sie Ihre Transaktionen ganz einfach hinzufügen, indem Sie diese aus dem Online-Portal Ihrer Bank herunterladen und die Datei hier hochladen.',
   spreadsheetFile: 'Excel / CSV-Datei',
   spreadsheetFileDesc: '.xlsx, .xls oder .csv Datei hochladen',
   pdfStatement: 'PDF-Kontoauszug',
@@ -73,6 +73,10 @@ export const de: TranslationStrings = {
   cancel: 'Abbrechen',
   done: 'Fertig',
   noTransactionsLeft: 'Keine Transaktionen mehr vorhanden.',
+
+  filterDatePlaceholder: "Datum filtern...",
+  filterPlaceholder: "Filtern...",
+  selectDatePlaceholder: "Datum auswählen...",
 
   importSuccessTitle: 'Import erfolgreich!',
   importSuccessSubtitle:
@@ -158,5 +162,16 @@ export const de: TranslationStrings = {
     al: "Albanien",
     xk: "Kosovo",
     tr: "Türkei",
+  },
+  holidays: {
+    newYear: "Neujahr",
+    laborDay: "Tag der Arbeit",
+    germanUnity: "Tag der Deutschen Einheit",
+    christmas1: "1. Weihnachtstag",
+    christmas2: "2. Weihnachtstag",
+    goodFriday: "Karfreitag",
+    easterMonday: "Ostermontag",
+    ascensionDay: "Christi Himmelfahrt",
+    whitMonday: "Pfingstmontag",
   },
 };
