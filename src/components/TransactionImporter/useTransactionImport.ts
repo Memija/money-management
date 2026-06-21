@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { ImportMethod, Transaction } from '../../types';
+import type { TranslationStrings } from '../../i18n/types';
 import * as XLSX from 'xlsx';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import {
@@ -8,7 +9,7 @@ import {
   parsePdfText,
 } from '../../utils/transaction-parsers';
 
-export const useTransactionImport = (institutionName: string, method: ImportMethod | null) => {
+export const useTransactionImport = (institutionName: string, method: ImportMethod | null, t?: TranslationStrings) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +31,7 @@ export const useTransactionImport = (institutionName: string, method: ImportMeth
             const sheet = workbook.Sheets[sheetName];
             const rows: string[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
             const txs = rowsToTransactions(rows, institutionName);
-            if (txs.length === 0) throw new Error('No transactions found in the file.');
+            if (txs.length === 0) throw new Error(t?.errorNoTransactionsInFile || 'No transactions found in the file.');
             setTransactions(txs);
           } else {
             // Read as binary buffer so we can detect and handle encoding ourselves
@@ -56,7 +57,7 @@ export const useTransactionImport = (institutionName: string, method: ImportMeth
               // Strip trailing \r (CRLF) and split into cells, unquoting each
               .map((line) => line.replace(/\r$/, '').split(sep).map((cell) => cell.replace(/^"|"$/g, '').trim()));
             const txs = rowsToTransactions(rows, institutionName);
-            if (txs.length === 0) throw new Error('No transactions found in the CSV.');
+            if (txs.length === 0) throw new Error(t?.errorNoTransactionsInCSV || 'No transactions found in the CSV.');
             setTransactions(txs);
           }
         } else if (method === 'pdf' || file.name.match(/\.pdf$/i)) {
@@ -78,19 +79,19 @@ export const useTransactionImport = (institutionName: string, method: ImportMeth
           const txLines = parsePdfText(fullText, institutionName);
           if (txLines.length === 0) {
             throw new Error(
-              'Could not auto-detect transactions in this PDF. Try exporting as CSV or Excel from your bank portal instead.'
+              t?.errorParsePdf || 'Could not auto-detect transactions in this PDF. Try exporting as CSV or Excel from your bank portal instead.'
             );
           }
           setTransactions(txLines);
         }
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to process file.');
+        setError(err instanceof Error ? err.message : t?.errorProcessFile || 'Failed to process file.');
         setTransactions([]);
       } finally {
         setLoading(false);
       }
     },
-    [method, institutionName]
+    [method, institutionName, t]
   );
 
   const handlePaste = () => {
@@ -106,17 +107,20 @@ export const useTransactionImport = (institutionName: string, method: ImportMeth
 
       // Strategy 2: Structured CSV/TSV fallback (tab, semicolon, or comma separated)
       const lines = pasteText.trim().split('\n');
+      if (lines.length < 2) {
+        throw new Error(t?.errorParsePasteOneRow || 'Only 1 row detected. Please make sure to include a header row (e.g. "Date, Description, Amount") and at least one transaction row with a valid date format like DD.MM.YYYY.');
+      }
       const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
       const rows = lines.map((l) => l.split(sep).map((c) => c.replace(/^"|"$/g, '').trim()));
-      const csvTxs = rowsToTransactions(rows, institutionName);
+      const csvTxs = rowsToTransactions(rows, institutionName, t);
       if (csvTxs.length === 0) {
         throw new Error(
-          'No transactions could be parsed. Please try pasting directly from your bank\'s transaction list, or use a CSV/Excel export instead.'
+          t?.errorParsePaste || 'No transactions could be parsed. Please try pasting directly from your bank\'s transaction list, or use a CSV/Excel export instead.'
         );
       }
       setTransactions(csvTxs);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to parse pasted data.');
+      setError(err instanceof Error ? err.message : t?.errorParsePastedData || 'Failed to parse pasted data.');
     } finally {
       setLoading(false);
     }
@@ -124,6 +128,10 @@ export const useTransactionImport = (institutionName: string, method: ImportMeth
 
   const handleRemoveTransaction = useCallback((id: string) => {
     setTransactions(prev => prev.filter(tx => tx.id !== id));
+  }, []);
+
+  const handleUpdateTransaction = useCallback((id: string, updates: Partial<Transaction>) => {
+    setTransactions(prev => prev.map(tx => tx.id === id ? { ...tx, ...updates } : tx));
   }, []);
 
   const handleClearAll = useCallback(() => {
@@ -144,6 +152,7 @@ export const useTransactionImport = (institutionName: string, method: ImportMeth
     handleFileChange,
     handlePaste,
     handleRemoveTransaction,
+    handleUpdateTransaction,
     handleClearAll
   };
 };

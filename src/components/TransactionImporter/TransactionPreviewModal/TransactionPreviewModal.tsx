@@ -13,6 +13,7 @@ interface TransactionPreviewModalProps {
   onClose: () => void;
   transactions: Transaction[];
   onRemoveTransaction: (id: string) => void;
+  onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void;
 }
 
 type SortColumn = 'date' | 'description' | 'amount';
@@ -22,6 +23,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   onClose,
   transactions,
   onRemoveTransaction,
+  onUpdateTransaction,
 }) => {
   const t = useLanguageStore((s) => s.t);
   const { formatCurrency, formatDate } = useFormatters();
@@ -89,21 +91,65 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   const rowContent = (index: number, tx: Transaction) => (
     <div className={`${styles['tx-row']} ${index % 2 === 0 ? styles['tx-row-even'] : ''}`}>
       <div className={styles['tx-date']}>
-        {formatDate(tx.date)}
+        {onUpdateTransaction ? (
+          <DatePicker
+            className={styles['tx-date-picker-container']}
+            value={tx.date}
+            onChange={(date) => onUpdateTransaction(tx.id, { date })}
+          />
+        ) : (
+          formatDate(tx.date)
+        )}
       </div>
-      <div className={styles['tx-desc']} title={tx.description}>{tx.description}</div>
+      <div className={styles['tx-desc']} title={tx.description}>
+        {onUpdateTransaction ? (
+          <input
+            type="text"
+            aria-label={t.description || 'Description'}
+            className={styles['tx-inline-input']}
+            value={tx.description}
+            onChange={(e) => onUpdateTransaction(tx.id, { description: e.target.value })}
+            title={tx.description}
+          />
+        ) : (
+          tx.description
+        )}
+      </div>
       <div className={`${styles['tx-amount']} ${tx.type === 'income' ? styles.positive : styles.negative}`}>
-        {tx.type === 'income' ? '+' : ''}
-        {formatCurrency(tx.amount)}
+        {onUpdateTransaction ? (
+          <input
+            type="number"
+            step="0.01"
+            aria-label={t.amount || 'Amount'}
+            className={`${styles['tx-inline-input']} ${styles['tx-amount-input']}`}
+            value={tx.amount === 0 ? '' : tx.amount}
+            onChange={(e) => {
+              const val = e.target.value;
+              const num = val === '' ? 0 : parseFloat(val);
+              onUpdateTransaction(tx.id, {
+                amount: isNaN(num) ? 0 : num,
+                type: (isNaN(num) ? 0 : num) >= 0 ? 'income' : 'expense'
+              });
+            }}
+            title={formatCurrency(tx.amount)}
+          />
+        ) : (
+          <>
+            {tx.type === 'income' ? '+' : ''}
+            {formatCurrency(tx.amount)}
+          </>
+        )}
       </div>
-      <button
-        className={styles['tx-remove-btn']}
-        onClick={() => onRemoveTransaction(tx.id)}
-        aria-label="Remove transaction"
-        title="Remove transaction"
-      >
-        <Trash2 size={16} />
-      </button>
+      <div className={styles['tx-actions']}>
+        <button
+          className={styles['tx-remove-btn']}
+          onClick={() => onRemoveTransaction(tx.id)}
+          aria-label={t.removeTransaction}
+          title={t.removeTransaction}
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
     </div>
   );
 
@@ -143,6 +189,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 {renderSortIcon('description')}
               </div>
               <input
+                id="filter-desc"
+                name="filter-desc"
                 type="text"
                 className={styles['filter-input']}
                 placeholder={t.filterPlaceholder}
@@ -158,6 +206,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 {renderSortIcon('amount')}
               </div>
               <input
+                id="filter-amount"
+                name="filter-amount"
                 type="text"
                 className={`${styles['filter-input']} ${styles['text-right']}`}
                 placeholder={t.filterPlaceholder}

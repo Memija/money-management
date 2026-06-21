@@ -106,6 +106,7 @@ const CountrySelector: React.FC = () => {
                   onChange={(e) => setSearch(e.target.value)}
                   className={styles['country-search-input']}
                   id="country-search"
+                  name="country-search"
                   autoFocus
                 />
               </div>

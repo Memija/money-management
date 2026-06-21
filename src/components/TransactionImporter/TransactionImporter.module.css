@@ -136,19 +136,28 @@
 .import-error {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: rgba(244, 63, 94, 0.08);
-  border: 1px solid rgba(244, 63, 94, 0.2);
-  border-radius: var(--radius-sm);
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  border-radius: var(--radius-md);
   color: #fb7185;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: normal;
   margin-top: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.08);
 }
 
 .import-error svg {
   flex-shrink: 0;
-  margin-top: 2px;
+  color: #f43f5e;
+  margin-top: 0.1rem;
+}
+
+.import-error span {
+  white-space: pre-wrap;
+  line-height: 1.5;
 }
 
 .import-loading {

@@ -63,6 +63,16 @@ export interface TranslationStrings {
   dragDropFile: string;
   orClickToBrowse: string;
   acceptedFormats: string;
+  errorParsePaste: string;
+  errorParsePasteOneRow: string;
+  errorParsePasteInvalidDate: string;
+  errorParsePasteFailed: string;
+  errorParsePasteMore: string;
+  errorParsePdf: string;
+  errorProcessFile: string;
+  errorParsePastedData: string;
+  errorNoTransactionsInFile: string;
+  errorNoTransactionsInCSV: string;
   pasteDataPlaceholder: string;
   parseTransactions: string;
   processingData: string;
@@ -78,11 +88,15 @@ export interface TranslationStrings {
   clearAllTransactionsMessage: string;
   clearAll: string;
   cancel: string;
+  removeTransaction: string;
+  selectDatePlaceholder: string;
+  clearDate: string;
+  previousMonth: string;
+  nextMonth: string;
   done: string;
   noTransactionsLeft: string;
   filterDatePlaceholder: string;
   filterPlaceholder: string;
-  selectDatePlaceholder: string;
 
   // Import Review
   importSuccessTitle: string;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateId, inferType, parseAmount, parseDate } from '../helpers';
+import { generateId, inferType, parseAmount, parseCurrency, parseDate, isValidDateRaw } from '../helpers';
 
 describe('helpers', () => {
   describe('generateId', () => {
@@ -81,6 +81,35 @@ describe('helpers', () => {
     });
   });
 
+  describe('parseCurrency', () => {
+    it('returns EUR as default when input is undefined or empty', () => {
+      expect(parseCurrency(undefined)).toBe('EUR');
+      expect(parseCurrency('')).toBe('EUR');
+    });
+
+    it('returns EUR for the € symbol', () => {
+      expect(parseCurrency('€')).toBe('EUR');
+    });
+
+    it('returns USD for the $ symbol', () => {
+      expect(parseCurrency('$')).toBe('USD');
+    });
+
+    it('returns GBP for the £ symbol', () => {
+      expect(parseCurrency('£')).toBe('GBP');
+    });
+
+    it('returns PLN for the ZŁ symbol', () => {
+      expect(parseCurrency('ZŁ')).toBe('PLN');
+      expect(parseCurrency('zł')).toBe('PLN');
+    });
+
+    it('returns the uppercase input if it is not a known symbol', () => {
+      expect(parseCurrency('chf')).toBe('CHF');
+      expect(parseCurrency('YEN')).toBe('YEN');
+    });
+  });
+
   describe('parseDate', () => {
     it('returns current date string when input is empty', () => {
       const today = new Date().toISOString().split('T')[0];
@@ -114,6 +143,39 @@ describe('helpers', () => {
     it('returns current date string as fallback for unrecognised format', () => {
       const today = new Date().toISOString().split('T')[0];
       expect(parseDate('Yesterday')).toBe(today);
+    });
+  });
+
+  describe('isValidDateRaw', () => {
+    it('returns false for empty, null, or undefined values', () => {
+      expect(isValidDateRaw('')).toBe(false);
+      expect(isValidDateRaw(null as unknown as string)).toBe(false);
+      expect(isValidDateRaw(undefined as unknown as string)).toBe(false);
+    });
+
+    it('returns true for valid German format (DD.MM.YYYY or DD.MM.YY)', () => {
+      expect(isValidDateRaw('31.12.2023')).toBe(true);
+      expect(isValidDateRaw('1.2.2023')).toBe(true);
+      expect(isValidDateRaw('01.02.23')).toBe(true);
+    });
+
+    it('returns true for valid ISO format (YYYY-MM-DD)', () => {
+      expect(isValidDateRaw('2023-12-31')).toBe(true);
+      expect(isValidDateRaw('2023-01-01')).toBe(true);
+    });
+
+    it('returns true for valid US format (MM/DD/YYYY or MM/DD/YY)', () => {
+      expect(isValidDateRaw('12/31/2023')).toBe(true);
+      expect(isValidDateRaw('1/2/2023')).toBe(true);
+      expect(isValidDateRaw('12/31/23')).toBe(true);
+    });
+
+    it('returns false for invalid formats or non-date strings', () => {
+      expect(isValidDateRaw('Yesterday')).toBe(false);
+      expect(isValidDateRaw('2023.12.31')).toBe(false);
+      expect(isValidDateRaw('31-12-2023')).toBe(false);
+      expect(isValidDateRaw('abc')).toBe(false);
+      expect(isValidDateRaw('123')).toBe(false);
     });
   });
 });

@@ -149,6 +149,7 @@ const InstitutionSelector: React.FC = () => {
           onChange={(e) => setSearch(e.target.value)}
           className={styles['institution-search-input']}
           id="institution-search"
+          name="institution-search"
         />
       </div>
 

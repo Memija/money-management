@@ -1,61 +1,18 @@
 import type { Transaction } from '../../types';
 import { generateId, inferType, parseAmount, parseDate } from './helpers';
+import { ALL_SKIP_PATTERNS, ALL_TX_TYPES, ALL_ICON_PREFIX_RE, ALL_PROJECTED_DATE_RE } from './parser-i18n';
 
-// Noise lines to skip outright
-const SKIP_PATTERNS = [
-  /^\(Umsatzdetails öffnen\)$/i,
-  /^Menü öffnen$/i,
-  /^Symbol$/i,
-  /^Zahlungsverkehrspartner$/i,
-  /^Vorausichtliche Buchung$/i,
-  /^Umsatzart$/i,
-  /^Betrag$/i,
-  /^Mehr Optionen$/i,
-  /^Umsätze (für heute|von gestern|vom)/i,
-  /^Der Tagessaldo beträgt/i,
-  /^Umsätze für/i,
-  /^SymbolZahlungsverkehrspartnerVoraus/i,
-  // Pending section headers: "1 Umsatz vorgemerkt ..." and its combined variant
-  /^\d+ Ums[aä]tz/i,
-  /^Nicht im Saldo enthalten/i,
-  /^Umsatzübersicht$/i,
-  /^Geld überweisen$/i,
-  /^Wechseln$/i,
-  /^Ihr Kontostand beträgt$/i,
-  /^Details des Saldos anzeigen$/i,
-  /^Ihr Konto weist aktuell einen negativen Kontostand auf/i,
-  /^Dafür bezahlen Sie Zinsen/i,
-  /^Planen Sie, diesen Saldo/i,
-  /^Dann lassen Sie sich bei uns/i,
-  /^Filter$/i,
-  /^Suchen$/i,
-  /^Buchungsdetails erweitern$/i,
-  /^PDF\/CSV$/i,
-  /^PremiumKonto/i,
-  /^DE\d{2}\s\d{4}/i, // spaced IBAN
-  /^DE\d{20}/i, // continuous IBAN
-  /^\d{2}\.\d{2}\.\d{4},\s*\d{2}:\d{2}\s*Uhr/i, // Date + Time line
-];
-
-// Known transaction type keywords
-const TX_TYPES = new Set([
-  'dauerauftrag', 'lastschrift', 'überweisung', 'gutschrift', 'kartenzahlung',
-  'einzahlung', 'auszahlung', 'zinsen', 'entgelt', 'rückbuchung', 'lohnzahlung',
-  'gehalt', 'sepa-überweisung', 'sepa-lastschrift', 'direct debit', 'standing order',
-]);
-
-// Amount pattern: optional leading comma and minus or plus, digits with . or , separators, ends with EUR/€
-const AMOUNT_RE = /^,?([+-]?\d{1,3}(?:[.,]\d{3})*[.,]\d{2})\s*(EUR|€)$/;
+// Amount pattern: optional leading comma and minus or plus, digits with . or , separators, ends with common currency
+const AMOUNT_RE = /^,?([+-]?\d{1,3}(?:[.,]\d{3})*[.,]\d{2})\s*([A-Z]{3}|€|£|\$|zł)$/i;
 // Date header pattern: DD.MM.YYYY — standalone date line (day separator)
 const DATE_HEADER_RE = /^(\d{1,2}\.\d{1,2}\.\d{2,4})$/;
-// Projected booking date line: "Voraussichtliche Buchung: DD.MM.YYYY"
-const PROJECTED_DATE_RE = /Voraussichtliche Buchung:\s*(\d{1,2}\.\d{1,2}\.\d{2,4})/i;
 
 function getCleanLines(rawText: string): string[] {
   return rawText
+    .normalize('NFC')
     .split(/\r?\n/)
-    .map((l) => l.replace(/[\u2212\u2013\u2014]/g, '-').trim())
-    .filter((l) => l.length > 0 && !SKIP_PATTERNS.some((re) => re.test(l)));
+    .map((l) => l.trim().replace(/[\u2212\u2013\u2014]/g, '-').replace(ALL_ICON_PREFIX_RE, '').trim())
+    .filter((l) => l.length > 0 && !ALL_SKIP_PATTERNS.some((re) => re.test(l)));
 }
 
 interface RawTx {
@@ -64,6 +21,7 @@ interface RawTx {
   desc: string;
   type: string;
   amount: number;
+  currency: string;
 }
 
 /**
@@ -84,27 +42,34 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
   let currentDate = new Date().toISOString().split('T')[0];
   const rawTxs: RawTx[] = [];
 
-  let buf: { date: string; partner: string; desc: string; type: string; projDate: string | null } = {
-    date: currentDate, partner: '', desc: '', type: '', projDate: null,
+  let buf: { date: string; partner: string; desc: string; type: string; projDate: string | null, currency: string } = {
+    date: currentDate, partner: '', desc: '', type: '', projDate: null, currency: 'EUR'
   };
 
-  const pushBuf = (amount: number) => {
-    if (!buf.partner && !buf.desc && !buf.type) return;
+  const pushBuf = (amount: number, currency: string) => {
+    if (!buf.partner && !buf.desc && !buf.type) {
+      return;
+    }
     rawTxs.push({
       date: buf.projDate ?? buf.date,
       partner: buf.partner,
       desc: buf.desc,
       type: buf.type,
       amount,
+      currency,
     });
-    buf = { date: buf.date, partner: '', desc: '', type: '', projDate: null };
+    buf = { date: buf.date, partner: '', desc: '', type: '', projDate: null, currency: 'EUR' };
   };
 
   for (const line of cleanLines) {
     // Projected booking date annotation (pending transactions)
-    const projMatch = line.match(PROJECTED_DATE_RE);
+    const projMatch = line.match(ALL_PROJECTED_DATE_RE);
     if (projMatch) {
-      buf.projDate = parseDate(projMatch[1]);
+      // Find first captured group (date) — varies by locale branch
+      const dateStr = projMatch.slice(1).find(Boolean);
+      if (dateStr) {
+        buf.projDate = parseDate(dateStr);
+      }
       continue;
     }
 
@@ -118,18 +83,30 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
     // Amount line — finalises the current transaction buffer
     const amtMatch = line.match(AMOUNT_RE);
     if (amtMatch) {
-      pushBuf(parseAmount(amtMatch[1]));
+      let curr = amtMatch[2].toUpperCase();
+      if (curr === '€') {
+        curr = 'EUR';
+      } else if (curr === '$') {
+        curr = 'USD';
+      } else if (curr === '£') {
+        curr = 'GBP';
+      } else if (curr === 'ZŁ') {
+        curr = 'PLN';
+      }
+      pushBuf(parseAmount(amtMatch[1]), curr);
       continue;
     }
 
     // Transaction type keyword
-    if (TX_TYPES.has(line.toLowerCase())) {
+    if (ALL_TX_TYPES.has(line.toLowerCase())) {
       buf.type = line;
       continue;
     }
 
     // Avatar initials placeholder (e.g. "AM", "MG") — skip
-    if (/^[A-Z]{1,3}$/.test(line)) continue;
+    if (/^[A-Z]{1,3}$/.test(line)) {
+      continue;
+    }
 
     // Remaining text: first line → partner name, subsequent lines → description
     if (!buf.partner) {
@@ -146,7 +123,7 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
     date: r.date,
     description: [r.partner, r.desc].filter(Boolean).join(' – ') || r.type || 'Unknown',
     amount: r.amount,
-    currency: 'EUR',
+    currency: r.currency,
     type: inferType(r.amount),
     institution,
   }));

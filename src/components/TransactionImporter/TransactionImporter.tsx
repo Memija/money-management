@@ -44,8 +44,9 @@ const TransactionImporter: React.FC = () => {
     handleFileChange,
     handlePaste,
     handleRemoveTransaction,
+    handleUpdateTransaction,
     handleClearAll
-  } = useTransactionImport(institutionName, method);
+  } = useTransactionImport(institutionName, method, t);
 
   /* ─── import method cards ─── */
   const importMethods: { key: ImportMethod; label: string; icon: React.ReactNode; desc: string }[] = [
@@ -166,6 +167,17 @@ const TransactionImporter: React.FC = () => {
             <span>{t.chooseDifferentFormat}</span>
           </button>
 
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={styles['import-error']}
+            >
+              <AlertCircle size={16} />
+              <span>{error}</span>
+            </motion.div>
+          )}
+
           {method !== 'paste' ? (
             <div
               className={`${styles['drop-zone']} ${dragOver ? styles['drag-over'] : ''}`}
@@ -185,6 +197,7 @@ const TransactionImporter: React.FC = () => {
                 }}
                 className={styles['hidden']}
                 id="file-input"
+                name="file-input"
                 aria-label={t.dragDropFile}
                 title={t.dragDropFile}
               />
@@ -209,6 +222,7 @@ const TransactionImporter: React.FC = () => {
                 onChange={(e) => setPasteText(e.target.value)}
                 rows={10}
                 id="paste-area"
+                name="paste-area"
               />
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -221,17 +235,6 @@ const TransactionImporter: React.FC = () => {
                 {t.parseTransactions}
               </motion.button>
             </div>
-          )}
-
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={styles['import-error']}
-            >
-              <AlertCircle size={16} />
-              <span>{error}</span>
-            </motion.div>
           )}
         </div>
       )}
@@ -298,6 +301,7 @@ const TransactionImporter: React.FC = () => {
         onClose={() => setIsPreviewOpen(false)}
         transactions={transactions}
         onRemoveTransaction={handleRemoveTransaction}
+        onUpdateTransaction={handleUpdateTransaction}
       />
 
       <DeleteConfirmationModal

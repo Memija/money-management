@@ -334,6 +334,7 @@ Consistent naming improves readability and searchability.
 - ✅ **Early returns** - Reduce nesting with guard clauses in hooks/functions
 - ✅ **Descriptive names** - Code should read like prose
 - ✅ **Small functions** - Target < 30 lines per function
+- ✅ **Use curly braces for all control structures** - Even for single-line `if`/`else` statements
 
 ---
 

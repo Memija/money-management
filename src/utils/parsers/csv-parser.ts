@@ -1,5 +1,6 @@
 import type { Transaction } from '../../types';
-import { generateId, inferType, parseAmount, parseDate } from './helpers';
+import type { TranslationStrings } from '../../i18n/types';
+import { generateId, inferType, parseAmount, parseDate, isValidDateRaw } from './helpers';
 
 /**
  * Known preamble-row detection: some banks (ING, comdirect) emit metadata
@@ -124,7 +125,7 @@ function parseRow(row: string[], indices: ColumnIndices, institution: string): T
   };
 }
 
-export function rowsToTransactions(rows: string[][], institution: string): Transaction[] {
+export function rowsToTransactions(rows: string[][], institution: string, t?: TranslationStrings): Transaction[] {
   if (rows.length < 2) return [];
 
   // Skip preamble rows
@@ -137,12 +138,34 @@ export function rowsToTransactions(rows: string[][], institution: string): Trans
   const indices = detectColumnIndices(header);
 
   const transactions: Transaction[] = [];
+  const errors: string[] = [];
 
   for (let i = 1; i < dataRows.length; i++) {
-    const transaction = parseRow(dataRows[i], indices, institution);
+    const row = dataRows[i];
+    if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) continue;
+    
+    const rawDate = row[indices.dateIdx]?.toString() ?? '';
+    if (rawDate && !isValidDateRaw(rawDate)) {
+      const errTpl = t?.errorParsePasteInvalidDate || 'Line {line}: Invalid date format "{rawDate}" in position {pos}. Expected DD.MM.YYYY or YYYY-MM-DD.';
+      errors.push(errTpl.replace('{line}', String(headerRowIdx + i + 1)).replace('{rawDate}', rawDate).replace('{pos}', String(indices.dateIdx + 1)));
+      continue;
+    }
+
+    const transaction = parseRow(row, indices, institution);
     if (transaction) {
       transactions.push(transaction);
     }
+  }
+
+  if (transactions.length === 0 && errors.length > 0) {
+    const errTpl = t?.errorParsePasteFailed || 'Failed to parse:\n{errors}';
+    const moreTpl = t?.errorParsePasteMore || '\n...and {count} more.';
+    
+    let errMsg = errTpl.replace('{errors}', errors.slice(0, 3).join('\n'));
+    if (errors.length > 3) {
+      errMsg += moreTpl.replace('{count}', String(errors.length - 3));
+    }
+    throw new Error(errMsg);
   }
 
   return transactions;

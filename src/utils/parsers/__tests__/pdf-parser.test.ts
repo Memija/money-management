@@ -141,4 +141,36 @@ describe('parsePdfText', () => {
     expect(result).toHaveLength(1);
     expect(result[0].description).toBe('PDF Transaction');
   });
+
+  it('does not import "Summe der Umsätze" summary line (Double Date strategy)', () => {
+    const rawText = `
+    01.12.2023 02.12.2023 REWE Supermarkt -45,50 EUR
+    31.12.2023 31.12.2023 Summe der Umsätze 1.234,56 EUR
+    `;
+    const result = parsePdfText(rawText, 'TestBank');
+    expect(result).toHaveLength(1);
+    expect(result[0].description).toBe('REWE Supermarkt');
+  });
+
+  it('does not import "Summe der Umsatze" (without umlaut) summary line', () => {
+    const rawText = `
+    01.12.2023 REWE Supermarkt -45,50 EUR
+    31.12.2023 Summe der Umsatze 1.234,56 EUR
+    `;
+    const result = parsePdfText(rawText, 'TestBank');
+    expect(result).toHaveLength(1);
+    expect(result[0].description).toBe('REWE Supermarkt');
+  });
+
+  it('does not import Kontostand / Saldo / Übertrag footer lines', () => {
+    const rawText = `
+    01.12.2023 02.12.2023 Gehalt ACME Corp +2.500,00 EUR
+    01.12.2023 02.12.2023 Neuer Kontostand 5.000,00 EUR
+    01.12.2023 02.12.2023 Saldo 5.000,00 EUR
+    01.12.2023 02.12.2023 Übertrag 5.000,00 EUR
+    `;
+    const result = parsePdfText(rawText, 'TestBank');
+    expect(result).toHaveLength(1);
+    expect(result[0].description).toBe('Gehalt ACME Corp');
+  });
 });

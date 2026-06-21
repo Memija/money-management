@@ -6,6 +6,20 @@ export function inferType(amount: number): 'income' | 'expense' {
   return amount >= 0 ? 'income' : 'expense';
 }
 
+export function parseCurrency(raw: string | undefined): string {
+  const curr = raw ? raw.toUpperCase() : 'EUR';
+  if (curr === '€') {
+    return 'EUR';
+  } else if (curr === '$') {
+    return 'USD';
+  } else if (curr === '£') {
+    return 'GBP';
+  } else if (curr === 'ZŁ') {
+    return 'PLN';
+  }
+  return curr;
+}
+
 export function parseAmount(raw: string | number): number {
   if (typeof raw === 'number') return raw;
 
@@ -57,4 +71,20 @@ export function parseDate(raw: string): string {
     return `${year}-${usMatch[1].padStart(2, '0')}-${usMatch[2].padStart(2, '0')}`;
   }
   return new Date().toISOString().split('T')[0];
+}
+
+export function isValidDateRaw(raw: string): boolean {
+  if (!raw) {
+    return false;
+  }
+  if (raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/)) {
+    return true;
+  }
+  if (raw.match(/^\d{4}-\d{2}-\d{2}/)) {
+    return true;
+  }
+  if (raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/)) {
+    return true;
+  }
+  return false;
 }

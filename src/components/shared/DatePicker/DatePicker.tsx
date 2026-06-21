@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useId } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useLanguageStore } from '../../../store/useLanguageStore';
+import { useFormatters } from '../../../hooks/useFormatters';
 import { getPublicHolidayName } from '../../../utils/holidays';
 import styles from './DatePicker.module.css';
 
@@ -15,10 +16,12 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   value,
   onChange,
   className = '',
-  placeholder = 'Select date...'
+  placeholder
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { formatDate } = useFormatters();
+  const inputId = useId();
 
   // Parse current value or use today for the view
   const initialDate = value ? new Date(value) : new Date();
@@ -86,6 +89,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const { locale, t } = useLanguageStore();
 
   const monthNames = useMemo(() => {
+    const fallbacks: Record<string, string[]> = {
+      bs: ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Juni', 'Juli', 'August', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'],
+      sr: ['Јануар', 'Фебруар', 'Март', 'Април', 'Мај', 'Јун', 'Јул', 'Август', 'Септембар', 'Октобар', 'Новембар', 'Децембар']
+    };
+    
+    if (fallbacks[locale]) return fallbacks[locale];
+
     return Array.from({ length: 12 }, (_, i) => {
       const d = new Date(2023, i, 1);
       const name = new Intl.DateTimeFormat(locale, { month: 'long' }).format(d);
@@ -94,6 +104,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   }, [locale]);
 
   const weekdays = useMemo(() => {
+    const fallbacks: Record<string, string[]> = {
+      bs: ['Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub', 'Ned'],
+      sr: ['Пон', 'Уто', 'Сре', 'Чет', 'Пет', 'Суб', 'Нед']
+    };
+
+    if (fallbacks[locale]) return fallbacks[locale];
+
     // January 2, 2023 was a Monday
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(2023, 0, 2 + i);
@@ -140,14 +157,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     <div className={`${styles.container} ${className}`} ref={containerRef} title={placeholder || t.selectDatePlaceholder}>
       <div className={styles['input-wrapper']} onClick={toggleDropdown}>
         <input
+          id={inputId}
+          name={inputId}
           type="text"
           className={styles.input}
           placeholder={placeholder || t.selectDatePlaceholder}
-          value={value}
+          value={value ? formatDate(value) : ''}
           readOnly
         />
         {value ? (
-          <button className={styles['clear-button']} onClick={handleClear} title="Clear date">
+          <button className={styles['clear-button']} onClick={handleClear} title={t.clearDate}>
             <X size={12} />
           </button>
         ) : (
@@ -158,11 +177,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       {isOpen && (
         <div className={styles.dropdown}>
           <div className={styles.header}>
-            <button className={styles['nav-button']} onClick={handlePrevMonth} title="Previous month" aria-label="Previous month">
+            <button className={styles['nav-button']} onClick={handlePrevMonth} title={t.previousMonth} aria-label={t.previousMonth}>
               <ChevronLeft size={16} />
             </button>
             <span>{monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}</span>
-            <button className={styles['nav-button']} onClick={handleNextMonth} title="Next month" aria-label="Next month">
+            <button className={styles['nav-button']} onClick={handleNextMonth} title={t.nextMonth} aria-label={t.nextMonth}>
               <ChevronRight size={16} />
             </button>
           </div>
