@@ -1,150 +1,168 @@
-export type Locale = 'en' | 'id' | 'pl' | 'bs' | 'sr' | 'de';
+export type Locale = 'en' | 'id' | 'pl' | 'bs' | 'sr' | 'de'
+
+export interface CategoryKeywords {
+  Salary: string[]
+  Rent: string[]
+  Groceries: string[]
+  DiningOut: string[]
+  Shopping: string[]
+  Transport: string[]
+  Entertainment: string[]
+  Insurance: string[]
+  Utilities: string[]
+  Healthcare: string[]
+  Savings: string[]
+  Transfers: string[]
+}
 
 export interface TranslationStrings {
   // Header
-  appName: string;
+  appName: string
 
   // Theme switcher labels
-  themeSystem: string;
-  themeLight: string;
-  themeDark: string;
-  changeTheme: string;
-  themeOptions: string;
+  themeSystem: string
+  themeLight: string
+  themeDark: string
+  changeTheme: string
+  themeOptions: string
 
   // Language switcher
-  changeLanguage: string;
+  changeLanguage: string
 
   // Progress stepper
-  stepCountry: string;
-  stepInstitution: string;
-  stepImport: string;
-  stepReview: string;
+  stepCountry: string
+  stepInstitution: string
+  stepImport: string
+  stepReview: string
 
   // Country Selector
-  welcomeTitle: string;
-  welcomeSubtitle: string;
-  selectCountryPlaceholder: string;
-  searchCountries: string;
-  noCountriesFound: string;
-  soon: string;
-  continue: string;
+  welcomeTitle: string
+  welcomeSubtitle: string
+  selectCountryPlaceholder: string
+  searchCountries: string
+  noCountriesFound: string
+  soon: string
+  continue: string
 
   // Institution Selector
-  selectInstitutionTitle: string;
-  selectInstitutionSubtitle: string;
-  searchInstitutions: string;
-  all: string;
-  noInstitutionsFound: string;
-  back: string;
+  selectInstitutionTitle: string
+  selectInstitutionSubtitle: string
+  searchInstitutions: string
+  all: string
+  noInstitutionsFound: string
+  back: string
 
   // Category labels
-  catTraditional: string;
-  catSparkasse: string;
-  catVolksbank: string;
-  catDirect: string;
-  catNeobank: string;
-  catLandesbank: string;
-  catBrokerage: string;
-  catSpecialized: string;
-  catPayment: string;
+  catTraditional: string
+  catSparkasse: string
+  catVolksbank: string
+  catDirect: string
+  catNeobank: string
+  catLandesbank: string
+  catBrokerage: string
+  catSpecialized: string
+  catPayment: string
 
   // Transaction Importer
-  importTransactionsTitle: string;
-  importTransactionsSubtitle: string; // contains {institution} placeholder
-  importPsd2Notice: string;
-  spreadsheetFile: string;
-  spreadsheetFileDesc: string;
-  pdfStatement: string;
-  pdfStatementDesc: string;
-  copyPaste: string;
-  copyPasteDesc: string;
-  chooseDifferentFormat: string;
-  dropHere: string;
-  dragDropFile: string;
-  orClickToBrowse: string;
-  acceptedFormats: string;
-  errorParsePaste: string;
-  errorParsePasteOneRow: string;
-  errorParsePasteInvalidDate: string;
-  errorParsePasteFailed: string;
-  errorParsePasteMore: string;
-  errorParsePdf: string;
-  errorProcessFile: string;
-  errorParsePastedData: string;
-  errorNoTransactionsInFile: string;
-  errorNoTransactionsInCSV: string;
-  pasteDataPlaceholder: string;
-  parseTransactions: string;
-  processingData: string;
-  transactionsFound: string; // contains {count} placeholder
-  clear: string;
-  date: string;
-  description: string;
-  amount: string;
-  confirmImport: string;
-  moreTransactions: string; // contains {count} placeholder
-  reviewTransactions: string;
-  clearAllTransactionsTitle: string;
-  clearAllTransactionsMessage: string;
-  clearAll: string;
-  cancel: string;
-  removeTransaction: string;
-  selectDatePlaceholder: string;
-  clearDate: string;
-  previousMonth: string;
-  nextMonth: string;
-  done: string;
-  noTransactionsLeft: string;
-  filterDatePlaceholder: string;
-  filterPlaceholder: string;
+  importTransactionsTitle: string
+  importTransactionsSubtitle: string // contains {institution} placeholder
+  importPsd2Notice: string
+  spreadsheetFile: string
+  spreadsheetFileDesc: string
+  pdfStatement: string
+  pdfStatementDesc: string
+  copyPaste: string
+  copyPasteDesc: string
+  chooseDifferentFormat: string
+  dropHere: string
+  dragDropFile: string
+  orClickToBrowse: string
+  acceptedFormats: string
+  errorParsePaste: string
+  errorParsePasteOneRow: string
+  errorParsePasteInvalidDate: string
+  errorParsePasteFailed: string
+  errorParsePasteMore: string
+  errorParsePdf: string
+  errorProcessFile: string
+  errorParsePastedData: string
+  errorNoTransactionsInFile: string
+  errorNoTransactionsInCSV: string
+  pasteDataPlaceholder: string
+  parseTransactions: string
+  processingData: string
+  transactionsFound: string // contains {count} placeholder
+  clear: string
+  date: string
+  description: string
+  amount: string
+  confirmImport: string
+  moreTransactions: string // contains {count} placeholder
+  reviewTransactions: string
+  clearAllTransactionsTitle: string
+  clearAllTransactionsMessage: string
+  clearAll: string
+  cancel: string
+  removeTransaction: string
+  selectDatePlaceholder: string
+  clearDate: string
+  previousMonth: string
+  nextMonth: string
+  done: string
+  noTransactionsLeft: string
+  filterDatePlaceholder: string
+  filterPlaceholder: string
 
   // Import Review
-  importSuccessTitle: string;
-  importSuccessSubtitle: string;
-  institutions: string;
-  transactions: string;
-  totalIncome: string;
-  totalExpenses: string;
-  imported: string;
-  addAnotherInstitution: string;
-  proceedToAnalysis: string;
+  importSuccessTitle: string
+  importSuccessSubtitle: string
+  institutions: string
+  transactions: string
+  totalIncome: string
+  totalExpenses: string
+  imported: string
+  addAnotherInstitution: string
+  proceedToAnalysis: string
 
   // Dashboard
-  newImport: string;
-  totalBalance: string;
-  income: string;
-  expenses: string;
-  incomeVsExpenses: string;
-  expenseCategories: string;
-  spendingTrend: string;
-  allTransactions: string;
-  search: string;
-  allInstitutions: string;
-  newestFirst: string;
-  oldestFirst: string;
-  highestAmount: string;
-  lowestAmount: string;
-  showingOf: string; // "Showing {shown} of {total} transactions"
-  noTransactionsMatch: string;
+  newImport: string
+  totalBalance: string
+  income: string
+  expenses: string
+  incomeVsExpenses: string
+  expenseCategories: string
+  spendingTrend: string
+  allTransactions: string
+  search: string
+  allInstitutions: string
+  newestFirst: string
+  oldestFirst: string
+  highestAmount: string
+  lowestAmount: string
+  showingOf: string // "Showing {shown} of {total} transactions"
+  noTransactionsMatch: string
 
   // Expense category labels
-  catSalary: string;
-  catRent: string;
-  catGroceries: string;
-  catDiningOut: string;
-  catShopping: string;
-  catTransport: string;
-  catEntertainment: string;
-  catInsurance: string;
-  catUtilities: string;
-  catHealthcare: string;
-  catSavings: string;
-  catTransfers: string;
-  catOther: string;
+  catSalary: string
+  catRent: string
+  catGroceries: string
+  catDiningOut: string
+  catShopping: string
+  catTransport: string
+  catEntertainment: string
+  catInsurance: string
+  catUtilities: string
+  catHealthcare: string
+  catSavings: string
+  catTransfers: string
+  catOther: string
+
+  // Category keywords for auto-categorization
+  categoryKeywords: CategoryKeywords
 
   // Countries
-  countries: Record<string, string>;
+  countries: Record<string, string>
 
   // Holidays
-  holidays: Record<string, string>;
+  holidays: Record<string, string>
 }

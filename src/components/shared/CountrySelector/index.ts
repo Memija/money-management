@@ -1,1 +1,1 @@
-export { default } from './CountrySelector';
+export { default } from './CountrySelector'

@@ -1,18 +1,20 @@
-import React from 'react';
-import { AnimatePresence } from 'framer-motion';
-import AppHeader from './components/layout/AppHeader';
-import CountrySelector from './components/shared/CountrySelector';
-import InstitutionSelector from './components/shared/InstitutionSelector';
-import TransactionImporter from './components/TransactionImporter';
-import ImportReview from './components/ImportReview';
-import Dashboard from './components/Dashboard';
-import { useAppStore } from './store/useAppStore';
-import { useLanguageStore } from './store/useLanguageStore';
-import styles from './App.module.css';
+import React from 'react'
+import { AnimatePresence } from 'framer-motion'
+
+import Dashboard from './components/Dashboard'
+import ImportReview from './components/ImportReview'
+import AppHeader from './components/layout/AppHeader'
+import CountrySelector from './components/shared/CountrySelector'
+import InstitutionSelector from './components/shared/InstitutionSelector'
+import TransactionImporter from './components/TransactionImporter'
+import { useAppStore } from './store/useAppStore'
+import { useLanguageStore } from './store/useLanguageStore'
+
+import styles from './App.module.css'
 
 const App: React.FC = () => {
-  const currentStep = useAppStore((s) => s.currentStep);
-  const t = useLanguageStore((s) => s.t);
+  const currentStep = useAppStore((s) => s.currentStep)
+  const t = useLanguageStore((s) => s.t)
 
   // Dashboard has its own full layout
   if (currentStep === 'dashboard') {
@@ -21,10 +23,10 @@ const App: React.FC = () => {
         <AppHeader />
         <Dashboard />
       </>
-    );
+    )
   }
 
-  const stepLabels = [t.stepCountry, t.stepInstitution, t.stepImport, t.stepReview];
+  const stepLabels = [t.stepCountry, t.stepInstitution, t.stepImport, t.stepReview]
 
   return (
     <>
@@ -38,28 +40,29 @@ const App: React.FC = () => {
         <div className={styles['progress-wrapper']}>
           <div className={styles['progress-steps']}>
             {(['country', 'institution', 'import', 'review'] as const).map((step, idx) => {
-              const currentIdx = ['country', 'institution', 'import', 'review'].indexOf(currentStep);
-              const isActive = idx === currentIdx;
-              const isCompleted = idx < currentIdx;
+              const currentIdx = ['country', 'institution', 'import', 'review'].indexOf(currentStep)
+              const isActive = idx === currentIdx
+              const isCompleted = idx < currentIdx
               return (
                 <React.Fragment key={step}>
                   {idx > 0 && (
-                    <div className={`${styles['progress-connector']} ${isCompleted ? styles.completed : ''}`} />
+                    <div
+                      className={`${styles['progress-connector']} ${isCompleted ? styles.completed : ''}`}
+                    />
                   )}
-                  <div className={`${styles['progress-step']} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}>
-                    <div className={styles['progress-dot']}>
-                      {isCompleted ? '✓' : idx + 1}
-                    </div>
+                  <div
+                    className={`${styles['progress-step']} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}
+                  >
+                    <div className={styles['progress-dot']}>{isCompleted ? '✓' : idx + 1}</div>
                     <span className={styles['progress-label']}>{stepLabels[idx]}</span>
                   </div>
                 </React.Fragment>
-              );
+              )
             })}
           </div>
         </div>
 
         <AnimatePresence mode="wait">
-
           {currentStep === 'country' && <CountrySelector key="country" />}
           {currentStep === 'institution' && <InstitutionSelector key="institution" />}
           {currentStep === 'import' && <TransactionImporter key="import" />}
@@ -67,7 +70,7 @@ const App: React.FC = () => {
         </AnimatePresence>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default App;
+export default App

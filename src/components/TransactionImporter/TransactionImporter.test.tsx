@@ -1,14 +1,15 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import TransactionImporter from './TransactionImporter';
-import { type AppState } from '../../store/useAppStore';
-import { useLanguageStore, type LanguageState } from '../../store/useLanguageStore';
-import type { TranslationStrings } from '../../i18n/translations';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import type { TranslationStrings } from '../../i18n/translations'
+import { type AppState } from '../../store/useAppStore'
+import { type LanguageState, useLanguageStore } from '../../store/useLanguageStore'
+import TransactionImporter from './TransactionImporter'
 
 const { mockAddImportedAccount, mockSetStep } = vi.hoisted(() => ({
   mockAddImportedAccount: vi.fn(),
   mockSetStep: vi.fn(),
-}));
+}))
 
 // Mock the stores
 vi.mock('../../store/useAppStore', () => ({
@@ -17,10 +18,10 @@ vi.mock('../../store/useAppStore', () => ({
       selectedInstitution: { id: '1', name: 'Bank A' },
       addImportedAccount: mockAddImportedAccount,
       setStep: mockSetStep,
-    };
-    return typeof selector === 'function' ? selector(state as unknown as AppState) : state;
+    }
+    return typeof selector === 'function' ? selector(state as unknown as AppState) : state
   }),
-}));
+}))
 
 vi.mock('../../store/useLanguageStore', () => ({
   useLanguageStore: vi.fn((selector) => {
@@ -50,11 +51,13 @@ vi.mock('../../store/useLanguageStore', () => ({
         moreTransactions: '+{count} more',
         confirmImport: 'Confirm',
         dropHere: 'Drop here',
-      } as unknown as TranslationStrings
-    };
-    return typeof selector === 'function' ? selector(state as LanguageState) : state;
+        errorParsePaste: 'No transactions could be parsed.',
+        errorParsePasteOneRow: 'Only 1 row detected.',
+      } as unknown as TranslationStrings,
+    }
+    return typeof selector === 'function' ? selector(state as LanguageState) : state
   }),
-}));
+}))
 
 // Mock XLSX
 vi.mock('xlsx', () => ({
@@ -62,13 +65,13 @@ vi.mock('xlsx', () => ({
   utils: {
     sheet_to_json: vi.fn(),
   },
-}));
+}))
 
 // Mock pdfjs
 vi.mock('pdfjs-dist', () => ({
   getDocument: vi.fn(),
   GlobalWorkerOptions: { workerSrc: '' },
-}));
+}))
 
 describe('TransactionImporter', () => {
   const mockT = {
@@ -96,110 +99,116 @@ describe('TransactionImporter', () => {
     moreTransactions: '+{count} more',
     confirmImport: 'Confirm',
     dropHere: 'Drop here',
-  };
+    errorParsePaste: 'No transactions could be parsed.',
+    errorParsePasteOneRow: 'Only 1 row detected.',
+  }
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(useLanguageStore).mockImplementation((selector) => selector({
-      t: mockT as unknown as TranslationStrings,
-    } as unknown as LanguageState));
-  });
+    vi.clearAllMocks()
+    vi.mocked(useLanguageStore).mockImplementation((selector) =>
+      selector({
+        t: mockT as unknown as TranslationStrings,
+      } as unknown as LanguageState),
+    )
+  })
 
   it('renders initial methods correctly', () => {
-    render(<TransactionImporter />);
+    render(<TransactionImporter />)
 
-    expect(screen.getByText('Excel / CSV')).toBeInTheDocument();
-    expect(screen.getByText('PDF')).toBeInTheDocument();
-    expect(screen.getByText('Paste')).toBeInTheDocument();
-  });
+    expect(screen.getByText('Excel / CSV')).toBeInTheDocument()
+    expect(screen.getByText('PDF')).toBeInTheDocument()
+    expect(screen.getByText('Paste')).toBeInTheDocument()
+  })
 
   it('navigates back to institution selection', () => {
-    render(<TransactionImporter />);
+    render(<TransactionImporter />)
 
-    fireEvent.click(screen.getByText('Back'));
-    expect(mockSetStep).toHaveBeenCalledWith('institution');
-  });
+    fireEvent.click(screen.getByText('Back'))
+    expect(mockSetStep).toHaveBeenCalledWith('institution')
+  })
 
   it('shows paste area when copy-paste method is selected', () => {
-    render(<TransactionImporter />);
+    render(<TransactionImporter />)
 
-    fireEvent.click(screen.getByText('Paste'));
-    expect(screen.getByPlaceholderText('Paste here')).toBeInTheDocument();
-  });
+    fireEvent.click(screen.getByText('Paste'))
+    expect(screen.getByPlaceholderText('Paste here')).toBeInTheDocument()
+  })
 
   it('parses pasted data correctly', async () => {
-    render(<TransactionImporter />);
+    render(<TransactionImporter />)
 
-    fireEvent.click(screen.getByText('Paste'));
-    const textarea = screen.getByPlaceholderText('Paste here');
+    fireEvent.click(screen.getByText('Paste'))
+    const textarea = screen.getByPlaceholderText('Paste here')
 
     // Header + one row
-    const csvData = "Date,Description,Amount\n2024-01-01,Lunch,-15.50";
-    fireEvent.change(textarea, { target: { value: csvData } });
+    const csvData = 'Date,Description,Amount\n2024-01-01,Lunch,-15.50'
+    fireEvent.change(textarea, { target: { value: csvData } })
 
-    fireEvent.click(screen.getByText('Parse'));
+    fireEvent.click(screen.getByText('Parse'))
 
     // Transaction details are now shown in a modal; the main view shows the count summary
     await waitFor(() => {
-      expect(screen.getByText('1')).toBeInTheDocument();
-      expect(screen.getByText(/transactions found/)).toBeInTheDocument();
-    });
-  });
+      expect(screen.getByText('1')).toBeInTheDocument()
+      expect(screen.getByText(/transactions found/)).toBeInTheDocument()
+    })
+  })
 
   it('calls addImportedAccount on confirm', async () => {
-    render(<TransactionImporter />);
+    render(<TransactionImporter />)
 
     // Select paste and parse some data
-    fireEvent.click(screen.getByText('Paste'));
+    fireEvent.click(screen.getByText('Paste'))
     fireEvent.change(screen.getByPlaceholderText('Paste here'), {
-      target: { value: "Date,Description,Amount\n2024-01-01,Test,100" }
-    });
-    fireEvent.click(screen.getByText('Parse'));
+      target: { value: 'Date,Description,Amount\n2024-01-01,Test,100' },
+    })
+    fireEvent.click(screen.getByText('Parse'))
 
-    await waitFor(() => screen.getByText('Confirm'));
-    fireEvent.click(screen.getByText('Confirm'));
+    await waitFor(() => screen.getByText('Confirm'))
+    fireEvent.click(screen.getByText('Confirm'))
 
-    expect(mockAddImportedAccount).toHaveBeenCalledWith(expect.objectContaining({
-      institutionName: 'Bank A',
-      transactions: expect.arrayContaining([
-        expect.objectContaining({ description: 'Test', amount: 100 })
-      ])
-    }));
-  });
+    expect(mockAddImportedAccount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        institutionName: 'Bank A',
+        transactions: expect.arrayContaining([
+          expect.objectContaining({ description: 'Test', amount: 100 }),
+        ]),
+      }),
+    )
+  })
 
   it('shows error if no transactions found in pasted data', async () => {
-    render(<TransactionImporter />);
+    render(<TransactionImporter />)
 
-    fireEvent.click(screen.getByText('Paste'));
+    fireEvent.click(screen.getByText('Paste'))
     fireEvent.change(screen.getByPlaceholderText('Paste here'), {
-      target: { value: "Invalid Data" }
-    });
-    fireEvent.click(screen.getByText('Parse'));
+      target: { value: 'Invalid Data' },
+    })
+    fireEvent.click(screen.getByText('Parse'))
 
     await waitFor(() => {
-      expect(screen.getByText(/No transactions could be parsed\./)).toBeInTheDocument();
-    });
-  });
+      expect(screen.getByText(/Only 1 row detected/)).toBeInTheDocument()
+    })
+  })
 
   it('allows clearing transactions and going back to method selection', async () => {
-    render(<TransactionImporter />);
+    render(<TransactionImporter />)
 
-    fireEvent.click(screen.getByText('Paste'));
+    fireEvent.click(screen.getByText('Paste'))
     fireEvent.change(screen.getByPlaceholderText('Paste here'), {
-      target: { value: "Date,Description,Amount\n2024-01-01,Test,100" }
-    });
-    fireEvent.click(screen.getByText('Parse'));
+      target: { value: 'Date,Description,Amount\n2024-01-01,Test,100' },
+    })
+    fireEvent.click(screen.getByText('Parse'))
 
     // Click Clear — this now opens a DeleteConfirmationModal
-    await waitFor(() => screen.getByText('Clear'));
-    fireEvent.click(screen.getByText('Clear'));
+    await waitFor(() => screen.getByText('Clear'))
+    fireEvent.click(screen.getByText('Clear'))
 
     // Confirm in the deletion modal (button text matches confirmText='Delete')
-    await waitFor(() => screen.getByText('Delete'));
-    fireEvent.click(screen.getByText('Delete'));
+    await waitFor(() => screen.getByText('Delete'))
+    fireEvent.click(screen.getByText('Delete'))
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('Paste here')).toHaveValue('');
-    });
-  });
-});
+      expect(screen.getByPlaceholderText('Paste here')).toHaveValue('')
+    })
+  })
+})

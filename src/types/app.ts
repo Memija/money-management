@@ -1,1 +1,1 @@
-export type AppStep = 'country' | 'institution' | 'import' | 'review' | 'dashboard';
+export type AppStep = 'country' | 'institution' | 'import' | 'review' | 'dashboard'

@@ -1,4 +1,4 @@
-import type { Country } from '../types';
+import type { Country } from '../types'
 
 export const countries: Country[] = [
   { code: 'de', name: 'Germany', flag: '/flags/de.png', supported: true },
@@ -45,7 +45,7 @@ export const countries: Country[] = [
   { code: 'tr', name: 'Turkey', flag: '/flags/tr.png', supported: false },
 ].sort((a, b) => {
   // Supported countries first, then alphabetical
-  if (a.supported && !b.supported) return -1;
-  if (!a.supported && b.supported) return 1;
-  return a.name.localeCompare(b.name);
-});
+  if (a.supported && !b.supported) return -1
+  if (!a.supported && b.supported) return 1
+  return a.name.localeCompare(b.name)
+})

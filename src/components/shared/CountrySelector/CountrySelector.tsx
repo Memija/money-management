@@ -1,47 +1,49 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ChevronDown, Globe, Lock } from 'lucide-react';
-import { countries } from '../../../data/countries';
-import { useAppStore } from '../../../store/useAppStore';
-import { useLanguageStore } from '../../../store/useLanguageStore';
-import type { Country } from '../../../types';
-import styles from './CountrySelector.module.css';
+import React, { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronDown, Globe, Lock, Search } from 'lucide-react'
+
+import { countries } from '../../../data/countries'
+import { useAppStore } from '../../../store/useAppStore'
+import { useLanguageStore } from '../../../store/useLanguageStore'
+import type { Country } from '../../../types'
+
+import styles from './CountrySelector.module.css'
 
 const CountrySelector: React.FC = () => {
-  const selectCountry = useAppStore((s) => s.selectCountry);
-  const t = useLanguageStore((s) => s.t);
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const [selected, setSelected] = useState<Country | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const selectCountry = useAppStore((s) => s.selectCountry)
+  const t = useLanguageStore((s) => s.t)
+  const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [selected, setSelected] = useState<Country | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const filtered = countries.filter((c) => {
-    const localizedName = t.countries?.[c.code] || c.name;
-    return localizedName.toLowerCase().includes(search.toLowerCase());
-  });
+    const localizedName = t.countries?.[c.code] || c.name
+    return localizedName.toLowerCase().includes(search.toLowerCase())
+  })
 
   const handleSelect = (country: Country) => {
-    if (!country.supported) return;
-    setSelected(country);
-    setIsOpen(false);
-    setSearch('');
-  };
+    if (!country.supported) return
+    setSelected(country)
+    setIsOpen(false)
+    setSearch('')
+  }
 
   const handleContinue = () => {
     if (selected) {
-      selectCountry(selected);
+      selectCountry(selected)
     }
-  };
+  }
 
   return (
     <motion.div
@@ -61,9 +63,7 @@ const CountrySelector: React.FC = () => {
           <Globe size={32} />
         </motion.div>
         <h1 className="onboarding-title">{t.welcomeTitle}</h1>
-        <p className="onboarding-subtitle">
-          {t.welcomeSubtitle}
-        </p>
+        <p className="onboarding-subtitle">{t.welcomeSubtitle}</p>
       </div>
       <div className={styles['country-selector-wrapper']} ref={dropdownRef}>
         <div
@@ -107,6 +107,7 @@ const CountrySelector: React.FC = () => {
                   className={styles['country-search-input']}
                   id="country-search"
                   name="country-search"
+                  aria-label={t.searchCountries}
                   autoFocus
                 />
               </div>
@@ -117,8 +118,9 @@ const CountrySelector: React.FC = () => {
                   filtered.map((country) => (
                     <div
                       key={country.code}
-                      className={`${styles['country-option']} ${!country.supported ? styles.disabled : ''} ${selected?.code === country.code ? styles.selected : ''
-                        }`}
+                      className={`${styles['country-option']} ${!country.supported ? styles.disabled : ''} ${
+                        selected?.code === country.code ? styles.selected : ''
+                      }`}
                       onClick={() => handleSelect(country)}
                       id={`country-${country.code}`}
                     >
@@ -155,7 +157,7 @@ const CountrySelector: React.FC = () => {
         {t.continue}
       </motion.button>
     </motion.div>
-  );
-};
+  )
+}
 
-export default CountrySelector;
+export default CountrySelector

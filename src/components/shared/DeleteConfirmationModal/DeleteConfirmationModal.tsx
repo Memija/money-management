@@ -1,16 +1,18 @@
-import React from 'react';
-import { AlertTriangle } from 'lucide-react';
-import { Modal } from '../Modal';
-import styles from './DeleteConfirmationModal.module.css';
+import React from 'react'
+import { AlertTriangle } from 'lucide-react'
+
+import { Modal } from '../Modal'
+
+import styles from './DeleteConfirmationModal.module.css'
 
 export interface DeleteConfirmationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
+  title: string
+  message: string
+  confirmText?: string
+  cancelText?: string
 }
 
 export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
@@ -23,9 +25,9 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
   cancelText = 'Cancel',
 }) => {
   const handleConfirm = () => {
-    onConfirm();
-    onClose();
-  };
+    onConfirm()
+    onClose()
+  }
 
   return (
     <Modal
@@ -38,10 +40,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
           <button className={`secondary-button ${styles.cancelButton}`} onClick={onClose}>
             {cancelText}
           </button>
-          <button
-            className={`primary-button ${styles.deleteButton}`}
-            onClick={handleConfirm}
-          >
+          <button className={`primary-button ${styles.deleteButton}`} onClick={handleConfirm}>
             {confirmText}
           </button>
         </>
@@ -51,10 +50,8 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
         <div className={styles.iconContainer}>
           <AlertTriangle size={24} />
         </div>
-        <p className={styles.messageText}>
-          {message}
-        </p>
+        <p className={styles.messageText}>{message}</p>
       </div>
     </Modal>
-  );
-};
+  )
+}

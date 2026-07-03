@@ -40,7 +40,7 @@
 /* ═══════════════════════════════════════════════════════
    Theme Variables — Light
    ═══════════════════════════════════════════════════════ */
-[data-theme="light"] {
+[data-theme='light'] {
   --bg-color: #f8f9fb;
   --bg-elevated: #ffffff;
   --card-bg: rgba(0, 0, 0, 0.02);
@@ -77,14 +77,20 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   background-color: var(--bg-color);
   color: var(--text-main);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
 }
 
 #root {
@@ -324,8 +330,8 @@ h3 {
   stroke: rgba(255, 255, 255, 0.05);
 }
 
-[data-theme="light"] .recharts-cartesian-grid-horizontal line,
-[data-theme="light"] .recharts-cartesian-grid-vertical line {
+[data-theme='light'] .recharts-cartesian-grid-horizontal line,
+[data-theme='light'] .recharts-cartesian-grid-vertical line {
   stroke: rgba(0, 0, 0, 0.06);
 }
 
@@ -333,6 +339,6 @@ h3 {
   fill: rgba(255, 255, 255, 0.05);
 }
 
-[data-theme="light"] .recharts-tooltip-cursor {
+[data-theme='light'] .recharts-tooltip-cursor {
   fill: rgba(0, 0, 0, 0.04);
 }

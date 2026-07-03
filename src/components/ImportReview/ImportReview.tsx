@@ -1,41 +1,42 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from 'react'
+import { motion } from 'framer-motion'
 import {
-  CheckCircle2,
-  Plus,
   ArrowRight,
   Building2,
   Calendar,
-  TrendingUp,
+  CheckCircle2,
+  Plus,
   TrendingDown,
-} from 'lucide-react';
-import { useAppStore } from '../../store/useAppStore';
-import { useLanguageStore } from '../../store/useLanguageStore';
-import { useFormatters } from '../../hooks/useFormatters';
-import styles from './ImportReview.module.css';
+  TrendingUp,
+} from 'lucide-react'
+
+import { useFormatters } from '../../hooks/useFormatters'
+import { useAppStore } from '../../store/useAppStore'
+import { useLanguageStore } from '../../store/useLanguageStore'
+
+import styles from './ImportReview.module.css'
 
 const ImportReview: React.FC = () => {
-  const { importedAccounts, startNewInstitution, setStep } = useAppStore();
-  const t = useLanguageStore((s) => s.t);
-  const { formatCurrency } = useFormatters();
+  const { importedAccounts, startNewInstitution, setStep } = useAppStore()
+  const t = useLanguageStore((s) => s.t)
+  const { formatCurrency, locale } = useFormatters()
+  // Map bs/sr to de-DE consistent with useFormatters (Chromium stripped ICU data for these)
+  const intlLocale = locale === 'bs' || locale === 'sr' ? 'de-DE' : locale
 
-  const totalTransactions = importedAccounts.reduce(
-    (sum, acc) => sum + acc.transactions.length,
-    0
-  );
+  const totalTransactions = importedAccounts.reduce((sum, acc) => sum + acc.transactions.length, 0)
   const totalIncome = importedAccounts.reduce(
     (sum, acc) =>
       sum + acc.transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0),
-    0
-  );
+    0,
+  )
   const totalExpenses = importedAccounts.reduce(
     (sum, acc) =>
       sum +
       acc.transactions
         .filter((t) => t.type === 'expense')
         .reduce((s, t) => s + Math.abs(t.amount), 0),
-    0
-  );
+    0,
+  )
 
   return (
     <motion.div
@@ -55,9 +56,7 @@ const ImportReview: React.FC = () => {
           <CheckCircle2 size={32} />
         </motion.div>
         <h1 className="onboarding-title">{t.importSuccessTitle}</h1>
-        <p className="onboarding-subtitle">
-          {t.importSuccessSubtitle}
-        </p>
+        <p className="onboarding-subtitle">{t.importSuccessSubtitle}</p>
       </div>
 
       {/* Summary Cards */}
@@ -97,9 +96,7 @@ const ImportReview: React.FC = () => {
           <div className={`${styles['review-stat-icon']} ${styles['icon-income']}`}>
             <TrendingUp size={20} />
           </div>
-          <div className={styles['review-stat-value']}>
-            {formatCurrency(totalIncome, 0)}
-          </div>
+          <div className={styles['review-stat-value']}>{formatCurrency(totalIncome, 0)}</div>
           <div className={styles['review-stat-label']}>{t.totalIncome}</div>
         </motion.div>
 
@@ -112,9 +109,7 @@ const ImportReview: React.FC = () => {
           <div className={`${styles['review-stat-icon']} ${styles['icon-expenses']}`}>
             <TrendingDown size={20} />
           </div>
-          <div className={styles['review-stat-value']}>
-            {formatCurrency(totalExpenses, 0)}
-          </div>
+          <div className={styles['review-stat-value']}>{formatCurrency(totalExpenses, 0)}</div>
           <div className={styles['review-stat-label']}>{t.totalExpenses}</div>
         </motion.div>
       </div>
@@ -123,7 +118,7 @@ const ImportReview: React.FC = () => {
       <div className={styles['imported-accounts-list']}>
         {importedAccounts.map((acc, idx) => (
           <motion.div
-            key={idx}
+            key={acc.institutionId}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 + idx * 0.05 }}
@@ -137,7 +132,7 @@ const ImportReview: React.FC = () => {
                 <p className={styles['imported-account-name']}>{acc.institutionName}</p>
                 <p className={styles['imported-account-meta']}>
                   {acc.transactions.length} {t.transactions.toLowerCase()} • {t.imported}{' '}
-                  {new Date(acc.importedAt).toLocaleTimeString('de-DE', {
+                  {new Date(acc.importedAt).toLocaleTimeString(intlLocale, {
                     hour: '2-digit',
                     minute: '2-digit',
                   })}
@@ -151,7 +146,6 @@ const ImportReview: React.FC = () => {
 
       {/* Action Buttons */}
       <div className={styles['review-actions']}>
-
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -175,7 +169,7 @@ const ImportReview: React.FC = () => {
         </motion.button>
       </div>
     </motion.div>
-  );
-};
+  )
+}
 
-export default ImportReview;
+export default ImportReview

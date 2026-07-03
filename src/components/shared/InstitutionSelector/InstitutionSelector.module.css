@@ -71,61 +71,61 @@
   color: var(--active-color);
 }
 
-.category-tag.active[data-category="traditional"] {
+.category-tag.active[data-category='traditional'] {
   --active-color: #818cf8;
   --active-bg: rgba(99, 102, 241, 0.12);
   --active-count-bg: rgba(99, 102, 241, 0.2);
 }
 
-.category-tag.active[data-category="sparkasse"] {
+.category-tag.active[data-category='sparkasse'] {
   --active-color: #f87171;
   --active-bg: rgba(239, 68, 68, 0.12);
   --active-count-bg: rgba(239, 68, 68, 0.2);
 }
 
-.category-tag.active[data-category="volksbank"] {
+.category-tag.active[data-category='volksbank'] {
   --active-color: #fbbf24;
   --active-bg: rgba(245, 158, 11, 0.12);
   --active-count-bg: rgba(245, 158, 11, 0.2);
 }
 
-.category-tag.active[data-category="direct"] {
+.category-tag.active[data-category='direct'] {
   --active-color: #38bdf8;
   --active-bg: rgba(14, 165, 233, 0.12);
   --active-count-bg: rgba(14, 165, 233, 0.2);
 }
 
-.category-tag.active[data-category="neobank"] {
+.category-tag.active[data-category='neobank'] {
   --active-color: #34d399;
   --active-bg: rgba(16, 185, 129, 0.12);
   --active-count-bg: rgba(16, 185, 129, 0.2);
 }
 
-.category-tag.active[data-category="landesbank"] {
+.category-tag.active[data-category='landesbank'] {
   --active-color: #c084fc;
   --active-bg: rgba(168, 85, 247, 0.12);
   --active-count-bg: rgba(168, 85, 247, 0.2);
 }
 
-.category-tag.active[data-category="brokerage"] {
+.category-tag.active[data-category='brokerage'] {
   --active-color: #f472b6;
   --active-bg: rgba(236, 72, 153, 0.12);
   --active-count-bg: rgba(236, 72, 153, 0.2);
 }
 
-.category-tag.active[data-category="specialized"] {
+.category-tag.active[data-category='specialized'] {
   --active-color: #4ade80;
   --active-bg: rgba(34, 197, 94, 0.12);
   --active-count-bg: rgba(34, 197, 94, 0.2);
 }
 
-.category-tag.active[data-category="payment"] {
+.category-tag.active[data-category='payment'] {
   --active-color: #fb923c;
   --active-bg: rgba(251, 146, 60, 0.12);
   --active-count-bg: rgba(251, 146, 60, 0.2);
 }
 
-.category-tag.active[data-category="other"] {
+.category-tag.active[data-category='other'] {
   --active-color: #9ca3af;
   --active-bg: rgba(156, 163, 175, 0.12);
   --active-count-bg: rgba(156, 163, 175, 0.2);
@@ -206,52 +206,52 @@
 }
 
 /* Category-based badge colors */
-.institution-type-badge[data-category="traditional"] {
+.institution-type-badge[data-category='traditional'] {
   background: rgba(99, 102, 241, 0.12);
   color: #818cf8;
 }
 
-.institution-type-badge[data-category="sparkasse"] {
+.institution-type-badge[data-category='sparkasse'] {
   background: rgba(239, 68, 68, 0.12);
   color: #f87171;
 }
 
-.institution-type-badge[data-category="volksbank"] {
+.institution-type-badge[data-category='volksbank'] {
   background: rgba(245, 158, 11, 0.12);
   color: #fbbf24;
 }
 
-.institution-type-badge[data-category="direct"] {
+.institution-type-badge[data-category='direct'] {
   background: rgba(14, 165, 233, 0.12);
   color: #38bdf8;
 }
 
-.institution-type-badge[data-category="neobank"] {
+.institution-type-badge[data-category='neobank'] {
   background: rgba(16, 185, 129, 0.12);
   color: #34d399;
 }
 
-.institution-type-badge[data-category="landesbank"] {
+.institution-type-badge[data-category='landesbank'] {
   background: rgba(168, 85, 247, 0.12);
   color: #c084fc;
 }
 
-.institution-type-badge[data-category="brokerage"] {
+.institution-type-badge[data-category='brokerage'] {
   background: rgba(236, 72, 153, 0.12);
   color: #f472b6;
 }
 
-.institution-type-badge[data-category="specialized"] {
+.institution-type-badge[data-category='specialized'] {
   background: rgba(34, 197, 94, 0.12);
   color: #4ade80;
 }
 
-.institution-type-badge[data-category="payment"] {
+.institution-type-badge[data-category='payment'] {
   background: rgba(251, 146, 60, 0.12);
   color: #fb923c;
 }
 
-.institution-type-badge[data-category="other"] {
+.institution-type-badge[data-category='other'] {
   background: rgba(156, 163, 175, 0.12);
   color: #9ca3af;
 }
@@ -305,52 +305,52 @@
 }
 
 /* Category-based item icon colors */
-.institution-item-icon[data-category="traditional"] {
+.institution-item-icon[data-category='traditional'] {
   background: rgba(99, 102, 241, 0.1);
   color: #818cf8;
 }
 
-.institution-item-icon[data-category="sparkasse"] {
+.institution-item-icon[data-category='sparkasse'] {
   background: rgba(239, 68, 68, 0.1);
   color: #f87171;
 }
 
-.institution-item-icon[data-category="volksbank"] {
+.institution-item-icon[data-category='volksbank'] {
   background: rgba(245, 158, 11, 0.1);
   color: #fbbf24;
 }
 
-.institution-item-icon[data-category="direct"] {
+.institution-item-icon[data-category='direct'] {
   background: rgba(14, 165, 233, 0.1);
   color: #38bdf8;
 }
 
-.institution-item-icon[data-category="neobank"] {
+.institution-item-icon[data-category='neobank'] {
   background: rgba(16, 185, 129, 0.1);
   color: #34d399;
 }
 
-.institution-item-icon[data-category="landesbank"] {
+.institution-item-icon[data-category='landesbank'] {
   background: rgba(168, 85, 247, 0.1);
   color: #c084fc;
 }
 
-.institution-item-icon[data-category="brokerage"] {
+.institution-item-icon[data-category='brokerage'] {
   background: rgba(236, 72, 153, 0.1);
   color: #f472b6;
 }
 
-.institution-item-icon[data-category="specialized"] {
+.institution-item-icon[data-category='specialized'] {
   background: rgba(34, 197, 94, 0.1);
   color: #4ade80;
 }
 
-.institution-item-icon[data-category="payment"] {
+.institution-item-icon[data-category='payment'] {
   background: rgba(251, 146, 60, 0.1);
   color: #fb923c;
 }
 
-.institution-item-icon[data-category="other"] {
+.institution-item-icon[data-category='other'] {
   background: rgba(156, 163, 175, 0.1);
   color: #9ca3af;
 }

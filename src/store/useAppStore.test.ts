@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { useAppStore } from './useAppStore';
-import type { Country, FinancialInstitution, ImportedAccount } from '../types';
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import type { Country, FinancialInstitution, ImportedAccount } from '../types'
+import { useAppStore } from './useAppStore'
 
 describe('useAppStore', () => {
   beforeEach(() => {
@@ -10,30 +11,30 @@ describe('useAppStore', () => {
       selectedCountry: null,
       selectedInstitution: null,
       importedAccounts: [],
-    });
-  });
+    })
+  })
 
   it('should have initial state', () => {
-    const state = useAppStore.getState();
-    expect(state.currentStep).toBe('country');
-    expect(state.selectedCountry).toBeNull();
-    expect(state.selectedInstitution).toBeNull();
-    expect(state.importedAccounts).toEqual([]);
-  });
+    const state = useAppStore.getState()
+    expect(state.currentStep).toBe('country')
+    expect(state.selectedCountry).toBeNull()
+    expect(state.selectedInstitution).toBeNull()
+    expect(state.importedAccounts).toEqual([])
+  })
 
   it('should set step', () => {
-    useAppStore.getState().setStep('import');
-    expect(useAppStore.getState().currentStep).toBe('import');
-  });
+    useAppStore.getState().setStep('import')
+    expect(useAppStore.getState().currentStep).toBe('import')
+  })
 
   it('should select country and move to institution step', () => {
-    const mockCountry: Country = { code: 'us', name: 'USA', flag: '🇺🇸', supported: true };
-    useAppStore.getState().selectCountry(mockCountry);
+    const mockCountry: Country = { code: 'us', name: 'USA', flag: '🇺🇸', supported: true }
+    useAppStore.getState().selectCountry(mockCountry)
 
-    const state = useAppStore.getState();
-    expect(state.selectedCountry).toEqual(mockCountry);
-    expect(state.currentStep).toBe('institution');
-  });
+    const state = useAppStore.getState()
+    expect(state.selectedCountry).toEqual(mockCountry)
+    expect(state.currentStep).toBe('institution')
+  })
 
   it('should select institution and move to import step', () => {
     const mockInstitution: FinancialInstitution = {
@@ -41,52 +42,72 @@ describe('useAppStore', () => {
       name: 'Chase',
       type: 'bank',
       category: 'traditional',
-      logo: 'chase.png'
-    };
-    useAppStore.getState().selectInstitution(mockInstitution);
+      logo: 'chase.png',
+    }
+    useAppStore.getState().selectInstitution(mockInstitution)
 
-    const state = useAppStore.getState();
-    expect(state.selectedInstitution).toEqual(mockInstitution);
-    expect(state.currentStep).toBe('import');
-  });
+    const state = useAppStore.getState()
+    expect(state.selectedInstitution).toEqual(mockInstitution)
+    expect(state.currentStep).toBe('import')
+  })
 
   it('should add imported account and move to review step', () => {
     const mockAccount: ImportedAccount = {
       institutionId: 'chase',
       institutionName: 'Chase',
       transactions: [],
-      importedAt: new Date().toISOString()
-    };
-    useAppStore.getState().addImportedAccount(mockAccount);
+      importedAt: new Date().toISOString(),
+    }
+    useAppStore.getState().addImportedAccount(mockAccount)
 
-    const state = useAppStore.getState();
-    expect(state.importedAccounts).toContainEqual(mockAccount);
-    expect(state.currentStep).toBe('review');
-  });
+    const state = useAppStore.getState()
+    expect(state.importedAccounts).toContainEqual(mockAccount)
+    expect(state.currentStep).toBe('review')
+  })
 
   it('should replace existing account when re-importing the same institution (no duplicates)', () => {
     const firstImport: ImportedAccount = {
       institutionId: 'chase',
       institutionName: 'Chase',
-      transactions: [{ id: 'tx1', date: '2026-01-01', description: 'Old', amount: -10, currency: 'EUR', type: 'expense', institution: 'Chase' }],
+      transactions: [
+        {
+          id: 'tx1',
+          date: '2026-01-01',
+          description: 'Old',
+          amount: -10,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Chase',
+        },
+      ],
       importedAt: new Date().toISOString(),
-    };
+    }
     const secondImport: ImportedAccount = {
       institutionId: 'chase',
       institutionName: 'Chase',
-      transactions: [{ id: 'tx2', date: '2026-01-02', description: 'New', amount: -20, currency: 'EUR', type: 'expense', institution: 'Chase' }],
+      transactions: [
+        {
+          id: 'tx2',
+          date: '2026-01-02',
+          description: 'New',
+          amount: -20,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Chase',
+        },
+      ],
       importedAt: new Date().toISOString(),
-    };
+    }
 
-    useAppStore.getState().addImportedAccount(firstImport);
-    useAppStore.getState().addImportedAccount(secondImport);
+    useAppStore.getState().addImportedAccount(firstImport)
+    useAppStore.getState().addImportedAccount(secondImport)
 
-    const state = useAppStore.getState();
+    const state = useAppStore.getState()
     // Should still be exactly 1 account, not 2
-    expect(state.importedAccounts).toHaveLength(1);
+    expect(state.importedAccounts).toHaveLength(1)
     // Should have the latest data
-    expect(state.importedAccounts[0].transactions[0].id).toBe('tx2');
-  });
+    expect(state.importedAccounts[0].transactions[0].id).toBe('tx2')
+  })
 
   it('should reset import state', () => {
     // Set some non-initial state
@@ -94,33 +115,35 @@ describe('useAppStore', () => {
       currentStep: 'review',
       selectedCountry: { code: 'us', name: 'USA', flag: '🇺🇸', supported: true },
       selectedInstitution: { id: 'chase', name: 'Chase', type: 'bank', category: 'traditional' },
-      importedAccounts: [{
-        institutionId: '1',
-        institutionName: 'test',
-        transactions: [],
-        importedAt: ''
-      }],
-    });
+      importedAccounts: [
+        {
+          institutionId: '1',
+          institutionName: 'test',
+          transactions: [],
+          importedAt: '',
+        },
+      ],
+    })
 
-    useAppStore.getState().resetImport();
+    useAppStore.getState().resetImport()
 
-    const state = useAppStore.getState();
-    expect(state.currentStep).toBe('country');
-    expect(state.selectedCountry).toBeNull();
-    expect(state.selectedInstitution).toBeNull();
-    expect(state.importedAccounts).toEqual([]);
-  });
+    const state = useAppStore.getState()
+    expect(state.currentStep).toBe('country')
+    expect(state.selectedCountry).toBeNull()
+    expect(state.selectedInstitution).toBeNull()
+    expect(state.importedAccounts).toEqual([])
+  })
 
   it('should start new institution flow', () => {
     useAppStore.setState({
       currentStep: 'import',
       selectedInstitution: { id: 'chase', name: 'Chase', type: 'bank', category: 'traditional' },
-    });
+    })
 
-    useAppStore.getState().startNewInstitution();
+    useAppStore.getState().startNewInstitution()
 
-    const state = useAppStore.getState();
-    expect(state.selectedInstitution).toBeNull();
-    expect(state.currentStep).toBe('institution');
-  });
-});
+    const state = useAppStore.getState()
+    expect(state.selectedInstitution).toBeNull()
+    expect(state.currentStep).toBe('institution')
+  })
+})

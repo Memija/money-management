@@ -1,36 +1,38 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { useCallback, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import {
+  AlertCircle,
   ArrowLeft,
-  Upload,
+  CheckCircle2,
+  ClipboardPaste,
   FileSpreadsheet,
   FileType,
-  ClipboardPaste,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
-  X,
   Info,
-} from 'lucide-react';
-import { useAppStore } from '../../store/useAppStore';
-import { useLanguageStore } from '../../store/useLanguageStore';
-import type { ImportMethod, ImportedAccount } from '../../types';
-import styles from './TransactionImporter.module.css';
-import { TransactionPreviewModal } from './TransactionPreviewModal';
-import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal';
-import { useTransactionImport } from './useTransactionImport';
+  Loader2,
+  Upload,
+  X,
+} from 'lucide-react'
+
+import { useAppStore } from '../../store/useAppStore'
+import { useLanguageStore } from '../../store/useLanguageStore'
+import type { ImportedAccount, ImportMethod } from '../../types'
+import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal'
+import { TransactionPreviewModal } from './TransactionPreviewModal'
+import { useTransactionImport } from './useTransactionImport'
+
+import styles from './TransactionImporter.module.css'
 
 /* ─── component ─── */
 const TransactionImporter: React.FC = () => {
-  const { selectedInstitution, addImportedAccount, setStep } = useAppStore();
-  const t = useLanguageStore((s) => s.t);
-  const institutionName = selectedInstitution?.name ?? 'Unknown';
+  const { selectedInstitution, addImportedAccount, setStep } = useAppStore()
+  const t = useLanguageStore((s) => s.t)
+  const institutionName = selectedInstitution?.name ?? 'Unknown'
 
-  const [method, setMethod] = useState<ImportMethod | null>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [showClearConfirmation, setShowClearConfirmation] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [method, setMethod] = useState<ImportMethod | null>(null)
+  const [dragOver, setDragOver] = useState(false)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [showClearConfirmation, setShowClearConfirmation] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
     transactions,
@@ -45,41 +47,42 @@ const TransactionImporter: React.FC = () => {
     handlePaste,
     handleRemoveTransaction,
     handleUpdateTransaction,
-    handleClearAll
-  } = useTransactionImport(institutionName, method, t);
+    handleClearAll,
+  } = useTransactionImport(institutionName, method, t)
 
   /* ─── import method cards ─── */
-  const importMethods: { key: ImportMethod; label: string; icon: React.ReactNode; desc: string }[] = [
-    {
-      key: 'spreadsheet',
-      label: t.spreadsheetFile,
-      icon: <FileSpreadsheet size={24} />,
-      desc: t.spreadsheetFileDesc,
-    },
-    {
-      key: 'pdf',
-      label: t.pdfStatement,
-      icon: <FileType size={24} />,
-      desc: t.pdfStatementDesc,
-    },
-    {
-      key: 'paste',
-      label: t.copyPaste,
-      icon: <ClipboardPaste size={24} />,
-      desc: t.copyPasteDesc,
-    },
-  ];
+  const importMethods: { key: ImportMethod; label: string; icon: React.ReactNode; desc: string }[] =
+    [
+      {
+        key: 'spreadsheet',
+        label: t.spreadsheetFile,
+        icon: <FileSpreadsheet size={24} />,
+        desc: t.spreadsheetFileDesc,
+      },
+      {
+        key: 'pdf',
+        label: t.pdfStatement,
+        icon: <FileType size={24} />,
+        desc: t.pdfStatementDesc,
+      },
+      {
+        key: 'paste',
+        label: t.copyPaste,
+        icon: <ClipboardPaste size={24} />,
+        desc: t.copyPasteDesc,
+      },
+    ]
 
   /* ─── file handlers ─── */
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
-      e.preventDefault();
-      setDragOver(false);
-      const file = e.dataTransfer.files[0];
-      if (file) handleFileChange(file);
+      e.preventDefault()
+      setDragOver(false)
+      const file = e.dataTransfer.files[0]
+      if (file) handleFileChange(file)
     },
-    [handleFileChange]
-  );
+    [handleFileChange],
+  )
 
   const handleConfirmImport = () => {
     const account: ImportedAccount = {
@@ -87,20 +90,20 @@ const TransactionImporter: React.FC = () => {
       institutionName,
       transactions,
       importedAt: new Date().toISOString(),
-    };
-    addImportedAccount(account);
-  };
+    }
+    addImportedAccount(account)
+  }
 
   const onClearAll = useCallback(() => {
-    handleClearAll();
-    setShowClearConfirmation(false);
-  }, [handleClearAll]);
+    handleClearAll()
+    setShowClearConfirmation(false)
+  }, [handleClearAll])
 
   const acceptTypes: Record<ImportMethod, string> = {
     spreadsheet: '.xlsx,.xls,.csv',
     pdf: '.pdf',
     paste: '',
-  };
+  }
 
   /* ─── render ─── */
   return (
@@ -111,7 +114,11 @@ const TransactionImporter: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="onboarding-container"
     >
-      <button className="back-button" onClick={() => setStep('institution')} id="back-to-institution">
+      <button
+        className="back-button"
+        onClick={() => setStep('institution')}
+        id="back-to-institution"
+      >
         <ArrowLeft size={18} />
         <span>{t.back}</span>
       </button>
@@ -162,7 +169,14 @@ const TransactionImporter: React.FC = () => {
       {/* Step 2: Upload area / Paste */}
       {method && transactions.length === 0 && !loading && (
         <div className={styles['import-upload-area']}>
-          <button className={`back-button ${styles['back-button-aligned']}`} onClick={() => { setMethod(null); setError(null); setFileName(null); }}>
+          <button
+            className={`back-button ${styles['back-button-aligned']}`}
+            onClick={() => {
+              setMethod(null)
+              setError(null)
+              setFileName(null)
+            }}
+          >
             <ArrowLeft size={18} />
             <span>{t.chooseDifferentFormat}</span>
           </button>
@@ -181,7 +195,10 @@ const TransactionImporter: React.FC = () => {
           {method !== 'paste' ? (
             <div
               className={`${styles['drop-zone']} ${dragOver ? styles['drag-over'] : ''}`}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragOver={(e) => {
+                e.preventDefault()
+                setDragOver(true)
+              }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
@@ -192,8 +209,8 @@ const TransactionImporter: React.FC = () => {
                 type="file"
                 accept={acceptTypes[method]}
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileChange(file);
+                  const file = e.target.files?.[0]
+                  if (file) handleFileChange(file)
                 }}
                 className={styles['hidden']}
                 id="file-input"
@@ -202,12 +219,8 @@ const TransactionImporter: React.FC = () => {
                 title={t.dragDropFile}
               />
               <Upload size={40} className={styles['drop-zone-icon']} />
-              <p className={styles['drop-zone-title']}>
-                {dragOver ? t.dropHere : t.dragDropFile}
-              </p>
-              <p className={styles['drop-zone-subtitle']}>
-                {t.orClickToBrowse}
-              </p>
+              <p className={styles['drop-zone-title']}>{dragOver ? t.dropHere : t.dragDropFile}</p>
+              <p className={styles['drop-zone-subtitle']}>{t.orClickToBrowse}</p>
               <p className={`${styles['drop-zone-subtitle']} ${styles['drop-zone-formats']}`}>
                 {t.acceptedFormats.replace('{accepted}', acceptTypes[method])}
               </p>
@@ -258,7 +271,8 @@ const TransactionImporter: React.FC = () => {
             <div className={styles['import-preview-info']}>
               <CheckCircle2 size={20} className={styles['success-icon']} />
               <span>
-                <strong>{transactions.length}</strong> {t.transactionsFound.replace('{count}', '').trim()}
+                <strong>{transactions.length}</strong>{' '}
+                {t.transactionsFound.replace('{count}', '').trim()}
               </span>
             </div>
             <button
@@ -314,7 +328,7 @@ const TransactionImporter: React.FC = () => {
         cancelText={t.cancel}
       />
     </motion.div>
-  );
-};
+  )
+}
 
-export default TransactionImporter;
+export default TransactionImporter

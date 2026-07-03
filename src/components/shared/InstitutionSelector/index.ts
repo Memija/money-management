@@ -1,1 +1,1 @@
-export { default } from './InstitutionSelector';
+export { default } from './InstitutionSelector'

@@ -1,25 +1,27 @@
-import React, { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
 import {
-  Search,
-  Building2,
   ArrowLeft,
-  Landmark,
-  Smartphone,
-  TrendingUp,
-  ChevronRight,
-  CreditCard,
   Banknote,
   Briefcase,
+  Building2,
+  ChevronRight,
+  CreditCard,
   Globe,
+  Landmark,
   Leaf,
+  Search,
+  Smartphone,
+  TrendingUp,
   Wallet,
-} from 'lucide-react';
-import { useAppStore } from '../../../store/useAppStore';
-import { useLanguageStore } from '../../../store/useLanguageStore';
-import { institutionsByCountry, categoryOrder } from '../../../data/institutions';
-import type { FinancialInstitution, InstitutionCategory } from '../../../types';
-import styles from './InstitutionSelector.module.css';
+} from 'lucide-react'
+
+import { categoryOrder, institutionsByCountry } from '../../../data/institutions'
+import { useAppStore } from '../../../store/useAppStore'
+import { useLanguageStore } from '../../../store/useLanguageStore'
+import type { FinancialInstitution, InstitutionCategory } from '../../../types'
+
+import styles from './InstitutionSelector.module.css'
 
 /* ─── icon / colour maps ─── */
 
@@ -29,7 +31,7 @@ const typeIcons: Record<FinancialInstitution['type'], React.ReactNode> = {
   credit_union: <Building2 size={18} />,
   brokerage: <TrendingUp size={18} />,
   insurance: <Building2 size={18} />,
-};
+}
 
 const categoryIcons: Record<InstitutionCategory, React.ReactNode> = {
   traditional: <Landmark size={14} />,
@@ -42,10 +44,22 @@ const categoryIcons: Record<InstitutionCategory, React.ReactNode> = {
   specialized: <Leaf size={14} />,
   payment: <Wallet size={14} />,
   other: <Building2 size={14} />,
-};
+}
 
 /** Map InstitutionCategory to translation key */
-const categoryTranslationKeys: Record<InstitutionCategory, 'catTraditional' | 'catSparkasse' | 'catVolksbank' | 'catDirect' | 'catNeobank' | 'catLandesbank' | 'catBrokerage' | 'catSpecialized' | 'catPayment' | 'catOther'> = {
+const categoryTranslationKeys: Record<
+  InstitutionCategory,
+  | 'catTraditional'
+  | 'catSparkasse'
+  | 'catVolksbank'
+  | 'catDirect'
+  | 'catNeobank'
+  | 'catLandesbank'
+  | 'catBrokerage'
+  | 'catSpecialized'
+  | 'catPayment'
+  | 'catOther'
+> = {
   traditional: 'catTraditional',
   sparkasse: 'catSparkasse',
   volksbank: 'catVolksbank',
@@ -56,50 +70,46 @@ const categoryTranslationKeys: Record<InstitutionCategory, 'catTraditional' | 'c
   specialized: 'catSpecialized',
   payment: 'catPayment',
   other: 'catOther',
-};
-
+}
 
 const InstitutionSelector: React.FC = () => {
-  const { selectedCountry, selectInstitution, setStep } = useAppStore();
-  const t = useLanguageStore((s) => s.t);
-  const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState<InstitutionCategory | 'all'>('all');
+  const { selectedCountry, selectInstitution, setStep } = useAppStore()
+  const t = useLanguageStore((s) => s.t)
+  const [search, setSearch] = useState('')
+  const [activeCategory, setActiveCategory] = useState<InstitutionCategory | 'all'>('all')
 
   const institutions = useMemo(() => {
-    return selectedCountry
-      ? institutionsByCountry[selectedCountry.code] || []
-      : [];
-  }, [selectedCountry]);
-
+    return selectedCountry ? institutionsByCountry[selectedCountry.code] || [] : []
+  }, [selectedCountry])
 
   /* Determine which categories actually have institutions */
   const availableCategories = useMemo(() => {
-    const cats = new Set(institutions.map((i) => i.category));
-    return categoryOrder.filter((c) => cats.has(c));
-  }, [institutions]);
+    const cats = new Set(institutions.map((i) => i.category))
+    return categoryOrder.filter((c) => cats.has(c))
+  }, [institutions])
 
   /* Filter by search + category */
   const filtered = useMemo(() => {
     return institutions.filter((inst) => {
-      const matchesSearch = inst.name.toLowerCase().includes(search.toLowerCase());
-      const matchesCat = activeCategory === 'all' || inst.category === activeCategory;
-      return matchesSearch && matchesCat;
-    });
-  }, [institutions, search, activeCategory]);
+      const matchesSearch = inst.name.toLowerCase().includes(search.toLowerCase())
+      const matchesCat = activeCategory === 'all' || inst.category === activeCategory
+      return matchesSearch && matchesCat
+    })
+  }, [institutions, search, activeCategory])
 
   /* Group by category for display */
   const grouped = useMemo(() => {
-    const map = new Map<InstitutionCategory, FinancialInstitution[]>();
+    const map = new Map<InstitutionCategory, FinancialInstitution[]>()
     for (const inst of filtered) {
-      const arr = map.get(inst.category) || [];
-      arr.push(inst);
-      map.set(inst.category, arr);
+      const arr = map.get(inst.category) || []
+      arr.push(inst)
+      map.set(inst.category, arr)
     }
     // Preserve display order
     return categoryOrder
       .filter((c) => map.has(c))
-      .map((c) => ({ category: c, institutions: map.get(c)! }));
-  }, [filtered]);
+      .map((c) => ({ category: c, institutions: map.get(c)! }))
+  }, [filtered])
 
   return (
     <motion.div
@@ -121,7 +131,11 @@ const InstitutionSelector: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className={styles['country-badge-top']}
           >
-            <img src={selectedCountry.flag} alt="" className={styles['country-flag-sm']} />
+            <img
+              src={selectedCountry.flag}
+              alt={`${t.countries[selectedCountry.code as keyof typeof t.countries]} flag`}
+              className={styles['country-flag-sm']}
+            />
             <span>{t.countries[selectedCountry.code as keyof typeof t.countries]}</span>
           </motion.div>
         )}
@@ -134,9 +148,7 @@ const InstitutionSelector: React.FC = () => {
           <Building2 size={32} />
         </motion.div>
         <h1 className="onboarding-title">{t.selectInstitutionTitle}</h1>
-        <p className="onboarding-subtitle">
-          {t.selectInstitutionSubtitle}
-        </p>
+        <p className="onboarding-subtitle">{t.selectInstitutionSubtitle}</p>
       </div>
 
       {/* Search */}
@@ -150,6 +162,7 @@ const InstitutionSelector: React.FC = () => {
           className={styles['institution-search-input']}
           id="institution-search"
           name="institution-search"
+          aria-label={t.searchInstitutions}
         />
       </div>
 
@@ -166,7 +179,7 @@ const InstitutionSelector: React.FC = () => {
             <span className={styles['category-tag-count']}>{institutions.length}</span>
           </button>
           {availableCategories.map((cat) => {
-            const count = institutions.filter((i) => i.category === cat).length;
+            const count = institutions.filter((i) => i.category === cat).length
             return (
               <button
                 key={cat}
@@ -179,7 +192,7 @@ const InstitutionSelector: React.FC = () => {
                 <span>{t[categoryTranslationKeys[cat]]}</span>
                 <span className={styles['category-tag-count']}>{count}</span>
               </button>
-            );
+            )
           })}
         </div>
       </div>
@@ -195,10 +208,7 @@ const InstitutionSelector: React.FC = () => {
             <div key={category} className={styles['institution-group']}>
               {activeCategory === 'all' && (
                 <div className={styles['institution-group-header']}>
-                  <span
-                    className={styles['institution-type-badge']}
-                    data-category={category}
-                  >
+                  <span className={styles['institution-type-badge']} data-category={category}>
                     {categoryIcons[category]}
                     {t[categoryTranslationKeys[category]]}
                   </span>
@@ -221,7 +231,11 @@ const InstitutionSelector: React.FC = () => {
                       data-category={inst.category}
                     >
                       {inst.logo ? (
-                        <img src={inst.logo} alt="" className={styles['institution-logo']} />
+                        <img
+                          src={inst.logo}
+                          alt={`${inst.name} logo`}
+                          className={styles['institution-logo']}
+                        />
                       ) : (
                         typeIcons[inst.type]
                       )}
@@ -240,9 +254,8 @@ const InstitutionSelector: React.FC = () => {
           ))
         )}
       </div>
-
     </motion.div>
-  );
-};
+  )
+}
 
-export default InstitutionSelector;
+export default InstitutionSelector

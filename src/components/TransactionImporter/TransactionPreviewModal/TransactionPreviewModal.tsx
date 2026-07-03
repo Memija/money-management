@@ -1,22 +1,33 @@
-import React, { useState, useMemo } from 'react';
-import { Virtuoso } from 'react-virtuoso';
-import { Trash2, ArrowUp, ArrowDown, ArrowUpDown, CalendarDays, FileText, Coins, Check } from 'lucide-react';
-import { Modal } from '../../shared/Modal';
-import { useLanguageStore } from '../../../store/useLanguageStore';
-import { DatePicker } from '../../shared/DatePicker';
-import { useFormatters } from '../../../hooks/useFormatters';
-import type { Transaction } from '../../../types';
-import styles from './TransactionPreviewModal.module.css';
+import React, { useMemo, useState } from 'react'
+import { Virtuoso } from 'react-virtuoso'
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  CalendarDays,
+  Check,
+  Coins,
+  FileText,
+  Trash2,
+} from 'lucide-react'
+
+import { useFormatters } from '../../../hooks/useFormatters'
+import { useLanguageStore } from '../../../store/useLanguageStore'
+import type { Transaction } from '../../../types'
+import { DatePicker } from '../../shared/DatePicker'
+import { Modal } from '../../shared/Modal'
+
+import styles from './TransactionPreviewModal.module.css'
 
 interface TransactionPreviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  transactions: Transaction[];
-  onRemoveTransaction: (id: string) => void;
-  onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void;
+  isOpen: boolean
+  onClose: () => void
+  transactions: Transaction[]
+  onRemoveTransaction: (id: string) => void
+  onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void
 }
 
-type SortColumn = 'date' | 'description' | 'amount';
+type SortColumn = 'date' | 'description' | 'amount'
 
 export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = ({
   isOpen,
@@ -25,36 +36,39 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   onRemoveTransaction,
   onUpdateTransaction,
 }) => {
-  const t = useLanguageStore((s) => s.t);
-  const { formatCurrency, formatDate } = useFormatters();
+  const t = useLanguageStore((s) => s.t)
+  const { formatCurrency, formatDate } = useFormatters()
 
-  const [sortConfig, setSortConfig] = useState<{ key: SortColumn; direction: 'asc' | 'desc' } | null>(null);
-  const [filters, setFilters] = useState({ date: '', description: '', amount: '' });
+  const [sortConfig, setSortConfig] = useState<{
+    key: SortColumn
+    direction: 'asc' | 'desc'
+  } | null>(null)
+  const [filters, setFilters] = useState({ date: '', description: '', amount: '' })
 
   const handleSort = (key: SortColumn) => {
-    let direction: 'asc' | 'desc' = 'asc';
+    let direction: 'asc' | 'desc' = 'asc'
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+      direction = 'desc'
     }
-    setSortConfig({ key, direction });
-  };
+    setSortConfig({ key, direction })
+  }
 
   const filteredAndSortedTransactions = useMemo(() => {
-    let result = [...transactions];
+    let result = [...transactions]
 
     if (filters.date) {
-      result = result.filter(tx => tx.date === filters.date);
+      result = result.filter((tx) => tx.date === filters.date)
     }
     if (filters.description) {
-      const lowerQuery = filters.description.toLowerCase();
-      result = result.filter(tx => tx.description.toLowerCase().includes(lowerQuery));
+      const lowerQuery = filters.description.toLowerCase()
+      result = result.filter((tx) => tx.description.toLowerCase().includes(lowerQuery))
     }
     if (filters.amount) {
-      const lowerQuery = filters.amount.toLowerCase();
-      result = result.filter(tx => {
-        const formattedAmount = formatCurrency(tx.amount).toLowerCase();
-        return formattedAmount.includes(lowerQuery) || tx.amount.toString().includes(lowerQuery);
-      });
+      const lowerQuery = filters.amount.toLowerCase()
+      result = result.filter((tx) => {
+        const formattedAmount = formatCurrency(tx.amount).toLowerCase()
+        return formattedAmount.includes(lowerQuery) || tx.amount.toString().includes(lowerQuery)
+      })
     }
 
     if (sortConfig !== null) {
@@ -62,31 +76,31 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         if (sortConfig.key === 'date') {
           return sortConfig.direction === 'asc'
             ? a.date.localeCompare(b.date)
-            : b.date.localeCompare(a.date);
+            : b.date.localeCompare(a.date)
         }
         if (sortConfig.key === 'description') {
           return sortConfig.direction === 'asc'
             ? a.description.localeCompare(b.description)
-            : b.description.localeCompare(a.description);
+            : b.description.localeCompare(a.description)
         }
         if (sortConfig.key === 'amount') {
-          return sortConfig.direction === 'asc'
-            ? a.amount - b.amount
-            : b.amount - a.amount;
+          return sortConfig.direction === 'asc' ? a.amount - b.amount : b.amount - a.amount
         }
-        return 0;
-      });
+        return 0
+      })
     }
 
-    return result;
-  }, [transactions, filters, sortConfig, formatCurrency]);
+    return result
+  }, [transactions, filters, sortConfig, formatCurrency])
 
   const renderSortIcon = (key: SortColumn) => {
-    if (sortConfig?.key !== key) return <ArrowUpDown size={14} className={styles['sort-icon']} />;
-    return sortConfig.direction === 'asc'
-      ? <ArrowUp size={14} className={`${styles['sort-icon']} ${styles.active}`} />
-      : <ArrowDown size={14} className={`${styles['sort-icon']} ${styles.active}`} />;
-  };
+    if (sortConfig?.key !== key) return <ArrowUpDown size={14} className={styles['sort-icon']} />
+    return sortConfig.direction === 'asc' ? (
+      <ArrowUp size={14} className={`${styles['sort-icon']} ${styles.active}`} />
+    ) : (
+      <ArrowDown size={14} className={`${styles['sort-icon']} ${styles.active}`} />
+    )
+  }
 
   const rowContent = (index: number, tx: Transaction) => (
     <div className={`${styles['tx-row']} ${index % 2 === 0 ? styles['tx-row-even'] : ''}`}>
@@ -115,7 +129,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           tx.description
         )}
       </div>
-      <div className={`${styles['tx-amount']} ${tx.type === 'income' ? styles.positive : styles.negative}`}>
+      <div
+        className={`${styles['tx-amount']} ${tx.type === 'income' ? styles.positive : styles.negative}`}
+      >
         {onUpdateTransaction ? (
           <input
             type="number"
@@ -124,12 +140,12 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             className={`${styles['tx-inline-input']} ${styles['tx-amount-input']}`}
             value={tx.amount === 0 ? '' : tx.amount}
             onChange={(e) => {
-              const val = e.target.value;
-              const num = val === '' ? 0 : parseFloat(val);
+              const val = e.target.value
+              const num = val === '' ? 0 : parseFloat(val)
               onUpdateTransaction(tx.id, {
                 amount: isNaN(num) ? 0 : num,
-                type: (isNaN(num) ? 0 : num) >= 0 ? 'income' : 'expense'
-              });
+                type: (isNaN(num) ? 0 : num) >= 0 ? 'income' : 'expense',
+              })
             }}
             title={formatCurrency(tx.amount)}
           />
@@ -151,7 +167,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         </button>
       </div>
     </div>
-  );
+  )
 
   return (
     <Modal
@@ -160,7 +176,11 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       title={t.transactions}
       maxWidth="800px"
       footer={
-        <button className={`primary-button ${styles['done-button']}`} onClick={onClose} title={t.done}>
+        <button
+          className={`primary-button ${styles['done-button']}`}
+          onClick={onClose}
+          title={t.done}
+        >
           <Check size={18} className={styles['header-concept-icon']} />
           <span className={styles['hide-on-mobile']}>{t.done}</span>
         </button>
@@ -169,22 +189,40 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       <div className={styles['table-responsive-wrapper']}>
         <div className={styles['table-min-width']}>
           <div className={styles['table-header']}>
-            <div className={`${styles['header-col']} ${styles['header-col-date']} ${styles['theme-primary-strong']}`}>
-              <div className={styles['sortable-title']} onClick={() => handleSort('date')} title={t.date}>
-                <CalendarDays size={16} className={`${styles['header-concept-icon']} ${styles['icon-secondary']}`} />
+            <div
+              className={`${styles['header-col']} ${styles['header-col-date']} ${styles['theme-primary-strong']}`}
+            >
+              <div
+                className={styles['sortable-title']}
+                onClick={() => handleSort('date')}
+                title={t.date}
+              >
+                <CalendarDays
+                  size={16}
+                  className={`${styles['header-concept-icon']} ${styles['icon-secondary']}`}
+                />
                 <span className={styles['hide-on-mobile']}>{t.date}</span>
                 {renderSortIcon('date')}
               </div>
               <DatePicker
                 className={styles['filter-input']}
                 value={filters.date}
-                onChange={(date) => setFilters(prev => ({ ...prev, date }))}
+                onChange={(date) => setFilters((prev) => ({ ...prev, date }))}
                 placeholder={t.filterDatePlaceholder}
               />
             </div>
-            <div className={`${styles['header-col']} ${styles['header-col-desc']} ${styles['theme-primary-medium']}`}>
-              <div className={styles['sortable-title']} onClick={() => handleSort('description')} title={t.description}>
-                <FileText size={16} className={`${styles['header-concept-icon']} ${styles['icon-accent']}`} />
+            <div
+              className={`${styles['header-col']} ${styles['header-col-desc']} ${styles['theme-primary-medium']}`}
+            >
+              <div
+                className={styles['sortable-title']}
+                onClick={() => handleSort('description')}
+                title={t.description}
+              >
+                <FileText
+                  size={16}
+                  className={`${styles['header-concept-icon']} ${styles['icon-accent']}`}
+                />
                 <span className={styles['hide-on-mobile']}>{t.description}</span>
                 {renderSortIcon('description')}
               </div>
@@ -196,12 +234,21 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 placeholder={t.filterPlaceholder}
                 title={t.filterPlaceholder}
                 value={filters.description}
-                onChange={(e) => setFilters(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) => setFilters((prev) => ({ ...prev, description: e.target.value }))}
               />
             </div>
-            <div className={`${styles['header-col']} ${styles['header-col-amount']} ${styles['theme-primary-light']}`}>
-              <div className={`${styles['sortable-title']} ${styles['sortable-title-right']}`} onClick={() => handleSort('amount')} title={t.amount}>
-                <Coins size={16} className={`${styles['header-concept-icon']} ${styles['icon-primary']}`} />
+            <div
+              className={`${styles['header-col']} ${styles['header-col-amount']} ${styles['theme-primary-light']}`}
+            >
+              <div
+                className={`${styles['sortable-title']} ${styles['sortable-title-right']}`}
+                onClick={() => handleSort('amount')}
+                title={t.amount}
+              >
+                <Coins
+                  size={16}
+                  className={`${styles['header-concept-icon']} ${styles['icon-primary']}`}
+                />
                 <span className={styles['hide-on-mobile']}>{t.amount}</span>
                 {renderSortIcon('amount')}
               </div>
@@ -214,8 +261,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 title={t.filterPlaceholder}
                 value={filters.amount}
                 onChange={(e) => {
-                  const val = e.target.value.replace(/[^0-9.,-]/g, '');
-                  setFilters(prev => ({ ...prev, amount: val }));
+                  const val = e.target.value.replace(/[^0-9.,-]/g, '')
+                  setFilters((prev) => ({ ...prev, amount: val }))
                 }}
               />
             </div>
@@ -229,7 +276,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           ) : (
             <div className={styles['list-container']}>
               <Virtuoso
-                style={{ height: '100%' }}
+                className={styles['virtuoso-list']}
                 totalCount={filteredAndSortedTransactions.length}
                 data={filteredAndSortedTransactions}
                 itemContent={rowContent}
@@ -239,5 +286,5 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         </div>
       </div>
     </Modal>
-  );
-};
+  )
+}

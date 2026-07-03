@@ -8,12 +8,12 @@ export type InstitutionCategory =
   | 'brokerage'
   | 'specialized'
   | 'payment'
-  | 'other';
+  | 'other'
 
 export interface FinancialInstitution {
-  id: string;
-  name: string;
-  type: 'bank' | 'neobank' | 'credit_union' | 'brokerage' | 'insurance';
-  category: InstitutionCategory;
-  logo?: string;
+  id: string
+  name: string
+  type: 'bank' | 'neobank' | 'credit_union' | 'brokerage' | 'insurance'
+  category: InstitutionCategory
+  logo?: string
 }

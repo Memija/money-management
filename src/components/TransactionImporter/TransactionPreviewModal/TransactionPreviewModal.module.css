@@ -34,6 +34,10 @@
   overflow: hidden;
 }
 
+.virtuoso-list {
+  height: 100%;
+}
+
 .tx-row {
   display: flex;
   padding: 0;
@@ -104,7 +108,7 @@
   margin: -4px -6px;
 }
 
-.tx-date-picker-container input[type="text"] {
+.tx-date-picker-container input[type='text'] {
   height: 24px;
   /* smaller height to match inline input */
   background: transparent;
@@ -120,11 +124,11 @@
   /* offset the height restriction */
 }
 
-.tx-date-picker-container input[type="text"]:hover {
+.tx-date-picker-container input[type='text']:hover {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.tx-date-picker-container input[type="text"]:focus {
+.tx-date-picker-container input[type='text']:focus {
   background: rgba(0, 0, 0, 0.2);
   border-color: var(--primary);
   outline: none;
@@ -135,7 +139,7 @@
   width: 100px;
 }
 
-.tx-inline-input[type="date"]::-webkit-calendar-picker-indicator {
+.tx-inline-input[type='date']::-webkit-calendar-picker-indicator {
   filter: invert(1);
   opacity: 0.5;
   cursor: pointer;
@@ -306,7 +310,9 @@
   outline: none;
   border-color: var(--primary);
   background: rgba(0, 0, 0, 0.3);
-  box-shadow: 0 0 8px var(--primary), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 0 8px var(--primary),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .theme-primary-strong .filter-input::placeholder,

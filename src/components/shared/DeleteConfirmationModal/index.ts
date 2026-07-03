@@ -1,2 +1,2 @@
-export { DeleteConfirmationModal } from './DeleteConfirmationModal';
-export type { DeleteConfirmationModalProps } from './DeleteConfirmationModal';
+export type { DeleteConfirmationModalProps } from './DeleteConfirmationModal'
+export { DeleteConfirmationModal } from './DeleteConfirmationModal'

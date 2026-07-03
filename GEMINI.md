@@ -141,10 +141,10 @@ interface ReusableThingProps {
   onActionCompleted: () => void;
 }
 
-export const ReusableThing = ({ 
-  config, 
-  variant = 'primary', 
-  onActionCompleted 
+export const ReusableThing = ({
+  config,
+  variant = 'primary',
+  onActionCompleted
 }: ReusableThingProps) => {
   // ... implementation
   return (
@@ -289,16 +289,16 @@ Use descriptive names that reflect single responsibility:
 ```typescript
 const handleAction = async () => {
   try {
-    setIsLoading(true);
-    await apiService.doSomething();
-    showSuccess('Success!');
+    setIsLoading(true)
+    await apiService.doSomething()
+    showSuccess('Success!')
   } catch (error) {
-    console.error('Action failed:', error);
-    showError('Failed to complete action. Please try again.');
+    console.error('Action failed:', error)
+    showError('Failed to complete action. Please try again.')
   } finally {
-    setIsLoading(false);
+    setIsLoading(false)
   }
-};
+}
 ```
 
 ---
@@ -438,11 +438,11 @@ Consistent naming improves readability and searchability.
 
 ```typescript
 // ✅ GOOD
-const name = user?.profile?.name ?? 'Anonymous';
-const message = `Hello, ${name}!`;
+const name = user?.profile?.name ?? 'Anonymous'
+const message = `Hello, ${name}!`
 
 // ❌ BAD
-const name = (user && user.profile && user.profile.name) || 'Anonymous';
+const name = (user && user.profile && user.profile.name) || 'Anonymous'
 ```
 
 ### Functions
@@ -534,8 +534,8 @@ src/
 ### Test Naming
 
 ```typescript
-it('should display error message when form is invalid', () => {});
-it('should call onSave when button is clicked', () => {});
+it('should display error message when form is invalid', () => {})
+it('should call onSave when button is clicked', () => {})
 ```
 
 ### Testing Best Practices
@@ -557,17 +557,15 @@ it('should call onSave when button is clicked', () => {});
  * @returns Total amount spent, or 0 if no matching transactions
  */
 export const sumByCategory = (transactions: Transaction[], category: string): number => {
-  return transactions
-    .filter(t => t.category === category)
-    .reduce((sum, t) => sum + t.amount, 0);
-};
+  return transactions.filter((t) => t.category === category).reduce((sum, t) => sum + t.amount, 0)
+}
 ```
 
 ---
 
 ## Internationalization (i18n)
 
-### Pattern
+### i18n Pattern
 
 The project uses a custom i18n solution via `useLanguageStore` (Zustand).
 
@@ -612,3 +610,82 @@ src/
 - **Feature-based structure** - Group components and logic by feature
 - **Keep components and their styles together** in the same folder
 - **Export from index.ts** in each folder for cleaner imports
+
+---
+
+## Routing Strategy
+
+### Routing Pattern
+
+The project uses **React Router** (or similar) with lazy loading for page-level components.
+
+### Routing Rules
+
+- **Lazy Load Pages:** Always use `React.lazy` and `Suspense` for top-level routes to minimize the initial bundle size.
+- **Route Protection:** Wrap protected routes in an authentication/authorization wrapper component rather than checking state inside individual pages.
+- **Centralized Routes:** Define routes in a centralized configuration file (e.g., `src/App.tsx` or `src/routes.tsx`) to maintain a clear overview of the application's structure.
+
+---
+
+## API & Data Fetching
+
+### Server vs. Client State
+
+- **Client State:** Use **Zustand** strictly for UI state, form state, and client-only logic (e.g., theme, sidebar toggle, local filters).
+- **Server State:** Use **React Query** (or similar) for fetching, caching, synchronizing, and updating server data.
+
+### Data Fetching Rules
+
+- **No `useEffect` for Fetching:** Avoid raw `fetch` or `axios` calls inside `useEffect`. Always prefer React Query hooks (`useQuery`, `useMutation`).
+- **Cancellation:** Utilize `AbortController` in your API service functions to cancel pending requests when a component unmounts.
+- **Centralized API Service:** Keep all API call definitions in a dedicated service file or folder (e.g., `src/services/api.ts`), separated from UI components.
+
+---
+
+## Environment Variables
+
+### Environment Variables Pattern
+
+Environment variables are handled via Vite's `import.meta.env`.
+
+### Env Rules
+
+- **Prefixing:** All client-facing environment variables MUST be prefixed with `VITE_` (e.g., `VITE_API_URL`).
+- **No Secrets:** Never store sensitive secrets (API keys for paid services, database credentials) in `.env` files used by the frontend.
+- **Type Safety:** Define types for environment variables in `src/vite-env.d.ts` to ensure TypeScript intellisense and safety.
+
+---
+
+## Import Sorting Rules
+
+Consistent imports prevent merge conflicts and improve readability.
+
+### Preferred Order
+
+1. **React and Core Libraries:** `import React, { useState } from 'react';`
+2. **Third-Party Packages:** `import { useForm } from 'react-hook-form';`
+3. **Absolute Internal Imports (if configured):** `import { Button } from '@/components/shared/Button';`
+4. **Relative Internal Imports:** `import { useTransactions } from '../../hooks/useTransactions';`
+5. **Types and Interfaces:** `import type { User } from '@/types';`
+6. **Styles:** `import styles from './Component.module.css';`
+
+_Tip: Configure ESLint (`eslint-plugin-import`) or Prettier to auto-sort imports._
+
+---
+
+## Linting, Formatting & Commits
+
+### Code Consistency
+
+- **Prettier:** Use Prettier for all code formatting. Do not manually format code; rely on the IDE plugin or run the format script.
+- **ESLint:** Ensure there are no ESLint warnings or errors before committing code. Fix issues rather than disabling rules via `// eslint-disable-next-line` unless absolutely necessary.
+
+### Commit Messages
+
+- **Conventional Commits:** Follow the conventional commit format for clearer history and automated changelog generation:
+  - `feat:` for new features
+  - `fix:` for bug fixes
+  - `refactor:` for code refactoring
+  - `docs:` for documentation updates
+  - `chore:` for maintenance tasks (e.g., dependency updates)
+  - _Example:_ `feat(dashboard): add transaction summary chart`

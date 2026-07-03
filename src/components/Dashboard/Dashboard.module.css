@@ -18,7 +18,6 @@
 }
 
 @media (max-width: 1024px) {
-
   .col-span-8,
   .col-span-4 {
     grid-column: span 12;
@@ -101,7 +100,7 @@
   pointer-events: none;
 }
 
-:global([data-theme="light"]) .balance-hero::before {
+:global([data-theme='light']) .balance-hero::before {
   background: radial-gradient(circle at center, var(--primary-glow) 0%, transparent 70%);
 }
 

@@ -16,10 +16,13 @@
 
 .modal {
   width: 100%;
+  max-width: var(--modal-max-width, 500px);
   background: var(--bg-elevated);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg), 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    var(--shadow-lg),
+    0 20px 40px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 2rem);

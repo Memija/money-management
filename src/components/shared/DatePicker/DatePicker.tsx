@@ -1,160 +1,198 @@
-import React, { useState, useRef, useEffect, useMemo, useId } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { useLanguageStore } from '../../../store/useLanguageStore';
-import { useFormatters } from '../../../hooks/useFormatters';
-import { getPublicHolidayName } from '../../../utils/holidays';
-import styles from './DatePicker.module.css';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react'
+
+import { useFormatters } from '../../../hooks/useFormatters'
+import { useLanguageStore } from '../../../store/useLanguageStore'
+import { getPublicHolidayName } from '../../../utils/holidays'
+
+import styles from './DatePicker.module.css'
 
 interface DatePickerProps {
-  value: string;
-  onChange: (date: string) => void;
-  className?: string;
-  placeholder?: string;
+  value: string
+  onChange: (date: string) => void
+  className?: string
+  placeholder?: string
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
   value,
   onChange,
   className = '',
-  placeholder
+  placeholder,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { formatDate } = useFormatters();
-  const inputId = useId();
+  const [isOpen, setIsOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { formatDate } = useFormatters()
+  const inputId = useId()
 
   // Parse current value or use today for the view
-  const initialDate = value ? new Date(value) : new Date();
-  const [currentMonth, setCurrentMonth] = useState(new Date(initialDate.getFullYear(), initialDate.getMonth(), 1));
+  const initialDate = value ? new Date(value) : new Date()
+  const [currentMonth, setCurrentMonth] = useState(
+    new Date(initialDate.getFullYear(), initialDate.getMonth(), 1),
+  )
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handlePrevMonth = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-  };
+    e.stopPropagation()
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))
+  }
 
   const handleNextMonth = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-  };
+    e.stopPropagation()
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))
+  }
 
   const handleDateSelect = (day: number) => {
-    const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
     // Format to YYYY-MM-DD local time
-    const formatted = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
-    onChange(formatted);
-    setIsOpen(false);
-  };
+    const formatted = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+    onChange(formatted)
+    setIsOpen(false)
+  }
 
   const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange('');
-    setIsOpen(false);
-  };
+    e.stopPropagation()
+    onChange('')
+    setIsOpen(false)
+  }
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen);
+    setIsOpen(!isOpen)
     if (!isOpen && value) {
-      const d = new Date(value);
-      setCurrentMonth(new Date(d.getFullYear(), d.getMonth(), 1));
+      const d = new Date(value)
+      setCurrentMonth(new Date(d.getFullYear(), d.getMonth(), 1))
     }
-  };
+  }
 
   // Calendar logic
   const { days, blanks } = useMemo(() => {
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const year = currentMonth.getFullYear()
+    const month = currentMonth.getMonth()
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
     // 0 = Sunday, 1 = Monday. We want Monday as first day.
-    let firstDayOfWeek = new Date(year, month, 1).getDay();
+    let firstDayOfWeek = new Date(year, month, 1).getDay()
     // Adjust to Monday start (1-7)
-    firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+    firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1
 
     return {
       days: Array.from({ length: daysInMonth }, (_, i) => i + 1),
-      blanks: Array.from({ length: firstDayOfWeek }, (_, i) => i)
-    };
-  }, [currentMonth]);
+      blanks: Array.from({ length: firstDayOfWeek }, (_, i) => i),
+    }
+  }, [currentMonth])
 
   // Localized months and weekdays
-  const { locale, t } = useLanguageStore();
+  const { locale, t } = useLanguageStore()
 
   const monthNames = useMemo(() => {
     const fallbacks: Record<string, string[]> = {
-      bs: ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Juni', 'Juli', 'August', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'],
-      sr: ['Јануар', 'Фебруар', 'Март', 'Април', 'Мај', 'Јун', 'Јул', 'Август', 'Септембар', 'Октобар', 'Новембар', 'Децембар']
-    };
-    
-    if (fallbacks[locale]) return fallbacks[locale];
+      bs: [
+        'Januar',
+        'Februar',
+        'Mart',
+        'April',
+        'Maj',
+        'Juni',
+        'Juli',
+        'August',
+        'Septembar',
+        'Oktobar',
+        'Novembar',
+        'Decembar',
+      ],
+      sr: [
+        'Јануар',
+        'Фебруар',
+        'Март',
+        'Април',
+        'Мај',
+        'Јун',
+        'Јул',
+        'Август',
+        'Септембар',
+        'Октобар',
+        'Новембар',
+        'Децембар',
+      ],
+    }
+
+    if (fallbacks[locale]) return fallbacks[locale]
 
     return Array.from({ length: 12 }, (_, i) => {
-      const d = new Date(2023, i, 1);
-      const name = new Intl.DateTimeFormat(locale, { month: 'long' }).format(d);
-      return name.charAt(0).toUpperCase() + name.slice(1);
-    });
-  }, [locale]);
+      const d = new Date(2023, i, 1)
+      const name = new Intl.DateTimeFormat(locale, { month: 'long' }).format(d)
+      return name.charAt(0).toUpperCase() + name.slice(1)
+    })
+  }, [locale])
 
   const weekdays = useMemo(() => {
     const fallbacks: Record<string, string[]> = {
       bs: ['Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub', 'Ned'],
-      sr: ['Пон', 'Уто', 'Сре', 'Чет', 'Пет', 'Суб', 'Нед']
-    };
+      sr: ['Пон', 'Уто', 'Сре', 'Чет', 'Пет', 'Суб', 'Нед'],
+    }
 
-    if (fallbacks[locale]) return fallbacks[locale];
+    if (fallbacks[locale]) return fallbacks[locale]
 
     // January 2, 2023 was a Monday
     return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(2023, 0, 2 + i);
-      const name = new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d);
-      return name.charAt(0).toUpperCase() + name.slice(1);
-    });
-  }, [locale]);
+      const d = new Date(2023, 0, 2 + i)
+      const name = new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d)
+      return name.charAt(0).toUpperCase() + name.slice(1)
+    })
+  }, [locale])
 
   // Check if a day is today
   const isToday = (day: number) => {
-    const today = new Date();
-    return today.getDate() === day &&
+    const today = new Date()
+    return (
+      today.getDate() === day &&
       today.getMonth() === currentMonth.getMonth() &&
-      today.getFullYear() === currentMonth.getFullYear();
-  };
+      today.getFullYear() === currentMonth.getFullYear()
+    )
+  }
 
   // Check if a day is selected
   const isSelected = (day: number) => {
-    if (!value) return false;
-    const selected = new Date(value);
-    return selected.getDate() === day &&
+    if (!value) return false
+    const selected = new Date(value)
+    return (
+      selected.getDate() === day &&
       selected.getMonth() === currentMonth.getMonth() &&
-      selected.getFullYear() === currentMonth.getFullYear();
-  };
+      selected.getFullYear() === currentMonth.getFullYear()
+    )
+  }
 
   const isFuture = (day: number) => {
-    const d = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return d > today;
-  };
+    const d = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return d > today
+  }
 
   const isSunday = (day: number) => {
-    const d = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return d.getDay() === 0;
-  };
+    const d = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
+    return d.getDay() === 0
+  }
 
   const getHolidayKey = (day: number) => {
-    const d = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return getPublicHolidayName(d, 'DE');
-  };
+    const d = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
+    return getPublicHolidayName(d, 'DE')
+  }
 
   return (
-    <div className={`${styles.container} ${className}`} ref={containerRef} title={placeholder || t.selectDatePlaceholder}>
+    <div
+      className={`${styles.container} ${className}`}
+      ref={containerRef}
+      title={placeholder || t.selectDatePlaceholder}
+    >
       <div className={styles['input-wrapper']} onClick={toggleDropdown}>
         <input
           id={inputId}
@@ -162,11 +200,17 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           type="text"
           className={styles.input}
           placeholder={placeholder || t.selectDatePlaceholder}
+          aria-label={placeholder || t.selectDatePlaceholder}
           value={value ? formatDate(value) : ''}
           readOnly
         />
         {value ? (
-          <button className={styles['clear-button']} onClick={handleClear} title={t.clearDate}>
+          <button
+            className={styles['clear-button']}
+            onClick={handleClear}
+            title={t.clearDate}
+            aria-label={t.clearDate}
+          >
             <X size={12} />
           </button>
         ) : (
@@ -177,27 +221,44 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       {isOpen && (
         <div className={styles.dropdown}>
           <div className={styles.header}>
-            <button className={styles['nav-button']} onClick={handlePrevMonth} title={t.previousMonth} aria-label={t.previousMonth}>
+            <button
+              className={styles['nav-button']}
+              onClick={handlePrevMonth}
+              title={t.previousMonth}
+              aria-label={t.previousMonth}
+            >
               <ChevronLeft size={16} />
             </button>
-            <span>{monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}</span>
-            <button className={styles['nav-button']} onClick={handleNextMonth} title={t.nextMonth} aria-label={t.nextMonth}>
+            <span>
+              {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+            </span>
+            <button
+              className={styles['nav-button']}
+              onClick={handleNextMonth}
+              title={t.nextMonth}
+              aria-label={t.nextMonth}
+            >
               <ChevronRight size={16} />
             </button>
           </div>
 
           <div className={styles.grid}>
             {weekdays.map((day, index) => (
-              <div key={day} className={`${styles.weekday} ${index === 6 ? styles.sundayText : ''}`}>{day}</div>
+              <div
+                key={day}
+                className={`${styles.weekday} ${index === 6 ? styles.sundayText : ''}`}
+              >
+                {day}
+              </div>
             ))}
 
-            {blanks.map(blank => (
+            {blanks.map((blank) => (
               <div key={`blank-${blank}`} className={`${styles.day} ${styles.empty}`}></div>
             ))}
 
-            {days.map(day => {
-              const holidayKey = getHolidayKey(day);
-              const holidayName = holidayKey ? t.holidays[holidayKey] : null;
+            {days.map((day) => {
+              const holidayKey = getHolidayKey(day)
+              const holidayName = holidayKey ? t.holidays[holidayKey] : null
               return (
                 <div
                   key={day}
@@ -213,11 +274,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 >
                   {day}
                 </div>
-              );
+              )
             })}
           </div>
         </div>
       )}
     </div>
-  );
-};
+  )
+}

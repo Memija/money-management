@@ -1,61 +1,61 @@
-import { create } from 'zustand';
+import { create } from 'zustand'
 
-export type Theme = 'system' | 'light' | 'dark';
+export type Theme = 'system' | 'light' | 'dark'
 
-const STORAGE_KEY = 'mm-theme-preference';
+const STORAGE_KEY = 'mm-theme-preference'
 
 function getStoredTheme(): Theme {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_KEY)
     if (stored === 'system' || stored === 'light' || stored === 'dark') {
-      return stored;
+      return stored
     }
-  } catch {
-    // localStorage not available
+  } catch (e) {
+    console.debug('localStorage not available:', e)
   }
-  return 'system';
+  return 'system'
 }
 
 function getResolvedTheme(theme: Theme): 'light' | 'dark' {
-  if (theme !== 'system') return theme;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (theme !== 'system') return theme
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
 function applyTheme(theme: Theme) {
-  const resolved = getResolvedTheme(theme);
-  document.documentElement.setAttribute('data-theme', resolved);
+  const resolved = getResolvedTheme(theme)
+  document.documentElement.setAttribute('data-theme', resolved)
 }
 
 interface ThemeState {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  theme: Theme
+  setTheme: (theme: Theme) => void
 }
 
 export const useThemeStore = create<ThemeState>((set) => {
   // Initialize from localStorage
-  const initialTheme = getStoredTheme();
+  const initialTheme = getStoredTheme()
   // Apply immediately on store creation
-  applyTheme(initialTheme);
+  applyTheme(initialTheme)
 
   // Listen for system theme changes when in 'system' mode
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
   mediaQuery.addEventListener('change', () => {
-    const currentTheme = useThemeStore.getState().theme;
+    const currentTheme = useThemeStore.getState().theme
     if (currentTheme === 'system') {
-      applyTheme('system');
+      applyTheme('system')
     }
-  });
+  })
 
   return {
     theme: initialTheme,
     setTheme: (theme: Theme) => {
       try {
-        localStorage.setItem(STORAGE_KEY, theme);
-      } catch {
-        // localStorage not available
+        localStorage.setItem(STORAGE_KEY, theme)
+      } catch (e) {
+        console.warn('Failed to save theme to localStorage:', e)
       }
-      applyTheme(theme);
-      set({ theme });
+      applyTheme(theme)
+      set({ theme })
     },
-  };
-});
+  }
+})

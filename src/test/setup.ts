@@ -1,25 +1,26 @@
-import '@testing-library/jest-dom';
-import { afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup } from '@testing-library/react'
+import { afterEach, vi } from 'vitest'
+
+import '@testing-library/jest-dom'
 
 // Run cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {
-  cleanup();
-});
+  cleanup()
+})
 
 // Mock ResizeObserver which is used by Recharts but not provided by jsdom
 class ResizeObserver {
-  observe() { }
-  unobserve() { }
-  disconnect() { }
+  observe() {}
+  unobserve() {}
+  disconnect() {}
 }
 
-window.ResizeObserver = ResizeObserver;
+window.ResizeObserver = ResizeObserver
 
 // Mock window.matchMedia if needed
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -29,4 +30,4 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-});
+})

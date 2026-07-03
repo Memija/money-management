@@ -1,6 +1,6 @@
 export interface Country {
-  code: string;
-  name: string;
-  flag: string;
-  supported: boolean;
+  code: string
+  name: string
+  flag: string
+  supported: boolean
 }
