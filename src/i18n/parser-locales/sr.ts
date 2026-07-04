@@ -84,7 +84,8 @@ export const sr: ParserLocaleConfig = {
     'сепа пренос',
     'сепа директно задужење',
   ],
-  projectedDateRe: /(?:Očekivano knjiženje|Na čekanju|Очекивано књижење|На чекању):\s*(\d{1,2}\.\d{1,2}\.\d{2,4})/i,
+  projectedDateRe:
+    /(?:Očekivano knjiženje|Na čekanju|Очекивано књижење|На чекању):\s*(\d{1,2}\.\d{1,2}\.\d{2,4})/i,
   iconPrefixRe: /^(?:Ikona-primaoca|Ikona-pošiljaoca|Икона-примаоца|Икона-пошиљаоца)[\s-]+/i,
   summaryKeywords: [
     // Latin

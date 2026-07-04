@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Globe, Lock, Search } from 'lucide-react'
 
-import { countries } from '../../../data/countries'
-import { useAppStore } from '../../../store/useAppStore'
-import { useLanguageStore } from '../../../store/useLanguageStore'
-import type { Country } from '../../../types'
+import { countries } from '../../data/countries'
+import { useAppStore } from '../../store/useAppStore'
+import { useLanguageStore } from '../../store/useLanguageStore'
+import type { Country } from '../../types'
 
 import styles from './CountrySelector.module.css'
 
@@ -118,9 +118,8 @@ const CountrySelector: React.FC = () => {
                   filtered.map((country) => (
                     <div
                       key={country.code}
-                      className={`${styles['country-option']} ${!country.supported ? styles.disabled : ''} ${
-                        selected?.code === country.code ? styles.selected : ''
-                      }`}
+                      className={`${styles['country-option']} ${!country.supported ? styles.disabled : ''} ${selected?.code === country.code ? styles.selected : ''
+                        }`}
                       onClick={() => handleSelect(country)}
                       id={`country-${country.code}`}
                     >

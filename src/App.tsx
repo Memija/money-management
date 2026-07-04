@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { AnimatePresence } from 'framer-motion'
 
-import Dashboard from './components/Dashboard'
-import ImportReview from './components/ImportReview'
 import AppHeader from './components/layout/AppHeader'
-import CountrySelector from './components/shared/CountrySelector'
-import InstitutionSelector from './components/shared/InstitutionSelector'
-import TransactionImporter from './components/TransactionImporter'
+import { ErrorBoundary } from './components/shared/ErrorBoundary'
+
+const Dashboard = React.lazy(() => import('./components/Dashboard'))
+const ImportReview = React.lazy(() => import('./components/ImportReview'))
+const CountrySelector = React.lazy(() => import('./components/CountrySelector'))
+const InstitutionSelector = React.lazy(() => import('./components/InstitutionSelector'))
+const TransactionImporter = React.lazy(() => import('./components/TransactionImporter'))
 import { useAppStore } from './store/useAppStore'
 import { useLanguageStore } from './store/useLanguageStore'
 
@@ -19,10 +21,18 @@ const App: React.FC = () => {
   // Dashboard has its own full layout
   if (currentStep === 'dashboard') {
     return (
-      <>
-        <AppHeader />
-        <Dashboard />
-      </>
+      <ErrorBoundary>
+        <Suspense
+          fallback={
+            <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-dim)' }}>
+              Loading...
+            </div>
+          }
+        >
+          <AppHeader />
+          <Dashboard />
+        </Suspense>
+      </ErrorBoundary>
     )
   }
 
@@ -62,12 +72,22 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <AnimatePresence mode="wait">
-          {currentStep === 'country' && <CountrySelector key="country" />}
-          {currentStep === 'institution' && <InstitutionSelector key="institution" />}
-          {currentStep === 'import' && <TransactionImporter key="import" />}
-          {currentStep === 'review' && <ImportReview key="review" />}
-        </AnimatePresence>
+        <ErrorBoundary>
+          <Suspense
+            fallback={
+              <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-dim)' }}>
+                Loading...
+              </div>
+            }
+          >
+            <AnimatePresence mode="wait">
+              {currentStep === 'country' && <CountrySelector key="country" />}
+              {currentStep === 'institution' && <InstitutionSelector key="institution" />}
+              {currentStep === 'import' && <TransactionImporter key="import" />}
+              {currentStep === 'review' && <ImportReview key="review" />}
+            </AnimatePresence>
+          </Suspense>
+        </ErrorBoundary>
       </div>
     </>
   )

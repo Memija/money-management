@@ -2,10 +2,10 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDownLeft, ArrowUpRight, Search } from 'lucide-react'
 
-import { useFormatters } from '../../hooks/useFormatters'
-import { useLanguageStore } from '../../store/useLanguageStore'
-import type { Transaction } from '../../types'
-import { getCategoryLabel } from '../../utils/category-utils'
+import { useFormatters } from '../../../hooks/useFormatters'
+import { useLanguageStore } from '../../../store/useLanguageStore'
+import type { Transaction } from '../../../types'
+import { getCategoryLabel } from '../../../utils/category-utils'
 
 import styles from './TransactionList.module.css'
 
@@ -96,9 +96,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           <div key={tx.id} className={styles['transaction-item']}>
             <div className={styles['tx-left']}>
               <div
-                className={`${styles['icon-box']} ${
-                  tx.type === 'income' ? styles['icon-income'] : styles['icon-expense']
-                }`}
+                className={`${styles['icon-box']} ${tx.type === 'income' ? styles['icon-income'] : styles['icon-expense']
+                  }`}
               >
                 {tx.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
               </div>

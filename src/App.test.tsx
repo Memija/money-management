@@ -33,10 +33,10 @@ vi.mock('./store/useLanguageStore', () => ({
 vi.mock('./components/layout/AppHeader', () => ({
   default: () => <div data-testid="app-header" />,
 }))
-vi.mock('./components/shared/CountrySelector', () => ({
+vi.mock('./components/CountrySelector', () => ({
   default: () => <div data-testid="country-selector" />,
 }))
-vi.mock('./components/shared/InstitutionSelector', () => ({
+vi.mock('./components/InstitutionSelector', () => ({
   default: () => <div data-testid="institution-selector" />,
 }))
 vi.mock('./components/TransactionImporter', () => ({
@@ -61,55 +61,55 @@ describe('App', () => {
     })
   })
 
-  it('renders CountrySelector on initial step', () => {
+  it('renders CountrySelector on initial step', async () => {
     vi.mocked(useAppStore).mockImplementation((selector) => {
       const state = { currentStep: 'country' }
       return typeof selector === 'function' ? selector(state as unknown as AppState) : state
     })
 
     render(<App />)
-    expect(screen.getByTestId('country-selector')).toBeInTheDocument()
+    expect(await screen.findByTestId('country-selector')).toBeInTheDocument()
     expect(screen.getByTestId('app-header')).toBeInTheDocument()
   })
 
-  it('renders InstitutionSelector on institution step', () => {
+  it('renders InstitutionSelector on institution step', async () => {
     vi.mocked(useAppStore).mockImplementation((selector) => {
       const state = { currentStep: 'institution' }
       return typeof selector === 'function' ? selector(state as unknown as AppState) : state
     })
 
     render(<App />)
-    expect(screen.getByTestId('institution-selector')).toBeInTheDocument()
+    expect(await screen.findByTestId('institution-selector')).toBeInTheDocument()
   })
 
-  it('renders TransactionImporter on import step', () => {
+  it('renders TransactionImporter on import step', async () => {
     vi.mocked(useAppStore).mockImplementation((selector) => {
       const state = { currentStep: 'import' }
       return typeof selector === 'function' ? selector(state as unknown as AppState) : state
     })
 
     render(<App />)
-    expect(screen.getByTestId('transaction-importer')).toBeInTheDocument()
+    expect(await screen.findByTestId('transaction-importer')).toBeInTheDocument()
   })
 
-  it('renders ImportReview on review step', () => {
+  it('renders ImportReview on review step', async () => {
     vi.mocked(useAppStore).mockImplementation((selector) => {
       const state = { currentStep: 'review' }
       return typeof selector === 'function' ? selector(state as unknown as AppState) : state
     })
 
     render(<App />)
-    expect(screen.getByTestId('import-review')).toBeInTheDocument()
+    expect(await screen.findByTestId('import-review')).toBeInTheDocument()
   })
 
-  it('renders Dashboard on dashboard step', () => {
+  it('renders Dashboard on dashboard step', async () => {
     vi.mocked(useAppStore).mockImplementation((selector) => {
       const state = { currentStep: 'dashboard' }
       return typeof selector === 'function' ? selector(state as unknown as AppState) : state
     })
 
     render(<App />)
-    expect(screen.getByTestId('dashboard')).toBeInTheDocument()
+    expect(await screen.findByTestId('dashboard')).toBeInTheDocument()
     // In dashboard mode, it shouldn't render the onboarding layout (ambient glows, progress etc)
     expect(screen.queryByText('Country')).not.toBeInTheDocument()
   })

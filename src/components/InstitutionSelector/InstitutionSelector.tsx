@@ -16,10 +16,10 @@ import {
   Wallet,
 } from 'lucide-react'
 
-import { categoryOrder, institutionsByCountry } from '../../../data/institutions'
-import { useAppStore } from '../../../store/useAppStore'
-import { useLanguageStore } from '../../../store/useLanguageStore'
-import type { FinancialInstitution, InstitutionCategory } from '../../../types'
+import { categoryOrder, institutionsByCountry } from '../../data/institutions'
+import { useAppStore } from '../../store/useAppStore'
+import { useLanguageStore } from '../../store/useLanguageStore'
+import type { FinancialInstitution, InstitutionCategory } from '../../types'
 
 import styles from './InstitutionSelector.module.css'
 

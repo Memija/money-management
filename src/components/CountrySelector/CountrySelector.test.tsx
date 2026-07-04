@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { TranslationStrings } from '../../../i18n/translations'
-import { type AppState } from '../../../store/useAppStore'
-import { type LanguageState, useLanguageStore } from '../../../store/useLanguageStore'
+import type { TranslationStrings } from '../../i18n/translations'
+import { type AppState } from '../../store/useAppStore'
+import { type LanguageState, useLanguageStore } from '../../store/useLanguageStore'
 import CountrySelector from './CountrySelector'
 
 const { mockSelectCountry } = vi.hoisted(() => ({
@@ -11,14 +11,14 @@ const { mockSelectCountry } = vi.hoisted(() => ({
 }))
 
 // Mock the stores
-vi.mock('../../../store/useAppStore', () => ({
+vi.mock('../../store/useAppStore', () => ({
   useAppStore: vi.fn((selector) => {
     const state = { selectCountry: mockSelectCountry }
     return typeof selector === 'function' ? selector(state as unknown as AppState) : state
   }),
 }))
 
-vi.mock('../../../store/useLanguageStore', () => ({
+vi.mock('../../store/useLanguageStore', () => ({
   useLanguageStore: vi.fn((selector) => {
     const state = {
       t: {

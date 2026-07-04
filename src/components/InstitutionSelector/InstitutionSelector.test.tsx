@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { TranslationStrings } from '../../../i18n/translations'
-import { type AppState, useAppStore } from '../../../store/useAppStore'
-import { type LanguageState, useLanguageStore } from '../../../store/useLanguageStore'
+import type { TranslationStrings } from '../../i18n/translations'
+import { type AppState, useAppStore } from '../../store/useAppStore'
+import { type LanguageState, useLanguageStore } from '../../store/useLanguageStore'
 import InstitutionSelector from './InstitutionSelector'
 
 const { mockSelectInstitution, mockSetStep } = vi.hoisted(() => ({
@@ -12,7 +12,7 @@ const { mockSelectInstitution, mockSetStep } = vi.hoisted(() => ({
 }))
 
 // Mock the stores
-vi.mock('../../../store/useAppStore', () => ({
+vi.mock('../../store/useAppStore', () => ({
   useAppStore: vi.fn((selector) =>
     selector({
       selectedCountry: { code: 'DE', name: 'Germany', flag: 'de-flag' },
@@ -22,7 +22,7 @@ vi.mock('../../../store/useAppStore', () => ({
   ),
 }))
 
-vi.mock('../../../store/useLanguageStore', () => ({
+vi.mock('../../store/useLanguageStore', () => ({
   useLanguageStore: vi.fn((selector) =>
     selector({
       t: {
@@ -41,7 +41,7 @@ vi.mock('../../../store/useLanguageStore', () => ({
 }))
 
 // Mock the data
-vi.mock('../../../data/institutions', () => ({
+vi.mock('../../data/institutions', () => ({
   institutionsByCountry: {
     DE: [
       { id: '1', name: 'Deutsche Bank', type: 'bank', category: 'traditional', supported: true },

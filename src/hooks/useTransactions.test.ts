@@ -9,7 +9,10 @@ import { useTransactions } from './useTransactions'
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeAccount(institutionId: string, overrides: Partial<ImportedAccount> = {}): ImportedAccount {
+function makeAccount(
+  institutionId: string,
+  overrides: Partial<ImportedAccount> = {},
+): ImportedAccount {
   return {
     institutionId,
     institutionName: institutionId,
@@ -295,9 +298,7 @@ describe('useTransactions', () => {
           ],
         }),
         makeAccount('bank-b', {
-          transactions: [
-            makeTx({ institution: 'bank-b', description: 'REWE Hamburg' }),
-          ],
+          transactions: [makeTx({ institution: 'bank-b', description: 'REWE Hamburg' })],
         }),
       ],
     })
