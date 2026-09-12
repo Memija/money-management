@@ -136,15 +136,13 @@ const Dashboard: React.FC = () => {
       {/* Subheader — plain flex item above the scroll area, no position tricks needed */}
       <div className={styles['subheader-bar']}>
         <div className={styles['subheader-inner']}>
-          <div className={styles['period-filter-wrapper']}>
-            <PeriodFilter
-              period={period}
-              onPeriodChange={setPeriod}
-              availableYears={analytics.availableYears}
-              availableQuarters={analytics.availableQuarters}
-              availableMonths={analytics.availableMonths}
-            />
-          </div>
+          <PeriodFilter
+            period={period}
+            onPeriodChange={setPeriod}
+            availableYears={analytics.availableYears}
+            availableQuarters={analytics.availableQuarters}
+            availableMonths={analytics.availableMonths}
+          />
 
           <AnimatePresence>
             {!isHeroInView && (
