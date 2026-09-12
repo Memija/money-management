@@ -8,7 +8,7 @@ import styles from './Modal.module.css'
 export interface ModalProps {
   isOpen: boolean
   onClose: () => void
-  title?: string
+  title?: React.ReactNode
   children: React.ReactNode
   footer?: React.ReactNode
   maxWidth?: string
@@ -77,7 +77,17 @@ export const Modal: React.FC<ModalProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.header}>
-              {title ? <h2 className={styles.title}>{title}</h2> : <div />}
+              {title ? (
+                typeof title === 'string' ? (
+                  <h2 className={styles.title} title={title}>
+                    {title}
+                  </h2>
+                ) : (
+                  <div className={styles['custom-title-wrapper']}>{title}</div>
+                )
+              ) : (
+                <div />
+              )}
               <button
                 className={styles['close-button']}
                 onClick={onClose}

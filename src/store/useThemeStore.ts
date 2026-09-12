@@ -21,13 +21,15 @@ function getResolvedTheme(theme: Theme): 'light' | 'dark' {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function applyTheme(theme: Theme) {
+function applyTheme(theme: Theme): 'light' | 'dark' {
   const resolved = getResolvedTheme(theme)
   document.documentElement.setAttribute('data-theme', resolved)
+  return resolved
 }
 
 interface ThemeState {
   theme: Theme
+  resolvedTheme: 'light' | 'dark'
   setTheme: (theme: Theme) => void
 }
 
@@ -35,27 +37,29 @@ export const useThemeStore = create<ThemeState>((set) => {
   // Initialize from localStorage
   const initialTheme = getStoredTheme()
   // Apply immediately on store creation
-  applyTheme(initialTheme)
+  const initialResolved = applyTheme(initialTheme)
 
   // Listen for system theme changes when in 'system' mode
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
   mediaQuery.addEventListener('change', () => {
     const currentTheme = useThemeStore.getState().theme
     if (currentTheme === 'system') {
-      applyTheme('system')
+      const resolved = applyTheme('system')
+      set({ resolvedTheme: resolved })
     }
   })
 
   return {
     theme: initialTheme,
+    resolvedTheme: initialResolved,
     setTheme: (theme: Theme) => {
       try {
         localStorage.setItem(STORAGE_KEY, theme)
       } catch (e) {
         console.warn('Failed to save theme to localStorage:', e)
       }
-      applyTheme(theme)
-      set({ theme })
+      const resolved = applyTheme(theme)
+      set({ theme, resolvedTheme: resolved })
     },
   }
 })

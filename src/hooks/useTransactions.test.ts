@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { useAppStore } from '../store/useAppStore'
 import type { ImportedAccount } from '../types'
+import type { PeriodFilter } from './useAnalytics'
 import { useTransactions } from './useTransactions'
 
 // ---------------------------------------------------------------------------
@@ -17,6 +18,7 @@ function makeAccount(
     institutionId,
     institutionName: institutionId,
     importedAt: '2024-01-01T00:00:00Z',
+    importedFingerprints: [],
     transactions: [],
     ...overrides,
   }
@@ -313,5 +315,35 @@ describe('useTransactions', () => {
     expect(result.current.filteredTx).toHaveLength(1)
     expect(result.current.filteredTx[0].institution).toBe('bank-a')
     expect(result.current.filteredTx[0].description).toBe('REWE Berlin')
+  })
+
+  it('should filter transactions by period when provided', () => {
+    useAppStore.setState({
+      importedAccounts: [
+        makeAccount('bank-a', {
+          transactions: [
+            makeTx({ date: '2024-01-10', description: 'January Tx' }),
+            makeTx({ date: '2024-02-15', description: 'February Tx' }),
+            makeTx({ date: '2025-01-10', description: 'Next Year Tx' }),
+          ],
+        }),
+      ],
+    })
+
+    const { result, rerender } = renderHook(
+      ({ period }: { period: PeriodFilter }) => useTransactions(period),
+      { initialProps: { period: { mode: 'month', value: '2024-01' } } },
+    )
+
+    expect(result.current.filteredTx).toHaveLength(1)
+    expect(result.current.filteredTx[0].description).toBe('January Tx')
+
+    // Rerender with year filter
+    rerender({ period: { mode: 'year', value: '2024' } })
+    expect(result.current.filteredTx).toHaveLength(2)
+
+    // Rerender with 'all'
+    rerender({ period: { mode: 'all', value: '' } })
+    expect(result.current.filteredTx).toHaveLength(3)
   })
 })

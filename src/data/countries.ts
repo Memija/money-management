@@ -43,6 +43,7 @@ export const countries: Country[] = [
   { code: 'al', name: 'Albania', flag: '/flags/al.png', supported: false },
   { code: 'xk', name: 'Kosovo', flag: '/flags/xk.png', supported: false },
   { code: 'tr', name: 'Turkey', flag: '/flags/tr.png', supported: false },
+  { code: 'id', name: 'Indonesia', flag: '/flags/id.png', supported: false },
 ].sort((a, b) => {
   // Supported countries first, then alphabetical
   if (a.supported && !b.supported) return -1

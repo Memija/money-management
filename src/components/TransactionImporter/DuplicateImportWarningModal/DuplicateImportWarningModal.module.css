@@ -1,0 +1,35 @@
+.cancelButton {
+  margin-top: 0;
+  width: auto;
+}
+
+.proceedButton {
+  margin-top: 0;
+  width: auto;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 4px 24px rgba(245, 158, 11, 0.25);
+}
+
+.proceedButton:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.contentContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.iconContainer {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 0.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.messageText {
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 0.25rem;
+}

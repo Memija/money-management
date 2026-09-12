@@ -1,0 +1,513 @@
+/* Override the global glass-card overflow so taller card content isn't clipped */
+.grid :global(.glass-card) {
+  overflow: visible;
+}
+
+/* ─────────────────────────────────────────────────
+   Grid layout
+───────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   Card base
+───────────────────────────────────────────────── */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem 1.1rem !important;
+  position: relative;
+  overflow: visible;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-3px) !important;
+}
+
+.card-clickable {
+  cursor: pointer;
+}
+
+.card-clickable:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.card-clickable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Subtle glow tint per card accent */
+.card-blue::before  { background: radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.07), transparent 70%); opacity: 1; }
+.card-rose::before  { background: radial-gradient(ellipse at top left, rgba(244, 63, 94, 0.07), transparent 70%); opacity: 1; }
+.card-amber::before { background: radial-gradient(ellipse at top left, rgba(245, 158, 11, 0.07), transparent 70%); opacity: 1; }
+.card-emerald::before { background: radial-gradient(ellipse at top left, rgba(16, 185, 129, 0.07), transparent 70%); opacity: 1; }
+
+.card-clickable {
+  cursor: pointer;
+}
+
+.card-clickable:hover {
+  transform: translateY(-6px) !important;
+}
+
+.card-clickable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────────
+   Card top: icon + text
+───────────────────────────────────────────────── */
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  position: relative;
+  z-index: 1;
+}
+
+.card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+/* ─────────────────────────────────────────────────
+   Icon box
+───────────────────────────────────────────────── */
+.iconBox {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.accent-emerald {
+  background: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+}
+
+.accent-rose {
+  background: rgba(244, 63, 94, 0.16);
+  color: #f43f5e;
+  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.2);
+}
+
+.accent-blue {
+  background: rgba(59, 130, 246, 0.16);
+  color: #3b82f6;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+}
+
+.accent-amber {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+}
+
+/* ─────────────────────────────────────────────────
+   Text
+───────────────────────────────────────────────── */
+.label {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-weight: 600;
+
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.value-row {
+  display: flex;
+  align-items: center;
+}
+
+.tooltip-icon {
+  opacity: 0.55;
+  margin-left: 6px;
+  color: var(--text-dim);
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.info-tooltip-wrapper:hover .tooltip-icon {
+  opacity: 1;
+  color: var(--primary);
+}
+
+/* Value gradient tints per accent */
+.card-blue   .value { color: var(--text-main); }
+.card-rose   .value { color: var(--text-main); }
+.card-amber  .value { color: var(--text-main); }
+.card-emerald .value { color: var(--text-main); }
+
+
+/* ─────────────────────────────────────────────────
+   Card bottom
+───────────────────────────────────────────────── */
+.card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.detail {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* ─────────────────────────────────────────────────
+   Avg transaction breakdown rows
+───────────────────────────────────────────────── */
+.avg-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.avg-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 6px;
+  padding: 0.15rem 0.2rem;
+  transition: background 0.15s ease;
+}
+
+.avg-row-clickable {
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+  margin: 0 -0.35rem;
+}
+
+.avg-row-clickable:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='light'] .avg-row-clickable:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.avg-row-clickable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.avg-row-chevron {
+  flex-shrink: 0;
+  color: var(--text-dim);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.avg-row-clickable:hover .avg-row-chevron {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.avg-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avg-icon-emerald { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.avg-icon-rose    { background: rgba(244, 63, 94, 0.18); color: #f43f5e; }
+.avg-icon-blue    { background: rgba(59, 130, 246, 0.18); color: #3b82f6; }
+.avg-icon-amber   { background: rgba(245, 158, 11, 0.18); color: #f59e0b; }
+
+.avg-row-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.avg-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.avg-row-label {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.01em;
+}
+
+.avg-row-value {
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: -0.01em;
+}
+
+.avg-value-emerald { color: #10b981; }
+.avg-value-rose    { color: #f43f5e; }
+.avg-value-blue    { color: #60a5fa; }
+.avg-value-amber   { color: #f59e0b; }
+
+.avg-bar-track {
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+[data-theme='light'] .avg-bar-track {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.avg-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+}
+
+.avg-bar-emerald { background: linear-gradient(90deg, #10b981, #34d399); }
+.avg-bar-rose    { background: linear-gradient(90deg, #f43f5e, #fb7185); }
+.avg-bar-blue    { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.avg-bar-amber   { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+.avg-ratio {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+  text-align: right;
+  font-style: italic;
+}
+
+/* ─────────────────────────────────────────────────
+   Transactions breakdown card
+───────────────────────────────────────────────── */
+.tx-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.tx-pills {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.pill-income,
+.pill-expense {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.67rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 99px;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.pill-income {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.pill-expense {
+  background: rgba(244, 63, 94, 0.12);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.pill-clickable {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+}
+
+.pill-clickable:hover {
+  filter: brightness(1.2);
+  transform: scale(1.06);
+}
+
+.pill-income.pill-clickable:hover {
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+}
+
+.pill-expense.pill-clickable:hover {
+  box-shadow: 0 2px 10px rgba(244, 63, 94, 0.35);
+}
+
+.pill-clickable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Progress bar */
+.tx-bar-track {
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(244, 63, 94, 0.2);
+  overflow: hidden;
+}
+
+[data-theme='light'] .tx-bar-track {
+  background: rgba(244, 63, 94, 0.12);
+}
+
+.tx-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+/* ─────────────────────────────────────────────────
+   Mobile
+───────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .card {
+    padding: 0.9rem 0.9rem !important;
+    gap: 0.5rem;
+  }
+
+  .iconBox {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+  }
+
+  .iconBox svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .label {
+    font-size: 0.62rem;
+  }
+
+  .value {
+    font-size: 1.2rem;
+  }
+
+  .pill-income,
+  .pill-expense {
+    font-size: 0.62rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .detail {
+    font-size: 0.65rem;
+  }
+
+  .avg-row-label,
+  .avg-row-value {
+    font-size: 0.6rem;
+  }
+
+  .avg-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* ── Tooltip ── */
+.info-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  margin-left: 0.35rem;
+}
+
+.info-tooltip-bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--card-bg-elevated, #2a2d36);
+  color: var(--text-main, #f3f4f6);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  white-space: normal;
+  width: 180px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 50;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+[data-theme='light'] .info-tooltip-bubble {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.info-tooltip-wrapper:hover .info-tooltip-bubble {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

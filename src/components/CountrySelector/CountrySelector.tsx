@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, Globe, Lock, Search } from 'lucide-react'
+import { ArrowLeft, ChevronDown, Globe, Lock, Search } from 'lucide-react'
 
 import { countries } from '../../data/countries'
 import { useAppStore } from '../../store/useAppStore'
@@ -10,7 +10,7 @@ import type { Country } from '../../types'
 import styles from './CountrySelector.module.css'
 
 const CountrySelector: React.FC = () => {
-  const selectCountry = useAppStore((s) => s.selectCountry)
+  const { selectCountry, cancelImport, importedAccounts } = useAppStore()
   const t = useLanguageStore((s) => s.t)
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -53,6 +53,17 @@ const CountrySelector: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="onboarding-container"
     >
+      {(importedAccounts || []).length > 0 && (
+        <button
+          className="back-button"
+          onClick={cancelImport}
+          id="cancel-import"
+        >
+          <ArrowLeft size={18} />
+          <span>{t.cancel}</span>
+        </button>
+      )}
+
       <div className="onboarding-header">
         <motion.div
           initial={{ scale: 0 }}

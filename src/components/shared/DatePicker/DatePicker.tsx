@@ -3,6 +3,7 @@ import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { getLocalizedMonthNames, getLocalizedWeekdays } from '../../../utils/date-utils'
 import { getPublicHolidayName } from '../../../utils/holidays'
 
 import styles from './DatePicker.module.css'
@@ -92,62 +93,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   // Localized months and weekdays
   const { locale, t } = useLanguageStore()
 
-  const monthNames = useMemo(() => {
-    const fallbacks: Record<string, string[]> = {
-      bs: [
-        'Januar',
-        'Februar',
-        'Mart',
-        'April',
-        'Maj',
-        'Juni',
-        'Juli',
-        'August',
-        'Septembar',
-        'Oktobar',
-        'Novembar',
-        'Decembar',
-      ],
-      sr: [
-        'Јануар',
-        'Фебруар',
-        'Март',
-        'Април',
-        'Мај',
-        'Јун',
-        'Јул',
-        'Август',
-        'Септембар',
-        'Октобар',
-        'Новембар',
-        'Децембар',
-      ],
-    }
+  const monthNames = useMemo(() => getLocalizedMonthNames(locale, 'long'), [locale])
 
-    if (fallbacks[locale]) return fallbacks[locale]
-
-    return Array.from({ length: 12 }, (_, i) => {
-      const d = new Date(2023, i, 1)
-      const name = new Intl.DateTimeFormat(locale, { month: 'long' }).format(d)
-      return name.charAt(0).toUpperCase() + name.slice(1)
-    })
-  }, [locale])
-
-  const weekdays = useMemo(() => {
-    const fallbacks: Record<string, string[]> = {
-      bs: ['Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub', 'Ned'],
-      sr: ['Пон', 'Уто', 'Сре', 'Чет', 'Пет', 'Суб', 'Нед'],
-    }
-
-    if (fallbacks[locale]) return fallbacks[locale]
-
-    // January 2, 2023 was a Monday
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(2023, 0, 2 + i)
-      const name = new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d)
-      return name.charAt(0).toUpperCase() + name.slice(1)
-    })
-  }, [locale])
+  const weekdays = useMemo(() => getLocalizedWeekdays(locale), [locale])
 
   // Check if a day is today
   const isToday = (day: number) => {

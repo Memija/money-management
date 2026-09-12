@@ -37,6 +37,7 @@ export default defineConfig([
         },
       ],
       'simple-import-sort/exports': 'error',
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
     languageOptions: {
       ecmaVersion: 2020,

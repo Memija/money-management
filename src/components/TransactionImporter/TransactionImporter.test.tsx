@@ -6,9 +6,11 @@ import { type AppState } from '../../store/useAppStore'
 import { type LanguageState, useLanguageStore } from '../../store/useLanguageStore'
 import TransactionImporter from './TransactionImporter'
 
-const { mockAddImportedAccount, mockSetStep } = vi.hoisted(() => ({
+const { mockAddImportedAccount, mockSetStep, mockGetDuplicateTransactionStats, mockReplaceImportedAccount } = vi.hoisted(() => ({
   mockAddImportedAccount: vi.fn(),
   mockSetStep: vi.fn(),
+  mockGetDuplicateTransactionStats: vi.fn().mockReturnValue({ duplicateCount: 0, newCount: 0 }),
+  mockReplaceImportedAccount: vi.fn(),
 }))
 
 // Mock the stores
@@ -17,7 +19,9 @@ vi.mock('../../store/useAppStore', () => ({
     const state = {
       selectedInstitution: { id: '1', name: 'Bank A' },
       addImportedAccount: mockAddImportedAccount,
+      replaceImportedAccount: mockReplaceImportedAccount,
       setStep: mockSetStep,
+      getDuplicateTransactionStats: mockGetDuplicateTransactionStats,
     }
     return typeof selector === 'function' ? selector(state as unknown as AppState) : state
   }),
@@ -53,6 +57,17 @@ vi.mock('../../store/useLanguageStore', () => ({
         dropHere: 'Drop here',
         errorParsePaste: 'No transactions could be parsed.',
         errorParsePasteOneRow: 'Only 1 row detected.',
+        clearAllTransactionsTitle: 'Clear All',
+        clearAllTransactionsMessage: 'Are you sure?',
+        clearAll: 'Delete',
+        cancel: 'Cancel',
+        reviewTransactions: 'Review',
+        duplicateImportTitle: 'Duplicate Import Detected',
+        duplicateImportMessageAll: 'All {duplicateCount} transactions have already been imported. There are no new transactions to add.',
+        duplicateImportMessagePartial: 'We found {duplicateCount} duplicate transactions which will be skipped. Only {newCount} new transactions will be imported. Do you want to proceed?',
+        duplicateImportProceed: 'Proceed with {newCount} transactions',
+        duplicateImportCancel: 'Cancel',
+        duplicateImportOk: 'OK',
       } as unknown as TranslationStrings,
     }
     return typeof selector === 'function' ? selector(state as LanguageState) : state
@@ -101,6 +116,17 @@ describe('TransactionImporter', () => {
     dropHere: 'Drop here',
     errorParsePaste: 'No transactions could be parsed.',
     errorParsePasteOneRow: 'Only 1 row detected.',
+    clearAllTransactionsTitle: 'Clear All',
+    clearAllTransactionsMessage: 'Are you sure?',
+    clearAll: 'Delete',
+    cancel: 'Cancel',
+    reviewTransactions: 'Review',
+    duplicateImportTitle: 'Duplicate Import Detected',
+    duplicateImportMessageAll: 'All {duplicateCount} transactions have already been imported. There are no new transactions to add.',
+    duplicateImportMessagePartial: 'We found {duplicateCount} duplicate transactions which will be skipped. Only {newCount} new transactions will be imported. Do you want to proceed?',
+    duplicateImportProceed: 'Proceed with {newCount} transactions',
+    duplicateImportCancel: 'Cancel',
+    duplicateImportOk: 'OK',
   }
 
   beforeEach(() => {

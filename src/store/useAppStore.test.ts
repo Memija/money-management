@@ -57,6 +57,7 @@ describe('useAppStore', () => {
       institutionName: 'Chase',
       transactions: [],
       importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-a'],
     }
     useAppStore.getState().addImportedAccount(mockAccount)
 
@@ -65,7 +66,90 @@ describe('useAppStore', () => {
     expect(state.currentStep).toBe('review')
   })
 
-  it('should replace existing account when re-importing the same institution (no duplicates)', () => {
+  it('should merge transactions when re-importing the same institution with new data', () => {
+    const firstImport: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: [
+        {
+          id: 'tx1',
+          date: '2026-01-01',
+          description: 'Old transaction',
+          amount: -10,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Chase',
+        },
+      ],
+      importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-jan'],
+    }
+    const secondImport: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: [
+        {
+          id: 'tx2',
+          date: '2026-01-02',
+          description: 'New transaction',
+          amount: -20,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Chase',
+        },
+      ],
+      importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-feb'],
+    }
+
+    useAppStore.getState().addImportedAccount(firstImport)
+    useAppStore.getState().addImportedAccount(secondImport)
+
+    const state = useAppStore.getState()
+    expect(state.importedAccounts).toHaveLength(1)
+    expect(state.importedAccounts[0].transactions).toHaveLength(2)
+    expect(state.importedAccounts[0].transactions.map((t) => t.description)).toEqual(
+      expect.arrayContaining(['Old transaction', 'New transaction']),
+    )
+    // Both fingerprints should be tracked
+    expect(state.importedAccounts[0].importedFingerprints).toEqual(
+      expect.arrayContaining(['fp-jan', 'fp-feb']),
+    )
+  })
+
+  it('should deduplicate transactions when re-importing overlapping data', () => {
+    const sharedTx = {
+      id: 'tx1',
+      date: '2026-01-01',
+      description: 'Shared transaction',
+      amount: -10,
+      currency: 'EUR',
+      type: 'expense' as const,
+      institution: 'Chase',
+    }
+    const firstImport: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: [sharedTx],
+      importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-1'],
+    }
+    const secondImport: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: [{ ...sharedTx, id: 'tx1-reimport' }],
+      importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-2'],
+    }
+
+    useAppStore.getState().addImportedAccount(firstImport)
+    useAppStore.getState().addImportedAccount(secondImport)
+
+    const state = useAppStore.getState()
+    expect(state.importedAccounts[0].transactions).toHaveLength(1)
+  })
+
+  it('should fully replace existing account when replaceImportedAccount is called', () => {
     const firstImport: ImportedAccount = {
       institutionId: 'chase',
       institutionName: 'Chase',
@@ -81,8 +165,9 @@ describe('useAppStore', () => {
         },
       ],
       importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-old'],
     }
-    const secondImport: ImportedAccount = {
+    const replacement: ImportedAccount = {
       institutionId: 'chase',
       institutionName: 'Chase',
       transactions: [
@@ -97,16 +182,47 @@ describe('useAppStore', () => {
         },
       ],
       importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-new'],
     }
 
     useAppStore.getState().addImportedAccount(firstImport)
-    useAppStore.getState().addImportedAccount(secondImport)
+    useAppStore.getState().replaceImportedAccount(replacement)
 
     const state = useAppStore.getState()
-    // Should still be exactly 1 account, not 2
     expect(state.importedAccounts).toHaveLength(1)
-    // Should have the latest data
-    expect(state.importedAccounts[0].transactions[0].id).toBe('tx2')
+    expect(state.importedAccounts[0].transactions).toHaveLength(1)
+    expect(state.importedAccounts[0].transactions[0].description).toBe('New')
+    expect(state.importedAccounts[0].importedFingerprints).toEqual(['fp-new'])
+  })
+
+  it('should return correct stats when checking duplicate transactions', () => {
+    const existingTransactions = [
+      { id: '1', date: '2023-01-01', amount: 100, description: 'Test 1', category: 'cat1', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+      { id: '2', date: '2023-01-02', amount: 200, description: 'Test 2', category: 'cat2', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+    ]
+    const account: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: existingTransactions,
+      importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-jan'],
+    }
+    useAppStore.getState().addImportedAccount(account)
+
+    const incomingTransactions = [
+      // Exact duplicate
+      { id: '1a', date: '2023-01-01', amount: 100, description: 'test 1 ', category: '', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+      // New transaction
+      { id: '3', date: '2023-01-03', amount: 300, description: 'Test 3', category: '', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+    ]
+
+    // Check against 'chase'
+    const statsChase = useAppStore.getState().getDuplicateTransactionStats('chase', incomingTransactions)
+    expect(statsChase).toEqual({ duplicateCount: 1, newCount: 1, duplicateIds: ['1a'] })
+
+    // Check against unknown institution (all should be new)
+    const statsIng = useAppStore.getState().getDuplicateTransactionStats('ing', incomingTransactions)
+    expect(statsIng).toEqual({ duplicateCount: 0, newCount: 2, duplicateIds: [] })
   })
 
   it('should reset import state', () => {
@@ -121,6 +237,7 @@ describe('useAppStore', () => {
           institutionName: 'test',
           transactions: [],
           importedAt: '',
+          importedFingerprints: [],
         },
       ],
     })
@@ -131,7 +248,7 @@ describe('useAppStore', () => {
     expect(state.currentStep).toBe('country')
     expect(state.selectedCountry).toBeNull()
     expect(state.selectedInstitution).toBeNull()
-    expect(state.importedAccounts).toEqual([])
+    expect(state.importedAccounts).toHaveLength(1)
   })
 
   it('should start new institution flow', () => {
@@ -145,5 +262,23 @@ describe('useAppStore', () => {
     const state = useAppStore.getState()
     expect(state.selectedInstitution).toBeNull()
     expect(state.currentStep).toBe('institution')
+  })
+
+  it('should bulk set manual categories', () => {
+    useAppStore.setState({
+      manualCategories: { 'tx-1': 'Groceries' },
+    })
+
+    useAppStore.getState().setManualCategoriesBulk({
+      'tx-2': 'Entertainment',
+      'tx-3': 'Entertainment',
+    })
+
+    const state = useAppStore.getState()
+    expect(state.manualCategories).toEqual({
+      'tx-1': 'Groceries',
+      'tx-2': 'Entertainment',
+      'tx-3': 'Entertainment',
+    })
   })
 })

@@ -1,1 +1,1 @@
-export { TransactionPreviewModal } from './TransactionPreviewModal'
+export { TransactionPreviewModal } from '../../shared/TransactionPreviewModal'

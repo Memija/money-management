@@ -16,7 +16,7 @@
 
 .modal {
   width: 100%;
-  max-width: var(--modal-max-width, 500px);
+  max-width: min(var(--modal-max-width, 500px), calc(100vw - 2rem));
   background: var(--bg-elevated);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
@@ -27,14 +27,20 @@
   flex-direction: column;
   max-height: calc(100vh - 2rem);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--card-border);
+  flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .title {
@@ -42,6 +48,17 @@
   font-weight: 600;
   margin: 0;
   color: var(--text-main);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-title-wrapper {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .close-button {
@@ -66,7 +83,8 @@
 .content {
   padding: 1.5rem;
   overflow-y: auto;
-  flex: 1;
+  flex: 0 1 auto;
+  min-height: 0;
 }
 
 .footer {

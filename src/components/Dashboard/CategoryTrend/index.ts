@@ -1,0 +1,1 @@
+export { CategoryTrend } from './CategoryTrend'

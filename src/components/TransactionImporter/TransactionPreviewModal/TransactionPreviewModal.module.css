@@ -25,9 +25,6 @@
 }
 
 .list-container {
-  height: 50vh;
-  min-height: 300px;
-  max-height: 600px;
   border: 1px solid var(--card-border);
   border-radius: var(--radius-sm);
   background: var(--card-bg);
@@ -55,6 +52,36 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
+.tx-row-duplicate {
+  background: rgba(245, 158, 11, 0.1) !important;
+  border-left: 3px solid #f59e0b;
+}
+
+.tx-row-duplicate:hover {
+  background: rgba(245, 158, 11, 0.15) !important;
+}
+
+.duplicate-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  margin: 0 -1.5rem 1rem;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.08));
+  border-top: 1px solid rgba(245, 158, 11, 0.25);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  border-left: 4px solid #f59e0b;
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.duplicate-banner > svg {
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
 .tx-date {
   flex: 0 0 calc(140px + 1rem);
   white-space: nowrap;
@@ -64,6 +91,10 @@
   border-right: 1px solid rgba(255, 255, 255, 0.02);
   display: flex;
   align-items: center;
+}
+
+[data-variant='expense'] .tx-date {
+  background: rgba(244, 63, 94, 0.12);
 }
 
 .tx-desc {
@@ -76,6 +107,10 @@
   border-right: 1px solid rgba(255, 255, 255, 0.02);
   display: flex;
   align-items: center;
+}
+
+[data-variant='expense'] .tx-desc {
+  background: rgba(244, 63, 94, 0.06);
 }
 
 .tx-inline-input {
@@ -156,6 +191,10 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+[data-variant='expense'] .tx-amount {
+  background: rgba(244, 63, 94, 0.03);
 }
 
 .tx-actions {

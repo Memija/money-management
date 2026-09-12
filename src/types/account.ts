@@ -5,6 +5,8 @@ export interface ImportedAccount {
   institutionName: string
   transactions: Transaction[]
   importedAt: string
+  /** All fingerprints ever imported for this institution (used for duplicate detection). */
+  importedFingerprints: string[]
 }
 
 export type ImportMethod = 'spreadsheet' | 'pdf' | 'paste'

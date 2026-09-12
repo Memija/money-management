@@ -1,0 +1,533 @@
+.container {
+  grid-column: span 12;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible;
+}
+
+/* ─────────────────────────────────────────────────
+   Header & Summary Stats
+───────────────────────────────────────────────── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.titleArea {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(59, 130, 246, 0.08) 100%);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.12);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+[data-theme='light'] .iconBadge {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+  color: #4f46e5;
+  border-color: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+}
+
+.spinIcon {
+  transition: transform 0.4s ease;
+}
+
+.container:hover .spinIcon {
+  transform: rotate(45deg);
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0 0;
+}
+
+/* Stat Pills in Top Right (Balanced, Sophisticated Style) */
+.summaryStats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  min-width: 145px;
+  border: 1px solid;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.statPill:hover {
+  transform: translateY(-2px);
+}
+
+/* Tasteful Soft-Accent Monthly Card */
+.statPillMonthly {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.08) 0%, rgba(244, 63, 94, 0.02) 100%);
+  border-color: rgba(244, 63, 94, 0.24);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.statPillMonthly:hover {
+  border-color: rgba(244, 63, 94, 0.45);
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.15);
+}
+
+[data-theme='light'] .statPillMonthly {
+  background: linear-gradient(135deg, rgba(254, 226, 226, 0.65) 0%, rgba(255, 241, 242, 0.35) 100%);
+  border-color: rgba(244, 63, 94, 0.25);
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.06);
+}
+
+.statIconBadgeMonthly {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(244, 63, 94, 0.14);
+  color: #f43f5e;
+}
+
+[data-theme='light'] .statIconBadgeMonthly {
+  background: rgba(244, 63, 94, 0.12);
+  color: #e11d48;
+}
+
+.statLabelMonthly {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fb7185;
+  letter-spacing: 0.02em;
+}
+
+[data-theme='light'] .statLabelMonthly {
+  color: #be123c;
+}
+
+.statAmountMonthly {
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+[data-theme='light'] .statAmountMonthly {
+  color: #be123c;
+}
+
+/* Tasteful Soft-Accent Projected Yearly Card */
+.statPillYearly {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(59, 130, 246, 0.02) 100%);
+  border-color: rgba(99, 102, 241, 0.24);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.statPillYearly:hover {
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
+}
+
+[data-theme='light'] .statPillYearly {
+  background: linear-gradient(135deg, rgba(224, 231, 255, 0.65) 0%, rgba(238, 242, 255, 0.35) 100%);
+  border-color: rgba(99, 102, 241, 0.25);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.06);
+}
+
+.statIconBadgeYearly {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.14);
+  color: #818cf8;
+}
+
+[data-theme='light'] .statIconBadgeYearly {
+  background: rgba(99, 102, 241, 0.12);
+  color: #4f46e5;
+}
+
+.statLabelYearly {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #818cf8;
+  letter-spacing: 0.02em;
+}
+
+[data-theme='light'] .statLabelYearly {
+  color: #4338ca;
+}
+
+.statAmountYearly {
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+[data-theme='light'] .statAmountYearly {
+  color: #4338ca;
+}
+
+.statPillHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.3rem;
+}
+
+.statValue {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
+.statFreq {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+/* ─────────────────────────────────────────────────
+   Grid of Recurring Cards
+───────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+  overflow: visible;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.95rem 1.05rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+[data-theme='light'] .card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.07);
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--card-accent-color, rgba(139, 92, 246, 0.4));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  z-index: 2;
+}
+
+[data-theme='light'] .card:hover {
+  background: rgba(0, 0, 0, 0.035);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Elevate card above grid when category dropdown is open */
+.cardWithOpenDropdown {
+  z-index: 100 !important;
+  border-color: var(--card-accent-color, var(--primary)) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Card Header */
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.cardInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.brandIconBox {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(125, 125, 125, 0.2);
+  background: rgba(125, 125, 125, 0.1);
+  transition: transform 0.2s ease;
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .brandIconBox {
+    border-color: color-mix(in srgb, var(--card-accent-color, var(--primary)) 25%, transparent);
+    background: color-mix(in srgb, var(--card-accent-color, var(--primary)) 12%, transparent);
+  }
+}
+
+.card:hover .brandIconBox {
+  transform: scale(1.08);
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.categorySelectWrapper {
+  position: relative;
+  width: fit-content;
+}
+
+/* Unified Vibrant Monthly Pill Inside Each Card */
+.frequencyTag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 1px 4px rgba(56, 189, 248, 0.1);
+  transition: all 0.2s ease;
+}
+
+[data-theme='light'] .frequencyTag {
+  background: rgba(2, 132, 199, 0.08);
+  border-color: rgba(2, 132, 199, 0.25);
+  color: #0284c7;
+  box-shadow: none;
+}
+
+.card:hover .frequencyTag {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+[data-theme='light'] .card:hover .frequencyTag {
+  background: rgba(2, 132, 199, 0.14);
+  border-color: rgba(2, 132, 199, 0.38);
+}
+
+.frequencyIcon {
+  color: #38bdf8;
+  flex-shrink: 0;
+  stroke-width: 2.2;
+}
+
+[data-theme='light'] .frequencyIcon {
+  color: #0284c7;
+}
+
+/* Card Pricing / Meta */
+.cardPricing {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.amountDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
+.amountValue {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.amountPeriod {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.projectionMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.yearlyEst {
+  font-weight: 600;
+}
+
+.bulletDot {
+  color: var(--text-dim);
+  font-size: 0.6rem;
+}
+
+.chargesCount {
+  color: var(--text-dim);
+}
+
+/* Card Footer & Current Spend Line (with Rich Hover Effects) */
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.2rem;
+}
+
+.weightBarContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.15rem 0;
+  cursor: default;
+}
+
+.weightBarBg {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+  transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.25s ease;
+}
+
+[data-theme='light'] .weightBarBg {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.weightBarFill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--card-accent-color, var(--primary));
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .weightBarFill {
+    background: linear-gradient(
+      90deg,
+      var(--card-accent-color, var(--primary)) 0%,
+      color-mix(in srgb, var(--card-accent-color, var(--primary)) 75%, transparent) 100%
+    );
+  }
+}
+
+/* Interactive Hover effect on current spend line */
+.card:hover .weightBarBg,
+.weightBarContainer:hover .weightBarBg {
+  height: 9px;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='light'] .card:hover .weightBarBg,
+[data-theme='light'] .weightBarContainer:hover .weightBarBg {
+  background: rgba(0, 0, 0, 0.14);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover .weightBarFill,
+.weightBarContainer:hover .weightBarFill {
+  filter: brightness(1.25);
+  box-shadow: 0 0 12px var(--card-accent-color, var(--primary)), 0 0 4px var(--card-accent-color, var(--primary));
+}
+
+.weightPctText {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  min-width: 32px;
+  text-align: right;
+  transition: color 0.2s ease, transform 0.2s ease, font-weight 0.2s ease;
+}
+
+.card:hover .weightPctText,
+.weightBarContainer:hover .weightPctText {
+  color: var(--card-accent-color, var(--text-main));
+  transform: scale(1.1);
+  font-weight: 700;
+}
+
+/* ─────────────────────────────────────────────────
+   Responsive Breakpoints
+───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summaryStats {
+    width: 100%;
+  }
+
+  .statPill {
+    flex: 1;
+  }
+}

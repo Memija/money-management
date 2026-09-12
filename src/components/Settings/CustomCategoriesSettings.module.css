@@ -1,0 +1,307 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-main);
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-main);
+}
+
+.sectionTitle svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.badge {
+  background: var(--glass-bg);
+  border: 1px solid var(--card-border);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ── Add form ─────────────────────────────── */
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mainInputGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+/* Icon selector button – square, same height as input */
+.iconSelectorBtn {
+  width: 42px;
+  min-height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.iconSelectorBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--glass-bg);
+}
+
+.iconPlaceholder {
+  opacity: 0.45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inputWrapper {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+
+.mainInput {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  outline: none;
+  transition: var(--transition);
+  min-height: 42px;
+}
+
+.mainInput::placeholder {
+  color: var(--text-dim);
+}
+
+.mainInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* Globe / translation toggle */
+.toggleTranslationBtn {
+  width: 42px;
+  min-height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.toggleTranslationBtn:hover {
+  background: var(--glass-bg);
+  color: var(--text-main);
+}
+
+.toggleTranslationBtn.active {
+  background: var(--primary-glow);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Add button */
+.addButton {
+  min-height: 42px;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  white-space: nowrap;
+  background: linear-gradient(135deg, var(--primary), #059669);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.addButton:hover:not(:disabled) {
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
+.addButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* ── Category list ─────────────────────────── */
+.categoriesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.categoriesList::-webkit-scrollbar {
+  width: 6px;
+}
+.categoriesList::-webkit-scrollbar-track {
+  background: transparent;
+}
+.categoriesList::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 4px;
+}
+.categoriesList::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+.categoryCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  gap: 1rem;
+  flex-shrink: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.categoryCard:hover {
+  border-color: var(--primary);
+}
+
+.catInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.catName {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.catTranslations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.transBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--glass-bg);
+  padding: 0.15rem 0.45rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  border: 1px solid var(--card-border);
+}
+
+.transBadge img {
+  width: 14px;
+  height: 10px;
+  border-radius: 1px;
+}
+
+/* ── Card Actions (Edit / Delete) ─────────────────────────── */
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.editBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.45rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.editBtn:hover {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.45rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.deleteBtn:hover {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--danger);
+}
+
+/* ── Empty state ───────────────────────────── */
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-dim);
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--card-border);
+  font-size: 0.9rem;
+}

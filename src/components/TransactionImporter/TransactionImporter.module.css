@@ -332,3 +332,15 @@
 .no-margin-top {
   margin-top: 0 !important;
 }
+
+.nav-actions-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.back-button-clean {
+  margin-bottom: 0;
+}

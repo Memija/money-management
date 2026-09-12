@@ -1,49 +1,53 @@
-import React, { useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { TrendingDown, TrendingUp } from 'lucide-react'
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import React, { useEffect, useMemo, useRef,useState } from 'react'
+import { AnimatePresence,motion, useInView } from 'framer-motion'
+import { TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 
+import type { PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
+import { useAnalytics } from '../../hooks/useAnalytics'
 import { useFormatters } from '../../hooks/useFormatters'
+import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
 import { useTransactions } from '../../hooks/useTransactions'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import { getCategoryLabel } from '../../utils/category-utils'
+import { TransactionPreviewModal } from '../shared/TransactionPreviewModal'
+import { AvgDetailModal } from './AvgDetailModal/AvgDetailModal'
+import { CategoryTrend } from './CategoryTrend'
+import { ExpenseCategories } from './ExpenseCategories'
+import { IncomeVsExpensesChart } from './IncomeVsExpensesChart'
+import { InsightCards } from './InsightCards'
+import { PeriodFilter } from './PeriodFilter'
+import { RecurringExpenses } from './RecurringExpenses'
+import { SavingsTrendModal } from './SavingsTrendModal/SavingsTrendModal'
+import { TopMerchants } from './TopMerchants'
 import { TransactionList } from './TransactionList'
 
 import styles from './Dashboard.module.css'
 
-const CATEGORY_COLORS = [
-  '#10b981',
-  '#6366f1',
-  '#f59e0b',
-  '#ec4899',
-  '#3b82f6',
-  '#8b5cf6',
-  '#14b8a6',
-  '#f43f5e',
-  '#84cc16',
-  '#06b6d4',
-  '#a855f7',
-  '#eab308',
-]
-
 const Dashboard: React.FC = () => {
-  const { importedAccounts, resetImport } = useAppStore()
+  const { importedAccounts } = useAppStore()
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatMonthYear } = useFormatters()
 
+  // Period filter state
+  const [period, setPeriod] = useState<PeriodFilterType>({ mode: 'all', value: '' })
+
+  // Detail modal state (consolidates filter, category, and merchant drilldowns)
+  type DetailModalState =
+    | { type: 'filter'; filter: 'all' | 'income' | 'expense' }
+    | { type: 'category'; category: string }
+    | { type: 'merchant'; merchant: string }
+    | null
+
+  const [activeDetailModal, setActiveDetailModal] = useState<DetailModalState>(null)
+
+  // Avg detail modal
+  const [avgDetailType, setAvgDetailType] = useState<'income' | 'expense' | null>(null)
+
+  // Savings trend modal
+  const [isSavingsTrendOpen, setIsSavingsTrendOpen] = useState(false)
+
+  // Transactions with active period filter applied
   const {
     allTransactions,
     filteredTx,
@@ -53,82 +57,151 @@ const Dashboard: React.FC = () => {
     setSelectedInstitution,
     sortOrder,
     setSortOrder,
-  } = useTransactions()
+  } = useTransactions(period)
 
-  const { totalIncome, totalExpenses, balance } = useMemo(() => {
-    const income = allTransactions
-      .filter((t) => t.type === 'income')
-      .reduce((s, t) => s + t.amount, 0)
-    const expenses = allTransactions
-      .filter((t) => t.type === 'expense')
-      .reduce((s, t) => s + Math.abs(t.amount), 0)
-    return { totalIncome: income, totalExpenses: expenses, balance: income - expenses }
-  }, [allTransactions])
+  // Analytics — all derived data from one centralized hook
+  const analytics = useAnalytics(allTransactions, period, formatMonthYear)
 
-  // Category breakdown
-  const categoryMap = useMemo(() => {
-    const map: Record<string, number> = {}
-    allTransactions
-      .filter((t) => t.type === 'expense')
-      .forEach((t) => {
-        const cat = t.category || 'Other'
-        map[cat] = (map[cat] || 0) + Math.abs(t.amount)
-      })
-    return Object.entries(map)
-      .sort((a, b) => b[1] - a[1])
-      .map(([name, value], i) => ({
-        name,
-        value: Math.round(value * 100) / 100,
-        color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
-        colorClass: styles[`cat-color-${i % CATEGORY_COLORS.length}`],
-      }))
-  }, [allTransactions])
+  const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(allTransactions)
 
-  // Monthly spending chart
-  const monthlyData = useMemo(() => {
-    const map: Record<string, { income: number; expense: number }> = {}
-    allTransactions.forEach((t) => {
-      const month = t.date.substring(0, 7) // YYYY-MM
-      if (!map[month]) map[month] = { income: 0, expense: 0 }
-      if (t.type === 'income') map[month].income += t.amount
-      else map[month].expense += Math.abs(t.amount)
-    })
-    return Object.entries(map)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([month, data]) => ({
-        name: formatMonthYear(month),
-        income: Math.round(data.income),
-        expenses: Math.round(data.expense),
-      }))
-  }, [allTransactions, formatMonthYear])
+  // Consolidated modal configuration
+  const detailModalConfig = useMemo(() => {
+    if (!activeDetailModal) return null
+
+    if (activeDetailModal.type === 'filter') {
+      const { filter } = activeDetailModal
+      const title =
+        filter === 'income'
+          ? t.income
+          : filter === 'expense'
+            ? t.expenses
+            : t.allTransactions
+      const variant: 'expense' | 'income' = filter === 'expense' ? 'expense' : 'income'
+      const transactions = analytics.periodTransactions.filter(
+        (tx) => filter === 'all' || tx.type === filter,
+      )
+      return { title, variant, transactions }
+    }
+
+    if (activeDetailModal.type === 'category') {
+      const { category } = activeDetailModal
+      const title = getCategoryLabel(category, t)
+      const variant = 'expense' as const
+      const transactions = analytics.periodTransactions.filter(
+        (tx) => tx.type === 'expense' && (tx.category || 'Other') === category,
+      )
+      return { title, variant, transactions }
+    }
+
+    if (activeDetailModal.type === 'merchant') {
+      const { merchant } = activeDetailModal
+      const title = merchant || t.topMerchants
+      const variant = 'expense' as const
+      const normalizedMerchant = merchant.trim().replace(/\s+/g, ' ').toLowerCase()
+      const transactions = analytics.periodTransactions.filter(
+        (tx) =>
+          tx.type === 'expense' &&
+          tx.description.trim().replace(/\s+/g, ' ').toLowerCase() === normalizedMerchant,
+      )
+      return { title, variant, transactions }
+    }
+
+    return null
+  }, [activeDetailModal, analytics.periodTransactions, t])
+
+  // Scroll container ref — useInView observes scroll inside this element
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const heroRef = useRef<HTMLElement>(null)
+  const isHeroInView = useInView(heroRef, { root: scrollRef, margin: '-60px 0px 0px 0px' })
+
+  // Lock body to viewport height while Dashboard is mounted so that the
+  // subheader can stay above a scrollable inner container (no position:fixed needed)
+  useEffect(() => {
+    document.body.classList.add('dashboard-scroll')
+    document.documentElement.classList.add('dashboard-scroll')
+    return () => {
+      document.body.classList.remove('dashboard-scroll')
+      document.documentElement.classList.remove('dashboard-scroll')
+    }
+  }, [])
 
   const institutionNames = useMemo(
     () => [...new Set(importedAccounts.map((a) => a.institutionName))],
     [importedAccounts],
   )
 
+
   return (
-    <div className="app-container">
-      <main className="container">
-        {/* New Import Action */}
-        <div className={styles['header-actions']}>
-          <button
-            className={styles['nav-reset-btn']}
-            onClick={resetImport}
-            title={t.newImport}
-            id="reset-import"
-          >
-            {t.newImport}
-          </button>
+    <div className={styles['dashboard-outer']}>
+      {/* Subheader — plain flex item above the scroll area, no position tricks needed */}
+      <div className={styles['subheader-bar']}>
+        <div className={styles['subheader-inner']}>
+          <div className={styles['period-filter-wrapper']}>
+            <PeriodFilter
+              period={period}
+              onPeriodChange={setPeriod}
+              availableYears={analytics.availableYears}
+              availableQuarters={analytics.availableQuarters}
+              availableMonths={analytics.availableMonths}
+            />
+          </div>
+
+          <AnimatePresence>
+            {!isHeroInView && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className={styles['sticky-stats']}
+              >
+                <div className={styles['sticky-stat-item']}>
+                  <Wallet size={14} className={styles['text-muted']} />
+                  <span className={styles['sticky-stat-label']}>{t.totalBalance}:</span>
+                  <span
+                    className={`${styles['sticky-stat-value']} ${
+                      analytics.balance >= 0 ? styles['text-primary'] : styles['text-danger']
+                    }`}
+                  >
+                    {formatCurrency(analytics.balance)}
+                  </span>
+                </div>
+                <div className={styles['sticky-stat-divider']} />
+                <div className={styles['sticky-stat-item']}>
+                  <TrendingUp size={14} className={styles['text-primary']} />
+                  <span className={styles['sticky-stat-label']}>{t.income}:</span>
+                  <span className={styles['sticky-stat-value']}>{formatCurrency(analytics.totalIncome)}</span>
+                </div>
+                <div className={styles['sticky-stat-divider']} />
+                <div className={styles['sticky-stat-item']}>
+                  <TrendingDown size={14} className={styles['text-danger']} />
+                  <span className={styles['sticky-stat-label']}>{t.expenses}:</span>
+                  <span className={styles['sticky-stat-value']}>{formatCurrency(analytics.totalExpenses)}</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        {/* Balance Hero */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`${styles['balance-hero']} glass`}
-        >
+      </div>
+
+      {/* Scrollable content area — only this div scrolls */}
+      <div ref={scrollRef} className={styles['scroll-area']}>
+        {/* Ambient decorative orbs — purely visual, no interaction */}
+        <div className={styles['ambient-orbs']} aria-hidden="true">
+          <div className={styles['orb-1']} />
+          <div className={styles['orb-2']} />
+          <div className={styles['orb-3']} />
+        </div>
+        <main className="container">
+          <motion.section
+            ref={heroRef}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className={`${styles['balance-hero']} ${analytics.balance < 0 ? styles.negative : ''}`}
+          >
           <p className={styles['balance-label']}>{t.totalBalance}</p>
-          <h1 className={styles['balance-amount']}>{formatCurrency(balance)}</h1>
+          <h1 className={styles['balance-amount']}>{formatCurrency(analytics.balance)}</h1>
           <div className={styles['balance-stats']}>
             <div className={styles['stat-item']}>
               <div className={`${styles['icon-box']} ${styles['icon-income']}`}>
@@ -136,7 +209,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div className={styles['stat-text-container']}>
                 <p className={styles['stat-label']}>{t.income}</p>
-                <p className={styles['stat-value']}>{formatCurrency(totalIncome)}</p>
+                <p className={styles['stat-value']}>{formatCurrency(analytics.totalIncome)}</p>
               </div>
             </div>
             <div className={styles['stat-item']}>
@@ -145,160 +218,66 @@ const Dashboard: React.FC = () => {
               </div>
               <div className={styles['stat-text-container']}>
                 <p className={styles['stat-label']}>{t.expenses}</p>
-                <p className={styles['stat-value']}>{formatCurrency(totalExpenses)}</p>
+                <p className={styles['stat-value']}>{formatCurrency(analytics.totalExpenses)}</p>
               </div>
             </div>
           </div>
         </motion.section>
 
+        {/* Insight Cards */}
+        <InsightCards
+          transactionCount={analytics.transactionCount}
+          incomeCount={analytics.incomeCount}
+          expenseCount={analytics.expenseCount}
+          avgExpense={analytics.avgExpense}
+          avgIncome={analytics.avgIncome}
+          avgTransaction={analytics.avgTransaction}
+          totalIncome={analytics.totalIncome}
+          totalExpenses={analytics.totalExpenses}
+          balance={analytics.balance}
+          topCategory={analytics.topCategory}
+          topCategories={analytics.topCategories}
+          savingsRate={analytics.savingsRate}
+          onIncomeClick={() => setActiveDetailModal({ type: 'filter', filter: 'income' })}
+          onExpenseClick={() => setActiveDetailModal({ type: 'filter', filter: 'expense' })}
+          onAllClick={() => setIsSavingsTrendOpen(true)}
+          onAvgIncomeClick={() => setAvgDetailType('income')}
+          onAvgExpenseClick={() => setAvgDetailType('expense')}
+          onCategoryClick={(cat) => setActiveDetailModal({ type: 'category', category: cat })}
+        />
+
         {/* Charts Grid */}
         <div className={styles['dashboard-grid']}>
-          {/* Spending Overview Chart */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className={`glass-card ${styles['col-span-8']}`}
-          >
-            <h3>{t.incomeVsExpenses}</h3>
-            <div className={styles['chart-container']}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData}>
-                  <defs>
-                    <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.2} />
-                    </linearGradient>
-                    <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.2} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: 'var(--text-dim)', fontSize: 12 }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: 'var(--text-dim)', fontSize: 12 }}
-                    tickFormatter={(v: number) => `€${(v / 1000).toFixed(0)}k`}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: 'rgba(15, 17, 21, 0.9)',
-                      border: '1px solid var(--card-border)',
-                      borderRadius: '12px',
-                      backdropFilter: 'blur(10px)',
-                    }}
-                    formatter={(value) => formatCurrency(Number(value))}
-                  />
-                  <Bar dataKey="income" fill="url(#colorIncome)" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="expenses" fill="url(#colorExpense)" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
+          {/* Income vs Expenses Chart */}
+          <IncomeVsExpensesChart
+            monthlyData={analytics.monthlyData}
+            totalIncome={analytics.totalIncome}
+            totalExpenses={analytics.totalExpenses}
+          />
 
-          {/* Category Pie Chart */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className={`glass-card ${styles['col-span-4']}`}
-          >
-            <h3>{t.expenseCategories}</h3>
-            <div className={`${styles['chart-container']} ${styles['chart-pie']}`}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={categoryMap}
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {categoryMap.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      background: 'rgba(15, 17, 21, 0.9)',
-                      border: '1px solid var(--card-border)',
-                      borderRadius: '12px',
-                    }}
-                    formatter={(value) => formatCurrency(Number(value))}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className={styles['category-list']}>
-              {categoryMap.slice(0, 6).map((cat) => (
-                <div key={cat.name} className={styles['category-item']}>
-                  <div className={styles['category-name-container']}>
-                    <div className={`${styles['category-dot']} ${cat.colorClass}`} />
-                    <span className={styles['category-name']}>{getCategoryLabel(cat.name, t)}</span>
-                  </div>
-                  <span className={styles['category-value']}>{formatCurrency(cat.value)}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          {/* Expense Categories full-row interactive breakdown */}
+          <ExpenseCategories
+            categoryBreakdown={analytics.categoryBreakdown}
+            totalExpenses={analytics.totalExpenses}
+            onCategoryClick={(cat) => setActiveDetailModal({ type: 'category', category: cat })}
+          />
 
-          {/* Spending Area Chart */}
-          {monthlyData.length > 1 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
-              className={`glass-card ${styles['col-span-12']}`}
-            >
-              <h3>{t.spendingTrend}</h3>
-              <div className={`${styles['chart-container']} ${styles['chart-area']}`}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={monthlyData}>
-                    <defs>
-                      <linearGradient id="colorAmt" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: 'var(--text-dim)', fontSize: 12 }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: 'var(--text-dim)', fontSize: 12 }}
-                      tickFormatter={(v: number) => `€${(v / 1000).toFixed(0)}k`}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'rgba(15, 17, 21, 0.9)',
-                        border: '1px solid var(--card-border)',
-                        borderRadius: '12px',
-                      }}
-                      formatter={(value) => formatCurrency(Number(value))}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="expenses"
-                      stroke="var(--primary)"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorAmt)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </motion.div>
-          )}
+          {/* Recurring Expenses */}
+          <RecurringExpenses
+            recurringExpenses={recurringExpenses}
+            totalMonthly={recurringMonthlyTotal}
+          />
+
+          {/* Top Merchants + Category Trend side by side */}
+          <TopMerchants
+            merchants={analytics.topMerchants}
+            totalExpenses={analytics.totalExpenses}
+            onMerchantClick={(merchant) => setActiveDetailModal({ type: 'merchant', merchant })}
+          />
+          <CategoryTrend
+            data={analytics.monthlyCategoryData}
+          />
+
 
           {/* Transactions Table */}
           <TransactionList
@@ -312,7 +291,37 @@ const Dashboard: React.FC = () => {
             setSortOrder={setSortOrder}
           />
         </div>
-      </main>
+        </main>
+      </div>
+
+      {/* Consolidated Transaction detail modal */}
+      <TransactionPreviewModal
+        isOpen={activeDetailModal !== null}
+        onClose={() => setActiveDetailModal(null)}
+        title={detailModalConfig?.title ?? ''}
+        variant={detailModalConfig?.variant ?? 'expense'}
+        transactions={detailModalConfig?.transactions ?? []}
+      />
+
+      {/* Avg detail modal — opened from Avg. Transaction card rows */}
+      {avgDetailType !== null && (
+        <AvgDetailModal
+          isOpen
+          onClose={() => setAvgDetailType(null)}
+          type={avgDetailType}
+          transactions={analytics.periodTransactions}
+        />
+      )}
+
+      {/* Savings trend modal — opened from Net Saved row */}
+      <SavingsTrendModal
+        isOpen={isSavingsTrendOpen}
+        onClose={() => setIsSavingsTrendOpen(false)}
+        monthlyData={analytics.monthlyData}
+        totalIncome={analytics.totalIncome}
+        totalExpenses={analytics.totalExpenses}
+        savingsRate={analytics.savingsRate}
+      />
     </div>
   )
 }

@@ -28,6 +28,8 @@ vi.mock('../../store/useAppStore', () => ({
 vi.mock('../../hooks/useFormatters', () => ({
   useFormatters: vi.fn(() => ({
     formatCurrency: (amount: number) => `€${amount}`,
+    formatTransactionCount: (count: number) =>
+      count === 1 ? `${count} transaction` : `${count} transactions`,
   })),
 }))
 
@@ -58,6 +60,7 @@ describe('ImportReview', () => {
         institutionId: '1',
         institutionName: 'Bank A',
         importedAt: new Date('2024-01-01T10:00:00').toISOString(),
+        importedFingerprints: [],
         transactions: [
           {
             id: 't1',
@@ -122,6 +125,7 @@ describe('ImportReview', () => {
         institutionId: '1',
         institutionName: 'Bank A',
         importedAt: new Date('2024-01-01T10:00:00').toISOString(),
+        importedFingerprints: [],
         transactions: [
           {
             id: 't1',
@@ -149,6 +153,7 @@ describe('ImportReview', () => {
         institutionId: '2',
         institutionName: 'Bank B',
         importedAt: new Date('2024-01-01T11:00:00').toISOString(),
+        importedFingerprints: [],
         transactions: [
           {
             id: 't3',

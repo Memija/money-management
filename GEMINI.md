@@ -584,6 +584,17 @@ return <h1>{t.dashboard.title}</h1>;
 - **German Compound Words** - Always use full forms (e.g., 'Kaltwasserverbrauch' instead of 'Kalt-')
 - **Add new keys to all locales** - Ensure consistency across `en`, `de`, `pl`, etc.
 
+### Adding a New Language Checklist
+
+When introducing a new language or locale:
+
+1. **Declare Locale**: Add code to `export type Locale` in `src/i18n/types.ts`
+2. **Translations**: Create `src/i18n/locales/<locale>.ts` implementing `TranslationStrings`
+3. **Register**: Add to `translations`, `localeLabels`, and `localeOrder` in `src/i18n/translations.ts`
+4. **Parser Locale**: Create `src/i18n/parser-locales/<locale>.ts` for transaction keywords and regex patterns
+5. **Date Fallbacks**: Check `src/utils/date-utils.ts` (`MONTH_FALLBACKS` & `WEEKDAY_FALLBACKS`). If the locale has incomplete or non-standard browser ICU output, register explicit fallbacks. The guardrail test in `date-utils.test.ts` automatically tests every locale in `localeOrder`.
+6. **Data Guardrails**: Run `src/data/` unit tests (`countries.test.ts`, `institutions.test.ts`, `merchants.test.ts`) to ensure country translation coverage, flag assets, and regional data integrity.
+
 ---
 
 ## Project Structure

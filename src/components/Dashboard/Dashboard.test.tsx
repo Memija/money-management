@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { TranslationStrings } from '../../i18n/translations'
@@ -6,19 +6,42 @@ import { type AppState, useAppStore } from '../../store/useAppStore'
 import type { LanguageState } from '../../store/useLanguageStore'
 import Dashboard from './Dashboard'
 
+if (typeof window !== 'undefined' && !window.IntersectionObserver) {
+  window.IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof IntersectionObserver
+}
+
 // Mock Recharts
 vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   BarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Bar: () => <div>Bar</div>,
+  ComposedChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Line: () => <div>Line</div>,
   XAxis: () => <div>XAxis</div>,
   YAxis: () => <div>YAxis</div>,
   Tooltip: () => <div>Tooltip</div>,
   PieChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Pie: () => <div>Pie</div>,
+  Pie: ({ children, shape, data }: { children?: React.ReactNode; shape?: (props: Record<string, unknown>, idx: number) => React.ReactNode; data?: Array<Record<string, unknown>> }) => (
+    <div>
+      Pie
+      {data?.map((item: Record<string, unknown>, idx: number) => (
+        <div key={idx}>
+          {shape ? shape({ ...item, cx: 100, cy: 100, innerRadius: 50, outerRadius: 80, startAngle: 0, endAngle: 180, fill: '#fff' }, idx) : null}
+        </div>
+      ))}
+      {children}
+    </div>
+  ),
   Cell: () => <div>Cell</div>,
+  Sector: () => <div>Sector</div>,
   AreaChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Area: () => <div>Area</div>,
+  Legend: () => <div>Legend</div>,
+  CartesianGrid: () => <div>CartesianGrid</div>,
 }))
 
 const { mockResetImport } = vi.hoisted(() => ({
@@ -90,6 +113,14 @@ vi.mock('../../store/useLanguageStore', () => ({
         catRent: 'Rent',
         catOther: 'Other',
         noTransactionsMatch: 'No transactions',
+        ofAvgIncome: '{percent}% of average income',
+        ofTotal: '{percent}% of total expenses',
+        insightTransactions: 'Transactions',
+        insightAvgTransaction: 'Average Transaction',
+        insightTopCategory: 'Top Category',
+        insightMedian: 'Median Transaction',
+        showingOf: 'Showing {shown} of {total}',
+        perPage: 'Per page:',
       } as unknown as TranslationStrings,
     }
     return typeof selector === 'function' ? selector(state as LanguageState) : state
@@ -105,18 +136,11 @@ describe('Dashboard', () => {
     render(<Dashboard />)
 
     // balance = 3000 - (1000 + 50) = 1950
-    expect(screen.getByText('Total Balance')).toBeInTheDocument()
+    expect(screen.getAllByText('Total Balance').length).toBeGreaterThan(0)
     // Use regex to be flexible with spaces and currency symbols
     expect(screen.getAllByText(/1[.,]950/).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/3[.,]000/).length).toBeGreaterThan(0) // Income
     expect(screen.getAllByText(/1[.,]050/).length).toBeGreaterThan(0) // Expenses
-  })
-
-  it('calls resetImport when New Import button is clicked', () => {
-    render(<Dashboard />)
-
-    fireEvent.click(screen.getByText('New Import'))
-    expect(mockResetImport).toHaveBeenCalled()
   })
 
   it('filters transactions by search term', () => {
@@ -125,9 +149,9 @@ describe('Dashboard', () => {
     const searchInput = screen.getByPlaceholderText('Search')
     fireEvent.change(searchInput, { target: { value: 'Rent' } })
 
-    // Should find 'Rent' in the transaction list (and maybe category, but that's fine for filter test)
-    expect(screen.getAllByText('Rent').length).toBeGreaterThan(0)
-    expect(screen.queryByText('Random')).not.toBeInTheDocument()
+    const txList = screen.getByTestId('transaction-list')
+    expect(within(txList).getAllByText('Rent').length).toBeGreaterThan(0)
+    expect(within(txList).queryByText('Random')).not.toBeInTheDocument()
   })
 
   it('sorts transactions correctly', () => {
@@ -138,17 +162,14 @@ describe('Dashboard', () => {
     // Test Highest Amount sorting
     fireEvent.change(sortSelect, { target: { value: 'highest' } })
 
-    const amounts = screen.getAllByText(/€/).map((el) => el.textContent)
-    // The first 3 '€' elements are in the Balance Hero (Total, Income, Expenses)
-    // The next 2 are in the Category Breakdown (Rent, Other)
-    // The transactions start after that.
-    const txAmounts = amounts.slice(5)
+    const txList = screen.getByTestId('transaction-list')
+    const salaryEl = within(txList).getAllByText('Salary')[0]
+    const rentEl = within(txList).getAllByText('Rent')[0]
+    const randomEl = within(txList).getByText('Random')
 
-    // Highest abs amount should be first (3000 then 1000 then 50)
-    // Use regex to be flexible with spaces and locale-specific thousands separators
-    expect(txAmounts[0]).toMatch(/3[.,]000/)
-    expect(txAmounts[1]).toMatch(/1[.,]000/)
-    expect(txAmounts[2]).toMatch(/50/)
+    // Highest abs amount should be first (3000 -> Salary, then 1000 -> Rent, then 50 -> Random)
+    expect(salaryEl.compareDocumentPosition(rentEl)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(rentEl.compareDocumentPosition(randomEl)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
   it('renders category breakdown', () => {
@@ -167,6 +188,6 @@ describe('Dashboard', () => {
     })
 
     render(<Dashboard />)
-    expect(screen.getByText('No transactions')).toBeInTheDocument()
+    expect(screen.getAllByText('No transactions').length).toBeGreaterThan(0)
   })
 })

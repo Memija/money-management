@@ -1,0 +1,614 @@
+.container {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible !important;
+  z-index: 2;
+  transition: z-index 0s, border-color var(--transition), box-shadow var(--transition);
+}
+
+.container:hover,
+.container:focus-within {
+  z-index: 50;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-column: span 12;
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   Header & Controls
+───────────────────────────────────────────────── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(236, 72, 153, 0.08) 100%);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.12);
+  flex-shrink: 0;
+}
+
+[data-theme='light'] .iconBadge {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(236, 72, 153, 0.06) 100%);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.22);
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Stat Pills in Header */
+.statPillsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statPill {
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='light'] .statPill {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.statLabel {
+  font-size: 0.64rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.statValue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 0.2rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.statValueShare {
+  color: #f59e0b;
+}
+
+/* View Mode Toggle Buttons */
+.viewToggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--card-border);
+  border-radius: 9px;
+  padding: 2px;
+  gap: 2px;
+}
+
+[data-theme='light'] .viewToggle {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.toggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toggleBtn:hover {
+  color: var(--text-main);
+}
+
+.toggleBtnActive {
+  background: var(--card-bg, rgba(255, 255, 255, 0.12));
+  color: var(--text-main);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ─────────────────────────────────────────────────
+   Ranked List View (Leaderboard)
+───────────────────────────────────────────────── */
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 4px 0.35rem 0.25rem 2px;
+  margin-top: 0.35rem;
+}
+
+.listContainer:focus,
+.listContainer:focus-visible {
+  outline: none;
+}
+
+.listContainer::-webkit-scrollbar {
+  width: 5px;
+}
+
+.listContainer::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+
+.listContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.listContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+[data-theme='light'] .listContainer::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='light'] .listContainer::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='light'] .listContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.merchantRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--card-border);
+  position: relative;
+  overflow: visible;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.merchantRow:focus {
+  outline: none;
+}
+
+.merchantRow:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.merchantRowClickable {
+  cursor: pointer;
+}
+
+.merchantRow:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme='light'] .merchantRow {
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='light'] .merchantRow:hover {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.14);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.rowMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.rowLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Rank Badges */
+.rankBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.rankGold {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #111827;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+  border: 1px solid rgba(253, 230, 138, 0.3);
+}
+
+.rankSilver {
+  background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+  color: #0f172a;
+  box-shadow: 0 0 8px rgba(148, 163, 184, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.rankBronze {
+  background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(234, 88, 12, 0.3);
+  border: 1px solid rgba(254, 215, 170, 0.3);
+}
+
+.rankDefault {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-dim);
+  border: 1px solid var(--card-border);
+}
+
+[data-theme='light'] .rankDefault {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-muted);
+}
+
+/* Brand Logo Box */
+.logoBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.merchantRow:hover .logoBox {
+  transform: scale(1.05);
+}
+
+[data-theme='light'] .logoBox {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.initialsAvatar {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-main);
+}
+
+/* Merchant Info */
+.merchantInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.nameCategoryRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.merchantName {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 190px;
+}
+
+.categoryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  border: 1px solid var(--card-border);
+}
+
+[data-theme='light'] .categoryBadge {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.bulletDot {
+  opacity: 0.5;
+}
+
+/* Right Column: Amount & Proportions */
+.rowRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 0.2rem;
+}
+
+.merchantAmount {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.shareBadge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--card-border);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme='light'] .shareBadge {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* Dedicated Progress Bar below Row Content */
+.progressBarWrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding-top: 0.1rem;
+}
+
+.progressBarTrack {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-theme='light'] .progressBarTrack {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.progressBarFill {
+  height: 100%;
+  width: var(--progress-width, 0%);
+  background: var(--brand-color, var(--primary));
+  border-radius: 99px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─────────────────────────────────────────────────
+   Chart View
+───────────────────────────────────────────────── */
+.chartContainer {
+  height: 360px;
+  width: 100%;
+  margin-top: 0.5rem;
+  position: relative;
+}
+
+.chartContainer *:focus,
+.chartContainer *:focus-visible {
+  outline: none;
+}
+
+/* Custom Tick styling */
+.yAxisTick {
+  font-size: 11px;
+  fill: var(--text-muted);
+  font-weight: 500;
+  cursor: default;
+  transition: fill 0.15s ease;
+  pointer-events: all;
+}
+
+.yAxisTickTruncated {
+  cursor: help;
+  pointer-events: all;
+}
+
+.yAxisTick:hover {
+  fill: var(--text-main);
+}
+
+/* Floating Tooltip for Truncated Merchant Column Labels */
+.axisTooltip {
+  position: absolute;
+  left: 8px;
+  top: var(--tooltip-top, 0px);
+  transform: translateY(-50%);
+  background: rgba(15, 17, 23, 0.96);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-main);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 100;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+}
+
+[data-theme='light'] .axisTooltip {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.15);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+}
+
+/* Custom Tooltip (Hover Modal) */
+.tooltipContainer {
+  background: rgba(15, 17, 23, 0.96);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  box-shadow: var(--shadow-lg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  min-width: 190px;
+  pointer-events: none;
+}
+
+[data-theme='light'] .tooltipContainer {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.tooltipHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.tooltipLogoBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+[data-theme='light'] .tooltipLogoBox {
+  background: #f1f5f9;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.tooltipInitialsAvatar {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.tooltipCategoryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.62rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+[data-theme='light'] .tooltipCategoryBadge {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.tooltipTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+  color: var(--text-muted);
+}
+
+.tooltipValue {
+  font-weight: 700;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,59 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.icon {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.pills {
+  display: flex;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.pill {
+  padding: 0.35rem 0.7rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.pill:hover {
+  color: var(--text-main);
+  background: var(--dropdown-item-hover);
+}
+
+.pill.active {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--primary);
+}
+
+.selector {
+  padding: 0.35rem 1.6rem 0.35rem 0.6rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.selector option {
+  background: var(--bg-elevated);
+  color: var(--text-main);
+}

@@ -1,9 +1,10 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
 import * as XLSX from 'xlsx'
 
 import type { TranslationStrings } from '../../i18n/types'
 import type { ImportMethod, Transaction } from '../../types'
+import { computeImportFingerprint } from '../../utils/import-fingerprint'
 import {
   parseBankStatementPaste,
   parsePdfText,
@@ -163,12 +164,18 @@ export const useTransactionImport = (
     setPasteText('')
   }, [])
 
+  const importFingerprint = useMemo(
+    () => computeImportFingerprint(transactions),
+    [transactions],
+  )
+
   return {
     transactions,
     loading,
     error,
     fileName,
     pasteText,
+    importFingerprint,
     setPasteText,
     setError,
     setFileName,

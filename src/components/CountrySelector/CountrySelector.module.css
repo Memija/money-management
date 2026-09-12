@@ -167,7 +167,6 @@
   background: var(--card-bg);
   color: var(--text-dim);
   border: 1px solid var(--header-border);
-  text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 

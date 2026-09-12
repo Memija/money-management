@@ -396,7 +396,6 @@
   color: var(--text-muted);
   font-size: 0.75rem;
   margin-bottom: 1rem;
-  text-transform: uppercase;
   letter-spacing: 0.03em;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -422,4 +421,16 @@
   height: 12px;
   object-fit: cover;
   border-radius: 2px;
+}
+
+.nav-actions-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.back-button-clean {
+  margin-bottom: 0;
 }

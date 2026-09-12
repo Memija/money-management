@@ -17,6 +17,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import type { ImportedAccount, ImportMethod } from '../../types'
 import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal'
+import { DuplicateImportWarningModal } from './DuplicateImportWarningModal'
 import { TransactionPreviewModal } from './TransactionPreviewModal'
 import { useTransactionImport } from './useTransactionImport'
 
@@ -24,7 +25,7 @@ import styles from './TransactionImporter.module.css'
 
 /* ─── component ─── */
 const TransactionImporter: React.FC = () => {
-  const { selectedInstitution, addImportedAccount, setStep } = useAppStore()
+  const { selectedInstitution, addImportedAccount, setStep, getDuplicateTransactionStats, importedAccounts, cancelImport } = useAppStore()
   const t = useLanguageStore((s) => s.t)
   const institutionName = selectedInstitution?.name ?? 'Unknown'
 
@@ -32,6 +33,7 @@ const TransactionImporter: React.FC = () => {
   const [dragOver, setDragOver] = useState(false)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [showClearConfirmation, setShowClearConfirmation] = useState(false)
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
@@ -40,6 +42,7 @@ const TransactionImporter: React.FC = () => {
     error,
     fileName,
     pasteText,
+    importFingerprint,
     setPasteText,
     setError,
     setFileName,
@@ -49,6 +52,10 @@ const TransactionImporter: React.FC = () => {
     handleUpdateTransaction,
     handleClearAll,
   } = useTransactionImport(institutionName, method, t)
+
+  const duplicateStats = React.useMemo(() => {
+    return getDuplicateTransactionStats(selectedInstitution?.id ?? 'unknown', transactions || [])
+  }, [selectedInstitution?.id, transactions, getDuplicateTransactionStats])
 
   /* ─── import method cards ─── */
   const importMethods: { key: ImportMethod; label: string; icon: React.ReactNode; desc: string }[] =
@@ -84,14 +91,25 @@ const TransactionImporter: React.FC = () => {
     [handleFileChange],
   )
 
+  const buildAccount = (): ImportedAccount => ({
+    institutionId: selectedInstitution?.id ?? 'unknown',
+    institutionName,
+    transactions,
+    importedAt: new Date().toISOString(),
+    importedFingerprints: [importFingerprint],
+  })
+
   const handleConfirmImport = () => {
-    const account: ImportedAccount = {
-      institutionId: selectedInstitution?.id ?? 'unknown',
-      institutionName,
-      transactions,
-      importedAt: new Date().toISOString(),
+    if (duplicateStats.duplicateCount > 0) {
+      setShowDuplicateWarning(true)
+      return
     }
-    addImportedAccount(account)
+    addImportedAccount(buildAccount())
+  }
+
+  const handleProceedDespiteDuplicate = () => {
+    // addImportedAccount automatically deduplicates transactions internally
+    addImportedAccount(buildAccount())
   }
 
   const onClearAll = useCallback(() => {
@@ -114,14 +132,22 @@ const TransactionImporter: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="onboarding-container"
     >
-      <button
-        className="back-button"
-        onClick={() => setStep('institution')}
-        id="back-to-institution"
-      >
-        <ArrowLeft size={18} />
-        <span>{t.back}</span>
-      </button>
+      <div className={styles['nav-actions-wrapper']}>
+        <button
+          className={`back-button ${styles['back-button-clean']}`}
+          onClick={() => setStep('institution')}
+          id="back-to-institution"
+        >
+          <ArrowLeft size={18} />
+          <span>{t.back}</span>
+        </button>
+        {(importedAccounts || []).length > 0 && (
+          <button className={`back-button ${styles['back-button-clean']}`} onClick={() => cancelImport?.()} id="cancel-import">
+            <ArrowLeft size={18} />
+            <span>{t.cancel}</span>
+          </button>
+        )}
+      </div>
 
       <div className="onboarding-header">
         <motion.div
@@ -271,8 +297,22 @@ const TransactionImporter: React.FC = () => {
             <div className={styles['import-preview-info']}>
               <CheckCircle2 size={20} className={styles['success-icon']} />
               <span>
-                <strong>{transactions.length}</strong>{' '}
-                {t.transactionsFound.replace('{count}', '').trim()}
+                {t.transactionsFound.includes('{count}') ? (
+                  (() => {
+                    const [before, after] = t.transactionsFound.split('{count}')
+                    return (
+                      <>
+                        {before}
+                        <strong>{transactions.length}</strong>
+                        {after}
+                      </>
+                    )
+                  })()
+                ) : (
+                  <>
+                    <strong>{transactions.length}</strong> {t.transactionsFound}
+                  </>
+                )}
               </span>
             </div>
             <button
@@ -314,6 +354,7 @@ const TransactionImporter: React.FC = () => {
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         transactions={transactions}
+        duplicateIds={new Set(duplicateStats.duplicateIds)}
         onRemoveTransaction={handleRemoveTransaction}
         onUpdateTransaction={handleUpdateTransaction}
       />
@@ -326,6 +367,27 @@ const TransactionImporter: React.FC = () => {
         message={t.clearAllTransactionsMessage}
         confirmText={t.clearAll}
         cancelText={t.cancel}
+      />
+
+      <DuplicateImportWarningModal
+        isOpen={showDuplicateWarning}
+        onClose={() => setShowDuplicateWarning(false)}
+        onProceed={handleProceedDespiteDuplicate}
+        title={t.duplicateImportTitle}
+        message={
+          duplicateStats?.newCount === 0
+            ? t.duplicateImportMessageAll.replace('{duplicateCount}', String(duplicateStats.duplicateCount))
+            : t.duplicateImportMessagePartial
+                .replace('{duplicateCount}', String(duplicateStats?.duplicateCount))
+                .replace('{newCount}', String(duplicateStats?.newCount))
+        }
+        proceedText={
+          duplicateStats?.newCount === 0
+            ? t.duplicateImportOk
+            : t.duplicateImportProceed.replace('{newCount}', String(duplicateStats?.newCount))
+        }
+        cancelText={t.duplicateImportCancel}
+        showProceedButton={duplicateStats?.newCount !== 0}
       />
     </motion.div>
   )

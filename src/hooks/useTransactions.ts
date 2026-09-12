@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react'
 
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
-import { categorize } from '../utils/category-utils'
+import { getTransactionCategory } from '../utils/category-utils'
+import { filterByPeriod, type PeriodFilter } from './useAnalytics'
 
-export function useTransactions() {
-  const { importedAccounts } = useAppStore()
+export function useTransactions(period?: PeriodFilter) {
+  const { importedAccounts, customKeywords, manualCategories } = useAppStore()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedInstitution, setSelectedInstitution] = useState<string>('all')
@@ -13,12 +14,15 @@ export function useTransactions() {
 
   const allTransactions: Transaction[] = useMemo(() => {
     return importedAccounts.flatMap((a) =>
-      a.transactions.map((t) => ({ ...t, category: categorize(t.description) })),
+      a.transactions.map((t) => ({ ...t, category: getTransactionCategory(t, customKeywords, manualCategories) })),
     )
-  }, [importedAccounts])
+  }, [importedAccounts, customKeywords, manualCategories])
 
   const filteredTx = useMemo(() => {
     let txs = allTransactions
+    if (period && period.mode !== 'all') {
+      txs = filterByPeriod(txs, period)
+    }
     if (selectedInstitution !== 'all') {
       txs = txs.filter((t) => t.institution === selectedInstitution)
     }
@@ -44,7 +48,7 @@ export function useTransactions() {
         break
     }
     return txs
-  }, [allTransactions, selectedInstitution, searchTerm, sortOrder])
+  }, [allTransactions, selectedInstitution, searchTerm, sortOrder, period])
 
   return {
     allTransactions,

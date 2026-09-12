@@ -19,7 +19,7 @@ import styles from './ImportReview.module.css'
 const ImportReview: React.FC = () => {
   const { importedAccounts, startNewInstitution, setStep } = useAppStore()
   const t = useLanguageStore((s) => s.t)
-  const { formatCurrency, locale } = useFormatters()
+  const { formatCurrency, formatTransactionCount, locale } = useFormatters()
   // Map bs/sr to de-DE consistent with useFormatters (Chromium stripped ICU data for these)
   const intlLocale = locale === 'bs' || locale === 'sr' ? 'de-DE' : locale
 
@@ -131,7 +131,7 @@ const ImportReview: React.FC = () => {
               <div>
                 <p className={styles['imported-account-name']}>{acc.institutionName}</p>
                 <p className={styles['imported-account-meta']}>
-                  {acc.transactions.length} {t.transactions.toLowerCase()} • {t.imported}{' '}
+                  {formatTransactionCount(acc.transactions.length)} • {t.imported}{' '}
                   {new Date(acc.importedAt).toLocaleTimeString(intlLocale, {
                     hour: '2-digit',
                     minute: '2-digit',

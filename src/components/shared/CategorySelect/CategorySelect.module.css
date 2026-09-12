@@ -1,0 +1,334 @@
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-main);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.button:hover {
+  background-color: var(--bg-elevated);
+  border-color: var(--card-border);
+}
+
+.buttonContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  max-height: 260px;
+  overflow-y: auto;
+  background-color: var(--dropdown-bg, #1a1e28);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  z-index: 1000;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+[data-theme='light'] .dropdown {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.dropdownAlignLeft {
+  left: 0;
+  right: auto;
+}
+
+.dropdownAlignRight {
+  right: 0;
+  left: auto;
+}
+
+.optgroupLabel {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+.optgroupLabel:first-child {
+  margin-top: 0;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.option:hover {
+  background-color: var(--dropdown-item-hover);
+}
+
+.optionSelected {
+  background-color: var(--dropdown-item-active-bg);
+  color: var(--primary);
+}
+
+.optionSelected .iconWrapper {
+  color: var(--primary);
+}
+
+.buttonLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badge variant for TransactionList & RecurringExpenses */
+.badgeContainer {
+  width: 100%;
+  display: block;
+}
+
+.badgeContainer .button {
+  width: 100%;
+  min-height: 32px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+  min-width: 120px;
+  gap: 0.45rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme='light'] .badgeContainer .button {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 
+    0 2px 8px rgba(15, 23, 42, 0.08),
+    0 1px 2px rgba(15, 23, 42, 0.05);
+  color: #0f172a;
+}
+
+.badgeContainer .button:hover {
+  background: rgba(99, 102, 241, 0.22);
+  border-color: rgba(99, 102, 241, 0.55);
+  box-shadow: 
+    0 4px 14px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+[data-theme='light'] .badgeContainer .button:hover {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+  transform: translateY(-1px);
+}
+
+.badgeContainer .buttonOpen {
+  border-color: var(--badge-color, var(--primary)) !important;
+  box-shadow: 
+    0 0 0 2px rgba(99, 102, 241, 0.35),
+    0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+.badgeContainer .buttonContent {
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.badgeContainer .buttonLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.badgeContainer .iconWrapper {
+  color: var(--badge-color, var(--primary));
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .badgeContainer .button {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--badge-color, var(--primary)) 24%, rgba(255, 255, 255, 0.04)) 0%,
+      color-mix(in srgb, var(--badge-color, var(--primary)) 14%, rgba(0, 0, 0, 0.25)) 100%
+    );
+    border-color: color-mix(in srgb, var(--badge-color, var(--primary)) 46%, transparent);
+    box-shadow: 
+      0 2px 8px color-mix(in srgb, var(--badge-color, var(--primary)) 18%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  [data-theme='light'] .badgeContainer .button {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--badge-color, var(--primary)) 20%, #ffffff) 0%,
+      color-mix(in srgb, var(--badge-color, var(--primary)) 10%, #ffffff) 100%
+    );
+    border-color: color-mix(in srgb, var(--badge-color, var(--primary)) 40%, rgba(0, 0, 0, 0.08));
+    box-shadow: 
+      0 2px 8px color-mix(in srgb, var(--badge-color, var(--primary)) 16%, transparent),
+      0 1px 2px rgba(15, 23, 42, 0.05);
+    color: color-mix(in srgb, var(--badge-color, var(--primary)) 45%, #0f172a);
+  }
+
+  .badgeContainer .button:hover {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--badge-color, var(--primary)) 32%, rgba(255, 255, 255, 0.08)) 0%,
+      color-mix(in srgb, var(--badge-color, var(--primary)) 20%, rgba(0, 0, 0, 0.2)) 100%
+    );
+    border-color: color-mix(in srgb, var(--badge-color, var(--primary)) 70%, transparent);
+    box-shadow: 
+      0 4px 14px color-mix(in srgb, var(--badge-color, var(--primary)) 32%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  [data-theme='light'] .badgeContainer .button:hover {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--badge-color, var(--primary)) 28%, #ffffff) 0%,
+      color-mix(in srgb, var(--badge-color, var(--primary)) 16%, #ffffff) 100%
+    );
+    border-color: color-mix(in srgb, var(--badge-color, var(--primary)) 60%, rgba(0, 0, 0, 0.14));
+    box-shadow: 
+      0 4px 14px color-mix(in srgb, var(--badge-color, var(--primary)) 24%, transparent);
+  }
+
+  .badgeContainer .buttonOpen {
+    box-shadow: 
+      0 0 0 2px color-mix(in srgb, var(--badge-color, var(--primary)) 35%, transparent),
+      0 4px 16px color-mix(in srgb, var(--badge-color, var(--primary)) 30%, transparent) !important;
+  }
+
+  .badgeContainer .iconWrapper {
+    filter: drop-shadow(0 1px 2px color-mix(in srgb, var(--badge-color, var(--primary)) 40%, transparent));
+  }
+}
+
+.badgeContainer .button:hover .iconWrapper {
+  transform: scale(1.1);
+}
+
+.badgeContainer .chevron {
+  color: var(--badge-color, var(--primary));
+  opacity: 0.85;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.badgeContainer .button:hover .chevron {
+  opacity: 1;
+}
+
+.badgeContainer .dropdown {
+  min-width: 220px;
+  width: auto;
+}
+
+.dropdownDivider {
+  height: 1px;
+  background: var(--border-color, rgba(255, 255, 255, 0.08));
+  margin: 0.35rem 0;
+}
+
+[data-theme='light'] .dropdownDivider {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.dropdownFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 0.25rem;
+}
+
+.footerActionBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.footerActionBtn:hover {
+  background-color: var(--dropdown-item-hover, rgba(255, 255, 255, 0.08));
+  color: var(--primary, #6366f1);
+}
+
+.footerIcon {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.footerActionBtn:hover .footerIcon {
+  color: var(--primary, #6366f1);
+}
+

@@ -67,4 +67,46 @@ describe('useFormatters', () => {
     // en format short month + 2 digit year: e.g., May 24
     expect(formatted).toMatch(/May(.*)24/)
   })
+
+  it('should format month year properly for bs and sr without falling back to de-DE month names', () => {
+    useLanguageStore.setState({ locale: 'bs' })
+    const { result: resultBs } = renderHook(() => useFormatters())
+    expect(resultBs.current.formatMonthYear('2024-03')).toBe('Mar 24')
+
+    useLanguageStore.setState({ locale: 'sr' })
+    const { result: resultSr } = renderHook(() => useFormatters())
+    expect(resultSr.current.formatMonthYear('2024-08')).toBe('Авг 24')
+  })
+
+  it('should format category counts correctly based on current locale in store', () => {
+    useLanguageStore.setState({ locale: 'en' })
+    const { result: resultEn } = renderHook(() => useFormatters())
+    expect(resultEn.current.formatCategoryCount(1)).toBe('1 category')
+    expect(resultEn.current.formatCategoryCount(11)).toBe('11 categories')
+
+    useLanguageStore.setState({ locale: 'sr' })
+    const { result: resultSr } = renderHook(() => useFormatters())
+    expect(resultSr.current.formatCategoryCount(1)).toBe('1 категорија')
+    expect(resultSr.current.formatCategoryCount(2)).toBe('2 категорије')
+    expect(resultSr.current.formatCategoryCount(11)).toBe('11 категорија')
+  })
+
+  it('should format charges counts correctly based on current locale in store', () => {
+    useLanguageStore.setState({ locale: 'en' })
+    const { result: resultEn } = renderHook(() => useFormatters())
+    expect(resultEn.current.formatChargesCount(1)).toBe('1 charge')
+    expect(resultEn.current.formatChargesCount(3)).toBe('3 charges')
+
+    useLanguageStore.setState({ locale: 'bs' })
+    const { result: resultBs } = renderHook(() => useFormatters())
+    expect(resultBs.current.formatChargesCount(1)).toBe('1 naplata')
+    expect(resultBs.current.formatChargesCount(3)).toBe('3 naplate')
+    expect(resultBs.current.formatChargesCount(5)).toBe('5 naplata')
+
+    useLanguageStore.setState({ locale: 'sr' })
+    const { result: resultSr } = renderHook(() => useFormatters())
+    expect(resultSr.current.formatChargesCount(1)).toBe('1 наплата')
+    expect(resultSr.current.formatChargesCount(3)).toBe('3 наплате')
+    expect(resultSr.current.formatChargesCount(11)).toBe('11 наплата')
+  })
 })

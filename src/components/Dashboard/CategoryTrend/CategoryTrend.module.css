@@ -1,0 +1,555 @@
+.container {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible !important;
+  z-index: 2;
+  transition: z-index 0s, border-color var(--transition), box-shadow var(--transition);
+}
+
+.container:hover,
+.container:focus-within {
+  z-index: 50;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-column: span 12;
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   Header & Controls
+───────────────────────────────────────────────── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.12) 100%);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.16);
+  flex-shrink: 0;
+}
+
+[data-theme='light'] .iconBadge {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(147, 51, 234, 0.08) 100%);
+  color: #4f46e5;
+  border-color: rgba(79, 70, 229, 0.22);
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Stat Pills in Header */
+.statPillsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statPill {
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='light'] .statPill {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.statLabel {
+  font-size: 0.64rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.statValue {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 0.2rem;
+  line-height: 1.2;
+}
+
+.statValueHighlight {
+  color: #a855f7;
+}
+
+[data-theme='light'] .statValueHighlight {
+  color: #7c3aed;
+}
+
+/* View Mode Switcher */
+.viewToggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+}
+
+[data-theme='light'] .viewToggle {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleBtnActive {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='light'] .toggleBtnActive {
+  background: #ffffff;
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ─────────────────────────────────────────────────
+   Chart Container
+───────────────────────────────────────────────── */
+.chartContainer {
+  flex: 1;
+  min-height: 360px;
+  width: 100%;
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+/* Eradicate any black focus borders/outlines on chart click */
+.chartContainer :global(.recharts-wrapper),
+.chartContainer :global(.recharts-wrapper:focus),
+.chartContainer :global(.recharts-wrapper:focus-visible),
+.chartContainer :global(.recharts-surface),
+.chartContainer :global(.recharts-surface:focus),
+.chartContainer :global(svg),
+.chartContainer :global(svg:focus),
+.chartContainer :global(*:focus),
+.chartContainer :global(*:focus-visible) {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─────────────────────────────────────────────────
+   Interactive Custom Legend
+───────────────────────────────────────────────── */
+.legendContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--card-border);
+}
+
+.legendPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+[data-theme='light'] .legendPill {
+  background: rgba(15, 23, 42, 0.03);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.legendPill:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+[data-theme='light'] .legendPill:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.legendPillActive {
+  background: rgba(125, 125, 125, 0.12);
+  border-color: var(--pill-color, var(--primary));
+  color: var(--text-main);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .legendPillActive {
+    background: color-mix(in srgb, var(--pill-color, var(--primary)) 16%, transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--pill-color, var(--primary)) 25%, transparent);
+  }
+}
+
+.legendPillDimmed {
+  opacity: 0.35;
+}
+
+.legendDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 5px currentColor;
+}
+
+.resetPill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(125, 125, 125, 0.1);
+  border-color: rgba(125, 125, 125, 0.25);
+}
+
+.resetPill:hover {
+  background: rgba(125, 125, 125, 0.18);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .resetPill {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+
+  .resetPill:hover {
+    background: color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+}
+
+.chartContainer :global(.recharts-tooltip-wrapper) {
+  pointer-events: auto !important;
+  z-index: 100;
+}
+
+/* ─────────────────────────────────────────────────
+   Custom Tooltip
+───────────────────────────────────────────────── */
+.tooltipContainer {
+  background: var(--bg-elevated);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md, 12px);
+  padding: 0.65rem 0.85rem;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+  min-width: 225px;
+  max-width: 320px;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+[data-theme='light'] .tooltipContainer {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+.tooltipHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.35rem;
+  padding-left: 2px;
+  padding-right: 2px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.tooltipMonth {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.tooltipTotalBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+}
+
+[data-theme='light'] .tooltipTotalBadge {
+  color: #4f46e5;
+  background: rgba(79, 70, 229, 0.08);
+}
+
+.tooltipList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.26rem;
+  padding: 2px 2px;
+}
+
+.tooltipRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px 48px;
+  align-items: center;
+  column-gap: 0.65rem;
+  font-size: 0.74rem;
+  line-height: 1.25;
+  padding: 0.24rem 0.45rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-user-select: none;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+/* Interactive reaction when hovering items inside the modal */
+.tooltipRow:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  transform: translateX(2px);
+}
+
+[data-theme='light'] .tooltipRow:hover {
+  background: rgba(15, 23, 42, 0.06);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+.tooltipRow:hover .tooltipDot {
+  transform: scale(1.3);
+  box-shadow: 0 0 8px currentColor;
+}
+
+.tooltipRow:hover .tooltipCatName,
+.tooltipRow:hover .tooltipAmount {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+/* Active / Spotlighted Category in Modal */
+.tooltipRowActive {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--cat-accent, var(--primary));
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+  opacity: 1 !important;
+}
+
+[data-theme='light'] .tooltipRowActive {
+  background: rgba(15, 23, 42, 0.08);
+  border-color: var(--cat-accent, var(--primary));
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .tooltipRowActive {
+    background: color-mix(in srgb, var(--cat-accent, var(--primary)) 18%, rgba(255, 255, 255, 0.05));
+    border-color: color-mix(in srgb, var(--cat-accent, var(--primary)) 45%, transparent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--cat-accent, var(--primary)) 22%, transparent);
+  }
+
+  [data-theme='light'] .tooltipRowActive {
+    background: color-mix(in srgb, var(--cat-accent, var(--primary)) 14%, #ffffff);
+    border-color: color-mix(in srgb, var(--cat-accent, var(--primary)) 35%, transparent);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--cat-accent, var(--primary)) 18%, transparent);
+  }
+}
+
+.tooltipRowActive .tooltipDot {
+  transform: scale(1.35);
+  box-shadow: 0 0 10px currentColor;
+}
+
+.tooltipRowActive .tooltipCatName {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.tooltipRowActive .tooltipAmount {
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+.tooltipRowActive .tooltipCatPct {
+  color: var(--cat-accent, var(--text-main));
+  font-weight: 700;
+}
+
+/* Other categories shown in a different shade when a category is selected/hovered */
+.tooltipRowDimmed {
+  opacity: 0.32;
+  filter: saturate(0.5);
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.tooltipRowDimmed:hover {
+  opacity: 0.88;
+  filter: saturate(1);
+}
+
+.tooltipRowDimmed .tooltipDot {
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+.tooltipRowDimmed .tooltipCatName {
+  color: var(--text-dim);
+}
+
+.tooltipRowDimmed .tooltipAmount {
+  color: var(--text-muted);
+}
+
+.tooltipRowDimmed .tooltipCatPct {
+  color: var(--text-dim);
+}
+
+.tooltipCatInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.tooltipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: 2px;
+  box-shadow: 0 0 6px currentColor;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .tooltipDot {
+    box-shadow: 0 0 6px color-mix(in srgb, currentColor 80%, transparent);
+  }
+}
+
+.tooltipCatName {
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s ease;
+}
+
+.tooltipAmount {
+  font-weight: 700;
+  color: var(--text-main);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.tooltipCatPct {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+/* ─────────────────────────────────────────────────
+   Enhanced 3D Depth & Hover Reaction on Stacked Bars
+───────────────────────────────────────────────── */
+.chartContainer :global(.recharts-bar-rectangles) {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+[data-theme='light'] .chartContainer :global(.recharts-bar-rectangles) {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
+}
+
+.chartContainer :global(.recharts-bar-rectangle) {
+  transition: filter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.barSegmentGroup {
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.barSegmentHovered {
+  filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.45));
+}
+
+.barSegmentDimmed {
+  opacity: 0.42;
+}
+
+.chartContainer :global(.recharts-bar-rectangle:hover) {
+  filter: brightness(1.25) drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+}

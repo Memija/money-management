@@ -129,8 +129,12 @@
   user-select: none;
 }
 
-.day:hover:not(.empty) {
+.day:hover:not(.empty):not(.selected) {
   background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='light'] .day:hover:not(.empty):not(.selected) {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .day.empty {

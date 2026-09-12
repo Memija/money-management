@@ -1,0 +1,114 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.explanation {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.median-value {
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--text-main);
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--card-border);
+  letter-spacing: -0.04em;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 0.25rem 0.25rem 0.25rem 0;
+}
+
+/* Custom scrollbar */
+.list::-webkit-scrollbar {
+  width: 6px;
+}
+.list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+[data-theme='light'] .list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s ease;
+}
+[data-theme='light'] .row {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.row-highlight {
+  background: rgba(245, 158, 11, 0.08); /* Amber accent */
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.05);
+}
+
+.row-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.row-index {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  width: 24px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.row-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.row-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.row-amount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-highlight {
+  color: #f59e0b;
+}
+
+.median-badge {
+  background: rgba(245, 158, 11, 0.9);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+
+  letter-spacing: 0.05em;
+}
