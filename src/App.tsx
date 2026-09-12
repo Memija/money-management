@@ -9,6 +9,7 @@ const ImportReview = React.lazy(() => import('./components/ImportReview'))
 const CountrySelector = React.lazy(() => import('./components/CountrySelector'))
 const InstitutionSelector = React.lazy(() => import('./components/InstitutionSelector'))
 const TransactionImporter = React.lazy(() => import('./components/TransactionImporter'))
+const Settings = React.lazy(() => import('./components/Settings'))
 import { useAppStore } from './store/useAppStore'
 import { useLanguageStore } from './store/useLanguageStore'
 
@@ -18,19 +19,31 @@ const App: React.FC = () => {
   const currentStep = useAppStore((s) => s.currentStep)
   const t = useLanguageStore((s) => s.t)
 
+  const loadingFallback = (
+    <div className={styles['loading-fallback']}>
+      {t.loading}
+    </div>
+  )
+
   // Dashboard has its own full layout
   if (currentStep === 'dashboard') {
     return (
       <ErrorBoundary>
-        <Suspense
-          fallback={
-            <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-dim)' }}>
-              Loading...
-            </div>
-          }
-        >
+        <Suspense fallback={loadingFallback}>
           <AppHeader />
           <Dashboard />
+        </Suspense>
+      </ErrorBoundary>
+    )
+  }
+
+  // Settings has its own full layout as well
+  if (currentStep === 'settings') {
+    return (
+      <ErrorBoundary>
+        <Suspense fallback={loadingFallback}>
+          <AppHeader />
+          <Settings />
         </Suspense>
       </ErrorBoundary>
     )
@@ -73,13 +86,7 @@ const App: React.FC = () => {
         </div>
 
         <ErrorBoundary>
-          <Suspense
-            fallback={
-              <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-dim)' }}>
-                Loading...
-              </div>
-            }
-          >
+          <Suspense fallback={loadingFallback}>
             <AnimatePresence mode="wait">
               {currentStep === 'country' && <CountrySelector key="country" />}
               {currentStep === 'institution' && <InstitutionSelector key="institution" />}

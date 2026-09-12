@@ -19,6 +19,7 @@ vi.mock('./store/useLanguageStore', () => ({
     const state = {
       locale: 'en',
       t: {
+        loading: 'Loading...',
         stepCountry: 'Country',
         stepInstitution: 'Institution',
         stepImport: 'Import',
@@ -44,9 +45,11 @@ vi.mock('./components/TransactionImporter', () => ({
 }))
 vi.mock('./components/ImportReview', () => ({ default: () => <div data-testid="import-review" /> }))
 vi.mock('./components/Dashboard', () => ({ default: () => <div data-testid="dashboard" /> }))
+vi.mock('./components/Settings', () => ({ default: () => <div data-testid="settings" /> }))
 
 describe('App', () => {
   const mockT = {
+    loading: 'Loading...',
     stepCountry: 'Country',
     stepInstitution: 'Institution',
     stepImport: 'Import',
@@ -111,6 +114,17 @@ describe('App', () => {
     render(<App />)
     expect(await screen.findByTestId('dashboard')).toBeInTheDocument()
     // In dashboard mode, it shouldn't render the onboarding layout (ambient glows, progress etc)
+    expect(screen.queryByText('Country')).not.toBeInTheDocument()
+  })
+
+  it('renders Settings on settings step', async () => {
+    vi.mocked(useAppStore).mockImplementation((selector) => {
+      const state = { currentStep: 'settings' }
+      return typeof selector === 'function' ? selector(state as unknown as AppState) : state
+    })
+
+    render(<App />)
+    expect(await screen.findByTestId('settings')).toBeInTheDocument()
     expect(screen.queryByText('Country')).not.toBeInTheDocument()
   })
 
