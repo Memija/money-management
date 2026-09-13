@@ -29,6 +29,10 @@ export interface AppState {
   cancelImport: () => void
   startNewInstitution: () => void
   /**
+   * Permanently clears all stored user data and returns the app to the initial state.
+   */
+  clearAllData: (resetPreferences?: boolean) => void
+  /**
    * Returns the count of duplicate and new transactions for the given institution.
    */
   getDuplicateTransactionStats: (institutionId: string, transactions: Transaction[]) => { duplicateCount: number; newCount: number; duplicateIds: string[] }
@@ -160,6 +164,31 @@ export const useAppStore = create<AppState>()(
           selectedInstitution: null,
           currentStep: 'institution',
         }),
+
+      clearAllData: (resetPreferences = false) => {
+        set({
+          currentStep: 'country',
+          selectedCountry: null,
+          selectedInstitution: null,
+          importedAccounts: [],
+          customKeywords: {},
+          manualCategories: {},
+          customCategories: [],
+        })
+        try {
+          useAppStore.persist?.clearStorage()
+        } catch (e) {
+          console.warn('Failed to clear persisted app storage:', e)
+        }
+        if (resetPreferences) {
+          try {
+            localStorage.removeItem('mm-theme-preference')
+            localStorage.removeItem('mm-language-preference')
+          } catch (e) {
+            console.warn('Failed to clear preferences:', e)
+          }
+        }
+      },
 
       getDuplicateTransactionStats: (institutionId, transactions) => {
         const { importedAccounts } = get()

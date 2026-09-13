@@ -279,6 +279,23 @@ export const en: TranslationStrings = {
   createAndApply: 'Create & Apply',
   quickCreateCategoryTitle: 'Quick Add Category',
   manageInSettingsHint: 'Want multi-language translations or rules? Manage in Settings',
+  categoriesAndRules: 'Categories & Rules',
+
+  // Data Management
+  dataManagementTitle: 'Data Management',
+  dataManagementDesc: 'Manage your locally stored financial data, backups, and privacy settings.',
+  dangerZone: 'Danger Zone',
+  deleteAllDataTitle: 'Delete All Data',
+  deleteAllDataDesc: 'Permanently erase all imported accounts, transactions, categorization rules, and custom categories. This action cannot be undone.',
+  deleteAllDataConfirmMessage: 'Are you sure you want to completely delete all of your data? All imported accounts, transactions, custom categories, and rules will be permanently removed.',
+  deleteAllDataButton: 'Delete All Data',
+  resetPreferencesOption: 'Also reset theme and language preferences',
+  resetPreferencesDesc: 'Revert display language and theme back to default settings',
+  storedDataSummary: 'Stored Data',
+  deleteDataAccountsCount: '{count} accounts',
+  deleteDataTransactionsCount: '{count} transactions',
+  deleteDataCategoriesCount: '{count} custom categories',
+  deleteDataRulesCount: '{count} custom rules',
 
   catSalary: 'Salary',
   catRent: 'Rent',

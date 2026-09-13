@@ -279,6 +279,23 @@ export const bs: TranslationStrings = {
   createAndApply: 'Kreiraj i primijeni',
   quickCreateCategoryTitle: 'Brzo dodavanje kategorije',
   manageInSettingsHint: 'Želite višejezične prevode ili pravila? Upravljajte u postavkama',
+  categoriesAndRules: 'Kategorije i pravila',
+
+  // Data Management
+  dataManagementTitle: 'Upravljanje podacima',
+  dataManagementDesc: 'Upravljajte lokalno sačuvanim finansijskim podacima, sigurnosnim kopijama i postavkama privatnosti.',
+  dangerZone: 'Opasna zona',
+  deleteAllDataTitle: 'Obriši sve podatke',
+  deleteAllDataDesc: 'Trajno briše sve uvezene račune, transakcije, pravila kategorizacije i prilagođene kategorije. Ova radnja se ne može poništiti.',
+  deleteAllDataConfirmMessage: 'Jeste li sigurni da želite u potpunosti obrisati sve svoje podatke? Svi uvezeni računi, transakcije, prilagođene kategorije i pravila bit će trajno uklonjeni.',
+  deleteAllDataButton: 'Obriši sve podatke',
+  resetPreferencesOption: 'Također resetuj postavke teme i jezika',
+  resetPreferencesDesc: 'Vrati postavke jezika i teme na zadane vrijednosti',
+  storedDataSummary: 'Pohranjeni podaci',
+  deleteDataAccountsCount: '{count} računa',
+  deleteDataTransactionsCount: '{count} transakcija',
+  deleteDataCategoriesCount: '{count} prilagođenih kategorija',
+  deleteDataRulesCount: '{count} prilagođenih pravila',
 
   catSalary: 'Plata',
   catRent: 'Stanarina',

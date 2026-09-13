@@ -279,6 +279,23 @@ export const de: TranslationStrings = {
   createAndApply: 'Erstellen & Zuweisen',
   quickCreateCategoryTitle: 'Kategorie schnell hinzufügen',
   manageInSettingsHint: 'Möchten Sie Übersetzungen oder Regeln? In Einstellungen verwalten',
+  categoriesAndRules: 'Kategorien & Regeln',
+
+  // Data Management
+  dataManagementTitle: 'Datenverwaltung',
+  dataManagementDesc: 'Verwalten Sie Ihre lokal gespeicherten Finanzdaten, Sicherungen und Datenschutzeinstellungen.',
+  dangerZone: 'Gefahrenbereich',
+  deleteAllDataTitle: 'Alle Daten löschen',
+  deleteAllDataDesc: 'Löscht unwiderruflich alle importierten Konten, Transaktionen, Kategorisierungsregeln und benutzerdefinierten Kategorien. Diese Aktion kann nicht rückgängig gemacht werden.',
+  deleteAllDataConfirmMessage: 'Sind Sie sicher, dass Sie alle Ihre Daten vollständig löschen möchten? Alle importierten Konten, Transaktionen, benutzerdefinierten Kategorien und Regeln werden dauerhaft entfernt.',
+  deleteAllDataButton: 'Alle Daten löschen',
+  resetPreferencesOption: 'Auch Design- und Spracheinstellungen zurücksetzen',
+  resetPreferencesDesc: 'Sprach- und Designeinstellungen auf Standardwerte zurücksetzen',
+  storedDataSummary: 'Gespeicherte Daten',
+  deleteDataAccountsCount: '{count} Konten',
+  deleteDataTransactionsCount: '{count} Transaktionen',
+  deleteDataCategoriesCount: '{count} benutzerdefinierte Kategorien',
+  deleteDataRulesCount: '{count} benutzerdefinierte Regeln',
 
   catSalary: 'Gehalt',
   catRent: 'Miete',

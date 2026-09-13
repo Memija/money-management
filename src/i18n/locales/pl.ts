@@ -277,6 +277,23 @@ export const pl: TranslationStrings = {
   createAndApply: 'Utwórz i zastosuj',
   quickCreateCategoryTitle: 'Szybkie dodawanie kategorii',
   manageInSettingsHint: 'Chcesz tłumaczeń lub reguł? Zarządzaj w ustawieniach',
+  categoriesAndRules: 'Kategorie i reguły',
+
+  // Data Management
+  dataManagementTitle: 'Zarządzanie danymi',
+  dataManagementDesc: 'Zarządzaj lokalnie zapisanymi danymi finansowymi, kopiami zapasowymi i ustawieniami prywatności.',
+  dangerZone: 'Strefa niebezpieczna',
+  deleteAllDataTitle: 'Usuń wszystkie dane',
+  deleteAllDataDesc: 'Trwale usuwa wszystkie zaimportowane konta, transakcje, reguły kategoryzacji i kategorie niestandardowe. Tej operacji nie można cofnąć.',
+  deleteAllDataConfirmMessage: 'Czy na pewno chcesz całkowicie usunąć wszystkie swoje dane? Wszystkie konta, transakcje, kategorie i reguły zostaną bezpowrotnie usunięte.',
+  deleteAllDataButton: 'Usuń wszystkie dane',
+  resetPreferencesOption: 'Zresetuj także preferencje motywu i języka',
+  resetPreferencesDesc: 'Przywróć język i motyw do ustawień domyślnych',
+  storedDataSummary: 'Zapisane dane',
+  deleteDataAccountsCount: '{count} kont',
+  deleteDataTransactionsCount: '{count} transakcji',
+  deleteDataCategoriesCount: '{count} kategorii własnych',
+  deleteDataRulesCount: '{count} reguł kategoryzacji',
 
   catSalary: 'Wynagrodzenie',
   catRent: 'Czynsz',

@@ -13,6 +13,8 @@ export interface DeleteConfirmationModalProps {
   message: string
   confirmText?: string
   cancelText?: string
+  children?: React.ReactNode
+  maxWidth?: string
 }
 
 export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
@@ -23,6 +25,8 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
   message,
   confirmText = 'Delete',
   cancelText = 'Cancel',
+  children,
+  maxWidth = '460px',
 }) => {
   const handleConfirm = () => {
     onConfirm()
@@ -34,7 +38,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      maxWidth="400px"
+      maxWidth={maxWidth}
       footer={
         <>
           <button className={`secondary-button ${styles.cancelButton}`} onClick={onClose}>
@@ -50,7 +54,10 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
         <div className={styles.iconContainer}>
           <AlertTriangle size={24} />
         </div>
-        <p className={styles.messageText}>{message}</p>
+        <div className={styles.textContainer}>
+          <p className={styles.messageText}>{message}</p>
+          {children}
+        </div>
       </div>
     </Modal>
   )

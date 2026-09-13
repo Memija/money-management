@@ -278,6 +278,23 @@ export const id: TranslationStrings = {
   createAndApply: 'Buat & Terapkan',
   quickCreateCategoryTitle: 'Tambah Cepat Kategori',
   manageInSettingsHint: 'Ingin terjemahan atau aturan? Kelola di Pengaturan',
+  categoriesAndRules: 'Kategori & Aturan',
+
+  // Data Management
+  dataManagementTitle: 'Manajemen Data',
+  dataManagementDesc: 'Kelola data keuangan yang tersimpan secara lokal, cadangan, dan pengaturan privasi Anda.',
+  dangerZone: 'Zona Bahaya',
+  deleteAllDataTitle: 'Hapus Semua Data',
+  deleteAllDataDesc: 'Hapus secara permanen semua akun yang diimpor, transaksi, aturan kategorisasi, dan kategori kustom. Tindakan ini tidak dapat dibatalkan.',
+  deleteAllDataConfirmMessage: 'Apakah Anda yakin ingin menghapus semua data Anda secara menyeluruh? Semua akun yang diimpor, transaksi, kategori kustom, dan aturan akan dihapus secara permanen.',
+  deleteAllDataButton: 'Hapus Semua Data',
+  resetPreferencesOption: 'Juga atur ulang preferensi tema dan bahasa',
+  resetPreferencesDesc: 'Kembalikan pengaturan bahasa dan tema ke nilai default',
+  storedDataSummary: 'Data Tersimpan',
+  deleteDataAccountsCount: '{count} akun',
+  deleteDataTransactionsCount: '{count} transaksi',
+  deleteDataCategoriesCount: '{count} kategori kustom',
+  deleteDataRulesCount: '{count} aturan kustom',
 
   catSalary: 'Gaji',
   catRent: 'Sewa',

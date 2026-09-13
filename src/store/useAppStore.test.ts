@@ -281,4 +281,61 @@ describe('useAppStore', () => {
       'tx-3': 'Entertainment',
     })
   })
+
+  it('should completely clear all user data and reset to initial country step', () => {
+    useAppStore.setState({
+      currentStep: 'dashboard',
+      selectedCountry: { code: 'de', name: 'Germany', flag: '🇩🇪', supported: true },
+      selectedInstitution: { id: 'sparkasse', name: 'Sparkasse', type: 'bank', category: 'sparkasse' },
+      importedAccounts: [
+        {
+          institutionId: 'sparkasse',
+          institutionName: 'Sparkasse',
+          transactions: [
+            {
+              id: 'tx-1',
+              date: '2026-03-01',
+              description: 'Supermarket',
+              amount: -45.5,
+              currency: 'EUR',
+              type: 'expense',
+              institution: 'Sparkasse',
+            },
+          ],
+          importedAt: '2026-03-01T10:00:00.000Z',
+          importedFingerprints: ['fp-1'],
+        },
+      ],
+      customKeywords: { Groceries: ['edeka'] },
+      manualCategories: { 'tx-1': 'Groceries' },
+      customCategories: [
+        {
+          id: 'custom-pets',
+          icon: 'PawPrint',
+          translations: { en: 'Pets' },
+        },
+      ],
+    })
+
+    useAppStore.getState().clearAllData()
+
+    const state = useAppStore.getState()
+    expect(state.currentStep).toBe('country')
+    expect(state.selectedCountry).toBeNull()
+    expect(state.selectedInstitution).toBeNull()
+    expect(state.importedAccounts).toEqual([])
+    expect(state.customKeywords).toEqual({})
+    expect(state.manualCategories).toEqual({})
+    expect(state.customCategories).toEqual([])
+  })
+
+  it('should clear preference localStorage items when clearAllData(true) is requested', () => {
+    localStorage.setItem('mm-theme-preference', 'dark')
+    localStorage.setItem('mm-language-preference', 'de')
+
+    useAppStore.getState().clearAllData(true)
+
+    expect(localStorage.getItem('mm-theme-preference')).toBeNull()
+    expect(localStorage.getItem('mm-language-preference')).toBeNull()
+  })
 })

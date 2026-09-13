@@ -304,6 +304,23 @@ export interface TranslationStrings {
   createAndApply: string
   quickCreateCategoryTitle: string
   manageInSettingsHint: string
+  categoriesAndRules: string
+
+  // Data Management
+  dataManagementTitle: string
+  dataManagementDesc: string
+  dangerZone: string
+  deleteAllDataTitle: string
+  deleteAllDataDesc: string
+  deleteAllDataConfirmMessage: string
+  deleteAllDataButton: string
+  resetPreferencesOption: string
+  resetPreferencesDesc: string
+  storedDataSummary: string
+  deleteDataAccountsCount: string
+  deleteDataTransactionsCount: string
+  deleteDataCategoriesCount: string
+  deleteDataRulesCount: string
 
   // Expense category labels
   catSalary: string

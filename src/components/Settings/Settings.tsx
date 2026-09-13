@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { AnimatePresence,motion } from 'framer-motion'
-import { ArrowLeft, Info, Plus, Settings as SettingsIcon, Tag, Type,X } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ArrowLeft, Database, Info, Plus, Settings as SettingsIcon, Sliders, Tag, Type, X } from 'lucide-react'
 
 import { POPULAR_MERCHANTS } from '../../data/merchants'
 import { DEFAULT_CATEGORY_KEYS } from '../../i18n/categories'
@@ -11,17 +11,19 @@ import { AVAILABLE_ICONS, getCategoryIcon, MERCHANT_LOGOS } from '../../utils/ca
 import { getCategoryLabel } from '../../utils/category-utils'
 import { CategorySelect } from '../shared/CategorySelect'
 import { CustomCategoriesSettings } from './CustomCategoriesSettings'
+import { DataManagement } from './DataManagement'
 
 import styles from './Settings.module.css'
 
 export const Settings: React.FC = () => {
   const t = useLanguageStore((s) => s.t)
   const currentLocale = useLanguageStore((s) => s.locale)
-  const { customKeywords, customCategories, setCustomKeywords, setStep } = useAppStore()
+  const { customKeywords, customCategories, importedAccounts, setCustomKeywords, setStep } = useAppStore()
   
   const [selectedCategory, setSelectedCategory] = useState<string>(DEFAULT_CATEGORY_KEYS[0])
   const [newKeyword, setNewKeyword] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [activeTab, setActiveTab] = useState<'categories' | 'data'>('categories')
 
   const handleAddKeyword = (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,7 +70,10 @@ export const Settings: React.FC = () => {
       className={styles.container}
     >
       <div className={styles.header}>
-        <button className={`back-button ${styles.backButtonClean}`} onClick={() => setStep('dashboard')}>
+        <button
+          className={`back-button ${styles.backButtonClean}`}
+          onClick={() => setStep(importedAccounts.length > 0 ? 'dashboard' : 'country')}
+        >
           <ArrowLeft size={16} className={styles.backButtonIcon} />
           <span>{t.back}</span>
         </button>
@@ -78,9 +83,39 @@ export const Settings: React.FC = () => {
         </div>
       </div>
 
-      <CustomCategoriesSettings />
+      <div className={styles.tabNav} role="tablist" aria-label={t.settingsTitle}>
+        <button
+          type="button"
+          role="tab"
+          id="tab-categories"
+          aria-selected={activeTab === 'categories'}
+          aria-controls="tabpanel-categories"
+          className={`${styles.tabButton} ${activeTab === 'categories' ? styles.tabButtonActive : ''}`}
+          onClick={() => setActiveTab('categories')}
+        >
+          <Sliders size={16} aria-hidden="true" />
+          <span>{t.categoriesAndRules || 'Categories & Rules'}</span>
+        </button>
 
-      <div className={styles.sectionSpacer} />
+        <button
+          type="button"
+          role="tab"
+          id="tab-data"
+          aria-selected={activeTab === 'data'}
+          aria-controls="tabpanel-data"
+          className={`${styles.tabButton} ${activeTab === 'data' ? `${styles.tabButtonActive} ${styles.tabButtonDangerActive}` : ''}`}
+          onClick={() => setActiveTab('data')}
+        >
+          <Database size={16} aria-hidden="true" />
+          <span>{t.dataManagementTitle || 'Data Management'}</span>
+        </button>
+      </div>
+
+      {activeTab === 'categories' && (
+        <div role="tabpanel" id="tabpanel-categories" aria-labelledby="tab-categories">
+          <CustomCategoriesSettings />
+
+          <div className={styles.sectionSpacer} />
 
       <div className={styles.contentGrid}>
         {/* Left Column: Form */}
@@ -248,6 +283,14 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
+  )}
+
+  {activeTab === 'data' && (
+    <div role="tabpanel" id="tabpanel-data" aria-labelledby="tab-data">
+      <DataManagement />
+    </div>
+  )}
+</motion.div>
   )
 }

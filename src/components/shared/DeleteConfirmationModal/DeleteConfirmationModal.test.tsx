@@ -87,4 +87,15 @@ describe('DeleteConfirmationModal', () => {
 
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1)
   })
+
+  it('renders optional children if provided', () => {
+    render(
+      <DeleteConfirmationModal {...defaultProps}>
+        <div data-testid="custom-child">Additional warning details</div>
+      </DeleteConfirmationModal>,
+    )
+
+    expect(screen.getByTestId('custom-child')).toBeInTheDocument()
+    expect(screen.getByText('Additional warning details')).toBeInTheDocument()
+  })
 })
