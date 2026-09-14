@@ -54,6 +54,14 @@
   --dropdown-item-hover: rgba(255, 255, 255, 0.07);
   --dropdown-item-active-bg: rgba(16, 185, 129, 0.14);
   --dropdown-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+
+  --header-height: 56px;
+
+  /* iOS Safe Area insets */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -108,10 +116,16 @@
   --dropdown-shadow: 0 16px 48px rgba(15, 23, 42, 0.15);
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Custom modern scrollbars */
@@ -150,6 +164,7 @@ body {
   background-color: var(--bg-color);
   color: var(--text-main);
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
@@ -160,21 +175,20 @@ body {
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
-/* Applied by Dashboard while mounted */
-html.dashboard-scroll,
-body.dashboard-scroll {
-  height: 100dvh;
-  overflow: hidden;
+/* Prevent iOS Safari from automatically zooming into inputs, selects, and textareas */
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
-body.dashboard-scroll #root {
-  height: 100%;
-  overflow: hidden;
-}
 
 /* ═══════════════════════════════════════════════════════
    Glassmorphism Utilities
@@ -413,8 +427,37 @@ h3 {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --header-height: 50px;
+  }
+
   .container {
     padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0.75rem 0.65rem;
+    padding-left: max(0.65rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.65rem, env(safe-area-inset-right, 0px));
+  }
+
+  .glass-card {
+    padding: 1rem 0.9rem;
+    border-radius: var(--radius-md);
+  }
+}
+
+/* Prevent iOS Safari auto-zoom on form controls */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }
 

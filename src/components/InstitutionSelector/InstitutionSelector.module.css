@@ -434,3 +434,23 @@
 .back-button-clean {
   margin-bottom: 0;
 }
+
+@media (max-width: 640px) {
+  .category-tags {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .category-tags::-webkit-scrollbar {
+    display: none;
+  }
+
+  .institution-list {
+    max-height: calc(100vh - 360px);
+    max-height: calc(100dvh - 360px);
+  }
+}

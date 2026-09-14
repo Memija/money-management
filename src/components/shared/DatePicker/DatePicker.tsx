@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
+import { useDropdownPosition } from '../../../hooks/useDropdownPosition'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { getLocalizedMonthNames, getLocalizedWeekdays } from '../../../utils/date-utils'
@@ -23,8 +24,17 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const { formatDate } = useFormatters()
   const inputId = useId()
+
+  useDropdownPosition({
+    isOpen,
+    triggerRef: containerRef,
+    dropdownRef,
+    padding: 12,
+    estimatedHeight: 280,
+  })
 
   // Parse current value or use today for the view
   const initialDate = value ? new Date(value) : new Date()
@@ -167,7 +177,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       </div>
 
       {isOpen && (
-        <div className={styles.dropdown}>
+        <div ref={dropdownRef} className={styles.dropdown}>
           <div className={styles.header}>
             <button
               className={styles['nav-button']}

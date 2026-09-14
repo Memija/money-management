@@ -16,6 +16,7 @@ import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
 import { normalizeDescription } from '../../../utils/category-utils'
 import { getVisiblePages } from '../../../utils/pagination-utils'
+import { Select } from '../../shared/Select'
 import { TransactionItem } from './TransactionItem'
 
 import styles from './TransactionList.module.css'
@@ -249,41 +250,39 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </div>
 
           {institutionNames.length > 1 && (
-            <select
-              value={selectedInstitution}
-              onChange={(e) => {
-                setSelectedInstitution(e.target.value)
-                setCurrentPage(1)
-              }}
-              className={styles.txFilterSelect}
+            <Select
               id="institution-filter"
               name="institution-filter"
+              value={selectedInstitution}
+              onChange={(val) => {
+                setSelectedInstitution(val)
+                setCurrentPage(1)
+              }}
+              className={styles.txFilterSelectWrapper}
               aria-label={t.allInstitutions}
-            >
-              <option value="all">{t.allInstitutions}</option>
-              {institutionNames.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: 'all', label: t.allInstitutions },
+                ...institutionNames.map((n) => ({ value: n, label: n })),
+              ]}
+            />
           )}
 
-          <select
-            value={sortOrder}
-            onChange={(e) =>
-              setSortOrder(e.target.value as 'newest' | 'oldest' | 'highest' | 'lowest')
-            }
-            className={styles.txFilterSelect}
+          <Select
             id="sort-order"
             name="sort-order"
+            value={sortOrder}
+            onChange={(val) =>
+              setSortOrder(val as 'newest' | 'oldest' | 'highest' | 'lowest')
+            }
+            className={styles.txFilterSelectWrapper}
             aria-label="Sort order"
-          >
-            <option value="newest">{t.newestFirst}</option>
-            <option value="oldest">{t.oldestFirst}</option>
-            <option value="highest">{t.highestAmount}</option>
-            <option value="lowest">{t.lowestAmount}</option>
-          </select>
+            options={[
+              { value: 'newest', label: t.newestFirst },
+              { value: 'oldest', label: t.oldestFirst },
+              { value: 'highest', label: t.highestAmount },
+              { value: 'lowest', label: t.lowestAmount },
+            ]}
+          />
 
           {isFilterActive && (
             <button
@@ -346,21 +345,24 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               <label htmlFor="tx-page-size-select" className={styles.pageSizeLabel}>
                 {t.perPage || 'Per page:'}
               </label>
-              <select
+              <Select
                 id="tx-page-size-select"
+                name="tx-page-size-select"
                 value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value))
+                onChange={(val) => {
+                  setPageSize(Number(val))
                   setCurrentPage(1)
                 }}
-                className={styles.pageSizeSelect}
-                aria-label={t.perPage || 'Per page'}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
+                size="sm"
+                className={styles.pageSizeSelectWrapper}
+                aria-label={t.perPage || 'Per page:'}
+                options={[
+                  { value: 10, label: '10' },
+                  { value: 25, label: '25' },
+                  { value: 50, label: '50' },
+                  { value: 100, label: '100' },
+                ]}
+              />
             </div>
           </div>
 

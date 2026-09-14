@@ -5,18 +5,20 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
-  overflow: hidden;
+  width: 100%;
+  position: relative;
 }
 
 /* Subheader */
 .subheader-bar {
-  flex-shrink: 0;
+  position: sticky;
+  top: calc(var(--header-height, 54px) + env(safe-area-inset-top, 0px));
   background: var(--header-bg);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--header-border);
-  z-index: 10;
+  z-index: 100;
+  transition: background 0.35s ease, border-color 0.35s ease;
 }
 
 .subheader-inner {
@@ -31,13 +33,11 @@
   min-height: 48px;
 }
 
-/* Scrollable area */
+/* Content area */
 .scroll-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: 100%;
   position: relative;
+  padding-bottom: max(2rem, calc(2rem + env(safe-area-inset-bottom, 0px)));
 }
 
 /* ─────────────────────────────────────────────────
@@ -101,6 +101,8 @@
 .scroll-area > main {
   position: relative;
   z-index: 1;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
 }
 
 /* ─────────────────────────────────────────────────
@@ -547,23 +549,50 @@
 ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .balance-amount {
-    font-size: 3rem;
+    font-size: 2.75rem;
   }
 
   .balance-hero {
-    padding: 2.5rem 1.5rem 2rem;
+    padding: 1.75rem 1.25rem 1.5rem;
+    border-radius: 24px;
+    margin-bottom: 1.25rem;
   }
 
   .balance-stats {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+    width: 100%;
+    max-width: 380px;
+    margin-top: 1.25rem;
   }
 
   .stat-item {
     min-width: 0;
     width: 100%;
-    max-width: 260px;
+    max-width: none;
+    padding: 0.65rem 0.85rem;
+    border-radius: 14px;
+    gap: 0.55rem;
+  }
+
+  .icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .stat-value {
+    font-size: 0.95rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
+  .dashboard-grid {
+    gap: 1rem;
+    margin-top: 1.25rem;
   }
 
   .transactions-header {
@@ -572,10 +601,10 @@
   }
 
   .sticky-stats {
-    gap: 0.5rem;
-    padding: 0.4rem 0.75rem;
+    gap: 0.4rem;
+    padding: 0.35rem 0.65rem;
     flex: 1;
-    justify-content: space-between;
+    justify-content: space-around;
   }
 
   .sticky-stat-label {
@@ -585,6 +614,37 @@
   .orb-1 { width: 350px; height: 350px; }
   .orb-2 { width: 280px; height: 280px; }
   .orb-3 { width: 240px; height: 240px; }
+}
+
+@media (max-width: 480px) {
+  .balance-amount {
+    font-size: 2.15rem;
+  }
+
+  .balance-hero {
+    padding: 1.5rem 0.85rem 1.25rem;
+    border-radius: 20px;
+  }
+
+  .stat-item {
+    padding: 0.55rem 0.65rem;
+    gap: 0.45rem;
+  }
+
+  .icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .stat-value {
+    font-size: 0.85rem;
+  }
+
+  .subheader-inner {
+    padding: 0.35rem 0.5rem;
+    gap: 0.35rem;
+  }
 }
 
 /* Tooltip */

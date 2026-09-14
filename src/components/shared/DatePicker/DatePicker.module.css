@@ -59,10 +59,14 @@
 
 .dropdown {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: var(--dropdown-top, calc(100% + 0.5rem));
+  bottom: var(--dropdown-bottom, auto);
+  transform: translateX(var(--dropdown-shift-x, 0px));
   left: 0;
   z-index: 50;
   width: 260px;
+  max-width: calc(100vw - 1.5rem);
+  box-sizing: border-box;
   background: var(--dropdown-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);

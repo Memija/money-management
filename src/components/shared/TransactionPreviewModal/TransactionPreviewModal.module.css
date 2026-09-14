@@ -636,6 +636,8 @@
 
   .sort-select {
     width: 100%;
+    font-size: 16px;
+    height: 40px;
   }
 
   .col-date,

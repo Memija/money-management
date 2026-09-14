@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef,useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { AnimatePresence,motion, useInView } from 'framer-motion'
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 
@@ -109,21 +109,8 @@ const Dashboard: React.FC = () => {
     return null
   }, [activeDetailModal, analytics.periodTransactions, t])
 
-  // Scroll container ref — useInView observes scroll inside this element
-  const scrollRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLElement>(null)
-  const isHeroInView = useInView(heroRef, { root: scrollRef, margin: '-60px 0px 0px 0px' })
-
-  // Lock body to viewport height while Dashboard is mounted so that the
-  // subheader can stay above a scrollable inner container (no position:fixed needed)
-  useEffect(() => {
-    document.body.classList.add('dashboard-scroll')
-    document.documentElement.classList.add('dashboard-scroll')
-    return () => {
-      document.body.classList.remove('dashboard-scroll')
-      document.documentElement.classList.remove('dashboard-scroll')
-    }
-  }, [])
+  const isHeroInView = useInView(heroRef, { margin: '-60px 0px 0px 0px' })
 
   const institutionNames = useMemo(
     () => [...new Set(importedAccounts.map((a) => a.institutionName))],
@@ -182,8 +169,8 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Scrollable content area — only this div scrolls */}
-      <div ref={scrollRef} className={styles['scroll-area']}>
+      {/* Main content area */}
+      <div className={styles['scroll-area']}>
         {/* Ambient decorative orbs — purely visual, no interaction */}
         <div className={styles['ambient-orbs']} aria-hidden="true">
           <div className={styles['orb-1']} />

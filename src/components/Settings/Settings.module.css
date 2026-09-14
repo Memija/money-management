@@ -492,3 +492,35 @@
   color: #fff;
   background: #f43f5e;
 }
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1.25rem 0.75rem max(2rem, calc(2rem + env(safe-area-inset-bottom, 0px)));
+    padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  }
+
+  .header {
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .tabNav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.35rem;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+  }
+
+  .tabNav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tabButton {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.825rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}

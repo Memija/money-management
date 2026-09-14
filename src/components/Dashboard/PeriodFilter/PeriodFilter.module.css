@@ -57,3 +57,25 @@
   background: var(--bg-elevated);
   color: var(--text-main);
 }
+
+@media (max-width: 480px) {
+  .wrapper {
+    gap: 0.35rem;
+    flex-wrap: nowrap;
+  }
+
+  .pill {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.74rem;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .selector {
+    padding: 0.3rem 1.35rem 0.3rem 0.5rem;
+    font-size: 0.74rem;
+    height: 32px;
+  }
+}

@@ -34,10 +34,14 @@
 
 .dropdown {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: var(--dropdown-top, calc(100% + 0.5rem));
+  bottom: var(--dropdown-bottom, auto);
+  transform: translateX(var(--dropdown-shift-x, 0px));
   left: 0;
   z-index: 50;
   width: 260px;
+  max-width: calc(100vw - 1.5rem);
+  box-sizing: border-box;
   background: var(--dropdown-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
@@ -46,6 +50,13 @@
   animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
+}
+
+@media (max-width: 480px) {
+  .trigger {
+    min-height: 36px;
+    padding: 0.45rem 0.65rem;
+  }
 }
 
 .header {

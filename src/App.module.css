@@ -15,9 +15,14 @@
   align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
-  padding: 2rem 1rem;
+  min-height: 100dvh;
+  padding: 1.5rem 1rem max(2rem, calc(2rem + env(safe-area-inset-bottom, 0px)));
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ambient-glow {
@@ -134,5 +139,30 @@
 .progress-connector.completed {
   background: var(--primary);
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+@media (max-width: 480px) {
+  .onboarding-layout {
+    padding: 1rem 0.75rem max(2rem, calc(2rem + env(safe-area-inset-bottom, 0px)));
+  }
+
+  .progress-wrapper {
+    margin: 0.75rem auto 1.5rem;
+  }
+
+  .progress-connector {
+    width: 24px;
+    margin: 0 0.15rem 1.15rem;
+  }
+
+  .progress-dot {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .progress-label {
+    font-size: 0.68rem;
+  }
 }
 

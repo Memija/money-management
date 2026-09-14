@@ -261,3 +261,37 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+@media (max-width: 480px) {
+  .overlay {
+    padding: 0.5rem;
+  }
+
+  .scrollArea {
+    padding: 1rem 1rem;
+    gap: 1rem;
+  }
+
+  .header {
+    padding: 0.85rem 1rem;
+  }
+
+  .langLabel {
+    width: 85px;
+    font-size: 0.78rem;
+  }
+
+  .translationRow {
+    gap: 0.5rem;
+    padding: 0.25rem 0.35rem;
+  }
+
+  .transInput {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .footer {
+    padding: 0.75rem 1rem;
+  }
+}

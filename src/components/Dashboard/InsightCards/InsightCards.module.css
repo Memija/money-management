@@ -424,47 +424,65 @@
 ───────────────────────────────────────────────── */
 @media (max-width: 520px) {
   .card {
-    padding: 0.9rem 0.9rem !important;
+    padding: 0.85rem 0.85rem !important;
     gap: 0.5rem;
   }
 
   .iconBox {
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
   }
 
   .iconBox svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
 
   .label {
-    font-size: 0.62rem;
+    font-size: 0.68rem;
   }
 
   .value {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
   }
 
   .pill-income,
   .pill-expense {
-    font-size: 0.62rem;
-    padding: 0.15rem 0.4rem;
+    font-size: 0.68rem;
+    padding: 0.18rem 0.45rem;
   }
 
   .detail {
-    font-size: 0.65rem;
+    font-size: 0.72rem;
   }
 
-  .avg-row-label,
+  .avg-row-label {
+    font-size: 0.68rem;
+  }
+
   .avg-row-value {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
   }
 
   .avg-icon {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .card {
+    padding: 0.75rem 0.7rem !important;
+  }
+
+  .value {
+    font-size: 1.1rem;
+  }
+
+  .iconBox {
+    width: 32px;
+    height: 32px;
   }
 }
 

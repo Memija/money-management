@@ -77,6 +77,7 @@ const AppHeader: React.FC = () => {
               className={styles['theme-switcher-trigger']}
               onClick={cancelImport}
               aria-label={t.goToDashboard}
+              title={t.goToDashboard}
               id="header-go-to-dashboard-btn"
             >
               <span className={styles['theme-switcher-icon']}><PieChart size={15} /></span>
@@ -90,6 +91,7 @@ const AppHeader: React.FC = () => {
               className={styles['theme-switcher-trigger']}
               onClick={resetImport}
               aria-label={t.newImport}
+              title={t.newImport}
               id="header-new-import-btn"
             >
               <span className={styles['theme-switcher-icon']}><PlusCircle size={15} /></span>
@@ -103,6 +105,7 @@ const AppHeader: React.FC = () => {
               className={styles['theme-switcher-trigger']}
               onClick={() => setStep('settings')}
               aria-label={t.settingsTitle || 'Settings'}
+              title={t.settingsTitle || 'Settings'}
               id="header-settings-btn"
             >
               <span className={styles['theme-switcher-icon']}><Settings size={15} /></span>

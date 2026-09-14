@@ -1,0 +1,225 @@
+.container {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  width: 100%;
+}
+
+/* Hidden native select for screen readers and automated test tools */
+.hiddenNativeSelect {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Visual Custom Trigger */
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm, 6px);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: var(--card-border-hover, rgba(255, 255, 255, 0.2));
+  background-color: var(--bg-elevated);
+}
+
+.trigger:focus-visible,
+.triggerOpen {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Size Variants */
+.sizeMd {
+  height: 38px;
+  padding: 0 0.75rem;
+  font-size: 0.825rem;
+  font-weight: 500;
+}
+
+.sizeSm {
+  height: 32px;
+  padding: 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 68px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.labelIcon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chevron {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+/* Dropdown Menu */
+.dropdown {
+  position: absolute;
+  top: var(--dropdown-top, calc(100% + 4px));
+  bottom: var(--dropdown-bottom, auto);
+  transform: translateX(var(--dropdown-shift-x, 0px));
+  max-height: var(--dropdown-max-height, 240px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--dropdown-bg, #1a1e28);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  padding: 0.35rem;
+  width: max-content;
+  min-width: 100%;
+  max-width: var(--dropdown-max-width, min(240px, calc(100vw - 1.5rem)));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+[data-theme='light'] .dropdown {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.dropdownSm {
+  min-width: 75px;
+  max-width: 105px;
+  padding: 0.25rem;
+}
+
+.dropdownAlignLeft {
+  left: 0;
+  right: auto;
+}
+
+.dropdownAlignRight {
+  right: 0;
+  left: auto;
+}
+
+/* Dropdown Option */
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm, 6px);
+  width: 100%;
+  text-align: left;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  outline: none;
+}
+
+.optionSm {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+  justify-content: center;
+}
+
+.option:hover,
+.optionFocused {
+  background-color: var(--dropdown-item-hover, rgba(255, 255, 255, 0.08));
+}
+
+[data-theme='light'] .option:hover,
+[data-theme='light'] .optionFocused {
+  background-color: rgba(15, 23, 42, 0.06);
+}
+
+.optionSelected {
+  background-color: var(--dropdown-item-active-bg, rgba(99, 102, 241, 0.15));
+  color: var(--primary, #6366f1);
+  font-weight: 600;
+}
+
+.optionSelected:hover {
+  background-color: var(--dropdown-item-active-bg, rgba(99, 102, 241, 0.22));
+}
+
+.optionIcon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.optionLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.checkIcon {
+  color: var(--primary, #6366f1);
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .sizeMd {
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .sizeSm {
+    height: 36px;
+    font-size: 14px;
+  }
+}

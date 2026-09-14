@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { ChevronDown, Plus, Settings } from 'lucide-react'
 
+import { useDropdownPosition } from '../../../hooks/useDropdownPosition'
 import { DEFAULT_CATEGORY_KEYS } from '../../../i18n/categories'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
@@ -31,10 +32,18 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const [isOpen, setIsOpen] = useState(false)
   const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   
   const { t, locale: currentLocale } = useLanguageStore()
   const customCategories = useAppStore((state) => state.customCategories)
   const setStep = useAppStore((state) => state.setStep)
+
+  useDropdownPosition({
+    isOpen,
+    triggerRef: containerRef,
+    dropdownRef,
+    padding: 12,
+  })
 
   const handleToggle = () => {
     const next = !isOpen
@@ -97,6 +106,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
 
       {isOpen && (
         <div 
+          ref={dropdownRef}
           className={`${styles.dropdown} ${align === 'right' ? styles.dropdownAlignRight : styles.dropdownAlignLeft}`} 
           role="listbox"
         >
@@ -112,7 +122,9 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
               <div className={styles.iconWrapper}>
                 {getCategoryIcon(catKey, 14, customCategories)}
               </div>
-              {getCategoryLabel(catKey, t, currentLocale, customCategories)}
+              <span className={styles.optionLabel}>
+                {getCategoryLabel(catKey, t, currentLocale, customCategories)}
+              </span>
             </button>
           ))}
 
@@ -130,7 +142,9 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
                   <div className={styles.iconWrapper}>
                     {getCategoryIcon(c.id, 14, customCategories)}
                   </div>
-                  {getCategoryLabel(c.id, t, currentLocale, customCategories)}
+                  <span className={styles.optionLabel}>
+                    {getCategoryLabel(c.id, t, currentLocale, customCategories)}
+                  </span>
                 </button>
               ))}
             </>

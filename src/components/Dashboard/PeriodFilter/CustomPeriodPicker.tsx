@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 
 import type { PeriodMode } from '../../../hooks/useAnalytics'
+import { useDropdownPosition } from '../../../hooks/useDropdownPosition'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { formatMonthYearLocalized, getLocalizedMonthNames } from '../../../utils/date-utils'
 
@@ -24,7 +25,16 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const { locale } = useLanguageStore()
+
+  useDropdownPosition({
+    isOpen,
+    triggerRef: containerRef,
+    dropdownRef,
+    padding: 12,
+    estimatedHeight: 220,
+  })
 
   // Initialize view year based on selected value or the most recent option
   const initialYear = useMemo(() => {
@@ -167,7 +177,7 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
       </button>
 
       {isOpen && (
-        <div className={styles.dropdown}>
+        <div ref={dropdownRef} className={styles.dropdown}>
           {mode !== 'year' && (
             <div className={styles.header}>
               <button
