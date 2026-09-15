@@ -27,6 +27,11 @@
   cursor: pointer;
 }
 
+.input::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
 .input:focus {
   outline: none;
 }
@@ -169,12 +174,6 @@
 
 .future {
   opacity: 0.4;
-}
-
-@media (max-width: 640px) {
-  .input::placeholder {
-    color: transparent;
-  }
 }
 
 @keyframes slideDown {

@@ -24,6 +24,7 @@ import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel } from '../../../utils/category-utils'
 import { DatePicker } from '../DatePicker'
 import { Modal } from '../Modal'
+import { Select, type SelectOption } from '../Select'
 
 import styles from './TransactionPreviewModal.module.css'
 
@@ -84,6 +85,28 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       }
       return { key, direction: key === 'description' ? 'asc' : 'desc' }
     })
+  }
+
+  const sortOptions = useMemo<SelectOption[]>(
+    () => [
+      { value: 'default', label: t.sortOrder || 'Default' },
+      { value: 'date-desc', label: t.newestFirst || 'Newest First' },
+      { value: 'date-asc', label: t.oldestFirst || 'Oldest First' },
+      { value: 'amount-desc', label: t.highestAmount || 'Highest Amount' },
+      { value: 'amount-asc', label: t.lowestAmount || 'Lowest Amount' },
+      { value: 'description-asc', label: 'A – Z' },
+      { value: 'description-desc', label: 'Z – A' },
+    ],
+    [t],
+  )
+
+  const handleSortChange = (val: string) => {
+    if (val === 'default') {
+      setSortConfig(null)
+      return
+    }
+    const [key, direction] = val.split('-') as [SortColumn, SortDirection]
+    setSortConfig({ key, direction })
   }
 
   const filteredAndSortedTransactions = useMemo(() => {
@@ -378,29 +401,15 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             </div>
           </div>
 
-          <select
+          <Select
             id="tx-modal-sort"
             name="tx-modal-sort"
-            className={styles['sort-select']}
+            className={styles['sort-select-wrapper']}
             value={sortConfig ? `${sortConfig.key}-${sortConfig.direction}` : 'default'}
-            onChange={(e) => {
-              if (e.target.value === 'default') {
-                setSortConfig(null)
-                return
-              }
-              const [key, direction] = e.target.value.split('-') as [SortColumn, SortDirection]
-              setSortConfig({ key, direction })
-            }}
+            onChange={handleSortChange}
+            options={sortOptions}
             aria-label="Sort transactions"
-          >
-            <option value="default">{t.sortOrder || 'Default'}</option>
-            <option value="date-desc">{t.newestFirst || 'Newest First'}</option>
-            <option value="date-asc">{t.oldestFirst || 'Oldest First'}</option>
-            <option value="amount-desc">{t.highestAmount || 'Highest Amount'}</option>
-            <option value="amount-asc">{t.lowestAmount || 'Lowest Amount'}</option>
-            <option value="description-asc">A – Z</option>
-            <option value="description-desc">Z – A</option>
-          </select>
+          />
 
           {isFilterActive && (
             <button
