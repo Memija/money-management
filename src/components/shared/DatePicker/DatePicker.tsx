@@ -43,13 +43,19 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   )
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: Event) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
+    document.addEventListener('pointerdown', handleClickOutside)
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('pointerdown', handleClickOutside)
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
   }, [])
 
   const handlePrevMonth = (e: React.MouseEvent) => {
@@ -147,7 +153,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   return (
     <div
-      className={`${styles.container} ${className}`}
+      className={`${styles.container} ${isOpen ? styles.containerOpen : ''} ${className}`}
       ref={containerRef}
       title={placeholder || t.selectDatePlaceholder}
     >

@@ -23,6 +23,7 @@ export interface SelectProps<T extends string | number = string> {
   className?: string
   placeholder?: string
   'aria-label'?: string
+  onOpenChange?: (open: boolean) => void
 }
 
 export const Select = <T extends string | number = string>({
@@ -37,6 +38,7 @@ export const Select = <T extends string | number = string>({
   className = '',
   placeholder,
   'aria-label': ariaLabel,
+  onOpenChange,
 }: SelectProps<T>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [focusedIndex, setFocusedIndex] = useState(-1)
@@ -56,22 +58,28 @@ export const Select = <T extends string | number = string>({
   useEffect(() => {
     if (!isOpen) return
 
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: Event) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
+        onOpenChange?.(false)
       }
     }
 
+    document.addEventListener('pointerdown', handleClickOutside)
     document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
     return () => {
+      document.removeEventListener('pointerdown', handleClickOutside)
       document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
     }
-  }, [isOpen])
+  }, [isOpen, onOpenChange])
 
   const handleToggle = () => {
     if (disabled) return
     const next = !isOpen
     setIsOpen(next)
+    onOpenChange?.(next)
     if (next) {
       const currentIndex = options.findIndex((opt) => opt.value === value)
       setFocusedIndex(currentIndex >= 0 ? currentIndex : 0)
@@ -81,6 +89,7 @@ export const Select = <T extends string | number = string>({
   const handleSelect = (newValue: T) => {
     onChange(newValue)
     setIsOpen(false)
+    onOpenChange?.(false)
     triggerRef.current?.focus()
   }
 
@@ -91,6 +100,7 @@ export const Select = <T extends string | number = string>({
       if (isOpen) {
         e.preventDefault()
         setIsOpen(false)
+        onOpenChange?.(false)
         triggerRef.current?.focus()
       }
       return
@@ -100,6 +110,7 @@ export const Select = <T extends string | number = string>({
       e.preventDefault()
       if (!isOpen) {
         setIsOpen(true)
+        onOpenChange?.(true)
         const currentIndex = options.findIndex((opt) => opt.value === value)
         setFocusedIndex(currentIndex >= 0 ? currentIndex : 0)
       } else {
@@ -112,6 +123,7 @@ export const Select = <T extends string | number = string>({
       e.preventDefault()
       if (!isOpen) {
         setIsOpen(true)
+        onOpenChange?.(true)
         const currentIndex = options.findIndex((opt) => opt.value === value)
         setFocusedIndex(currentIndex >= 0 ? currentIndex : options.length - 1)
       } else {
@@ -135,7 +147,11 @@ export const Select = <T extends string | number = string>({
   const alignClass = align === 'right' ? styles.dropdownAlignRight : styles.dropdownAlignLeft
 
   return (
-    <div className={`${styles.container} ${className}`} ref={containerRef} onKeyDown={handleKeyDown}>
+    <div
+      className={`${styles.container} ${isOpen ? styles.containerOpen : ''} ${className}`}
+      ref={containerRef}
+      onKeyDown={handleKeyDown}
+    >
       {/* Hidden native select for accessibility & automated tests compatibility */}
       <select
         id={id}

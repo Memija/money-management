@@ -6,6 +6,10 @@
   width: 100%;
 }
 
+.containerOpen {
+  z-index: 100;
+}
+
 /* Hidden native select for screen readers and automated test tools */
 .hiddenNativeSelect {
   position: absolute;
@@ -105,11 +109,13 @@
   position: absolute;
   top: var(--dropdown-top, calc(100% + 4px));
   bottom: var(--dropdown-bottom, auto);
-  transform: translateX(var(--dropdown-shift-x, 0px));
+  translate: var(--dropdown-shift-x, 0px) 0;
   max-height: var(--dropdown-max-height, 240px);
   overflow-y: auto;
   overflow-x: hidden;
   background-color: var(--dropdown-bg, #1a1e28);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
   border-radius: var(--radius-md, 8px);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);

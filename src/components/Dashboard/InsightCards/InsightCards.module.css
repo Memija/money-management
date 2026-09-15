@@ -8,27 +8,28 @@
 ───────────────────────────────────────────────── */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 @media (max-width: 1024px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.65rem;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 }
 
 /* ─────────────────────────────────────────────────
    Card base
-───────────────────────────────────────────────── */
+ ───────────────────────────────────────────────── */
 .card {
   display: flex;
   flex-direction: column;
@@ -36,6 +37,9 @@
   padding: 1rem 1.1rem !important;
   position: relative;
   overflow: visible;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -440,7 +444,7 @@
   }
 
   .label {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
   }
 
   .value {
@@ -449,20 +453,20 @@
 
   .pill-income,
   .pill-expense {
-    font-size: 0.68rem;
-    padding: 0.18rem 0.45rem;
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
   }
 
   .detail {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
   }
 
   .avg-row-label {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
   }
 
   .avg-row-value {
-    font-size: 0.7rem;
+    font-size: 0.74rem;
   }
 
   .avg-icon {
@@ -471,18 +475,41 @@
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 480px) {
   .card {
-    padding: 0.75rem 0.7rem !important;
+    padding: 0.85rem 0.85rem !important;
+    gap: 0.5rem;
+  }
+
+  .label {
+    font-size: 0.72rem;
   }
 
   .value {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+  }
+
+  .avg-row-label {
+    font-size: 0.7rem;
+  }
+
+  .avg-row-value {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .card {
+    padding: 0.85rem 0.85rem !important;
+  }
+
+  .value {
+    font-size: 1.2rem;
   }
 
   .iconBox {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
   }
 }
 

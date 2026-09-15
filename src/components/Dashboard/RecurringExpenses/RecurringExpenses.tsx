@@ -59,7 +59,8 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className={`glass-card ${styles.container}`}
+      className={`glass-card ${styles.container} ${openDropdownId ? styles.containerWithOpenDropdown : ''}`}
+      data-testid="recurring-expenses-container"
     >
       {/* Header Section with Title & Key Financial Metrics */}
       <div className={styles.header}>

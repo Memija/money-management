@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 
 import type { PeriodMode } from '../../../hooks/useAnalytics'
@@ -34,6 +35,8 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
     dropdownRef,
     padding: 12,
     estimatedHeight: 220,
+    usePortal: true,
+    align: 'right',
   })
 
   // Initialize view year based on selected value or the most recent option
@@ -50,13 +53,25 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
   const [viewYear, setViewYear] = useState<number>(initialYear)
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event: Event) => {
+      const target = event.target as Node
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
+      ) {
         setIsOpen(false)
       }
     }
+    document.addEventListener('pointerdown', handleClickOutside)
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('pointerdown', handleClickOutside)
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
   }, [])
 
   const toggleDropdown = () => {
@@ -165,7 +180,7 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
   }
 
   return (
-    <div className={styles.container} ref={containerRef}>
+    <div className={`${styles.container} ${isOpen ? styles.containerOpen : ''}`} ref={containerRef}>
       <button
         className={styles.trigger}
         onClick={toggleDropdown}
@@ -176,39 +191,41 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
         <ChevronDown className={styles.icon} />
       </button>
 
-      {isOpen && (
-        <div ref={dropdownRef} className={styles.dropdown}>
-          {mode !== 'year' && (
-            <div className={styles.header}>
-              <button
-                className={styles['nav-button']}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setViewYear(viewYear - 1)
-                }}
-                disabled={!availableYears.includes(viewYear - 1)}
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <span>{viewYear}</span>
-              <button
-                className={styles['nav-button']}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setViewYear(viewYear + 1)
-                }}
-                disabled={!availableYears.includes(viewYear + 1)}
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          )}
+      {isOpen &&
+        createPortal(
+          <div ref={dropdownRef} className={styles.dropdown}>
+            {mode !== 'year' && (
+              <div className={styles.header}>
+                <button
+                  className={styles['nav-button']}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setViewYear(viewYear - 1)
+                  }}
+                  disabled={!availableYears.includes(viewYear - 1)}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span>{viewYear}</span>
+                <button
+                  className={styles['nav-button']}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setViewYear(viewYear + 1)
+                  }}
+                  disabled={!availableYears.includes(viewYear + 1)}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
 
-          {mode === 'year' && renderYearGrid()}
-          {mode === 'quarter' && renderQuarterGrid()}
-          {mode === 'month' && renderMonthGrid()}
-        </div>
-      )}
+            {mode === 'year' && renderYearGrid()}
+            {mode === 'quarter' && renderQuarterGrid()}
+            {mode === 'month' && renderMonthGrid()}
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }

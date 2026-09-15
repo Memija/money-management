@@ -166,4 +166,23 @@ describe('RecurringExpenses', () => {
       'tx-2': 'Dining Out',
     })
   })
+
+  it('elevates the recurring expenses container with containerWithOpenDropdown when a dropdown is open', () => {
+    const { container } = render(
+      <RecurringExpenses
+        recurringExpenses={sampleRecurring}
+        totalMonthly={50.99}
+      />
+    )
+
+    const rootElement = container.firstElementChild as HTMLElement
+    expect(rootElement.className).not.toMatch(/containerWithOpenDropdown/)
+
+    // Open dropdown
+    const categoryBtn = screen.getByRole('button', { name: /Entertainment/i })
+    fireEvent.click(categoryBtn)
+
+    // Container should now have containerWithOpenDropdown
+    expect(rootElement.className).toMatch(/containerWithOpenDropdown/)
+  })
 })

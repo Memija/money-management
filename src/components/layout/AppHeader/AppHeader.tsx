@@ -35,7 +35,7 @@ const AppHeader: React.FC = () => {
   const currentThemeOption = themeOptions.find((o) => o.value === theme) || themeOptions[0]
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: Event) => {
       if (themeDropdownRef.current && !themeDropdownRef.current.contains(e.target as Node)) {
         setIsThemeOpen(false)
       }
@@ -43,8 +43,14 @@ const AppHeader: React.FC = () => {
         setIsLangOpen(false)
       }
     }
+    document.addEventListener('pointerdown', handleClickOutside)
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('pointerdown', handleClickOutside)
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
   }, [])
 
   useEffect(() => {

@@ -9,6 +9,10 @@
   box-sizing: border-box;
 }
 
+.containerWithOpenDropdown {
+  z-index: 50 !important;
+}
+
 /* ─────────────────────────────────────────────────
    Header & Summary Stats
 ───────────────────────────────────────────────── */

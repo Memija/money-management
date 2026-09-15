@@ -7,6 +7,8 @@ interface UseDropdownPositionOptions {
   padding?: number
   estimatedHeight?: number
   topObstructionSelector?: string
+  usePortal?: boolean
+  align?: 'left' | 'right'
 }
 
 /**
@@ -16,6 +18,7 @@ interface UseDropdownPositionOptions {
  * - Detects top obstructions (such as sticky headers) and calculates true visible space.
  * - Flips vertically to the side with optimal space if space below is constrained.
  * - Dynamically clamps max-height so the dropdown never overflows above or below the viewport.
+ * - Supports portaled dropdowns (position: fixed) with absolute viewport coordinate calculation.
  */
 export const useDropdownPosition = ({
   isOpen,
@@ -24,6 +27,8 @@ export const useDropdownPosition = ({
   padding = 12,
   estimatedHeight = 260,
   topObstructionSelector = 'header, [class*="app-header"], [class*="subheader"]',
+  usePortal = false,
+  align = 'left',
 }: UseDropdownPositionOptions) => {
   useLayoutEffect(() => {
     if (!isOpen || typeof window === 'undefined') return
@@ -40,27 +45,21 @@ export const useDropdownPosition = ({
       const maxAllowedWidth = Math.max(160, Math.floor(viewportWidth - 2 * padding))
       dropdown.style.setProperty('--dropdown-max-width', `${maxAllowedWidth}px`)
 
-      // Reset transform to measure natural layout bounds
+      // Reset transform and shift to measure natural layout bounds
+      dropdown.style.setProperty('--dropdown-shift-x', '0px')
       dropdown.style.transform = 'none'
+      dropdown.style.translate = 'none'
       const dropdownRect = dropdown.getBoundingClientRect()
       const triggerRect = trigger.getBoundingClientRect()
       dropdown.style.transform = ''
+      dropdown.style.translate = ''
 
-      // 2. Horizontal bounds clamping: ensure strictly between padding and viewportWidth - padding
-      let shiftX = 0
-      if (dropdownRect.right > viewportWidth - padding) {
-        shiftX = (viewportWidth - padding) - dropdownRect.right
-      }
-      if (dropdownRect.left + shiftX < padding) {
-        shiftX = padding - dropdownRect.left
-      }
-      dropdown.style.setProperty('--dropdown-shift-x', `${Math.round(shiftX)}px`)
-
-      // 3. Measure top obstruction (sticky header / subheader)
+      // Measure top obstruction (sticky header / subheader)
       let headerBottom = 0
       if (typeof document !== 'undefined' && topObstructionSelector) {
         const stickyElements = document.querySelectorAll(topObstructionSelector)
         stickyElements.forEach((el) => {
+          if (el.contains(trigger)) return
           const rect = el.getBoundingClientRect()
           if (rect.bottom > headerBottom && rect.top >= 0 && rect.bottom < viewportHeight * 0.5) {
             headerBottom = rect.bottom
@@ -74,7 +73,7 @@ export const useDropdownPosition = ({
       const spaceBelow = Math.max(0, bottomLimit - triggerRect.bottom)
       const spaceAbove = Math.max(0, triggerRect.top - topLimit)
 
-      // 4. Vertical flip decision
+      // Vertical flip decision
       const fitsBelow = spaceBelow >= estimatedHeight
       const fitsAbove = spaceAbove >= estimatedHeight
 
@@ -87,6 +86,66 @@ export const useDropdownPosition = ({
         shouldFlip = spaceAbove > spaceBelow
       }
 
+      if (usePortal) {
+        dropdown.style.position = 'fixed'
+        dropdown.style.zIndex = '1000'
+
+        // Determine dropdown dimensions
+        const dWidth = dropdownRect.width || Math.min(260, maxAllowedWidth)
+        const dHeight = dropdownRect.height || estimatedHeight
+
+        // Horizontal positioning: align left or right edge of trigger, then clamp strictly within viewport safe area
+        const idealLeft = align === 'right' ? triggerRect.right - dWidth : triggerRect.left
+        const clampedLeft = Math.max(padding, Math.min(idealLeft, viewportWidth - padding - dWidth))
+        dropdown.style.left = `${Math.round(clampedLeft)}px`
+        dropdown.style.right = 'auto'
+
+        // Vertical positioning
+        if (shouldFlip) {
+          const top = Math.max(topLimit, triggerRect.top - dHeight - 4)
+          dropdown.style.top = `${Math.round(top)}px`
+          dropdown.style.bottom = 'auto'
+        } else {
+          const top = triggerRect.bottom + 4
+          dropdown.style.top = `${Math.round(top)}px`
+          dropdown.style.bottom = 'auto'
+        }
+
+        // Dynamic height constraint
+        const availableSpace = shouldFlip ? spaceAbove : spaceBelow
+        const maxAllowedHeight = Math.max(
+          120,
+          Math.min(estimatedHeight, Math.floor(availableSpace - 4))
+        )
+        dropdown.style.maxHeight = `${maxAllowedHeight}px`
+        dropdown.style.setProperty('--dropdown-max-height', `${maxAllowedHeight}px`)
+
+        // Hide if trigger is scrolled completely out of view
+        if (triggerRect.bottom < 0 || triggerRect.top > viewportHeight) {
+          dropdown.style.display = 'none'
+        } else {
+          dropdown.style.display = ''
+        }
+        return
+      }
+
+      // Non-portal relative positioning:
+      // 2. Horizontal bounds clamping: ensure strictly between padding and viewportWidth - padding
+      let shiftX = 0
+      if (dropdownRect.right > viewportWidth - padding) {
+        shiftX = (viewportWidth - padding) - dropdownRect.right
+      }
+      if (dropdownRect.left + shiftX < padding) {
+        shiftX = padding - dropdownRect.left
+      }
+      const roundedShift = Math.round(shiftX)
+      dropdown.style.setProperty('--dropdown-shift-x', `${roundedShift}px`)
+      if (roundedShift !== 0) {
+        dropdown.style.translate = `${roundedShift}px 0`
+      } else {
+        dropdown.style.translate = ''
+      }
+
       if (shouldFlip) {
         dropdown.style.setProperty('--dropdown-top', 'auto')
         dropdown.style.setProperty('--dropdown-bottom', 'calc(100% + 4px)')
@@ -95,7 +154,7 @@ export const useDropdownPosition = ({
         dropdown.style.setProperty('--dropdown-bottom', 'auto')
       }
 
-      // 5. Dynamic height constraint: strictly fit within visible space in chosen direction
+      // Dynamic height constraint: strictly fit within visible space in chosen direction
       const availableSpace = shouldFlip ? spaceAbove : spaceBelow
       const maxAllowedHeight = Math.max(
         120,
@@ -113,6 +172,6 @@ export const useDropdownPosition = ({
       window.removeEventListener('resize', updatePosition)
       window.removeEventListener('scroll', updatePosition, true)
     }
-  }, [isOpen, triggerRef, dropdownRef, padding, estimatedHeight, topObstructionSelector])
+  }, [isOpen, triggerRef, dropdownRef, padding, estimatedHeight, topObstructionSelector, usePortal, align])
 }
 

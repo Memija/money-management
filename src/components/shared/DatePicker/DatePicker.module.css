@@ -3,6 +3,10 @@
   width: 100%;
 }
 
+.containerOpen {
+  z-index: 100;
+}
+
 .input-wrapper {
   position: relative;
   display: flex;
@@ -29,27 +33,25 @@
 
 .icon {
   position: absolute;
-  right: 0.5rem;
-  opacity: 0.5;
+  right: 0.6rem;
+  color: var(--text-muted);
   pointer-events: none;
 }
 
 .clear-button {
   position: absolute;
-  right: 0.5rem;
+  right: 0.6rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: none;
-  color: inherit;
-  opacity: 0.6;
-  cursor: pointer;
-  padding: 0;
-  width: 16px;
-  height: 16px;
+  padding: 2px;
   border-radius: 50%;
-  transition: all 0.2s;
+  opacity: 0.7;
+  transition: opacity 0.2s, background-color 0.2s;
 }
 
 .clear-button:hover {
@@ -61,9 +63,9 @@
   position: absolute;
   top: var(--dropdown-top, calc(100% + 0.5rem));
   bottom: var(--dropdown-bottom, auto);
-  transform: translateX(var(--dropdown-shift-x, 0px));
+  translate: var(--dropdown-shift-x, 0px) 0;
   left: 0;
-  z-index: 50;
+  z-index: 1000;
   width: 260px;
   max-width: calc(100vw - 1.5rem);
   box-sizing: border-box;

@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .icon {
@@ -16,6 +16,7 @@
   border: 1px solid var(--card-border);
   border-radius: var(--radius-sm);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .pill {
@@ -62,20 +63,52 @@
   .wrapper {
     gap: 0.35rem;
     flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .icon {
+    display: none;
+  }
+
+  .pills {
+    flex-shrink: 0;
   }
 
   .pill {
-    padding: 0.35rem 0.5rem;
+    padding: 0.35rem 0.55rem;
     font-size: 0.74rem;
     min-height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
 
   .selector {
     padding: 0.3rem 1.35rem 0.3rem 0.5rem;
     font-size: 0.74rem;
     height: 32px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .wrapper {
+    gap: 0.25rem;
+  }
+
+  .pill {
+    padding: 0.3rem 0.45rem;
+    font-size: 0.7rem;
+    min-height: 30px;
   }
 }

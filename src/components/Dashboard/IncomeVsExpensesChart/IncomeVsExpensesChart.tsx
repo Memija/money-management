@@ -227,11 +227,11 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = ({
       transition={{ delay: 0.2 }}
       className={`glass-card ${styles.container}`}
     >
-      {/* Header with Title and Summary Badges */}
+      {/* Header with Title, Timeline Subtitle, Info Metric Pill, and View Toggle */}
       <div className={styles.header}>
-        <div className={styles.titleGroup}>
-          <h3 className={styles.title}>{t.incomeVsExpenses || 'Income vs Expenses'}</h3>
-          <div className={styles.subtitleToggleGroup}>
+        <div className={styles.headerMain}>
+          <div className={styles.titleGroup}>
+            <h3 className={styles.title}>{t.incomeVsExpenses || 'Income vs Expenses'}</h3>
             {monthlyData.length > 0 && (
               <p className={styles.subtitle}>
                 {monthlyData.length === 1
@@ -239,36 +239,39 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = ({
                   : `${monthlyData[0].name} – ${monthlyData[monthlyData.length - 1].name}`}
               </p>
             )}
-            <div className={styles.viewToggle}>
-              <button
-                className={`${styles.toggleBtn} ${viewMode === 'monthly' ? styles.toggleBtnActive : ''}`}
-                onClick={() => setViewMode('monthly')}
-              >
-                {t.viewMonthly || 'Monthly'}
-              </button>
-              <button
-                className={`${styles.toggleBtn} ${viewMode === 'cumulative' ? styles.toggleBtnActive : ''}`}
-                onClick={() => setViewMode('cumulative')}
-              >
-                {t.viewCumulative || 'Cumulative'}
-              </button>
-            </div>
           </div>
+
+          {/* Live summary pill */}
+          {monthlyData.length > 0 && (
+            <div className={styles.metricsGroup}>
+              <div
+                className={`${styles.metricPill} ${isNetPositive ? styles.netPillPositive : styles.netPillNegative}`}
+                title={isNetPositive ? (t.netSavedLabel || 'Net Saved') : (t.netDeficitLabel || 'Net Deficit')}
+              >
+                {isNetPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                <span>{isNetPositive ? '+' : ''}{formatCurrency(netSaved)}</span>
+                <span className={styles.pillLabel}>({formatSavingsRate(savingsRate)})</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Live summary pill */}
-        {monthlyData.length > 0 && (
-          <div className={styles.metricsGroup}>
-            <div
-              className={`${styles.metricPill} ${isNetPositive ? styles.netPillPositive : styles.netPillNegative}`}
-              title={isNetPositive ? (t.netSavedLabel || 'Net Saved') : (t.netDeficitLabel || 'Net Deficit')}
-            >
-              {isNetPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-              <span>{isNetPositive ? '+' : ''}{formatCurrency(netSaved)}</span>
-              <span className={styles.pillLabel}>({formatSavingsRate(savingsRate)})</span>
-            </div>
-          </div>
-        )}
+        <div className={styles.viewToggle}>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${viewMode === 'monthly' ? styles.toggleBtnActive : ''}`}
+            onClick={() => setViewMode('monthly')}
+          >
+            {t.viewMonthly || 'Monthly'}
+          </button>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${viewMode === 'cumulative' ? styles.toggleBtnActive : ''}`}
+            onClick={() => setViewMode('cumulative')}
+          >
+            {t.viewCumulative || 'Cumulative'}
+          </button>
+        </div>
       </div>
 
       {/* Chart container */}

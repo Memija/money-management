@@ -5,6 +5,7 @@ import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 
 
 import type { MerchantEntry } from '../../../hooks/useAnalytics'
 import { useFormatters } from '../../../hooks/useFormatters'
+import { useIsMobile } from '../../../hooks/useIsMobile'
 import type { TranslationStrings } from '../../../i18n/translations'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
@@ -28,6 +29,8 @@ interface CustomTooltipProps {
   formatChargesCount: (n: number) => string
   totalExpenses?: number
   t: TranslationStrings
+  isMobile?: boolean
+  onMerchantClick?: (merchantName: string) => void
 }
 
 const CustomMerchantTooltip: React.FC<CustomTooltipProps> = ({
@@ -37,6 +40,8 @@ const CustomMerchantTooltip: React.FC<CustomTooltipProps> = ({
   formatChargesCount,
   totalExpenses,
   t,
+  isMobile = false,
+  onMerchantClick,
 }) => {
   if (!active || !payload?.length) {
     return null
@@ -82,7 +87,7 @@ const CustomMerchantTooltip: React.FC<CustomTooltipProps> = ({
           <span>
             {data.count === 1
               ? (t.perTransaction || 'Per transaction')
-              : (t.avgPerTransaction || 'Avg. / Transaction')}
+              : (isMobile ? (t.perTransactionShort || 'Avg. / tx') : (t.avgPerTransaction || 'Avg. / Transaction'))}
           </span>
           <span className={styles.tooltipValue}>{formatCurrency(data.amount / data.count)}</span>
         </div>
@@ -91,6 +96,18 @@ const CustomMerchantTooltip: React.FC<CustomTooltipProps> = ({
         <div className={styles.tooltipRow}>
           <span>{t.ofTotal?.replace('{percent}', share) || `${share}% of total`}</span>
         </div>
+      )}
+      {isMobile && onMerchantClick && (
+        <button
+          type="button"
+          className={styles.tooltipActionBtn}
+          onClick={(e) => {
+            e.stopPropagation()
+            onMerchantClick(data.name)
+          }}
+        >
+          {t.allTransactions || 'View transactions'} &rarr;
+        </button>
       )}
     </div>
   )
@@ -101,6 +118,7 @@ interface CustomYAxisTickProps {
   y?: number
   payload?: { value: string }
   onHoverTick?: (info: { name: string; y: number } | null) => void
+  isMobile?: boolean
 }
 
 const CustomYAxisTick: React.FC<CustomYAxisTickProps> = ({
@@ -108,27 +126,29 @@ const CustomYAxisTick: React.FC<CustomYAxisTickProps> = ({
   y = 0,
   payload,
   onHoverTick,
+  isMobile = false,
 }) => {
   const fullName = payload?.value ?? ''
-  const maxChars = 18
+  const maxChars = isMobile ? 10 : 18
+  const truncateLength = isMobile ? 8 : 16
   const isTruncated = fullName.length > maxChars
-  const displayName = isTruncated ? `${fullName.substring(0, 16)}…` : fullName
+  const displayName = isTruncated ? `${fullName.substring(0, truncateLength)}…` : fullName
 
   return (
     <g transform={`translate(${x},${y})`}>
       <text
-        x={-136}
+        x={isMobile ? -80 : -136}
         y={0}
         dy={4}
         textAnchor="start"
         className={`${styles.yAxisTick} ${isTruncated ? styles.yAxisTickTruncated : ''}`}
         onMouseEnter={() => {
-          if (isTruncated) {
+          if (isTruncated && !isMobile) {
             onHoverTick?.({ name: fullName, y })
           }
         }}
         onMouseLeave={() => {
-          if (isTruncated) {
+          if (isTruncated && !isMobile) {
             onHoverTick?.(null)
           }
         }}
@@ -150,6 +170,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
   const { formatCurrency, formatChargesCount, formatPopularMerchantsCount } = useFormatters()
   const [viewMode, setViewMode] = useState<'list' | 'chart'>('list')
   const [hoveredLabel, setHoveredLabel] = useState<{ name: string; y: number } | null>(null)
+  const isMobile = useIsMobile(640)
 
   const totalTopSpend = useMemo(() => {
     return merchants.reduce((acc, m) => acc + m.amount, 0)
@@ -337,7 +358,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
           className={styles.chartContainer}
           onMouseLeave={() => setHoveredLabel(null)}
         >
-          {hoveredLabel && (
+          {!isMobile && hoveredLabel && (
             <div
               className={styles.axisTooltip}
               style={{ '--tooltip-top': `${hoveredLabel.y}px` } as React.CSSProperties}
@@ -349,7 +370,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
             <BarChart
               data={merchants}
               layout="vertical"
-              margin={{ left: 8, right: 20, top: 4, bottom: 4 }}
+              margin={{ left: 8, right: isMobile ? 12 : 20, top: 4, bottom: 4 }}
             >
               <XAxis
                 type="number"
@@ -363,12 +384,12 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
-                width={140}
-                tick={<CustomYAxisTick onHoverTick={setHoveredLabel} />}
+                width={isMobile ? 85 : 140}
+                tick={<CustomYAxisTick onHoverTick={setHoveredLabel} isMobile={isMobile} />}
               />
               <Tooltip
-                wrapperStyle={{ zIndex: 9999, pointerEvents: 'none' }}
-                allowEscapeViewBox={{ x: false, y: false }}
+                wrapperStyle={{ zIndex: 9999, pointerEvents: isMobile ? 'auto' : 'none' }}
+                allowEscapeViewBox={{ x: false, y: true }}
                 animationDuration={150}
                 content={
                   <CustomMerchantTooltip
@@ -376,6 +397,8 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
                     formatChargesCount={formatChargesCount}
                     totalExpenses={totalExpenses}
                     t={t}
+                    isMobile={isMobile}
+                    onMerchantClick={onMerchantClick}
                   />
                 }
                 cursor={{ fill: 'rgba(255,255,255,0.04)' }}
@@ -384,10 +407,11 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
                 dataKey="amount"
                 radius={[0, 6, 6, 0]}
                 onClick={(entry) => {
+                  if (isMobile) return
                   const m = entry as unknown as { name?: string }
                   if (m?.name) onMerchantClick?.(m.name)
                 }}
-                className={onMerchantClick ? styles.merchantRowClickable : undefined}
+                className={!isMobile && onMerchantClick ? styles.merchantRowClickable : undefined}
               >
                 {merchants.map((entry) => {
                   const brand = getMerchantBrandInfo(entry.name)

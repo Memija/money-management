@@ -195,4 +195,32 @@ describe('Select Component', () => {
     fireEvent.click(trigger)
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
+
+  it('calls onOpenChange and applies containerOpen class when opened and closed', () => {
+    const handleOpenChange = vi.fn()
+    const { container } = render(
+      <Select
+        id="fruit-select"
+        value="apple"
+        onChange={vi.fn()}
+        options={options}
+        onOpenChange={handleOpenChange}
+        aria-label="Select fruit"
+      />
+    )
+
+    const trigger = screen.getByTestId('fruit-select-trigger')
+    const selectContainer = container.firstElementChild as HTMLElement
+    expect(selectContainer.className).not.toMatch(/containerOpen/)
+
+    // Open
+    fireEvent.click(trigger)
+    expect(handleOpenChange).toHaveBeenCalledWith(true)
+    expect(selectContainer.className).toMatch(/containerOpen/)
+
+    // Close
+    fireEvent.click(trigger)
+    expect(handleOpenChange).toHaveBeenCalledWith(false)
+    expect(selectContainer.className).not.toMatch(/containerOpen/)
+  })
 })

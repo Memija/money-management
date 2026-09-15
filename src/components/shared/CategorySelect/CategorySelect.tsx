@@ -53,7 +53,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
 
   // Handle click outside to close dropdown
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: Event) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
         onOpenChange?.(false)
@@ -61,10 +61,14 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
     }
     
     if (isOpen) {
+      document.addEventListener('pointerdown', handleClickOutside)
       document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('touchstart', handleClickOutside)
     }
     return () => {
+      document.removeEventListener('pointerdown', handleClickOutside)
       document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
     }
   }, [isOpen, onOpenChange])
 
@@ -79,7 +83,7 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
 
   return (
     <div 
-      className={`${styles.container} ${variant === 'badge' ? styles.badgeContainer : ''} ${className}`}
+      className={`${styles.container} ${variant === 'badge' ? styles.badgeContainer : ''} ${isOpen ? styles.containerOpen : ''} ${className}`}
       ref={containerRef}
       style={{ '--badge-color': categoryColor } as React.CSSProperties}
     >

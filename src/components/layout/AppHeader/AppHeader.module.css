@@ -237,3 +237,25 @@
     max-width: calc(100vw - 1.5rem);
   }
 }
+
+@media (max-width: 360px) {
+  .app-header-inner {
+    padding: 0.35rem 0.5rem;
+    min-height: 42px;
+  }
+
+  .app-header-logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .app-header-actions {
+    gap: 0.25rem;
+  }
+
+  .theme-switcher-trigger {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0.25rem;
+  }
+}
