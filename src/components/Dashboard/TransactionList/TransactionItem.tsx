@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
+import { Ghost } from 'lucide-react'
 
+import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryIcon } from '../../../utils/category-icons'
+import { getCategoryLabel } from '../../../utils/category-utils'
 import { CategorySelect } from '../../shared/CategorySelect'
 
 import styles from './TransactionItem.module.css'
@@ -22,12 +25,16 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
   formatCurrency,
   onCategoryChange,
 }) => {
+  const t = useLanguageStore((s) => s.t)
+  const locale = useLanguageStore((s) => s.locale)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
 
   return (
     <div
-      className={`${styles.transactionItem} ${isDropdownOpen ? styles.itemWithOpenDropdown : ''}`}
+      className={`${styles.transactionItem} ${tx.isGhost ? styles.ghostItem : ''} ${
+        isDropdownOpen ? styles.itemWithOpenDropdown : ''
+      }`}
       style={{ '--cat-color': categoryColor } as React.CSSProperties}
     >
       <div className={styles.txLeft}>
@@ -43,6 +50,12 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
           </p>
           <p className={styles.txMeta}>
             {formatDate(tx.date)} • {tx.institution}
+            {tx.isGhost && (
+              <span className={styles.ghostBadge}>
+                <Ghost size={11} aria-hidden="true" />
+                {t.internalTransfer || 'Internal Transfer'}
+              </span>
+            )}
           </p>
         </div>
       </div>
@@ -58,13 +71,23 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
           </p>
         </div>
         <div className={styles.categoryBadgeWrapper}>
-          <CategorySelect
-            value={tx.category || 'Other'}
-            onChange={(val) => onCategoryChange(tx, val)}
-            variant="badge"
-            align="right"
-            onOpenChange={setIsDropdownOpen}
-          />
+          {tx.isGhost ? (
+            <span
+              className={styles.readOnlyBadge}
+              data-testid={`tx-ghost-readonly-${tx.id}`}
+              title={t.internalTransfer || 'Internal Transfer'}
+            >
+              {getCategoryLabel(tx.category || 'Other', t, locale, customCategories)}
+            </span>
+          ) : (
+            <CategorySelect
+              value={tx.category || 'Other'}
+              onChange={(val) => onCategoryChange(tx, val)}
+              variant="badge"
+              align="right"
+              onOpenChange={setIsDropdownOpen}
+            />
+          )}
         </div>
       </div>
     </div>

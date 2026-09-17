@@ -122,6 +122,28 @@ export const bs: TranslationStrings = {
     '1 duplikatna transakcija otkrivena (označena žutom bojom).',
   duplicateTransactionsDetected: '{count} duplikatne transakcije otkrivene (označene žutom bojom).',
 
+  spaceTransfersExcluded:
+    '{count} internih prijenosa između prostora (Spaces) je automatski isključeno radi izbjegavanja dvostrukog računanja.',
+  spaceTransfersExcludedSingular:
+    '1 interni prijenos između prostora (Spaces) je automatski isključen radi izbjegavanja dvostrukog računanja.',
+  internalTransfersDetectedSingular:
+    'Otkriven je 1 interni prijenos s vašim drugim računima (isključen iz prihoda/rashoda i sakriven iz standardnih pregleda).',
+  internalTransfersDetected:
+    'Otkriveno je {count} internih prijenosa s vašim drugim računima (isključeni iz prihoda/rashoda i sakriveni iz standardnih pregleda).',
+  internalTransfersDetectedBannerSingular:
+    'Otkriven je 1 interni prijenos između vaših računa (označen značkom internog prijenosa).',
+  internalTransfersDetectedBanner:
+    'Otkriveno je {count} internih prijenosa između vaših računa (označeni značkom internog prijenosa).',
+  internalTransfersReconciledTitle: 'Interni prijenosi usklađeni',
+  internalTransfersReconciledDesc:
+    '{count} prijenosa između vaših računa je prepoznato, isključeno iz prihoda i rashoda i sakriveno iz standardnih pregleda radi tačne analitike.',
+  internalTransfersReconciledDescSingular:
+    '1 prijenos između vaših računa je prepoznat, isključen iz prihoda i rashoda i sakriven iz standardnih pregleda radi tačne analitike.',
+  accountInternalTransfers: '{count} internih prijenosa',
+  accountInternalTransfersSingular: '1 interni prijenos',
+  inflows: 'Prilivi',
+  outflows: 'Odlivi',
+
   importSuccessTitle: 'Uvoz uspješan!',
   importSuccessSubtitle:
     'Vaše transakcije su uvezene. Možete dodati više institucija ili nastaviti s analizom.',
@@ -159,6 +181,14 @@ export const bs: TranslationStrings = {
   showingOf: 'Prikazano {shown} od {total} transakcija',
   noTransactionsMatch: 'Nijedna transakcija ne odgovara pretraživanju.',
   perPage: 'Po stranici:',
+  internalTransfer: 'Interni prijenos',
+  internalTransfers: 'Interni prijenosi',
+  ghostTransfersHidden: '{count} internih prijenosa skriveno',
+  ghostTransfersShown: 'Prikazani interni prijenosi',
+  showInternalTransfers: 'Prikaži interne prijenose',
+  hideInternalTransfers: 'Sakrij interne prijenose',
+  transfersTabNotice:
+    'Interni prijenosi između vaših računa su isključeni iz prihoda i rashoda (samo za čitanje).',
 
   insightTransactions: 'Transakcije',
   insightAvgTransaction: 'Prosječna transakcija',

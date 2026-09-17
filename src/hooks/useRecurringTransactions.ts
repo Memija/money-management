@@ -32,9 +32,9 @@ export const useRecurringTransactions = (
   const { customKeywords, manualCategories } = useAppStore()
 
   return useMemo(() => {
-    // 1. Filter for expenses and categorize
+    // 1. Filter for non-ghost expenses and categorize
     const expenses = allRawTransactions
-      .filter((t) => t.type === 'expense')
+      .filter((t) => t.type === 'expense' && !t.isGhost)
       .map((t) => ({ ...t, category: getTransactionCategory(t, customKeywords, manualCategories) }))
 
     // 2. Group by normalized description

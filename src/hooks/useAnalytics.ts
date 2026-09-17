@@ -150,17 +150,23 @@ export const useAnalytics = (
 ): AnalyticsData => {
   const { customKeywords, manualCategories, customCategories } = useAppStore()
 
-  // Categorize all transactions once if not already categorized
+  // Exclude ghost transactions (internal transfers between own accounts) from financial analytics
+  const activeRawTransactions = useMemo(
+    () => allRawTransactions.filter((t) => !t.isGhost),
+    [allRawTransactions],
+  )
+
+  // Categorize all active transactions once if not already categorized
   const allTransactions = useMemo(() => {
-    const allAlreadyCategorized = allRawTransactions.every((t) => typeof t.category === 'string')
+    const allAlreadyCategorized = activeRawTransactions.every((t) => typeof t.category === 'string')
     if (allAlreadyCategorized) {
-      return allRawTransactions
+      return activeRawTransactions
     }
-    return allRawTransactions.map((t) => ({
+    return activeRawTransactions.map((t) => ({
       ...t,
       category: t.category || getTransactionCategory(t, customKeywords, manualCategories),
     }))
-  }, [allRawTransactions, customKeywords, manualCategories])
+  }, [activeRawTransactions, customKeywords, manualCategories])
 
   // Available periods for filter
   const { availableYears, availableQuarters, availableMonths } = useMemo(() => {

@@ -7,4 +7,12 @@ export interface Transaction {
   category?: string
   type: 'income' | 'expense'
   institution: string
+  /** True if this transaction is an internal transfer between the user's own accounts. */
+  isGhost?: boolean
+  /** ID of the paired reciprocal transaction in the other account. */
+  linkedTransactionId?: string
+  /** Counterparty IBAN if present in the statement/row (e.g. Partner IBAN). */
+  counterpartyIban?: string
+  /** Own account IBAN if present in the statement/row (e.g. IBAN Kontoinhaber). */
+  ownIban?: string
 }

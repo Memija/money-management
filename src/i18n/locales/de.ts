@@ -121,6 +121,28 @@ export const de: TranslationStrings = {
   duplicateTransactionsDetectedSingular: '1 doppelte Transaktion erkannt (gelb hervorgehoben).',
   duplicateTransactionsDetected: '{count} doppelte Transaktionen erkannt (gelb hervorgehoben).',
 
+  spaceTransfersExcluded:
+    '{count} interne Space-Umbuchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
+  spaceTransfersExcludedSingular:
+    '1 interne Space-Umbuchung wurde automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
+  internalTransfersDetectedSingular:
+    '1 interne Umbuchung mit deinen anderen Konten erkannt (von Einnahmen/Ausgaben ausgeschlossen und in Standardansichten ausgeblendet).',
+  internalTransfersDetected:
+    '{count} interne Umbuchungen mit deinen anderen Konten erkannt (von Einnahmen/Ausgaben ausgeschlossen und in Standardansichten ausgeblendet).',
+  internalTransfersDetectedBannerSingular:
+    '1 interne Umbuchung zwischen deinen Konten erkannt (mit Umbuchungs-Badge gekennzeichnet).',
+  internalTransfersDetectedBanner:
+    '{count} interne Umbuchungen zwischen deinen Konten erkannt (mit Umbuchungs-Badge gekennzeichnet).',
+  internalTransfersReconciledTitle: 'Interne Umbuchungen abgestimmt',
+  internalTransfersReconciledDesc:
+    '{count} Umbuchungen zwischen deinen Konten wurden erkannt, aus Einnahmen und Ausgaben ausgeschlossen und in Standardansichten ausgeblendet, um deine Analysen sauber zu halten.',
+  internalTransfersReconciledDescSingular:
+    '1 Umbuchung zwischen deinen Konten wurde erkannt, aus Einnahmen und Ausgaben ausgeschlossen und in Standardansichten ausgeblendet, um deine Analysen sauber zu halten.',
+  accountInternalTransfers: '{count} interne Umbuchungen',
+  accountInternalTransfersSingular: '1 interne Umbuchung',
+  inflows: 'Einnahmen',
+  outflows: 'Ausgaben',
+
   importSuccessTitle: 'Import erfolgreich!',
   importSuccessSubtitle:
     'Ihre Transaktionen wurden importiert. Sie können weitere Institute hinzufügen oder zur Analyse fortfahren.',
@@ -158,6 +180,14 @@ export const de: TranslationStrings = {
   showingOf: '{shown} von {total} Transaktionen angezeigt',
   noTransactionsMatch: 'Keine Transaktionen entsprechen Ihrer Suche.',
   perPage: 'Pro Seite:',
+  internalTransfer: 'Interne Umbuchung',
+  internalTransfers: 'Interne Umbuchungen',
+  ghostTransfersHidden: '{count} interne Umbuchungen ausgeblendet',
+  ghostTransfersShown: 'Interne Umbuchungen sichtbar',
+  showInternalTransfers: 'Interne Umbuchungen anzeigen',
+  hideInternalTransfers: 'Interne Umbuchungen ausblenden',
+  transfersTabNotice:
+    'Interne Umbuchungen zwischen deinen Konten sind von Einnahmen und Ausgaben ausgeschlossen (schreibgeschützt).',
 
   insightTransactions: 'Transaktionen',
   insightAvgTransaction: 'Durchschnittliche Transaktion',

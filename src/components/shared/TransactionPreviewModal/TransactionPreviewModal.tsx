@@ -6,6 +6,8 @@ import {
   ArrowUp,
   ArrowUpDown,
   Check,
+  Ghost,
+  Info,
   RotateCcw,
   Search,
   Trash2,
@@ -33,6 +35,8 @@ export interface TransactionPreviewModalProps {
   onClose: () => void
   transactions: Transaction[]
   duplicateIds?: Set<string>
+  internalTransferIds?: Set<string>
+  discardedSpaceCount?: number
   onRemoveTransaction?: (id: string) => void
   onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void
   title?: string
@@ -47,6 +51,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   onClose,
   transactions,
   duplicateIds = new Set(),
+  internalTransferIds = new Set(),
+  discardedSpaceCount = 0,
   onRemoveTransaction,
   onUpdateTransaction,
   title,
@@ -151,10 +157,25 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     return result
   }, [transactions, hasMultipleTransactions, startDate, endDate, searchQuery, sortConfig, formatCurrency])
 
-  const filteredTotal = useMemo(
-    () => filteredAndSortedTransactions.reduce((sum, tx) => sum + Math.abs(tx.amount), 0),
-    [filteredAndSortedTransactions],
-  )
+  const { totalInflows, totalOutflows } = useMemo(() => {
+    let inflows = 0
+    let outflows = 0
+    for (const tx of filteredAndSortedTransactions) {
+      if (tx.isGhost || internalTransferIds.has(tx.id)) {
+        continue
+      }
+      const amt = Math.abs(tx.amount)
+      if (tx.type === 'income' || tx.amount > 0) {
+        inflows += amt
+      } else {
+        outflows += amt
+      }
+    }
+    return {
+      totalInflows: inflows,
+      totalOutflows: outflows,
+    }
+  }, [filteredAndSortedTransactions, internalTransferIds])
 
   const renderSortIcon = (key: SortColumn) => {
     if (sortConfig?.key !== key) return <ArrowUpDown size={14} className={styles['sort-icon']} />
@@ -190,18 +211,42 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             <span className={styles['summary-chip']}>
               {formatTransactionCount(filteredAndSortedTransactions.length)}
             </span>
-            <span
-              className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${
-                isIncome
-                  ? styles['summary-chip-income']
-                  : isExpense
-                    ? styles['summary-chip-expense']
-                    : ''
-              }`}
-            >
-              {isIncome ? '+' : isExpense ? '-' : ''}
-              {formatCurrency(filteredTotal)}
-            </span>
+            {isIncome ? (
+              <span
+                className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']}`}
+                data-testid="modal-total-income"
+              >
+                <TrendingUp size={12} aria-hidden="true" />
+                +{formatCurrency(totalInflows)}
+              </span>
+            ) : isExpense ? (
+              <span
+                className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']}`}
+                data-testid="modal-total-expense"
+              >
+                <TrendingDown size={12} aria-hidden="true" />
+                -{formatCurrency(totalOutflows)}
+              </span>
+            ) : (
+              <>
+                <span
+                  className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']}`}
+                  title={`${t.inflows || 'Inflows'}: +${formatCurrency(totalInflows)}`}
+                  data-testid="modal-total-inflow"
+                >
+                  <TrendingUp size={12} aria-hidden="true" />
+                  +{formatCurrency(totalInflows)}
+                </span>
+                <span
+                  className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']}`}
+                  title={`${t.outflows || 'Outflows'}: -${formatCurrency(totalOutflows)}`}
+                  data-testid="modal-total-outflow"
+                >
+                  <TrendingDown size={12} aria-hidden="true" />
+                  -{formatCurrency(totalOutflows)}
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -210,6 +255,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const rowContent = (index: number, tx: Transaction) => {
     const isDuplicate = duplicateIds.has(tx.id)
+    const isInternalTransfer = tx.isGhost || internalTransferIds.has(tx.id)
+    const isEditable = Boolean(onUpdateTransaction && !isInternalTransfer)
     const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
     const isTxIncome = tx.type === 'income'
 
@@ -229,7 +276,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           </div>
 
           <div className={styles['row-text']}>
-            {onUpdateTransaction ? (
+            {isEditable ? (
               <input
                 id={`tx-desc-${tx.id}`}
                 name={`tx-desc-${tx.id}`}
@@ -237,7 +284,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 aria-label={t.description || 'Description'}
                 className={styles['inline-input-desc']}
                 value={tx.description}
-                onChange={(e) => onUpdateTransaction(tx.id, { description: e.target.value })}
+                onChange={(e) => onUpdateTransaction?.(tx.id, { description: e.target.value })}
                 title={tx.description}
               />
             ) : (
@@ -255,16 +302,22 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
               {isDuplicate && (
                 <span className={styles['duplicate-pill']}>{t.duplicate || 'Duplicate'}</span>
               )}
+              {isInternalTransfer && (
+                <span className={styles['internal-transfer-pill']}>
+                  <Ghost size={11} aria-hidden="true" />
+                  {t.internalTransfer || 'Internal Transfer'}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         <div className={styles['row-date']}>
-          {onUpdateTransaction ? (
+          {isEditable ? (
             <div className={styles['inline-datepicker-wrapper']}>
               <DatePicker
                 value={tx.date}
-                onChange={(date) => onUpdateTransaction(tx.id, { date })}
+                onChange={(date) => onUpdateTransaction?.(tx.id, { date })}
               />
             </div>
           ) : (
@@ -277,7 +330,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             isTxIncome ? styles['amount-positive'] : styles['amount-negative']
           }`}
         >
-          {onUpdateTransaction ? (
+          {isEditable ? (
             <input
               id={`tx-amount-${tx.id}`}
               name={`tx-amount-${tx.id}`}
@@ -289,7 +342,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
               onChange={(e) => {
                 const val = e.target.value
                 const num = val === '' ? 0 : parseFloat(val)
-                onUpdateTransaction(tx.id, {
+                onUpdateTransaction?.(tx.id, {
                   amount: isNaN(num) ? 0 : num,
                   type: (isNaN(num) ? 0 : num) >= 0 ? 'income' : 'expense',
                 })
@@ -304,7 +357,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           )}
         </div>
 
-        {onRemoveTransaction && (
+        {onRemoveTransaction && !isInternalTransfer && (
           <div className={styles['row-actions']}>
             <button
               className={styles['remove-button']}
@@ -351,6 +404,28 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             {duplicateIds.size === 1
               ? t.duplicateTransactionsDetectedSingular
               : t.duplicateTransactionsDetected.replace('{count}', String(duplicateIds.size))}
+          </span>
+        </div>
+      )}
+
+      {internalTransferIds.size > 0 && (
+        <div className={styles['internal-transfer-banner']} data-testid="preview-internal-transfers-banner">
+          <Ghost size={18} />
+          <span>
+            {internalTransferIds.size === 1
+              ? t.internalTransfersDetectedBannerSingular
+              : t.internalTransfersDetectedBanner.replace('{count}', String(internalTransferIds.size))}
+          </span>
+        </div>
+      )}
+
+      {discardedSpaceCount > 0 && (
+        <div className={styles['space-transfer-banner']} data-testid="preview-space-transfers-banner">
+          <Info size={18} />
+          <span>
+            {discardedSpaceCount === 1
+              ? t.spaceTransfersExcludedSingular || '1 transaction between spaces was automatically excluded.'
+              : (t.spaceTransfersExcluded || '{count} transactions between spaces were automatically excluded.').replace('{count}', String(discardedSpaceCount))}
           </span>
         </div>
       )}

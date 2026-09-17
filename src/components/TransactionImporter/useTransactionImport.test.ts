@@ -9,8 +9,13 @@ import { useTransactionImport } from './useTransactionImport'
 // Mock the dependencies
 vi.mock('../../utils/transaction-parsers', () => ({
   rowsToTransactions: vi.fn(),
+  rowsToTransactionsWithMeta: vi.fn(),
   parseBankStatementPaste: vi.fn(),
   parsePdfText: vi.fn(),
+  extractAccountIbansFromPaste: vi.fn(() => []),
+  extractAccountIbansFromPdf: vi.fn(() => []),
+  splitCsvLine: (line: string, sep: string) =>
+    line.split(sep).map((c: string) => c.replace(/^"|"$/g, '').trim()),
 }))
 
 vi.mock('xlsx', () => ({
@@ -82,9 +87,59 @@ describe('useTransactionImport', () => {
       expect(parsers.parseBankStatementPaste).toHaveBeenCalledWith('some raw paste text', 'Bank A')
     })
 
+    it('should detect and discard space transfers from bank statement paste', () => {
+      const spaceTxs: Transaction[] = [
+        {
+          id: '1',
+          date: '2024-03-01',
+          description: 'Umbuchung auf Space Notgroschen',
+          amount: -200,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Bank A',
+        },
+        {
+          id: '2',
+          date: '2024-03-01',
+          description: 'Umbuchung von Hauptkonto',
+          amount: 200,
+          currency: 'EUR',
+          type: 'income',
+          institution: 'Bank A',
+        },
+        {
+          id: '3',
+          date: '2024-03-01',
+          description: 'Supermarket',
+          amount: -35,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Bank A',
+        },
+      ]
+      vi.mocked(parsers.parseBankStatementPaste).mockReturnValue(spaceTxs)
+
+      const { result } = renderHook(() => useTransactionImport('Bank A', 'paste'))
+
+      act(() => {
+        result.current.setPasteText('bank statement paste content')
+      })
+
+      act(() => {
+        result.current.handlePaste()
+      })
+
+      expect(result.current.discardedSpaceCount).toBe(2)
+      expect(result.current.transactions).toHaveLength(1)
+      expect(result.current.transactions[0].id).toBe('3')
+    })
+
     it('should fallback to CSV parsing if bank statement paste fails', () => {
       vi.mocked(parsers.parseBankStatementPaste).mockReturnValue([])
-      vi.mocked(parsers.rowsToTransactions).mockReturnValue(mockTransactions)
+      vi.mocked(parsers.rowsToTransactionsWithMeta).mockReturnValue({
+        transactions: mockTransactions,
+        discardedSpaceCount: 0,
+      })
 
       const { result } = renderHook(() => useTransactionImport('Bank A', 'paste'))
 
@@ -97,12 +152,15 @@ describe('useTransactionImport', () => {
       })
 
       expect(result.current.transactions).toEqual(mockTransactions)
-      expect(parsers.rowsToTransactions).toHaveBeenCalled()
+      expect(parsers.rowsToTransactionsWithMeta).toHaveBeenCalled()
     })
 
     it('should set error if both paste parsing strategies fail', () => {
       vi.mocked(parsers.parseBankStatementPaste).mockReturnValue([])
-      vi.mocked(parsers.rowsToTransactions).mockReturnValue([])
+      vi.mocked(parsers.rowsToTransactionsWithMeta).mockReturnValue({
+        transactions: [],
+        discardedSpaceCount: 0,
+      })
 
       const { result } = renderHook(() => useTransactionImport('Bank A', 'paste'))
 
@@ -132,7 +190,10 @@ describe('useTransactionImport', () => {
         ['Date', 'Amount'],
         ['2024-01-01', '100'],
       ])
-      vi.mocked(parsers.rowsToTransactions).mockReturnValue(mockTransactions)
+      vi.mocked(parsers.rowsToTransactionsWithMeta).mockReturnValue({
+        transactions: mockTransactions,
+        discardedSpaceCount: 0,
+      })
 
       const { result } = renderHook(() => useTransactionImport('Bank A', 'spreadsheet'))
 
@@ -143,12 +204,13 @@ describe('useTransactionImport', () => {
       expect(result.current.fileName).toBe('test.xlsx')
       expect(result.current.transactions).toEqual(mockTransactions)
       expect(result.current.error).toBeNull()
-      expect(parsers.rowsToTransactions).toHaveBeenCalledWith(
+      expect(parsers.rowsToTransactionsWithMeta).toHaveBeenCalledWith(
         [
           ['Date', 'Amount'],
           ['2024-01-01', '100'],
         ],
         'Bank A',
+        undefined,
       )
     })
 
@@ -161,7 +223,10 @@ describe('useTransactionImport', () => {
         Sheets: { Sheet1: {} },
       } as unknown as XLSX.WorkBook)
       vi.mocked(XLSX.utils.sheet_to_json).mockReturnValue([])
-      vi.mocked(parsers.rowsToTransactions).mockReturnValue([])
+      vi.mocked(parsers.rowsToTransactionsWithMeta).mockReturnValue({
+        transactions: [],
+        discardedSpaceCount: 0,
+      })
 
       const { result } = renderHook(() => useTransactionImport('Bank A', 'spreadsheet'))
 
@@ -178,7 +243,10 @@ describe('useTransactionImport', () => {
     it('should parse valid CSV file successfully', async () => {
       const csvContent = 'Date,Amount\n2024-01-01,100'
       const file = new File([csvContent], 'test.csv', { type: 'text/csv' })
-      vi.mocked(parsers.rowsToTransactions).mockReturnValue(mockTransactions)
+      vi.mocked(parsers.rowsToTransactionsWithMeta).mockReturnValue({
+        transactions: mockTransactions,
+        discardedSpaceCount: 0,
+      })
 
       const { result } = renderHook(() => useTransactionImport('Bank A', 'spreadsheet'))
 
@@ -191,11 +259,37 @@ describe('useTransactionImport', () => {
       expect(result.current.error).toBeNull()
     })
 
+    it('should track discardedSpaceCount from parser meta', async () => {
+      const csvContent = 'Date,Amount\n2024-01-01,100'
+      const file = new File([csvContent], 'test.csv', { type: 'text/csv' })
+      vi.mocked(parsers.rowsToTransactionsWithMeta).mockReturnValue({
+        transactions: mockTransactions,
+        discardedSpaceCount: 4,
+      })
+
+      const { result } = renderHook(() => useTransactionImport('Bank A', 'spreadsheet'))
+
+      await act(async () => {
+        await result.current.handleFileChange(file)
+      })
+
+      expect(result.current.transactions).toEqual(mockTransactions)
+      expect(result.current.discardedSpaceCount).toBe(4)
+
+      act(() => {
+        result.current.handleClearAll()
+      })
+      expect(result.current.discardedSpaceCount).toBe(0)
+    })
+
     it('should handle ISO-8859-1 encoded CSV files', async () => {
       // Provide a buffer that decodes poorly in UTF-8
       const buffer = new Uint8Array([0xc4, 0xd6, 0xdc]) // ÄÖÜ in ISO-8859-1
       const file = new File([buffer], 'iso.csv', { type: 'text/csv' })
-      vi.mocked(parsers.rowsToTransactions).mockReturnValue(mockTransactions)
+      vi.mocked(parsers.rowsToTransactionsWithMeta).mockReturnValue({
+        transactions: mockTransactions,
+        discardedSpaceCount: 0,
+      })
 
       const { result } = renderHook(() => useTransactionImport('Bank A', 'spreadsheet'))
 
@@ -209,7 +303,10 @@ describe('useTransactionImport', () => {
 
     it('should handle CSV files with no transactions', async () => {
       const file = new File(['HeaderOnly'], 'empty.csv', { type: 'text/csv' })
-      vi.mocked(parsers.rowsToTransactions).mockReturnValue([])
+      vi.mocked(parsers.rowsToTransactionsWithMeta).mockReturnValue({
+        transactions: [],
+        discardedSpaceCount: 0,
+      })
 
       const { result } = renderHook(() => useTransactionImport('Bank A', 'spreadsheet'))
 
@@ -252,6 +349,62 @@ describe('useTransactionImport', () => {
       expect(parsers.parsePdfText).toHaveBeenCalledWith('PDF Content\n', 'Bank A')
     })
 
+    it('should detect and discard space transfers from PDF statements', async () => {
+      const file = new File(['dummy content'], 'statement.pdf', { type: 'application/pdf' })
+      const spaceTxs: Transaction[] = [
+        {
+          id: 'pdf-1',
+          date: '2024-04-10',
+          description: 'Investment fund',
+          amount: -100,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Bank A',
+        },
+        {
+          id: 'pdf-2',
+          date: '2024-04-10',
+          description: 'Main Account',
+          amount: 100,
+          currency: 'EUR',
+          type: 'income',
+          institution: 'Bank A',
+        },
+        {
+          id: 'pdf-3',
+          date: '2024-04-10',
+          description: 'Bakery',
+          amount: -5.5,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Bank A',
+        },
+      ]
+      vi.mocked(parsers.parsePdfText).mockReturnValue(spaceTxs)
+
+      const mockPdfjs = await import('pdfjs-dist')
+      vi.mocked(mockPdfjs.getDocument).mockReturnValue({
+        promise: Promise.resolve({
+          numPages: 1,
+          getPage: vi.fn().mockResolvedValue({
+            getTextContent: vi.fn().mockResolvedValue({
+              items: [{ str: 'Statement text' }],
+            }),
+          }),
+        }),
+      } as unknown as ReturnType<typeof mockPdfjs.getDocument>)
+
+      const { result } = renderHook(() => useTransactionImport('Bank A', 'pdf'))
+
+      await act(async () => {
+        await result.current.handleFileChange(file)
+      })
+
+      expect(result.current.discardedSpaceCount).toBe(2)
+      expect(result.current.transactions).toHaveLength(1)
+      expect(result.current.transactions[0].id).toBe('pdf-3')
+    })
+
     it('should handle PDF files with no transactions', async () => {
       const file = new File(['dummy content'], 'empty.pdf', { type: 'application/pdf' })
       vi.mocked(parsers.parsePdfText).mockReturnValue([])
@@ -276,6 +429,52 @@ describe('useTransactionImport', () => {
 
       expect(result.current.transactions).toEqual([])
       expect(result.current.error).toMatch(/Could not auto-detect transactions in this PDF/)
+    })
+
+    it('should NOT discard merchant refunds or reversals in PDF statements', async () => {
+      const file = new File(['dummy content'], 'statement.pdf', { type: 'application/pdf' })
+      const refundTxs: Transaction[] = [
+        {
+          id: 'pdf-buy',
+          date: '2024-04-10',
+          description: 'Amazon Payments Europe',
+          amount: -59.99,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Bank A',
+        },
+        {
+          id: 'pdf-refund',
+          date: '2024-04-10',
+          description: 'Amazon Payments Europe Erstattung',
+          amount: 59.99,
+          currency: 'EUR',
+          type: 'income',
+          institution: 'Bank A',
+        },
+      ]
+      vi.mocked(parsers.parsePdfText).mockReturnValue(refundTxs)
+
+      const mockPdfjs = await import('pdfjs-dist')
+      vi.mocked(mockPdfjs.getDocument).mockReturnValue({
+        promise: Promise.resolve({
+          numPages: 1,
+          getPage: vi.fn().mockResolvedValue({
+            getTextContent: vi.fn().mockResolvedValue({
+              items: [{ str: 'Statement text' }],
+            }),
+          }),
+        }),
+      } as unknown as ReturnType<typeof mockPdfjs.getDocument>)
+
+      const { result } = renderHook(() => useTransactionImport('Bank A', 'pdf'))
+
+      await act(async () => {
+        await result.current.handleFileChange(file)
+      })
+
+      expect(result.current.discardedSpaceCount).toBe(0)
+      expect(result.current.transactions).toHaveLength(2)
     })
   })
 

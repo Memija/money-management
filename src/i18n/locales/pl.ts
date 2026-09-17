@@ -121,6 +121,28 @@ export const pl: TranslationStrings = {
   duplicateTransactionsDetectedSingular: 'Wykryto 1 zduplikowaną transakcję (zaznaczoną na żółto).',
   duplicateTransactionsDetected: 'Wykryto {count} zduplikowane transakcje (zaznaczone na żółto).',
 
+  spaceTransfersExcluded:
+    '{count} wewnętrznych transferów między przestrzeniami (Spaces) zostało automatycznie wykluczonych, aby uniknąć podwójnego liczenia.',
+  spaceTransfersExcludedSingular:
+    '1 wewnętrzny transfer między przestrzeniami (Spaces) został automatycznie wykluczony, aby uniknąć podwójnego liczenia.',
+  internalTransfersDetectedSingular:
+    'Wykryto 1 przelew własny między Twoimi kontami (wykluczony z przychodów/wydatków i ukryty w widokach standardowych).',
+  internalTransfersDetected:
+    'Wykryto {count} przelewów własnych między Twoimi kontami (wykluczonych z przychodów/wydatków i ukrytych w widokach standardowych).',
+  internalTransfersDetectedBannerSingular:
+    'Wykryto 1 przelew własny między Twoimi kontami (oznaczony etykietą przelewu własnego).',
+  internalTransfersDetectedBanner:
+    'Wykryto {count} przelewów własnych między Twoimi kontami (oznaczonych etykietą przelewu własnego).',
+  internalTransfersReconciledTitle: 'Przelewy własne uzgodnione',
+  internalTransfersReconciledDesc:
+    '{count} przelewów między Twoimi kontami zostało rozpoznanych, wykluczonych z przychodów i wydatków oraz ukrytych w widokach standardowych, aby zachować czyste statystyki.',
+  internalTransfersReconciledDescSingular:
+    '1 przelew między Twoimi kontami został rozpoznany, wykluczony z przychodów i wydatków oraz ukryty w widokach standardowych, aby zachować czyste statystyki.',
+  accountInternalTransfers: '{count} przelewów własnych',
+  accountInternalTransfersSingular: '1 przelew własny',
+  inflows: 'Wpływy',
+  outflows: 'Wypływy',
+
   importSuccessTitle: 'Import zakończony sukcesem!',
   importSuccessSubtitle:
     'Twoje transakcje zostały zaimportowane. Możesz dodać więcej instytucji lub przejść do analizy.',
@@ -158,6 +180,14 @@ export const pl: TranslationStrings = {
   showingOf: 'Wyświetlono {shown} z {total} transakcji',
   noTransactionsMatch: 'Brak transakcji pasujących do wyszukiwania.',
   perPage: 'Na stronę:',
+  internalTransfer: 'Przelew własny',
+  internalTransfers: 'Przelewy własne',
+  ghostTransfersHidden: 'Ukryto {count} przelewów własnych',
+  ghostTransfersShown: 'Widoczne przelewy własne',
+  showInternalTransfers: 'Pokaż przelewy własne',
+  hideInternalTransfers: 'Ukryj przelewy własne',
+  transfersTabNotice:
+    'Przelewy własne między Twoimi kontami są wyłączone z przychodów i wydatków (tylko do odczytu).',
 
   insightTransactions: 'Transakcje',
   insightAvgTransaction: 'Średnia transakcja',

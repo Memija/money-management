@@ -121,6 +121,46 @@
   flex-shrink: 0;
 }
 
+/* Internal Transfer Banner */
+.internal-transfer-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.internal-transfer-banner>svg {
+  color: #818cf8;
+  flex-shrink: 0;
+}
+
+/* Space Transfer Excluded Banner */
+.space-transfer-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.space-transfer-banner>svg {
+  color: #60a5fa;
+  flex-shrink: 0;
+}
+
 /* Toolbar */
 .toolbar {
   display: flex;
@@ -462,6 +502,26 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.internal-transfer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: var(--text-dim);
+  font-size: 0.675rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.internal-transfer-pill>svg {
+  color: var(--text-dim);
+  flex-shrink: 0;
 }
 
 .row-date {

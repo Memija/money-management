@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import {
   ChevronLeft,
   ChevronRight,
+  Ghost,
   Receipt,
   RotateCcw,
   Search,
@@ -30,9 +31,12 @@ interface TransactionListProps {
   setSelectedInstitution: (val: string) => void
   sortOrder: 'newest' | 'oldest' | 'highest' | 'lowest'
   setSortOrder: (val: 'newest' | 'oldest' | 'highest' | 'lowest') => void
+  showGhost?: boolean
+  setShowGhost?: (val: boolean) => void
+  ghostCount?: number
 }
 
-type TypeFilter = 'all' | 'income' | 'expense'
+type TypeFilter = 'all' | 'income' | 'expense' | 'transfers'
 
 const DEFAULT_PAGE_SIZE = 10
 
@@ -45,6 +49,9 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   setSelectedInstitution,
   sortOrder,
   setSortOrder,
+  showGhost = false,
+  setShowGhost,
+  ghostCount = 0,
 }) => {
   const t = useLanguageStore((s) => s.t)
   const customCategories = useAppStore((s) => s.customCategories)
@@ -57,14 +64,22 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE)
   const [currentPage, setCurrentPage] = useState<number>(1)
 
-  // Calculate summary counts & values
-  const { incomeCount, expenseCount, netBalance } = useMemo(() => {
+  const normalTx = useMemo(() => filteredTx.filter((tx) => !tx.isGhost), [filteredTx])
+  const ghostTx = useMemo(() => filteredTx.filter((tx) => tx.isGhost), [filteredTx])
+
+  // Calculate summary counts & values (excluding internal ghost transfers from financial totals)
+  const { incomeCount, expenseCount, netBalance, visibleGhostCount } = useMemo(() => {
     let incCount = 0
     let expCount = 0
     let incTot = 0
     let expTot = 0
+    let ghosts = 0
 
     for (const tx of filteredTx) {
+      if (tx.isGhost) {
+        ghosts++
+        continue
+      }
       const amt = Math.abs(tx.amount)
       if (tx.type === 'income') {
         incCount++
@@ -81,14 +96,17 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       incomeTotal: incTot,
       expenseTotal: expTot,
       netBalance: incTot - expTot,
+      visibleGhostCount: ghosts,
     }
   }, [filteredTx])
 
-  // Filter transactions by Type (All / Income / Expense)
+  // Filter transactions by Type (All / Income / Expense / Transfers)
+  // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', or 'expense'!
   const effectiveTx = useMemo(() => {
-    if (typeFilter === 'all') return filteredTx
-    return filteredTx.filter((tx) => tx.type === typeFilter)
-  }, [filteredTx, typeFilter])
+    if (typeFilter === 'all') return normalTx
+    if (typeFilter === 'transfers') return ghostTx
+    return normalTx.filter((tx) => tx.type === typeFilter)
+  }, [normalTx, ghostTx, typeFilter])
 
   // Total pages and sliced page transactions
   const totalPages = Math.max(1, Math.ceil(effectiveTx.length / pageSize))
@@ -150,18 +168,31 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
         <div className={styles.statPillsGroup}>
           <div className={styles.statPill}>
-            <span className={styles.statLabel}>{t.all}</span>
-            <span className={styles.statValue}>{filteredTx.length}</span>
+            <span className={styles.statLabel}>
+              {typeFilter === 'transfers' ? (t.internalTransfers || 'Transfers') : t.all}
+            </span>
+            <span className={styles.statValue}>
+              {typeFilter === 'transfers' ? (ghostCount || visibleGhostCount) : normalTx.length}
+            </span>
           </div>
           <div className={styles.statPill}>
-            <span className={styles.statLabel}>{t.totalBalance || 'Total Balance'}</span>
+            <span className={styles.statLabel}>
+              {typeFilter === 'transfers'
+                ? `${t.totalBalance || 'Total Balance'} (0 impact)`
+                : (t.totalBalance || 'Total Balance')}
+            </span>
             <span
               className={`${styles.statValue} ${
-                netBalance >= 0 ? styles.statIncome : styles.statExpense
+                typeFilter === 'transfers'
+                  ? styles.statNeutral
+                  : netBalance >= 0
+                    ? styles.statIncome
+                    : styles.statExpense
               }`}
             >
-              {netBalance >= 0 ? '+' : ''}
-              {formatCurrency(netBalance)}
+              {typeFilter === 'transfers'
+                ? formatCurrency(0)
+                : `${netBalance >= 0 ? '+' : ''}${formatCurrency(netBalance)}`}
             </span>
           </div>
         </div>
@@ -183,7 +214,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             }`}
           >
             {t.all || 'All'}
-            <span className={styles.typeBadge}>{filteredTx.length}</span>
+            <span className={styles.typeBadge}>{normalTx.length}</span>
           </button>
           <button
             type="button"
@@ -215,9 +246,66 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             {t.expenses || 'Expenses'}
             <span className={styles.typeBadge}>{expenseCount}</span>
           </button>
+          {(ghostCount > 0 || visibleGhostCount > 0) && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={typeFilter === 'transfers'}
+              onClick={() => {
+                setShowGhost?.(true)
+                setTypeFilter('transfers')
+                setCurrentPage(1)
+              }}
+              className={`${styles.typeFilterBtn} ${
+                typeFilter === 'transfers' ? styles.typeFilterBtnActive : ''
+              }`}
+            >
+              {t.internalTransfers || 'Transfers'}
+              <span className={styles.typeBadge}>{ghostCount || visibleGhostCount}</span>
+            </button>
+          )}
         </div>
 
         <div className={styles.controlsRight}>
+          {(ghostCount > 0 || visibleGhostCount > 0) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (typeFilter === 'transfers') {
+                  setTypeFilter('all')
+                  setShowGhost?.(false)
+                } else {
+                  setShowGhost?.(true)
+                  setTypeFilter('transfers')
+                }
+                setCurrentPage(1)
+              }}
+              className={`${styles.ghostToggleBtn} ${
+                typeFilter === 'transfers' || showGhost ? styles.ghostToggleBtnActive : ''
+              }`}
+              title={
+                typeFilter === 'transfers' || showGhost
+                  ? (t.hideInternalTransfers || 'Hide internal transfers')
+                  : (t.showInternalTransfers || 'Show internal transfers')
+              }
+              aria-label={
+                typeFilter === 'transfers' || showGhost
+                  ? (t.hideInternalTransfers || 'Hide internal transfers')
+                  : (t.showInternalTransfers || 'Show internal transfers')
+              }
+              aria-pressed={typeFilter === 'transfers' || showGhost}
+            >
+              <Ghost size={14} aria-hidden="true" />
+              <span>
+                {typeFilter === 'transfers'
+                  ? t.ghostTransfersShown
+                  : (t.ghostTransfersHidden || '{count} internal transfers hidden').replace(
+                      '{count}',
+                      String(ghostCount || visibleGhostCount),
+                    )}
+              </span>
+            </button>
+          )}
           <div className={styles.txSearchWrapper}>
             <Search size={15} className={styles.searchIcon} aria-hidden="true" />
             <input
@@ -300,6 +388,16 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
       {/* Transactions List */}
       <div className={styles.transactionList} data-testid="transaction-list">
+        {typeFilter === 'transfers' && (
+          <div className={styles.transfersNotice} data-testid="transfers-read-only-notice">
+            <Ghost size={16} aria-hidden="true" />
+            <span>
+              {t.transfersTabNotice ||
+                'Internal transfers between your accounts are excluded from income and expenses (read-only).'}
+            </span>
+          </div>
+        )}
+
         {pagedTx.map((tx) => (
           <TransactionItem
             key={tx.id}

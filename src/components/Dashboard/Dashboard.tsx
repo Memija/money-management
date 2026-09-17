@@ -57,6 +57,9 @@ const Dashboard: React.FC = () => {
     setSelectedInstitution,
     sortOrder,
     setSortOrder,
+    showGhost,
+    setShowGhost,
+    ghostCount,
   } = useTransactions(period)
 
   // Analytics — all derived data from one centralized hook
@@ -274,6 +277,9 @@ const Dashboard: React.FC = () => {
             setSelectedInstitution={setSelectedInstitution}
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
+            showGhost={showGhost}
+            setShowGhost={setShowGhost}
+            ghostCount={ghostCount}
           />
         </div>
         </main>

@@ -534,6 +534,37 @@ describe('rowsToTransactions', () => {
         type: 'income',
       })
     })
+
+    it('parses N26 CSV with Spaces and discards transactions between spaces', () => {
+      const rows = [
+        [
+          'Booking Date',
+          'Value Date',
+          'Partner Name',
+          'Partner Iban',
+          'Type',
+          'Payment Reference',
+          'Account Name',
+          'Amount (EUR)',
+          'Original Amount',
+          'Original Currency',
+          'Exchange Rate',
+        ],
+        // Internal transfer between spaces
+        ['2023-08-25', '2023-08-25', 'Main Account', '', 'Credit Transfer', 'Monthly Rule', 'Investment fund', '500.00', '', '', ''],
+        ['2023-08-25', '2023-08-25', 'Investment fund', '', 'Debit Transfer', 'Monthly Rule', 'Main Account', '-500.00', '', '', ''],
+        // Real card purchase
+        ['2023-08-28', '2023-08-28', 'WIZZ AIR UK', '', 'Presentment', '-', 'Main Account', '-79.99', '', '', ''],
+      ]
+      const txs = rowsToTransactions(rows, 'N26')
+      expect(txs).toHaveLength(1)
+      expect(txs[0]).toMatchObject({
+        date: '2023-08-28',
+        description: 'WIZZ AIR UK',
+        amount: -79.99,
+        type: 'expense',
+      })
+    })
   })
 
   // ── Volksbank ─────────────────────────────────────────────────────────────

@@ -1,5 +1,17 @@
 import type { Transaction } from '../../types'
+import { extractIbans } from '../account-transfers'
 import { generateId, inferType, parseAmount, parseDate } from './helpers'
+
+export function extractAccountIbansFromPaste(rawText: string): string[] {
+  const result = new Set<string>()
+  const headerMatch = rawText.match(/(?:iban|konto(?:nummer)?|account)[\s:]+([a-z]{2}\d{2}[a-z0-9\s]{11,32})/i)
+  if (headerMatch) {
+    for (const ib of extractIbans(headerMatch[1])) {
+      result.add(ib)
+    }
+  }
+  return Array.from(result)
+}
 import {
   ALL_ICON_PREFIX_RE,
   ALL_PROJECTED_DATE_RE,
@@ -141,13 +153,18 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
     }
   }
 
-  return rawTxs.map((r) => ({
-    id: generateId(),
-    date: r.date,
-    description: [r.partner, r.desc].filter(Boolean).join(' – ') || r.type || 'Unknown',
-    amount: r.amount,
-    currency: r.currency,
-    type: inferType(r.amount),
-    institution,
-  }))
+  return rawTxs.map((r) => {
+    const fullText = [r.partner, r.desc].filter(Boolean).join(' ')
+    const ibans = extractIbans(fullText)
+    return {
+      id: generateId(),
+      date: r.date,
+      description: [r.partner, r.desc].filter(Boolean).join(' – ') || r.type || 'Unknown',
+      amount: r.amount,
+      currency: r.currency,
+      type: inferType(r.amount),
+      institution,
+      counterpartyIban: ibans.length > 0 ? ibans[0] : undefined,
+    }
+  })
 }

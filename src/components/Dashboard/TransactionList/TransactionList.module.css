@@ -116,6 +116,10 @@
   color: #e11d48;
 }
 
+.statNeutral {
+  color: var(--text-dim);
+}
+
 /* ─────────────────────────────────────────────────
    Toolbar & Filters
 ───────────────────────────────────────────────── */
@@ -192,6 +196,48 @@
   flex-wrap: wrap;
   flex: 1;
   justify-content: flex-end;
+}
+
+.ghostToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 38px;
+  padding: 0 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ghostToggleBtn:hover {
+  background: rgba(148, 163, 184, 0.16);
+  color: var(--text-main);
+  border-color: rgba(148, 163, 184, 0.7);
+}
+
+.ghostToggleBtnActive {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.5);
+  color: var(--primary);
+}
+
+.transfersNotice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin-bottom: 0.25rem;
 }
 
 .txSearchWrapper {
@@ -581,4 +627,54 @@
     align-items: center;
     gap: 0.5rem;
   }
+}
+
+.ghostToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.775rem;
+  font-weight: 500;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.ghostToggleBtn:hover {
+  background: rgba(148, 163, 184, 0.16);
+  border-color: rgba(148, 163, 184, 0.4);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.ghostToggleBtnActive {
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(99, 102, 241, 0.45);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.15);
+}
+
+[data-theme='light'] .ghostToggleBtn {
+  background: rgba(100, 116, 139, 0.08);
+  border-color: rgba(100, 116, 139, 0.2);
+  color: #475569;
+}
+
+[data-theme='light'] .ghostToggleBtn:hover {
+  background: rgba(100, 116, 139, 0.15);
+  border-color: rgba(100, 116, 139, 0.35);
+  color: #0f172a;
+}
+
+[data-theme='light'] .ghostToggleBtnActive {
+  background: rgba(79, 70, 229, 0.12);
+  border-color: rgba(79, 70, 229, 0.35);
+  color: #4f46e5;
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.1);
 }

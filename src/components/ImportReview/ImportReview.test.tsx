@@ -46,6 +46,11 @@ vi.mock('../../store/useLanguageStore', () => ({
         imported: 'Imported',
         addAnotherInstitution: 'Add Another',
         proceedToAnalysis: 'Proceed',
+        internalTransfersReconciledTitle: 'Internal Transfers Reconciled',
+        internalTransfersReconciledDesc: '{count} transfers between your accounts were recognized, excluded from income and expenses, and hidden from standard views.',
+        internalTransfersReconciledDescSingular: '1 transfer between your accounts was recognized, excluded from income and expenses, and hidden from standard views.',
+        accountInternalTransfers: '{count} internal transfers',
+        accountInternalTransfersSingular: '1 internal transfer',
       } as unknown as TranslationStrings,
     }
     return typeof selector === 'function' ? selector(state as LanguageState) : state
@@ -200,5 +205,146 @@ describe('ImportReview', () => {
 
     expect(screen.getAllByText('0').length).toBeGreaterThanOrEqual(2) // Institutions and Transactions
     expect(screen.getAllByText('€0').length).toBe(2) // Income and Expense
+  })
+
+  it('renders reconciliation card and account badges when accounts have internal transfers', () => {
+    mockState.importedAccounts = [
+      {
+        institutionId: '1',
+        institutionName: 'Bank A',
+        importedAt: new Date('2024-01-01T10:00:00').toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 't1',
+            amount: -100,
+            type: 'expense',
+            date: '2024-01-01',
+            description: 'Transfer to Bank B',
+            currency: 'EUR',
+            institution: 'Bank A',
+            isGhost: true,
+            linkedTransactionId: 't2',
+          },
+          {
+            id: 't-normal',
+            amount: 500,
+            type: 'income',
+            date: '2024-01-01',
+            description: 'Salary',
+            currency: 'EUR',
+            institution: 'Bank A',
+          },
+        ],
+      },
+      {
+        institutionId: '2',
+        institutionName: 'Bank B',
+        importedAt: new Date('2024-01-01T11:00:00').toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 't2',
+            amount: 100,
+            type: 'income',
+            date: '2024-01-01',
+            description: 'Transfer from Bank A',
+            currency: 'EUR',
+            institution: 'Bank B',
+            isGhost: true,
+            linkedTransactionId: 't1',
+          },
+        ],
+      },
+    ]
+
+    render(<ImportReview />)
+
+    expect(screen.getByTestId('internal-transfers-reconciliation-card')).toBeInTheDocument()
+    expect(screen.getByText('Internal Transfers Reconciled')).toBeInTheDocument()
+    expect(
+      screen.getByText(/1 transfer between your accounts was recognized/i),
+    ).toBeInTheDocument()
+
+    // Both accounts should have internal transfer badges
+    expect(screen.getAllByText(/1 internal transfer/i)).toHaveLength(2)
+
+    // Income and expense calculations exclude ghost transactions:
+    // Only t-normal (500 income) is counted
+    expect(screen.getByText('€500')).toBeInTheDocument()
+    expect(screen.getByText('€0')).toBeInTheDocument() // expenses = 0
+  })
+
+  it('correctly counts 2 transfer pairs from 4 ghost transactions across accounts', () => {
+    mockState.importedAccounts = [
+      {
+        institutionId: '1',
+        institutionName: 'Bank A',
+        importedAt: new Date('2024-01-01T10:00:00').toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 'a1',
+            amount: -100,
+            type: 'expense',
+            date: '2024-01-01',
+            description: 'Transfer 1',
+            currency: 'EUR',
+            institution: 'Bank A',
+            isGhost: true,
+            linkedTransactionId: 'b1',
+          },
+          {
+            id: 'a2',
+            amount: -200,
+            type: 'expense',
+            date: '2024-01-02',
+            description: 'Transfer 2',
+            currency: 'EUR',
+            institution: 'Bank A',
+            isGhost: true,
+            linkedTransactionId: 'b2',
+          },
+        ],
+      },
+      {
+        institutionId: '2',
+        institutionName: 'Bank B',
+        importedAt: new Date('2024-01-01T11:00:00').toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 'b1',
+            amount: 100,
+            type: 'income',
+            date: '2024-01-01',
+            description: 'Transfer 1 inbound',
+            currency: 'EUR',
+            institution: 'Bank B',
+            isGhost: true,
+            linkedTransactionId: 'a1',
+          },
+          {
+            id: 'b2',
+            amount: 200,
+            type: 'income',
+            date: '2024-01-02',
+            description: 'Transfer 2 inbound',
+            currency: 'EUR',
+            institution: 'Bank B',
+            isGhost: true,
+            linkedTransactionId: 'a2',
+          },
+        ],
+      },
+    ]
+
+    render(<ImportReview />)
+
+    // 4 ghost transactions across 2 accounts form exactly 2 transfer pairs
+    expect(
+      screen.getByText(/2 transfers between your accounts were recognized/i),
+    ).toBeInTheDocument()
+    expect(screen.getAllByText(/2 internal transfers/i)).toHaveLength(2)
   })
 })

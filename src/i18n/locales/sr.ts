@@ -123,6 +123,28 @@ export const sr: TranslationStrings = {
   duplicateTransactionsDetected:
     'Откривено {count} дупликатних трансакција (означене жутом бојом).',
 
+  spaceTransfersExcluded:
+    '{count} интерних преноса између простора (Spaces) је аутоматски искључено ради избегавања двоструког рачунања.',
+  spaceTransfersExcludedSingular:
+    '1 интерни пренос између простора (Spaces) је аутоматски искључен ради избегавања двоструког рачунања.',
+  internalTransfersDetectedSingular:
+    'Откривен је 1 интерни пренос са вашим другим рачунима (искључен из прихода/расхода и сакривен из стандардних прегледа).',
+  internalTransfersDetected:
+    'Откривено је {count} интерних преноса са вашим другим рачунима (искључени из прихода/расхода и сакривени из стандардних прегледа).',
+  internalTransfersDetectedBannerSingular:
+    'Откривен је 1 интерни пренос између ваших рачуна (означен ознаком интерног преноса).',
+  internalTransfersDetectedBanner:
+    'Откривено је {count} интерних преноса између ваших рачуна (означени ознаком интерног преноса).',
+  internalTransfersReconciledTitle: 'Интерни преноси усклађени',
+  internalTransfersReconciledDesc:
+    '{count} преноса између ваших рачуна је препознато, искључено из прихода и расхода и сакривено из стандардних прегледа ради тачне аналитике.',
+  internalTransfersReconciledDescSingular:
+    '1 пренос између ваших рачуна је препознат, искључен из прихода и расхода и сакривен из стандардних прегледа ради тачне аналитике.',
+  accountInternalTransfers: '{count} интерних преноса',
+  accountInternalTransfersSingular: '1 интерни пренос',
+  inflows: 'Приливи',
+  outflows: 'Одливи',
+
   importSuccessTitle: 'Увоз успешан!',
   importSuccessSubtitle:
     'Ваше трансакције су увезене. Можете додати више институција или наставити са анализом.',
@@ -160,6 +182,14 @@ export const sr: TranslationStrings = {
   showingOf: 'Приказано {shown} од {total} трансакција',
   noTransactionsMatch: 'Ниједна трансакција не одговара претраживању.',
   perPage: 'По страници:',
+  internalTransfer: 'Интерни пренос',
+  internalTransfers: 'Интерни преноси',
+  ghostTransfersHidden: '{count} интерних преноса скривено',
+  ghostTransfersShown: 'Приказани интерни преноси',
+  showInternalTransfers: 'Прикажи интерне преносе',
+  hideInternalTransfers: 'Сакриј интерне преносе',
+  transfersTabNotice:
+    'Интерни преноси између ваших рачуна су искључени из прихода и расхода (само за читање).',
 
   insightTransactions: 'Трансакције',
   insightAvgTransaction: 'Просечна трансакција',

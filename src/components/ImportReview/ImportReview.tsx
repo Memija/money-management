@@ -5,6 +5,7 @@ import {
   Building2,
   Calendar,
   CheckCircle2,
+  Ghost,
   Plus,
   TrendingDown,
   TrendingUp,
@@ -24,16 +25,39 @@ const ImportReview: React.FC = () => {
   const intlLocale = locale === 'bs' || locale === 'sr' ? 'de-DE' : locale
 
   const totalTransactions = importedAccounts.reduce((sum, acc) => sum + acc.transactions.length, 0)
+  const totalInternalTransfers = React.useMemo(() => {
+    const countedPairKeys = new Set<string>()
+    let count = 0
+
+    for (const acc of importedAccounts) {
+      for (const tx of acc.transactions) {
+        if (!tx.isGhost) continue
+        if (tx.linkedTransactionId) {
+          const pairKey = [tx.id, tx.linkedTransactionId].sort().join(':')
+          if (!countedPairKeys.has(pairKey)) {
+            countedPairKeys.add(pairKey)
+            count++
+          }
+        } else {
+          count++
+        }
+      }
+    }
+    return count
+  }, [importedAccounts])
   const totalIncome = importedAccounts.reduce(
     (sum, acc) =>
-      sum + acc.transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0),
+      sum +
+      acc.transactions
+        .filter((t) => t.type === 'income' && !t.isGhost)
+        .reduce((s, t) => s + t.amount, 0),
     0,
   )
   const totalExpenses = importedAccounts.reduce(
     (sum, acc) =>
       sum +
       acc.transactions
-        .filter((t) => t.type === 'expense')
+        .filter((t) => t.type === 'expense' && !t.isGhost)
         .reduce((s, t) => s + Math.abs(t.amount), 0),
     0,
   )
@@ -114,34 +138,69 @@ const ImportReview: React.FC = () => {
         </motion.div>
       </div>
 
+      {/* Internal Transfers Reconciliation Notice */}
+      {totalInternalTransfers > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28 }}
+          className={styles['reconciliation-card']}
+          data-testid="internal-transfers-reconciliation-card"
+        >
+          <div className={styles['reconciliation-icon-box']}>
+            <Ghost size={20} />
+          </div>
+          <div className={styles['reconciliation-content']}>
+            <h2 className={styles['reconciliation-title']}>{t.internalTransfersReconciledTitle}</h2>
+            <p className={styles['reconciliation-desc']}>
+              {totalInternalTransfers === 1
+                ? t.internalTransfersReconciledDescSingular
+                : t.internalTransfersReconciledDesc.replace('{count}', String(totalInternalTransfers))}
+            </p>
+          </div>
+        </motion.div>
+      )}
+
       {/* Imported Accounts List */}
       <div className={styles['imported-accounts-list']}>
-        {importedAccounts.map((acc, idx) => (
-          <motion.div
-            key={acc.institutionId}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 + idx * 0.05 }}
-            className={styles['imported-account-card']}
-          >
-            <div className={styles['imported-account-left']}>
-              <div className={styles['imported-account-icon']}>
-                <Building2 size={18} />
+        {importedAccounts.map((acc, idx) => {
+          const internalCount = acc.transactions.filter((tx) => tx.isGhost).length
+
+          return (
+            <motion.div
+              key={acc.institutionId}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 + idx * 0.05 }}
+              className={styles['imported-account-card']}
+            >
+              <div className={styles['imported-account-left']}>
+                <div className={styles['imported-account-icon']}>
+                  <Building2 size={18} />
+                </div>
+                <div>
+                  <p className={styles['imported-account-name']}>{acc.institutionName}</p>
+                  <p className={styles['imported-account-meta']}>
+                    {formatTransactionCount(acc.transactions.length)} • {t.imported}{' '}
+                    {new Date(acc.importedAt).toLocaleTimeString(intlLocale, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                    {internalCount > 0 && (
+                      <span className={styles['account-internal-badge']}>
+                        • <Ghost size={11} aria-hidden="true" />
+                        {internalCount === 1
+                          ? t.accountInternalTransfersSingular
+                          : t.accountInternalTransfers.replace('{count}', String(internalCount))}
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className={styles['imported-account-name']}>{acc.institutionName}</p>
-                <p className={styles['imported-account-meta']}>
-                  {formatTransactionCount(acc.transactions.length)} • {t.imported}{' '}
-                  {new Date(acc.importedAt).toLocaleTimeString(intlLocale, {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-              </div>
-            </div>
-            <CheckCircle2 size={18} className={styles['imported-check']} />
-          </motion.div>
-        ))}
+              <CheckCircle2 size={18} className={styles['imported-check']} />
+            </motion.div>
+          )
+        })}
       </div>
 
       {/* Action Buttons */}

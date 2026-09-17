@@ -83,6 +83,7 @@ describe('useAppStore', () => {
       ],
       importedAt: new Date().toISOString(),
       importedFingerprints: ['fp-jan'],
+      accountIbans: ['DE11111111111111111111'],
     }
     const secondImport: ImportedAccount = {
       institutionId: 'chase',
@@ -100,6 +101,7 @@ describe('useAppStore', () => {
       ],
       importedAt: new Date().toISOString(),
       importedFingerprints: ['fp-feb'],
+      accountIbans: ['DE22222222222222222222'],
     }
 
     useAppStore.getState().addImportedAccount(firstImport)
@@ -114,6 +116,10 @@ describe('useAppStore', () => {
     // Both fingerprints should be tracked
     expect(state.importedAccounts[0].importedFingerprints).toEqual(
       expect.arrayContaining(['fp-jan', 'fp-feb']),
+    )
+    // Both account IBANs should be merged
+    expect(state.importedAccounts[0].accountIbans).toEqual(
+      expect.arrayContaining(['DE11111111111111111111', 'DE22222222222222222222']),
     )
   })
 
@@ -337,5 +343,61 @@ describe('useAppStore', () => {
 
     expect(localStorage.getItem('mm-theme-preference')).toBeNull()
     expect(localStorage.getItem('mm-language-preference')).toBeNull()
+  })
+
+  it('should automatically reconcile cross-account transfers and mark ghosts across imported accounts', () => {
+    const acc1: ImportedAccount = {
+      institutionId: 'cb',
+      institutionName: 'Commerzbank',
+      transactions: [
+        {
+          id: 'cb-tx-1',
+          date: '2026-08-20',
+          description: 'ANEL MEMIC N26 Transfer',
+          amount: -500,
+          currency: 'EUR',
+          type: 'expense',
+          institution: 'Commerzbank',
+        },
+      ],
+      importedAt: '2026-09-15T10:00:00Z',
+      importedFingerprints: ['fp-cb'],
+    }
+
+    useAppStore.getState().addImportedAccount(acc1)
+
+    // Initially not ghost since only 1 account exists
+    expect(useAppStore.getState().importedAccounts[0].transactions[0].isGhost).toBeFalsy()
+
+    // Import 2nd account with matching reciprocal transaction
+    const acc2: ImportedAccount = {
+      institutionId: 'n26',
+      institutionName: 'N26',
+      transactions: [
+        {
+          id: 'n26-tx-1',
+          date: '2026-08-21',
+          description: 'ANEL MEMIC Commerzbank',
+          amount: 500,
+          currency: 'EUR',
+          type: 'income',
+          institution: 'N26',
+        },
+      ],
+      importedAt: '2026-09-15T10:05:00Z',
+      importedFingerprints: ['fp-n26'],
+    }
+
+    useAppStore.getState().addImportedAccount(acc2)
+
+    const accounts = useAppStore.getState().importedAccounts
+    const cbTx = accounts[0].transactions[0]
+    const n26Tx = accounts[1].transactions[0]
+
+    expect(cbTx.isGhost).toBe(true)
+    expect(cbTx.linkedTransactionId).toBe('n26-tx-1')
+
+    expect(n26Tx.isGhost).toBe(true)
+    expect(n26Tx.linkedTransactionId).toBe('cb-tx-1')
   })
 })

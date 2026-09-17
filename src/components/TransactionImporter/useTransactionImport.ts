@@ -4,12 +4,17 @@ import * as XLSX from 'xlsx'
 
 import type { TranslationStrings } from '../../i18n/types'
 import type { ImportMethod, Transaction } from '../../types'
+import { filterInternalSpaceTransfers } from '../../utils/account-transfers'
 import { computeImportFingerprint } from '../../utils/import-fingerprint'
+import { splitCsvLine } from '../../utils/parsers/helpers'
 import {
+  extractAccountIbansFromPaste,
+  extractAccountIbansFromPdf,
   parseBankStatementPaste,
   parsePdfText,
-  rowsToTransactions,
+  rowsToTransactionsWithMeta,
 } from '../../utils/transaction-parsers'
+
 
 export const useTransactionImport = (
   institutionName: string,
@@ -17,6 +22,8 @@ export const useTransactionImport = (
   t?: TranslationStrings,
 ) => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [discardedSpaceCount, setDiscardedSpaceCount] = useState(0)
+  const [detectedAccountIbans, setDetectedAccountIbans] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
@@ -27,6 +34,8 @@ export const useTransactionImport = (
       setLoading(true)
       setError(null)
       setFileName(file.name)
+      setDiscardedSpaceCount(0)
+      setDetectedAccountIbans([])
 
       try {
         if (method === 'spreadsheet' || file.name.match(/\.(xlsx|xls|csv)$/i)) {
@@ -36,10 +45,13 @@ export const useTransactionImport = (
             const sheetName = workbook.SheetNames[0]
             const sheet = workbook.Sheets[sheetName]
             const rows: string[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 })
-            const txs = rowsToTransactions(rows, institutionName)
+            const { transactions: txs, discardedSpaceCount: spaceCount, detectedAccountIbans: ibans } =
+              rowsToTransactionsWithMeta(rows, institutionName, t)
             if (txs.length === 0)
               throw new Error(t?.errorNoTransactionsInFile || 'No transactions found in the file.')
             setTransactions(txs)
+            setDiscardedSpaceCount(spaceCount)
+            setDetectedAccountIbans(ibans ?? [])
           } else {
             // Read as binary buffer so we can detect and handle encoding ourselves
             const buffer = await file.arrayBuffer()
@@ -61,17 +73,15 @@ export const useTransactionImport = (
             const rows = text
               .trim()
               .split('\n')
-              // Strip trailing \r (CRLF) and split into cells, unquoting each
-              .map((line) =>
-                line
-                  .replace(/\r$/, '')
-                  .split(sep)
-                  .map((cell) => cell.replace(/^"|"$/g, '').trim()),
-              )
-            const txs = rowsToTransactions(rows, institutionName)
+              // Strip trailing \r (CRLF) and split into cells using quote-aware parser
+              .map((line) => splitCsvLine(line.replace(/\r$/, ''), sep))
+            const { transactions: txs, discardedSpaceCount: spaceCount, detectedAccountIbans: ibans } =
+              rowsToTransactionsWithMeta(rows, institutionName, t)
             if (txs.length === 0)
               throw new Error(t?.errorNoTransactionsInCSV || 'No transactions found in the CSV.')
             setTransactions(txs)
+            setDiscardedSpaceCount(spaceCount)
+            setDetectedAccountIbans(ibans ?? [])
           }
         } else if (method === 'pdf' || file.name.match(/\.pdf$/i)) {
           // Dynamically import pdfjs
@@ -96,13 +106,19 @@ export const useTransactionImport = (
                 'Could not auto-detect transactions in this PDF. Try exporting as CSV or Excel from your bank portal instead.',
             )
           }
-          setTransactions(txLines)
+          const { transactions: filteredTxs, discardedSpaceCount: spaceCount } =
+            filterInternalSpaceTransfers(txLines)
+          setTransactions(filteredTxs)
+          setDiscardedSpaceCount(spaceCount)
+          const detectedIbans = extractAccountIbansFromPdf(fullText, file.name)
+          setDetectedAccountIbans(detectedIbans)
         }
       } catch (err: unknown) {
         setError(
           err instanceof Error ? err.message : t?.errorProcessFile || 'Failed to process file.',
         )
         setTransactions([])
+        setDiscardedSpaceCount(0)
       } finally {
         setLoading(false)
       }
@@ -113,11 +129,17 @@ export const useTransactionImport = (
   const handlePaste = useCallback(() => {
     setLoading(true)
     setError(null)
+    setDiscardedSpaceCount(0)
     try {
       // Strategy 1: German bank portal format (multi-line structured copy-paste)
       const bankTxs = parseBankStatementPaste(pasteText, institutionName)
       if (bankTxs.length > 0) {
-        setTransactions(bankTxs)
+        const { transactions: filteredTxs, discardedSpaceCount: spaceCount } =
+          filterInternalSpaceTransfers(bankTxs)
+        setTransactions(filteredTxs)
+        setDiscardedSpaceCount(spaceCount)
+        const detectedIbans = extractAccountIbansFromPaste(pasteText)
+        setDetectedAccountIbans(detectedIbans)
         return
       }
 
@@ -130,8 +152,9 @@ export const useTransactionImport = (
         )
       }
       const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ','
-      const rows = lines.map((l) => l.split(sep).map((c) => c.replace(/^"|"$/g, '').trim()))
-      const csvTxs = rowsToTransactions(rows, institutionName, t)
+      const rows = lines.map((l) => splitCsvLine(l.replace(/\r$/, ''), sep))
+      const { transactions: csvTxs, discardedSpaceCount: spaceCount, detectedAccountIbans: ibans } =
+        rowsToTransactionsWithMeta(rows, institutionName, t)
       if (csvTxs.length === 0) {
         throw new Error(
           t?.errorParsePaste ||
@@ -139,12 +162,16 @@ export const useTransactionImport = (
         )
       }
       setTransactions(csvTxs)
+      setDiscardedSpaceCount(spaceCount)
+      setDetectedAccountIbans(ibans ?? [])
     } catch (err: unknown) {
       setError(
         err instanceof Error
           ? err.message
           : t?.errorParsePastedData || 'Failed to parse pasted data.',
       )
+      setDiscardedSpaceCount(0)
+      setDetectedAccountIbans([])
     } finally {
       setLoading(false)
     }
@@ -160,6 +187,8 @@ export const useTransactionImport = (
 
   const handleClearAll = useCallback(() => {
     setTransactions([])
+    setDiscardedSpaceCount(0)
+    setDetectedAccountIbans([])
     setFileName(null)
     setPasteText('')
   }, [])
@@ -171,6 +200,8 @@ export const useTransactionImport = (
 
   return {
     transactions,
+    discardedSpaceCount,
+    detectedAccountIbans,
     loading,
     error,
     fileName,

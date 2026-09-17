@@ -122,6 +122,28 @@ export const en: TranslationStrings = {
     '1 duplicate transaction detected (highlighted in yellow).',
   duplicateTransactionsDetected: '{count} duplicate transactions detected (highlighted in yellow).',
 
+  spaceTransfersExcluded:
+    '{count} internal space transfers were automatically excluded to prevent double counting.',
+  spaceTransfersExcludedSingular:
+    '1 internal space transfer was automatically excluded to prevent double counting.',
+  internalTransfersDetectedSingular:
+    '1 internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
+  internalTransfersDetected:
+    '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
+  internalTransfersDetectedBannerSingular:
+    '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
+  internalTransfersDetectedBanner:
+    '{count} internal transfers between your accounts detected (marked with an internal transfer badge).',
+  internalTransfersReconciledTitle: 'Internal Transfers Reconciled',
+  internalTransfersReconciledDesc:
+    '{count} transfers between your accounts were recognized, excluded from income and expenses, and hidden from standard views.',
+  internalTransfersReconciledDescSingular:
+    '1 transfer between your accounts was recognized, excluded from income and expenses, and hidden from standard views.',
+  accountInternalTransfers: '{count} internal transfers',
+  accountInternalTransfersSingular: '1 internal transfer',
+  inflows: 'Inflows',
+  outflows: 'Outflows',
+
   importSuccessTitle: 'Import Successful!',
   importSuccessSubtitle:
     'Your transactions have been imported. You can add more institutions or proceed to analysis.',
@@ -159,6 +181,14 @@ export const en: TranslationStrings = {
   showingOf: 'Showing {shown} of {total} transactions',
   noTransactionsMatch: 'No transactions match your search.',
   perPage: 'Per page:',
+  internalTransfer: 'Internal Transfer',
+  internalTransfers: 'Internal Transfers',
+  ghostTransfersHidden: '{count} internal transfers hidden',
+  ghostTransfersShown: 'Showing internal transfers',
+  showInternalTransfers: 'Show internal transfers',
+  hideInternalTransfers: 'Hide internal transfers',
+  transfersTabNotice:
+    'Internal transfers between your accounts are excluded from income and expenses (read-only).',
 
   insightTransactions: 'Transactions',
   insightAvgTransaction: 'Average Transaction',

@@ -30,6 +30,10 @@ vi.mock('../../../store/useLanguageStore', () => ({
         toDate: 'To date',
         transactionCountSingular: '{count} transaction',
         transactionCountPlural: '{count} transactions',
+        spaceTransfersExcluded: '{count} transactions between spaces were automatically excluded.',
+        spaceTransfersExcludedSingular: '1 transaction between spaces was automatically excluded.',
+        inflows: 'Inflows',
+        outflows: 'Outflows',
       },
     }
     return selector ? selector(state) : state
@@ -168,6 +172,28 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.getByText('Duplicate')).toBeInTheDocument()
   })
 
+  it('highlights internal transfer transactions with badge and banner', () => {
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        internalTransferIds={new Set(['tx-2'])}
+      />,
+    )
+    expect(screen.getByTestId('preview-internal-transfers-banner')).toBeInTheDocument()
+    expect(screen.getByText('Internal Transfer')).toBeInTheDocument()
+  })
+
+  it('renders space transfers excluded banner when discardedSpaceCount is provided', () => {
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        discardedSpaceCount={4}
+      />,
+    )
+    expect(screen.getByTestId('preview-space-transfers-banner')).toBeInTheDocument()
+    expect(screen.getByText(/4 transactions between spaces were automatically excluded/i)).toBeInTheDocument()
+  })
+
   it('renders inline editable inputs when onUpdateTransaction is provided', () => {
     const onUpdate = vi.fn()
     render(<TransactionPreviewModal {...defaultProps} onUpdateTransaction={onUpdate} />)
@@ -242,4 +268,87 @@ describe('TransactionPreviewModal (Shared)', () => {
     // Single transaction item is still displayed cleanly
     expect(screen.getByText('Salary Employer')).toBeInTheDocument()
   })
+
+  it('renders both inflow and outflow chips for mixed transactions', () => {
+    render(<TransactionPreviewModal {...defaultProps} />)
+    const inflowChip = screen.getByTestId('modal-total-inflow')
+    const outflowChip = screen.getByTestId('modal-total-outflow')
+
+    expect(inflowChip).toBeInTheDocument()
+    expect(inflowChip).toHaveTextContent(/3,500/)
+    expect(inflowChip).toHaveAttribute('title', expect.stringContaining('Inflows'))
+
+    expect(outflowChip).toBeInTheDocument()
+    expect(outflowChip).toHaveTextContent(/45.90/)
+    expect(outflowChip).toHaveAttribute('title', expect.stringContaining('Outflows'))
+  })
+
+  it('renders only inflow chip when variant is income', () => {
+    render(<TransactionPreviewModal {...defaultProps} variant="income" />)
+    expect(screen.getByTestId('modal-total-income')).toBeInTheDocument()
+    expect(screen.queryByTestId('modal-total-outflow')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('modal-total-expense')).not.toBeInTheDocument()
+  })
+
+  it('renders only outflow chip when variant is expense', () => {
+    render(<TransactionPreviewModal {...defaultProps} variant="expense" />)
+    expect(screen.getByTestId('modal-total-expense')).toBeInTheDocument()
+    expect(screen.queryByTestId('modal-total-inflow')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('modal-total-income')).not.toBeInTheDocument()
+  })
+
+  it('excludes internal transfers from inflow/outflow chips and renders them as read-only', () => {
+    const mockOnUpdate = vi.fn()
+    const mockOnRemove = vi.fn()
+
+    const transactionsWithTransfer: Transaction[] = [
+      {
+        id: 'tx-real-income',
+        date: '2024-01-15',
+        description: 'Salary',
+        amount: 2000,
+        currency: 'EUR',
+        type: 'income',
+        category: 'Income',
+        institution: 'Bank A',
+      },
+      {
+        id: 'tx-internal-transfer',
+        date: '2024-01-16',
+        description: 'Transfer to N26',
+        amount: -500,
+        currency: 'EUR',
+        type: 'expense',
+        institution: 'Bank A',
+        isGhost: true,
+      },
+    ]
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={transactionsWithTransfer}
+        internalTransferIds={new Set(['tx-internal-transfer'])}
+        onUpdateTransaction={mockOnUpdate}
+        onRemoveTransaction={mockOnRemove}
+      />,
+    )
+
+    // Inflow should be 2000, Outflow should be 0 (the -500 transfer is excluded)
+    const inflowChip = screen.getByTestId('modal-total-inflow')
+    const outflowChip = screen.getByTestId('modal-total-outflow')
+    expect(inflowChip).toHaveTextContent(/2,000/)
+    expect(outflowChip).toHaveTextContent(/0\.00/)
+
+    // The real transaction is editable
+    expect(screen.getByLabelText('Description', { selector: '#tx-desc-tx-real-income' })).toBeInTheDocument()
+
+    // The internal transfer is read-only (rendered as static text, not an input)
+    expect(screen.queryByLabelText('Description', { selector: '#tx-desc-tx-internal-transfer' })).not.toBeInTheDocument()
+    expect(screen.getByText('Transfer to N26')).toBeInTheDocument()
+
+    // Remove button should NOT exist for internal transfer
+    expect(screen.getAllByRole('button', { name: 'Remove transaction' })).toHaveLength(1)
+  })
 })
+

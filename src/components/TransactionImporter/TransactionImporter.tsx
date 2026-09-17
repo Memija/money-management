@@ -7,15 +7,20 @@ import {
   ClipboardPaste,
   FileSpreadsheet,
   FileType,
+  Ghost,
   Info,
   Loader2,
+  TrendingDown,
+  TrendingUp,
   Upload,
   X,
 } from 'lucide-react'
 
+import { useFormatters } from '../../hooks/useFormatters'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import type { ImportedAccount, ImportMethod } from '../../types'
+import { reconcileCrossAccountTransfers } from '../../utils/account-transfers'
 import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal'
 import { DuplicateImportWarningModal } from './DuplicateImportWarningModal'
 import { TransactionPreviewModal } from './TransactionPreviewModal'
@@ -27,6 +32,7 @@ import styles from './TransactionImporter.module.css'
 const TransactionImporter: React.FC = () => {
   const { selectedInstitution, addImportedAccount, setStep, getDuplicateTransactionStats, importedAccounts, cancelImport } = useAppStore()
   const t = useLanguageStore((s) => s.t)
+  const { formatCurrency } = useFormatters()
   const institutionName = selectedInstitution?.name ?? 'Unknown'
 
   const [method, setMethod] = useState<ImportMethod | null>(null)
@@ -38,6 +44,8 @@ const TransactionImporter: React.FC = () => {
 
   const {
     transactions,
+    discardedSpaceCount,
+    detectedAccountIbans,
     loading,
     error,
     fileName,
@@ -56,6 +64,52 @@ const TransactionImporter: React.FC = () => {
   const duplicateStats = React.useMemo(() => {
     return getDuplicateTransactionStats(selectedInstitution?.id ?? 'unknown', transactions || [])
   }, [selectedInstitution?.id, transactions, getDuplicateTransactionStats])
+
+  const internalTransferStats = React.useMemo(() => {
+    if (!transactions || transactions.length === 0 || !importedAccounts || importedAccounts.length === 0) {
+      return {
+        count: 0,
+        transferTxIds: new Set<string>(),
+      }
+    }
+
+    const draftAccount: ImportedAccount = {
+      institutionId: selectedInstitution?.id ?? 'draft',
+      institutionName,
+      transactions,
+      importedAt: new Date().toISOString(),
+      importedFingerprints: [],
+      accountIbans: detectedAccountIbans,
+    }
+
+    const reconciled = reconcileCrossAccountTransfers([...importedAccounts, draftAccount])
+    const reconciledDraft = reconciled[reconciled.length - 1]
+
+    const ghostTxs = reconciledDraft.transactions.filter((tx) => tx.isGhost)
+    const transferTxIds = new Set(ghostTxs.map((tx) => tx.id))
+
+    return {
+      count: transferTxIds.size,
+      transferTxIds,
+    }
+  }, [transactions, importedAccounts, selectedInstitution?.id, institutionName, detectedAccountIbans])
+
+  const importFlows = React.useMemo(() => {
+    let inflows = 0
+    let outflows = 0
+    for (const tx of transactions) {
+      if (tx.isGhost || internalTransferStats.transferTxIds.has(tx.id)) {
+        continue
+      }
+      const amt = Math.abs(tx.amount)
+      if (tx.type === 'income' || tx.amount > 0) {
+        inflows += amt
+      } else {
+        outflows += amt
+      }
+    }
+    return { inflows, outflows }
+  }, [transactions, internalTransferStats])
 
   /* ─── import method cards ─── */
   const importMethods: { key: ImportMethod; label: string; icon: React.ReactNode; desc: string }[] =
@@ -97,6 +151,7 @@ const TransactionImporter: React.FC = () => {
     transactions,
     importedAt: new Date().toISOString(),
     importedFingerprints: [importFingerprint],
+    accountIbans: detectedAccountIbans,
   })
 
   const handleConfirmImport = () => {
@@ -295,25 +350,45 @@ const TransactionImporter: React.FC = () => {
         >
           <div className={styles['import-preview-header']}>
             <div className={styles['import-preview-info']}>
-              <CheckCircle2 size={20} className={styles['success-icon']} />
-              <span>
-                {t.transactionsFound.includes('{count}') ? (
-                  (() => {
-                    const [before, after] = t.transactionsFound.split('{count}')
-                    return (
-                      <>
-                        {before}
-                        <strong>{transactions.length}</strong>
-                        {after}
-                      </>
-                    )
-                  })()
-                ) : (
-                  <>
-                    <strong>{transactions.length}</strong> {t.transactionsFound}
-                  </>
-                )}
-              </span>
+              <div className={styles['import-preview-title-row']}>
+                <CheckCircle2 size={20} className={styles['success-icon']} />
+                <span>
+                  {t.transactionsFound.includes('{count}') ? (
+                    (() => {
+                      const [before, after] = t.transactionsFound.split('{count}')
+                      return (
+                        <>
+                          {before}
+                          <strong>{transactions.length}</strong>
+                          {after}
+                        </>
+                      )
+                    })()
+                  ) : (
+                    <>
+                      <strong>{transactions.length}</strong> {t.transactionsFound}
+                    </>
+                  )}
+                </span>
+              </div>
+              <div className={styles['import-preview-flows']}>
+                <span
+                  className={styles['flow-badge-inflow']}
+                  title={`${t.inflows || 'Inflows'}: +${formatCurrency(importFlows.inflows)}`}
+                  data-testid="import-inflow-badge"
+                >
+                  <TrendingUp size={13} aria-hidden="true" />
+                  +{formatCurrency(importFlows.inflows)}
+                </span>
+                <span
+                  className={styles['flow-badge-outflow']}
+                  title={`${t.outflows || 'Outflows'}: -${formatCurrency(importFlows.outflows)}`}
+                  data-testid="import-outflow-badge"
+                >
+                  <TrendingDown size={13} aria-hidden="true" />
+                  -{formatCurrency(importFlows.outflows)}
+                </span>
+              </div>
             </div>
             <button
               className={styles['clear-button']}
@@ -324,6 +399,28 @@ const TransactionImporter: React.FC = () => {
               {t.clear}
             </button>
           </div>
+
+          {discardedSpaceCount > 0 && (
+            <div className={styles['transfer-info-banner']} data-testid="space-transfers-banner">
+              <Info size={16} className={styles['transfer-info-icon']} />
+              <span>
+                {discardedSpaceCount === 1
+                  ? t.spaceTransfersExcludedSingular
+                  : t.spaceTransfersExcluded.replace('{count}', String(discardedSpaceCount))}
+              </span>
+            </div>
+          )}
+
+          {internalTransferStats.count > 0 && (
+            <div className={styles['transfer-info-banner']} data-testid="internal-transfers-banner">
+              <Ghost size={16} className={styles['transfer-info-icon']} />
+              <span>
+                {internalTransferStats.count === 1
+                  ? t.internalTransfersDetectedSingular
+                  : t.internalTransfersDetected.replace('{count}', String(internalTransferStats.count))}
+              </span>
+            </div>
+          )}
 
           <div className={styles['action-buttons-container']}>
             <motion.button
@@ -355,6 +452,8 @@ const TransactionImporter: React.FC = () => {
         onClose={() => setIsPreviewOpen(false)}
         transactions={transactions}
         duplicateIds={new Set(duplicateStats.duplicateIds)}
+        internalTransferIds={internalTransferStats.transferTxIds}
+        discardedSpaceCount={discardedSpaceCount}
         onRemoveTransaction={handleRemoveTransaction}
         onUpdateTransaction={handleUpdateTransaction}
       />

@@ -11,6 +11,7 @@ export function useTransactions(period?: PeriodFilter) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedInstitution, setSelectedInstitution] = useState<string>('all')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest')
+  const [showGhost, setShowGhost] = useState(false)
 
   const allTransactions: Transaction[] = useMemo(() => {
     return importedAccounts.flatMap((a) =>
@@ -18,8 +19,22 @@ export function useTransactions(period?: PeriodFilter) {
     )
   }, [importedAccounts, customKeywords, manualCategories])
 
+  const ghostCount = useMemo(() => {
+    let txs = allTransactions
+    if (period && period.mode !== 'all') {
+      txs = filterByPeriod(txs, period)
+    }
+    if (selectedInstitution !== 'all') {
+      txs = txs.filter((t) => t.institution === selectedInstitution)
+    }
+    return txs.filter((t) => t.isGhost).length
+  }, [allTransactions, period, selectedInstitution])
+
   const filteredTx = useMemo(() => {
     let txs = allTransactions
+    if (!showGhost) {
+      txs = txs.filter((t) => !t.isGhost)
+    }
     if (period && period.mode !== 'all') {
       txs = filterByPeriod(txs, period)
     }
@@ -48,7 +63,7 @@ export function useTransactions(period?: PeriodFilter) {
         break
     }
     return txs
-  }, [allTransactions, selectedInstitution, searchTerm, sortOrder, period])
+  }, [allTransactions, showGhost, selectedInstitution, searchTerm, sortOrder, period])
 
   return {
     allTransactions,
@@ -59,5 +74,8 @@ export function useTransactions(period?: PeriodFilter) {
     setSelectedInstitution,
     sortOrder,
     setSortOrder,
+    showGhost,
+    setShowGhost,
+    ghostCount,
   }
 }

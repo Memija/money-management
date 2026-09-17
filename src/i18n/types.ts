@@ -147,6 +147,21 @@ export interface TranslationStrings {
   duplicateTransactionsDetectedSingular: string
   duplicateTransactionsDetected: string
 
+  // Internal & space transfers during import
+  spaceTransfersExcluded: string
+  spaceTransfersExcludedSingular: string
+  internalTransfersDetectedSingular: string
+  internalTransfersDetected: string
+  internalTransfersDetectedBannerSingular: string
+  internalTransfersDetectedBanner: string
+  internalTransfersReconciledTitle: string
+  internalTransfersReconciledDesc: string
+  internalTransfersReconciledDescSingular: string
+  accountInternalTransfers: string
+  accountInternalTransfersSingular: string
+  inflows: string
+  outflows: string
+
   // Import Review
   importSuccessTitle: string
   importSuccessSubtitle: string
@@ -185,6 +200,13 @@ export interface TranslationStrings {
   showingOf: string // "Showing {shown} of {total} transactions"
   noTransactionsMatch: string
   perPage: string
+  internalTransfer: string
+  internalTransfers: string
+  ghostTransfersHidden: string
+  ghostTransfersShown: string
+  showInternalTransfers: string
+  hideInternalTransfers: string
+  transfersTabNotice: string
 
   // Dashboard — Analytics enhancements
   insightTransactions: string

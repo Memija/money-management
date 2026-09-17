@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { parsePdfText } from '../pdf-parser'
+import { extractAccountIbansFromPdf, parsePdfText } from '../pdf-parser'
 
 vi.mock('../helpers', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../helpers')>()
@@ -173,5 +173,27 @@ describe('parsePdfText', () => {
     const result = parsePdfText(rawText, 'TestBank')
     expect(result).toHaveLength(1)
     expect(result[0].description).toBe('Gehalt ACME Corp')
+  })
+
+  it('extracts counterpartyIban when present in transaction description', () => {
+    const rawText = `
+    01.12.2023 02.12.2023 Transfer to DE89370400440532013000 -150,00 EUR
+    `
+    const result = parsePdfText(rawText, 'TestBank')
+    expect(result).toHaveLength(1)
+    expect(result[0].counterpartyIban).toBe('DE89370400440532013000')
+  })
+})
+
+describe('extractAccountIbansFromPdf', () => {
+  it('extracts IBAN from file name', () => {
+    const ibans = extractAccountIbansFromPdf('Some body text', 'Umsaetze_DE92500400000646293100_EUR.pdf')
+    expect(ibans).toContain('DE92500400000646293100')
+  })
+
+  it('extracts IBAN from header text', () => {
+    const text = 'Kontoauszug\nIBAN: DE35 1001 1001 2621 8280 92\nDatum: 01.01.2024'
+    const ibans = extractAccountIbansFromPdf(text)
+    expect(ibans).toContain('DE35100110012621828092')
   })
 })

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { parseBankStatementPaste } from '../paste-parser'
+import { extractAccountIbansFromPaste, parseBankStatementPaste } from '../paste-parser'
 
 vi.mock('../helpers', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../helpers')>()
@@ -132,5 +132,30 @@ Zinsen
     expect(result).toHaveLength(1)
     expect(result[0].description).toBe('Zinsen')
     expect(result[0].amount).toBe(1)
+  })
+
+  it('extracts counterpartyIban when present in paste description', () => {
+    const rawText = `
+01.01.2023
+Max Mustermann
+IBAN DE89370400440532013000
+Überweisung
+-50,00 EUR
+    `
+    const result = parseBankStatementPaste(rawText, 'TestBank')
+    expect(result).toHaveLength(1)
+    expect(result[0].counterpartyIban).toBe('DE89370400440532013000')
+  })
+})
+
+describe('extractAccountIbansFromPaste', () => {
+  it('extracts IBAN from header line', () => {
+    const rawText = `
+Konto: Girokonto
+IBAN: DE35 1001 1001 2621 8280 92
+Saldo: 1.000,00 EUR
+    `
+    const ibans = extractAccountIbansFromPaste(rawText)
+    expect(ibans).toContain('DE35100110012621828092')
   })
 })

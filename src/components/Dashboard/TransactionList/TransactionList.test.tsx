@@ -74,6 +74,14 @@ const mockTranslations = {
   transactions: 'Transactions',
   totalBalance: 'Total Balance',
   perPage: 'Per page:',
+  internalTransfer: 'Internal Transfer',
+  internalTransfers: 'Transfers',
+  ghostTransfersHidden: '{count} internal transfers hidden',
+  ghostTransfersShown: 'Showing internal transfers',
+  showInternalTransfers: 'Show internal transfers',
+  hideInternalTransfers: 'Hide internal transfers',
+  transfersTabNotice:
+    'Internal transfers between your accounts are excluded from income and expenses (read-only).',
 }
 
 const mockTransactions: Transaction[] = [
@@ -446,5 +454,140 @@ describe('TransactionList Component', () => {
     expect(screen.getByRole('button', { name: 'Page 14' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Page 2' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Page 8' })).not.toBeInTheDocument()
+  })
+
+  it('should display the ghost transfer toggle button when ghostCount > 0 and call setShowGhost on click', () => {
+    const setShowGhost = vi.fn()
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+        showGhost={false}
+        setShowGhost={setShowGhost}
+        ghostCount={5}
+      />
+    )
+
+    const toggleBtn = screen.getByRole('button', { name: 'Show internal transfers' })
+    expect(toggleBtn).toBeInTheDocument()
+    expect(toggleBtn).toHaveTextContent('5 internal transfers hidden')
+
+    fireEvent.click(toggleBtn)
+    expect(setShowGhost).toHaveBeenCalledWith(true)
+  })
+
+  it('should display the transfers tab and ghost transactions when showGhost is true', () => {
+    const transactionsWithGhost: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'tx-ghost-1',
+        date: '2023-01-03',
+        description: 'Internal Transfer to Bank B',
+        amount: -200,
+        currency: 'USD',
+        type: 'expense',
+        institution: 'Bank A',
+        isGhost: true,
+      },
+    ]
+
+    render(
+      <TransactionList
+        filteredTx={transactionsWithGhost}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+        showGhost={true}
+        setShowGhost={vi.fn()}
+        ghostCount={1}
+      />
+    )
+
+    // Transfers tab should be visible
+    const transfersTab = screen.getByRole('tab', { name: /Transfers/i })
+    expect(transfersTab).toBeInTheDocument()
+
+    // In 'All' tab by default, ghost transactions are NOT shown!
+    expect(screen.getByText('Groceries')).toBeInTheDocument()
+    expect(screen.queryByText('Internal Transfer to Bank B')).not.toBeInTheDocument()
+
+    // Clicking transfers tab should filter to only ghost transactions
+    fireEvent.click(transfersTab)
+    expect(screen.getByText('Internal Transfer to Bank B')).toBeInTheDocument()
+    expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
+
+    // In Transfers view, ghost transactions are strictly read-only
+    expect(screen.getByTestId('tx-ghost-readonly-tx-ghost-1')).toBeInTheDocument()
+    expect(screen.getByTestId('transfers-read-only-notice')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Internal transfers between your accounts are excluded from income and expenses (read-only).'
+      )
+    ).toBeInTheDocument()
+
+    // In Transfers view, calculation impact is €0.00 / 0 impact
+    expect(screen.getByText(/0 impact/i)).toBeInTheDocument()
+  })
+
+  it('never shows ghost transactions in income or expense tabs', () => {
+    const transactionsWithGhost: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'tx-ghost-exp',
+        date: '2023-01-03',
+        description: 'Internal Transfer Expense',
+        amount: -200,
+        currency: 'USD',
+        type: 'expense',
+        institution: 'Bank A',
+        isGhost: true,
+      },
+      {
+        id: 'tx-ghost-inc',
+        date: '2023-01-03',
+        description: 'Internal Transfer Income',
+        amount: 200,
+        currency: 'USD',
+        type: 'income',
+        institution: 'Bank B',
+        isGhost: true,
+      },
+    ]
+
+    render(
+      <TransactionList
+        filteredTx={transactionsWithGhost}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+        showGhost={true}
+        setShowGhost={vi.fn()}
+        ghostCount={2}
+      />
+    )
+
+    // Check Income tab
+    const incomeTab = screen.getByRole('tab', { name: /Income/i })
+    fireEvent.click(incomeTab)
+    expect(screen.queryByText('Internal Transfer Income')).not.toBeInTheDocument()
+
+    // Check Expense tab
+    const expenseTab = screen.getByRole('tab', { name: /Expenses/i })
+    fireEvent.click(expenseTab)
+    expect(screen.queryByText('Internal Transfer Expense')).not.toBeInTheDocument()
   })
 })

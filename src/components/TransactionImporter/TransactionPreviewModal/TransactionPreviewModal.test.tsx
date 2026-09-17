@@ -129,8 +129,8 @@ describe('TransactionPreviewModal', () => {
 
     // The amount formatting will output string with currency
     // Using partial match because of special whitespace/currency characters
-    const amount1 = screen.getByText(/\+.*3,500/i)
-    expect(amount1).toBeInTheDocument()
+    const amounts1 = screen.getAllByText(/\+.*3,500/i)
+    expect(amounts1.length).toBeGreaterThanOrEqual(1)
 
     // Check content of second transaction (expense)
     expect(screen.getByText('03/02/2026')).toBeInTheDocument()

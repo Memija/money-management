@@ -1,6 +1,23 @@
 import type { Transaction } from '../../types'
+import { extractIbans } from '../account-transfers'
 import { generateId, inferType, parseAmount, parseCurrency, parseDate } from './helpers'
 import { ALL_SUMMARY_KEYWORDS } from './parser-i18n'
+
+export function extractAccountIbansFromPdf(fullText: string, fileName?: string): string[] {
+  const result = new Set<string>()
+  if (fileName) {
+    for (const ib of extractIbans(fileName)) {
+      result.add(ib)
+    }
+  }
+  const headerMatch = fullText.match(/(?:iban|konto(?:nummer)?|account)[\s:]+([a-z]{2}\d{2}[a-z0-9\s]{11,32})/i)
+  if (headerMatch) {
+    for (const ib of extractIbans(headerMatch[1])) {
+      result.add(ib)
+    }
+  }
+  return Array.from(result)
+}
 
 function isSummaryLine(description: string): boolean {
   const lower = description.toLowerCase()
@@ -33,6 +50,7 @@ function parseDoubleDateStrategy(
     }
 
     const curr = parseCurrency(m[4])
+    const counterpartyIban = extractIbans(desc)[0] || undefined
 
     transactions.push({
       id: generateId(),
@@ -42,6 +60,7 @@ function parseDoubleDateStrategy(
       currency: curr,
       type: inferType(amount),
       institution,
+      counterpartyIban,
     })
   }
 
@@ -73,6 +92,7 @@ function parseSingleDateStrategy(
     }
 
     const curr = parseCurrency(m[4])
+    const counterpartyIban = extractIbans(desc)[0] || undefined
 
     transactions.push({
       id: generateId(),
@@ -82,6 +102,7 @@ function parseSingleDateStrategy(
       currency: curr,
       type: inferType(amount),
       institution,
+      counterpartyIban,
     })
   }
 
@@ -112,6 +133,7 @@ function parseFallbackStrategy(text: string, institution: string): Transaction[]
       }
 
       const curr = parseCurrency(aMatch[2])
+      const counterpartyIban = extractIbans(desc)[0] || undefined
 
       transactions.push({
         id: generateId(),
@@ -121,6 +143,7 @@ function parseFallbackStrategy(text: string, institution: string): Transaction[]
         currency: curr,
         type: inferType(amount),
         institution,
+        counterpartyIban,
       })
     }
   }

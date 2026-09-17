@@ -7,6 +7,8 @@ export interface ImportedAccount {
   importedAt: string
   /** All fingerprints ever imported for this institution (used for duplicate detection). */
   importedFingerprints: string[]
+  /** Known IBAN(s) for this account. */
+  accountIbans?: string[]
 }
 
 export type ImportMethod = 'spreadsheet' | 'pdf' | 'paste'

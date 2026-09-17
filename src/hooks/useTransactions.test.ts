@@ -346,4 +346,29 @@ describe('useTransactions', () => {
     rerender({ period: { mode: 'all', value: '' } })
     expect(result.current.filteredTx).toHaveLength(3)
   })
+
+  // ---- Ghost / Internal transfers -----------------------------------------
+
+  it('should exclude ghost transactions by default and include them when showGhost is true', () => {
+    useAppStore.setState({
+      importedAccounts: [
+        makeAccount('bank-a', {
+          transactions: [
+            makeTx({ description: 'Real expense', isGhost: false }),
+            makeTx({ description: 'Ghost transfer', isGhost: true }),
+          ],
+        }),
+      ],
+    })
+
+    const { result } = renderHook(() => useTransactions())
+
+    expect(result.current.ghostCount).toBe(1)
+    expect(result.current.filteredTx).toHaveLength(1)
+    expect(result.current.filteredTx[0].description).toBe('Real expense')
+
+    act(() => result.current.setShowGhost(true))
+
+    expect(result.current.filteredTx).toHaveLength(2)
+  })
 })

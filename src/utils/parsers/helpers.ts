@@ -94,3 +94,28 @@ export function isValidDateRaw(raw: string): boolean {
   }
   return false
 }
+
+/**
+ * Splits a CSV or TSV line into cell values, respecting quotes so that separators
+ * inside quoted strings are not split.
+ */
+export function splitCsvLine(line: string, sep: string): string[] {
+  const result: string[] = []
+  let cur = ''
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i]
+    if (c === '"') {
+      inQuotes = !inQuotes
+    } else if (c === sep && !inQuotes) {
+      result.push(cur.trim().replace(/^"|"$/g, ''))
+      cur = ''
+    } else {
+      cur += c
+    }
+  }
+  result.push(cur.trim().replace(/^"|"$/g, ''))
+  return result
+}
+

@@ -122,6 +122,28 @@ export const id: TranslationStrings = {
   duplicateTransactionsDetected:
     'Terdeteksi {count} transaksi duplikat (ditandai dengan warna kuning).',
 
+  spaceTransfersExcluded:
+    '{count} transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',
+  spaceTransfersExcludedSingular:
+    '1 transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',
+  internalTransfersDetectedSingular:
+    '1 transfer internal dengan akun Anda lainnya terdeteksi (dikecualikan dari pemasukan/pengeluaran dan disembunyikan dari tampilan standar).',
+  internalTransfersDetected:
+    '{count} transfer internal dengan akun Anda lainnya terdeteksi (dikecualikan dari pemasukan/pengeluaran dan disembunyikan dari tampilan standar).',
+  internalTransfersDetectedBannerSingular:
+    '1 transfer internal antar-akun Anda terdeteksi (ditandai dengan lencana transfer internal).',
+  internalTransfersDetectedBanner:
+    '{count} transfer internal antar-akun Anda terdeteksi (ditandai dengan lencana transfer internal).',
+  internalTransfersReconciledTitle: 'Transfer Internal Direkonsiliasi',
+  internalTransfersReconciledDesc:
+    '{count} transfer antar-akun Anda berhasil dikenali, dikecualikan dari pemasukan dan pengeluaran, serta disembunyikan dari tampilan standar agar analitik tetap akurat.',
+  internalTransfersReconciledDescSingular:
+    '1 transfer antar-akun Anda berhasil dikenali, dikecualikan dari pemasukan dan pengeluaran, serta disembunyikan dari tampilan standar agar analitik tetap akurat.',
+  accountInternalTransfers: '{count} transfer internal',
+  accountInternalTransfersSingular: '1 transfer internal',
+  inflows: 'Pemasukan',
+  outflows: 'Pengeluaran',
+
   importSuccessTitle: 'Impor Berhasil!',
   importSuccessSubtitle:
     'Transaksi Anda telah diimpor. Anda dapat menambahkan lebih banyak institusi atau melanjutkan ke analisis.',
@@ -159,6 +181,14 @@ export const id: TranslationStrings = {
   showingOf: 'Menampilkan {shown} dari {total} transaksi',
   noTransactionsMatch: 'Tidak ada transaksi yang cocok dengan pencarian Anda.',
   perPage: 'Per halaman:',
+  internalTransfer: 'Transfer Internal',
+  internalTransfers: 'Transfer Internal',
+  ghostTransfersHidden: '{count} transfer internal disembunyikan',
+  ghostTransfersShown: 'Menampilkan transfer internal',
+  showInternalTransfers: 'Tampilkan transfer internal',
+  hideInternalTransfers: 'Sembunyikan transfer internal',
+  transfersTabNotice:
+    'Transfer internal antar-akun Anda dikecualikan dari pemasukan dan pengeluaran (hanya baca).',
 
   insightTransactions: 'Transaksi',
   insightAvgTransaction: 'Rata-rata Transaksi',
