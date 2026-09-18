@@ -23,6 +23,7 @@ export const useTransactionImport = (
 ) => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [discardedSpaceCount, setDiscardedSpaceCount] = useState(0)
+  const [excludedSpaceTransactions, setExcludedSpaceTransactions] = useState<Transaction[]>([])
   const [detectedAccountIbans, setDetectedAccountIbans] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -35,6 +36,7 @@ export const useTransactionImport = (
       setError(null)
       setFileName(file.name)
       setDiscardedSpaceCount(0)
+      setExcludedSpaceTransactions([])
       setDetectedAccountIbans([])
 
       try {
@@ -45,12 +47,17 @@ export const useTransactionImport = (
             const sheetName = workbook.SheetNames[0]
             const sheet = workbook.Sheets[sheetName]
             const rows: string[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 })
-            const { transactions: txs, discardedSpaceCount: spaceCount, detectedAccountIbans: ibans } =
-              rowsToTransactionsWithMeta(rows, institutionName, t)
+            const {
+              transactions: txs,
+              discardedSpaceCount: spaceCount,
+              detectedAccountIbans: ibans,
+              excludedSpaceTransactions: excludedTxs,
+            } = rowsToTransactionsWithMeta(rows, institutionName, t)
             if (txs.length === 0)
               throw new Error(t?.errorNoTransactionsInFile || 'No transactions found in the file.')
             setTransactions(txs)
             setDiscardedSpaceCount(spaceCount)
+            setExcludedSpaceTransactions(excludedTxs ?? [])
             setDetectedAccountIbans(ibans ?? [])
           } else {
             // Read as binary buffer so we can detect and handle encoding ourselves
@@ -75,12 +82,17 @@ export const useTransactionImport = (
               .split('\n')
               // Strip trailing \r (CRLF) and split into cells using quote-aware parser
               .map((line) => splitCsvLine(line.replace(/\r$/, ''), sep))
-            const { transactions: txs, discardedSpaceCount: spaceCount, detectedAccountIbans: ibans } =
-              rowsToTransactionsWithMeta(rows, institutionName, t)
+            const {
+              transactions: txs,
+              discardedSpaceCount: spaceCount,
+              detectedAccountIbans: ibans,
+              excludedSpaceTransactions: excludedTxs,
+            } = rowsToTransactionsWithMeta(rows, institutionName, t)
             if (txs.length === 0)
               throw new Error(t?.errorNoTransactionsInCSV || 'No transactions found in the CSV.')
             setTransactions(txs)
             setDiscardedSpaceCount(spaceCount)
+            setExcludedSpaceTransactions(excludedTxs ?? [])
             setDetectedAccountIbans(ibans ?? [])
           }
         } else if (method === 'pdf' || file.name.match(/\.pdf$/i)) {
@@ -106,10 +118,14 @@ export const useTransactionImport = (
                 'Could not auto-detect transactions in this PDF. Try exporting as CSV or Excel from your bank portal instead.',
             )
           }
-          const { transactions: filteredTxs, discardedSpaceCount: spaceCount } =
-            filterInternalSpaceTransfers(txLines)
+          const {
+            transactions: filteredTxs,
+            discardedSpaceCount: spaceCount,
+            excludedTransactions: excludedTxs,
+          } = filterInternalSpaceTransfers(txLines)
           setTransactions(filteredTxs)
           setDiscardedSpaceCount(spaceCount)
+          setExcludedSpaceTransactions(excludedTxs ?? [])
           const detectedIbans = extractAccountIbansFromPdf(fullText, file.name)
           setDetectedAccountIbans(detectedIbans)
         }
@@ -119,6 +135,7 @@ export const useTransactionImport = (
         )
         setTransactions([])
         setDiscardedSpaceCount(0)
+        setExcludedSpaceTransactions([])
       } finally {
         setLoading(false)
       }
@@ -130,14 +147,19 @@ export const useTransactionImport = (
     setLoading(true)
     setError(null)
     setDiscardedSpaceCount(0)
+    setExcludedSpaceTransactions([])
     try {
       // Strategy 1: German bank portal format (multi-line structured copy-paste)
       const bankTxs = parseBankStatementPaste(pasteText, institutionName)
       if (bankTxs.length > 0) {
-        const { transactions: filteredTxs, discardedSpaceCount: spaceCount } =
-          filterInternalSpaceTransfers(bankTxs)
+        const {
+          transactions: filteredTxs,
+          discardedSpaceCount: spaceCount,
+          excludedTransactions: excludedTxs,
+        } = filterInternalSpaceTransfers(bankTxs)
         setTransactions(filteredTxs)
         setDiscardedSpaceCount(spaceCount)
+        setExcludedSpaceTransactions(excludedTxs ?? [])
         const detectedIbans = extractAccountIbansFromPaste(pasteText)
         setDetectedAccountIbans(detectedIbans)
         return
@@ -153,8 +175,12 @@ export const useTransactionImport = (
       }
       const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ','
       const rows = lines.map((l) => splitCsvLine(l.replace(/\r$/, ''), sep))
-      const { transactions: csvTxs, discardedSpaceCount: spaceCount, detectedAccountIbans: ibans } =
-        rowsToTransactionsWithMeta(rows, institutionName, t)
+      const {
+        transactions: csvTxs,
+        discardedSpaceCount: spaceCount,
+        detectedAccountIbans: ibans,
+        excludedSpaceTransactions: excludedTxs,
+      } = rowsToTransactionsWithMeta(rows, institutionName, t)
       if (csvTxs.length === 0) {
         throw new Error(
           t?.errorParsePaste ||
@@ -163,6 +189,7 @@ export const useTransactionImport = (
       }
       setTransactions(csvTxs)
       setDiscardedSpaceCount(spaceCount)
+      setExcludedSpaceTransactions(excludedTxs ?? [])
       setDetectedAccountIbans(ibans ?? [])
     } catch (err: unknown) {
       setError(
@@ -171,6 +198,7 @@ export const useTransactionImport = (
           : t?.errorParsePastedData || 'Failed to parse pasted data.',
       )
       setDiscardedSpaceCount(0)
+      setExcludedSpaceTransactions([])
       setDetectedAccountIbans([])
     } finally {
       setLoading(false)
@@ -185,9 +213,30 @@ export const useTransactionImport = (
     setTransactions((prev) => prev.map((tx) => (tx.id === id ? { ...tx, ...updates } : tx)))
   }, [])
 
+  const handleIncludeSpaceTransaction = useCallback((tx: Transaction) => {
+    setExcludedSpaceTransactions((prev) => prev.filter((t) => t.id !== tx.id))
+    setTransactions((prev) => [...prev, tx])
+    setDiscardedSpaceCount((prev) => Math.max(0, prev - 1))
+  }, [])
+
+  const handleExcludeSpaceTransaction = useCallback((tx: Transaction) => {
+    setTransactions((prev) => prev.filter((t) => t.id !== tx.id))
+    setExcludedSpaceTransactions((prev) => [...prev, tx])
+    setDiscardedSpaceCount((prev) => prev + 1)
+  }, [])
+
+  const handleIncludeAllSpaceTransactions = useCallback(() => {
+    setExcludedSpaceTransactions((prev) => {
+      setTransactions((current) => [...current, ...prev])
+      return []
+    })
+    setDiscardedSpaceCount(0)
+  }, [])
+
   const handleClearAll = useCallback(() => {
     setTransactions([])
     setDiscardedSpaceCount(0)
+    setExcludedSpaceTransactions([])
     setDetectedAccountIbans([])
     setFileName(null)
     setPasteText('')
@@ -201,6 +250,7 @@ export const useTransactionImport = (
   return {
     transactions,
     discardedSpaceCount,
+    excludedSpaceTransactions,
     detectedAccountIbans,
     loading,
     error,
@@ -214,6 +264,9 @@ export const useTransactionImport = (
     handlePaste,
     handleRemoveTransaction,
     handleUpdateTransaction,
+    handleIncludeSpaceTransaction,
+    handleExcludeSpaceTransaction,
+    handleIncludeAllSpaceTransactions,
     handleClearAll,
   }
 }

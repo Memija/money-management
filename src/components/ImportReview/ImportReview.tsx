@@ -25,26 +25,6 @@ const ImportReview: React.FC = () => {
   const intlLocale = locale === 'bs' || locale === 'sr' ? 'de-DE' : locale
 
   const totalTransactions = importedAccounts.reduce((sum, acc) => sum + acc.transactions.length, 0)
-  const totalInternalTransfers = React.useMemo(() => {
-    const countedPairKeys = new Set<string>()
-    let count = 0
-
-    for (const acc of importedAccounts) {
-      for (const tx of acc.transactions) {
-        if (!tx.isGhost) continue
-        if (tx.linkedTransactionId) {
-          const pairKey = [tx.id, tx.linkedTransactionId].sort().join(':')
-          if (!countedPairKeys.has(pairKey)) {
-            countedPairKeys.add(pairKey)
-            count++
-          }
-        } else {
-          count++
-        }
-      }
-    }
-    return count
-  }, [importedAccounts])
   const totalIncome = importedAccounts.reduce(
     (sum, acc) =>
       sum +
@@ -137,29 +117,6 @@ const ImportReview: React.FC = () => {
           <div className={styles['review-stat-label']}>{t.totalExpenses}</div>
         </motion.div>
       </div>
-
-      {/* Internal Transfers Reconciliation Notice */}
-      {totalInternalTransfers > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.28 }}
-          className={styles['reconciliation-card']}
-          data-testid="internal-transfers-reconciliation-card"
-        >
-          <div className={styles['reconciliation-icon-box']}>
-            <Ghost size={20} />
-          </div>
-          <div className={styles['reconciliation-content']}>
-            <h2 className={styles['reconciliation-title']}>{t.internalTransfersReconciledTitle}</h2>
-            <p className={styles['reconciliation-desc']}>
-              {totalInternalTransfers === 1
-                ? t.internalTransfersReconciledDescSingular
-                : t.internalTransfersReconciledDesc.replace('{count}', String(totalInternalTransfers))}
-            </p>
-          </div>
-        </motion.div>
-      )}
 
       {/* Imported Accounts List */}
       <div className={styles['imported-accounts-list']}>

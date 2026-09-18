@@ -19,12 +19,14 @@ describe('filterInternalSpaceTransfers', () => {
     expect(filterInternalSpaceTransfers([])).toEqual({
       transactions: [],
       discardedSpaceCount: 0,
+      excludedTransactions: [],
     })
 
     const single = [createTx({ amount: -100 })]
     expect(filterInternalSpaceTransfers(single)).toEqual({
       transactions: single,
       discardedSpaceCount: 0,
+      excludedTransactions: [],
     })
   })
 
@@ -55,6 +57,8 @@ describe('filterInternalSpaceTransfers', () => {
     expect(result.discardedSpaceCount).toBe(2)
     expect(result.transactions).toHaveLength(1)
     expect(result.transactions[0].id).toBe('tx-3')
+    expect(result.excludedTransactions).toHaveLength(2)
+    expect(result.excludedTransactions?.map((t) => t.id)).toEqual(expect.arrayContaining(['tx-1', 'tx-2']))
   })
 
   it('discards reciprocal space pairs with English space names (Main Account / Investment fund)', () => {
@@ -266,5 +270,54 @@ describe('filterInternalSpaceTransfers', () => {
       type: 'income',
     })
     expect(filterInternalSpaceTransfers([txEn1, txEn2]).discardedSpaceCount).toBe(2)
+  })
+
+  it('does NOT falsely mark SEPA transfers, Dauerauftrag, Junior Depot, or external counterparty transfers as space transfers', () => {
+    // 01/02/2026 pair
+    const tx1 = createTx({
+      id: 'tx-cmz-1',
+      date: '2026-02-01',
+      description:
+        'Anel Memic Sent from N26 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 4bf2726750a14accace9800b5ce2d73a',
+      amount: 250,
+      type: 'income',
+      institution: 'Commerzbank',
+    })
+    const tx2 = createTx({
+      id: 'tx-cmz-2',
+      date: '2026-02-01',
+      description:
+        'ARTUR MEMIC COBADEHD077 DE97200411770239797400 JUNIOR DEPOT End-to-End-Ref.: NOTPROVIDED Dauerauftrag',
+      amount: -250,
+      type: 'expense',
+      institution: 'Commerzbank',
+      counterpartyIban: 'DE97200411770239797400',
+    })
+
+    // 11/03/2025 pair
+    const tx3 = createTx({
+      id: 'tx-cmz-3',
+      date: '2025-03-11',
+      description:
+        'ARTUR MEMIC COBADEHD077 DE97200411770239797400 JUNIOR DEPOT End-to-End-Ref.: NOTPROVIDED Dauerauftrag',
+      amount: -250,
+      type: 'expense',
+      institution: 'Commerzbank',
+      counterpartyIban: 'DE97200411770239797400',
+    })
+    const tx4 = createTx({
+      id: 'tx-cmz-4',
+      date: '2025-03-11',
+      description:
+        'Biljana Memic Hilfe End-to-End-Ref.: NOTPROVIDED Kundenreferenz: CD-SCT-676910088',
+      amount: 250,
+      type: 'income',
+      institution: 'Commerzbank',
+    })
+
+    const result = filterInternalSpaceTransfers([tx1, tx2, tx3, tx4])
+    expect(result.discardedSpaceCount).toBe(0)
+    expect(result.transactions).toHaveLength(4)
+    expect(result.excludedTransactions).toHaveLength(0)
   })
 })

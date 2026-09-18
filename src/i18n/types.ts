@@ -146,10 +146,34 @@ export interface TranslationStrings {
   duplicateImportOk: string
   duplicateTransactionsDetectedSingular: string
   duplicateTransactionsDetected: string
+  duplicateImportAllBannerSingular: string
+  duplicateImportAllBanner: string
+  duplicateImportPartialBanner: string
+  allTransactionsAlreadyImported: string
+  importNewTransactions: string
+  filterDuplicates: string
+  duplicatesSkippedNotice: string
+  viewDuplicates: string
 
   // Internal & space transfers during import
   spaceTransfersExcluded: string
   spaceTransfersExcludedSingular: string
+  filterAll: string
+  filterIncluded: string
+  filterSpaceTransfers: string
+  filterInternalTransfers: string
+  viewExcludedSpaceTransfers: string
+  viewInternalTransfers: string
+  viewTheseTransactions: string
+  spaceTransfer: string
+  spaceTransferExcludedBadge: string
+  spaceTransfersExcludedNotice: string
+  internalTransfersNotice: string
+  includeInImport: string
+  includeAllInImport: string
+  include: string
+  excludeFromImport: string
+  exclude: string
   internalTransfersDetectedSingular: string
   internalTransfersDetected: string
   internalTransfersDetectedBannerSingular: string
@@ -161,6 +185,16 @@ export interface TranslationStrings {
   accountInternalTransfersSingular: string
   inflows: string
   outflows: string
+
+  // Transfer import warning modal
+  transferWarningModalTitle: string
+  transferWarningModalSpaceMessage: string
+  transferWarningModalSpaceMessageSingular: string
+  transferWarningModalInternalMessage: string
+  transferWarningModalInternalMessageSingular: string
+  transferWarningModalBothMessage: string
+  transferWarningModalReview: string
+  transferWarningModalProceed: string
 
   // Import Review
   importSuccessTitle: string

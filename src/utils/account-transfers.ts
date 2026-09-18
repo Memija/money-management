@@ -81,6 +81,55 @@ export const REVERSAL_KEYWORDS = [
   'reversal',
 ]
 
+export const BANKING_STOP_WORDS = new Set([
+  'end',
+  'ref',
+  'notprovided',
+  'kundenreferenz',
+  'dauerauftrag',
+  'sepa',
+  'iban',
+  'bic',
+  'mandat',
+  'mandatsreferenz',
+  'gref',
+  'mref',
+  'kref',
+  'ereference',
+  'cred',
+  'deb',
+  'sct',
+  'pmt',
+  'auftragskonto',
+  'buchungstext',
+  'umsatz',
+  'kartenzahlung',
+  'lastschrift',
+  'gutschrift',
+  'ueberweisung',
+  'überweisung',
+  'einzahlung',
+  'auszahlung',
+  'entgelt',
+  'gebuehr',
+  'gebühr',
+  'zinsen',
+  'steuer',
+  'abschluss',
+  'saldo',
+  'und',
+  'von',
+  'mit',
+  'auf',
+  'fuer',
+  'für',
+  'the',
+  'for',
+  'and',
+  'from',
+  'with',
+])
+
 export const SPACE_TRANSFER_KEYWORDS = [
   'space',
   'spaces',
@@ -113,7 +162,6 @@ export const SPACE_TRANSFER_KEYWORDS = [
   'wohnung und auto',
   'gebäude und wohnung',
   'gebaeude und wohnung',
-  'rente',
   'prostor',
   'prostori',
   'podracun',
@@ -124,6 +172,9 @@ export const SPACE_TRANSFER_KEYWORDS = [
   'trezor',
   'stednja',
   'štednja',
+  'prenos',
+  'glavni racun',
+  'glavni račun',
   'пренос',
   'простор',
   'простори',
@@ -134,9 +185,45 @@ export const SPACE_TRANSFER_KEYWORDS = [
   'главни рачун',
 ]
 
+/**
+ * Checks whether a normalized text contains any space/internal transfer keywords
+ * using whole-token or phrase matching (preventing false matches like "depot" matching "pot").
+ */
+export function hasSpaceTransferKeyword(normDesc: string): boolean {
+  if (!normDesc) return false
+  const tokens = normDesc.split(' ')
+  for (const kw of SPACE_TRANSFER_KEYWORDS) {
+    if (kw.includes(' ')) {
+      if (normDesc.includes(kw)) {
+        return true
+      }
+    } else {
+      if (tokens.some((token) => token === kw || token === `${kw}s` || token === `${kw}en`)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+/**
+ * Checks if a transaction has an explicit counterparty IBAN, BIC, or external account reference,
+ * which indicates an external transfer/standing order rather than an intra-statement space movement.
+ */
+export function hasExternalCounterparty(tx: Transaction): boolean {
+  if (tx.counterpartyIban && tx.counterpartyIban.trim().length > 0) {
+    return true
+  }
+  if (extractIbans(tx.description).length > 0) {
+    return true
+  }
+  return false
+}
+
 export interface SpaceTransferFilterResult {
   transactions: Transaction[]
   discardedSpaceCount: number
+  excludedTransactions?: Transaction[]
 }
 
 /**
@@ -150,7 +237,7 @@ export function filterInternalSpaceTransfers(
   transactions: Transaction[],
 ): SpaceTransferFilterResult {
   if (!transactions || transactions.length < 2) {
-    return { transactions: transactions || [], discardedSpaceCount: 0 }
+    return { transactions: transactions || [], discardedSpaceCount: 0, excludedTransactions: [] }
   }
 
   const discardedTxIds = new Set<string>()
@@ -180,7 +267,11 @@ export function filterInternalSpaceTransfers(
       const diffDays = dateDiffInDays(itemA.tx.date, itemB.tx.date)
       if (diffDays > 1) continue
 
-      // 3. Clues: At least one side MUST have a space/transfer keyword
+      // 3. External transfers with counterparty IBANs cannot be intra-statement space transfers
+      if (hasExternalCounterparty(itemA.tx) || hasExternalCounterparty(itemB.tx)) {
+        continue
+      }
+
       const normDescA = normalizeTransferText(itemA.tx.description)
       const normDescB = normalizeTransferText(itemB.tx.description)
 
@@ -191,27 +282,39 @@ export function filterInternalSpaceTransfers(
         continue
       }
 
-      const hasSpaceKeywordA = SPACE_TRANSFER_KEYWORDS.some((kw) => normDescA.includes(kw))
-      const hasSpaceKeywordB = SPACE_TRANSFER_KEYWORDS.some((kw) => normDescB.includes(kw))
+      // Custody/brokerage depot transfers are not internal space movements
+      if (normDescA.includes('depot') || normDescB.includes('depot')) {
+        continue
+      }
+
+      // 4. Clues: At least one side MUST have a space/transfer keyword
+      const hasSpaceKeywordA = hasSpaceTransferKeyword(normDescA)
+      const hasSpaceKeywordB = hasSpaceTransferKeyword(normDescB)
 
       if (!hasSpaceKeywordA && !hasSpaceKeywordB) {
         continue
       }
 
-      const wordsA = normDescA.split(' ').filter((w) => w.length >= 3)
-      const wordsB = normDescB.split(' ').filter((w) => w.length >= 3)
-      const sharedWords = wordsA.filter((w) => wordsB.includes(w))
-      const hasSharedWords = sharedWords.length >= 1
+      const meaningfulWordsA = normDescA
+        .split(' ')
+        .filter((w) => w.length >= 3 && !BANKING_STOP_WORDS.has(w))
+      const meaningfulWordsB = normDescB
+        .split(' ')
+        .filter((w) => w.length >= 3 && !BANKING_STOP_WORDS.has(w))
+      const sharedMeaningfulWords = meaningfulWordsA.filter((w) => meaningfulWordsB.includes(w))
 
       const isDescCrossReference =
-        (normDescA.length >= 4 && normDescB.includes(normDescA)) ||
-        (normDescB.length >= 4 && normDescA.includes(normDescB))
+        (normDescA.length >= 4 && !BANKING_STOP_WORDS.has(normDescA) && normDescB.includes(normDescA)) ||
+        (normDescB.length >= 4 && !BANKING_STOP_WORDS.has(normDescB) && normDescA.includes(normDescB))
 
-      // Valid space pair if both have space keywords, or one has space keyword and shares words/cross-references
+      // Valid space pair:
+      // - Both have explicit space keywords, OR
+      // - Direct cross-reference of the description/space name, OR
+      // - At least 2 meaningful shared non-stopword tokens (e.g. multi-word space target)
       const isSpacePair =
         (hasSpaceKeywordA && hasSpaceKeywordB) ||
-        hasSharedWords ||
-        isDescCrossReference
+        isDescCrossReference ||
+        (sharedMeaningfulWords.length >= 2)
 
       if (isSpacePair) {
         if (diffDays < minDays) {
@@ -230,9 +333,11 @@ export function filterInternalSpaceTransfers(
   }
 
   const remaining = transactions.filter((tx) => !discardedTxIds.has(tx.id))
+  const excluded = transactions.filter((tx) => discardedTxIds.has(tx.id))
   return {
     transactions: remaining,
     discardedSpaceCount: discardedTxIds.size,
+    excludedTransactions: excluded,
   }
 }
 
@@ -251,6 +356,11 @@ export function calculateTransferCandidateScore(
   txB: Transaction,
   accountB: ImportedAccount,
 ): number {
+  // 0. Accounts must belong to different institutions
+  if (accountA.institutionId && accountA.institutionId === accountB.institutionId) {
+    return 0
+  }
+
   // 1. Amounts must be opposite
   if (Math.abs(txA.amount + txB.amount) > 0.01) {
     return 0
@@ -436,6 +546,12 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
     for (let j = i + 1; j < allIndexed.length; j++) {
       const itemB = allIndexed[j]
       if (itemA.accIdx === itemB.accIdx) continue
+      if (
+        accounts[itemA.accIdx].institutionId &&
+        accounts[itemA.accIdx].institutionId === accounts[itemB.accIdx].institutionId
+      ) {
+        continue
+      }
 
       const score = calculateTransferCandidateScore(
         itemA.tx,

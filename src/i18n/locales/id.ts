@@ -117,15 +117,39 @@ export const id: TranslationStrings = {
   duplicateImportProceed: 'Lanjutkan dengan {newCount} transaksi',
   duplicateImportOk: 'OK',
   duplicateImportCancel: 'Batal',
-  duplicateTransactionsDetectedSingular:
-    'Terdeteksi 1 transaksi duplikat (ditandai dengan warna kuning).',
-  duplicateTransactionsDetected:
-    'Terdeteksi {count} transaksi duplikat (ditandai dengan warna kuning).',
+  duplicateTransactionsDetectedSingular: 'Terdeteksi 1 transaksi duplikat dan akan dilewati.',
+  duplicateTransactionsDetected: 'Terdeteksi {count} transaksi duplikat dan akan dilewati.',
+  duplicateImportAllBannerSingular: 'Terdeteksi 1 transaksi duplikat. Transaksi ini sudah pernah diimpor.',
+  duplicateImportAllBanner: 'Semua {count} transaksi dalam file ini sudah pernah diimpor (duplikat).',
+  duplicateImportPartialBanner: 'Terdeteksi {duplicateCount} transaksi duplikat dan akan dilewati. {newCount} transaksi baru akan diimpor.',
+  allTransactionsAlreadyImported: 'Semua transaksi sudah pernah diimpor',
+  importNewTransactions: 'Impor {count} transaksi baru',
+  filterDuplicates: 'Duplikat',
+  duplicatesSkippedNotice: 'Transaksi ini sudah ada dalam catatan Anda dan akan dilewati untuk mencegah penghitungan ganda.',
+  viewDuplicates: 'Lihat duplikat',
 
   spaceTransfersExcluded:
     '{count} transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',
   spaceTransfersExcludedSingular:
     '1 transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',
+  filterAll: 'Semua',
+  filterIncluded: 'Untuk Diimpor',
+  filterSpaceTransfers: 'Transfer Ruang',
+  filterInternalTransfers: 'Transfer Internal',
+  viewExcludedSpaceTransfers: 'Lihat yang dikecualikan',
+  viewInternalTransfers: 'Lihat transfer',
+  viewTheseTransactions: 'Lihat transaksi ini',
+  spaceTransfer: 'Transfer Ruang',
+  spaceTransferExcludedBadge: 'Dikecualikan',
+  spaceTransfersExcludedNotice:
+    'Transaksi ini secara otomatis dikecualikan untuk mencegah perhitungan ganda dan tidak akan diimpor.',
+  internalTransfersNotice:
+    'Transaksi ini adalah transfer internal antar rekening Anda sendiri. Transaksi ini dikecualikan dari pemasukan/pengeluaran dan disembunyikan dari tampilan standar.',
+  includeInImport: 'Sertakan dalam impor',
+  includeAllInImport: 'Sertakan semua dalam impor',
+  include: 'Sertakan',
+  excludeFromImport: 'Keluarkan dari impor',
+  exclude: 'Keluarkan',
   internalTransfersDetectedSingular:
     '1 transfer internal dengan akun Anda lainnya terdeteksi (dikecualikan dari pemasukan/pengeluaran dan disembunyikan dari tampilan standar).',
   internalTransfersDetected:
@@ -143,6 +167,20 @@ export const id: TranslationStrings = {
   accountInternalTransfersSingular: '1 transfer internal',
   inflows: 'Pemasukan',
   outflows: 'Pengeluaran',
+
+  transferWarningModalTitle: 'Transfer Internal Terdeteksi',
+  transferWarningModalSpaceMessage:
+    '{count} transfer antara sub-akun atau space Anda terdeteksi. Transaksi ini akan dikecualikan dari pengeluaran untuk mencegah penghitungan ganda. Anda dapat meninjaunya sebelum mengimpor.',
+  transferWarningModalSpaceMessageSingular:
+    '1 transfer antara sub-akun atau space Anda terdeteksi. Transaksi ini akan dikecualikan dari pengeluaran untuk mencegah penghitungan ganda. Anda dapat meninjaunya sebelum mengimpor.',
+  transferWarningModalInternalMessage:
+    '{count} transfer antar-akun Anda terdeteksi. Transaksi ini akan dikecualikan dari pemasukan dan pengeluaran untuk mencegah penghitungan ganda. Anda dapat meninjaunya sebelum mengimpor.',
+  transferWarningModalInternalMessageSingular:
+    '1 transfer antar-akun Anda terdeteksi. Transaksi ini akan dikecualikan dari pemasukan dan pengeluaran untuk mencegah penghitungan ganda. Anda dapat meninjaunya sebelum mengimpor.',
+  transferWarningModalBothMessage:
+    '{count} transfer internal (termasuk transfer antar-space dan transfer antar-akun) terdeteksi. Transaksi ini akan dikecualikan dari pemasukan dan pengeluaran.',
+  transferWarningModalReview: 'Tinjau Rincian',
+  transferWarningModalProceed: 'Lanjutkan Impor',
 
   importSuccessTitle: 'Impor Berhasil!',
   importSuccessSubtitle:

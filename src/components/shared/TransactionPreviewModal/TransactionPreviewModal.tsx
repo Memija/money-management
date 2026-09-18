@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import {
   AlertTriangle,
@@ -7,26 +7,25 @@ import {
   ArrowUpDown,
   Check,
   Ghost,
-  Info,
+  Layers,
+  Plus,
   RotateCcw,
   Search,
-  Trash2,
-  TrendingDown,
-  TrendingUp,
-  Wallet,
-  X,
 } from 'lucide-react'
 
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
-import { getCategoryColor } from '../../../utils/category-colors'
-import { getCategoryIcon } from '../../../utils/category-icons'
-import { getCategoryLabel } from '../../../utils/category-utils'
-import { DatePicker } from '../DatePicker'
 import { Modal } from '../Modal'
-import { Select, type SelectOption } from '../Select'
+import { TransactionPreviewHeader } from './TransactionPreviewHeader'
+import { TransactionPreviewRow } from './TransactionPreviewRow'
+import {
+  type ScopeFilter,
+  type SortColumn,
+  TransactionPreviewToolbar,
+} from './TransactionPreviewToolbar'
+import { usePreviewTransactionsFilter } from './usePreviewTransactionsFilter'
 
 import styles from './TransactionPreviewModal.module.css'
 
@@ -37,14 +36,17 @@ export interface TransactionPreviewModalProps {
   duplicateIds?: Set<string>
   internalTransferIds?: Set<string>
   discardedSpaceCount?: number
+  excludedSpaceTransactions?: Transaction[]
+  initialFilter?: ScopeFilter
   onRemoveTransaction?: (id: string) => void
   onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void
+  onIncludeSpaceTransaction?: (tx: Transaction) => void
+  onExcludeSpaceTransaction?: (tx: Transaction) => void
+  onIncludeAllSpaceTransactions?: () => void
   title?: string
   variant?: 'income' | 'expense'
+  showInstitution?: boolean
 }
-
-type SortColumn = 'date' | 'description' | 'amount'
-type SortDirection = 'asc' | 'desc'
 
 export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = ({
   isOpen,
@@ -53,10 +55,16 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   duplicateIds = new Set(),
   internalTransferIds = new Set(),
   discardedSpaceCount = 0,
+  excludedSpaceTransactions = [],
+  initialFilter = 'all',
   onRemoveTransaction,
   onUpdateTransaction,
+  onIncludeSpaceTransaction,
+  onExcludeSpaceTransaction,
+  onIncludeAllSpaceTransactions,
   title,
   variant,
+  showInstitution = false,
 }) => {
   const t = useLanguageStore((s) => s.t)
   const locale = useLanguageStore((s) => s.locale)
@@ -65,117 +73,136 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const ROW_HEIGHT = 64 // Standardized row height for Virtuoso virtualization
 
-  const hasMultipleTransactions = transactions.length > 1
+  const [scopeFilter, setScopeFilter] = useState<ScopeFilter>(initialFilter)
+  const [localTransactions, setLocalTransactions] = useState<Transaction[]>(transactions)
+  const [localExcludedSpaceTransactions, setLocalExcludedSpaceTransactions] = useState<Transaction[]>(
+    excludedSpaceTransactions || [],
+  )
+  const [manuallyIncludedIds, setManuallyIncludedIds] = useState<Set<string>>(new Set())
 
-  const [sortConfig, setSortConfig] = useState<{ key: SortColumn; direction: SortDirection } | null>(null)
+  useEffect(() => {
+    setLocalTransactions(transactions)
+  }, [transactions])
 
-  const [searchQuery, setSearchQuery] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
+  useEffect(() => {
+    setLocalExcludedSpaceTransactions(excludedSpaceTransactions || [])
+  }, [excludedSpaceTransactions])
 
-  const isFilterActive =
-    hasMultipleTransactions &&
-    (searchQuery.trim().length > 0 || startDate.length > 0 || endDate.length > 0)
+  useEffect(() => {
+    if (isOpen) {
+      setScopeFilter(initialFilter)
+      setManuallyIncludedIds(new Set())
+    }
+  }, [isOpen, initialFilter])
 
-  const handleClearFilters = () => {
-    setSearchQuery('')
-    setStartDate('')
-    setEndDate('')
-  }
+  const activeTransactions = onIncludeSpaceTransaction ? transactions : localTransactions
+  const activeExcluded = onIncludeSpaceTransaction
+    ? excludedSpaceTransactions
+    : localExcludedSpaceTransactions
 
-  const handleSort = (key: SortColumn) => {
-    if (!hasMultipleTransactions) return
-    setSortConfig((prev) => {
-      if (prev && prev.key === key) {
-        return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
+  const handleToggleSpaceTransferInclude = (tx: Transaction) => {
+    if (manuallyIncludedIds.has(tx.id)) {
+      if (onExcludeSpaceTransaction) {
+        onExcludeSpaceTransaction(tx)
+      } else {
+        setLocalTransactions((prev) => prev.filter((t) => t.id !== tx.id))
+        setLocalExcludedSpaceTransactions((prev) => [...prev, tx])
       }
-      return { key, direction: key === 'description' ? 'asc' : 'desc' }
-    })
+      setManuallyIncludedIds((prev) => {
+        const next = new Set(prev)
+        next.delete(tx.id)
+        return next
+      })
+    } else {
+      if (onIncludeSpaceTransaction) {
+        onIncludeSpaceTransaction(tx)
+      } else {
+        setLocalExcludedSpaceTransactions((prev) => prev.filter((t) => t.id !== tx.id))
+        setLocalTransactions((prev) => [...prev, tx])
+      }
+      setManuallyIncludedIds((prev) => new Set(prev).add(tx.id))
+    }
   }
 
-  const sortOptions = useMemo<SelectOption[]>(
-    () => [
-      { value: 'default', label: t.sortOrder || 'Default' },
-      { value: 'date-desc', label: t.newestFirst || 'Newest First' },
-      { value: 'date-asc', label: t.oldestFirst || 'Oldest First' },
-      { value: 'amount-desc', label: t.highestAmount || 'Highest Amount' },
-      { value: 'amount-asc', label: t.lowestAmount || 'Lowest Amount' },
-      { value: 'description-asc', label: 'A – Z' },
-      { value: 'description-desc', label: 'Z – A' },
-    ],
-    [t],
+  const handleIncludeAllSpaceTransfers = () => {
+    if (onIncludeAllSpaceTransactions) {
+      onIncludeAllSpaceTransactions()
+    } else {
+      setLocalTransactions((prev) => [...prev, ...localExcludedSpaceTransactions])
+      setLocalExcludedSpaceTransactions([])
+    }
+    const newlyIncluded = new Set(manuallyIncludedIds)
+    activeExcluded.forEach((tx) => newlyIncluded.add(tx.id))
+    setManuallyIncludedIds(newlyIncluded)
+  }
+
+  const spaceTransferIds = useMemo(() => {
+    return new Set(activeExcluded.map((tx) => tx.id))
+  }, [activeExcluded])
+
+  const hasSpaceTransfers = Boolean(
+    activeExcluded.length > 0 || manuallyIncludedIds.size > 0 || discardedSpaceCount > 0,
   )
 
-  const handleSortChange = (val: string) => {
-    if (val === 'default') {
-      setSortConfig(null)
-      return
+  const combinedTransactions = useMemo(() => {
+    if (activeExcluded.length === 0) {
+      return activeTransactions
     }
-    const [key, direction] = val.split('-') as [SortColumn, SortDirection]
-    setSortConfig({ key, direction })
-  }
+    return [...activeTransactions, ...activeExcluded]
+  }, [activeTransactions, activeExcluded])
 
-  const filteredAndSortedTransactions = useMemo(() => {
-    if (!hasMultipleTransactions) {
-      return transactions
+  const scopedTransactions = useMemo(() => {
+    if (scopeFilter === 'duplicates') {
+      return activeTransactions.filter((tx) => duplicateIds.has(tx.id))
     }
-
-    let result = [...transactions]
-
-    if (startDate && endDate) {
-      const [from, to] = startDate <= endDate ? [startDate, endDate] : [endDate, startDate]
-      result = result.filter((tx) => tx.date >= from && tx.date <= to)
-    } else if (startDate) {
-      result = result.filter((tx) => tx.date >= startDate)
-    } else if (endDate) {
-      result = result.filter((tx) => tx.date <= endDate)
+    if (scopeFilter === 'space-transfers') return activeExcluded
+    if (scopeFilter === 'internal-transfers') {
+      return activeTransactions.filter(
+        (tx) => !duplicateIds.has(tx.id) && (tx.isGhost || internalTransferIds.has(tx.id)),
+      )
     }
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim()
-      result = result.filter((tx) => {
-        const descMatch = tx.description.toLowerCase().includes(q)
-        const instMatch = tx.institution?.toLowerCase().includes(q) ?? false
-        const catMatch = (tx.category ?? '').toLowerCase().includes(q)
-        const formattedAmount = formatCurrency(tx.amount).toLowerCase()
-        const amountMatch = formattedAmount.includes(q) || tx.amount.toString().includes(q)
-        return descMatch || instMatch || catMatch || amountMatch
-      })
+    if (scopeFilter === 'included') {
+      return activeTransactions.filter((tx) => !duplicateIds.has(tx.id))
     }
+    if (hasSpaceTransfers) return combinedTransactions
+    return activeTransactions
+  }, [
+    activeTransactions,
+    activeExcluded,
+    hasSpaceTransfers,
+    scopeFilter,
+    combinedTransactions,
+    internalTransferIds,
+    duplicateIds,
+  ])
 
-    if (sortConfig !== null) {
-      const { key, direction } = sortConfig
-      const factor = direction === 'asc' ? 1 : -1
-      result.sort((a, b) => {
-        if (key === 'date') return a.date.localeCompare(b.date) * factor
-        if (key === 'description') return a.description.localeCompare(b.description) * factor
-        if (key === 'amount') return (a.amount - b.amount) * factor
-        return 0
-      })
-    }
+  const hasMultipleTransactions = combinedTransactions.length > 1
 
-    return result
-  }, [transactions, hasMultipleTransactions, startDate, endDate, searchQuery, sortConfig, formatCurrency])
-
-  const { totalInflows, totalOutflows } = useMemo(() => {
-    let inflows = 0
-    let outflows = 0
-    for (const tx of filteredAndSortedTransactions) {
-      if (tx.isGhost || internalTransferIds.has(tx.id)) {
-        continue
-      }
-      const amt = Math.abs(tx.amount)
-      if (tx.type === 'income' || tx.amount > 0) {
-        inflows += amt
-      } else {
-        outflows += amt
-      }
-    }
-    return {
-      totalInflows: inflows,
-      totalOutflows: outflows,
-    }
-  }, [filteredAndSortedTransactions, internalTransferIds])
+  const {
+    sortConfig,
+    searchQuery,
+    setSearchQuery,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    isFilterActive,
+    handleClearFilters,
+    handleSort,
+    handleSortChange,
+    sortOptions,
+    filteredAndSortedTransactions,
+    totalInflows,
+    totalOutflows,
+  } = usePreviewTransactionsFilter({
+    scopedTransactions,
+    hasMultipleTransactions,
+    duplicateIds,
+    internalTransferIds,
+    spaceTransferIds,
+    formatCurrency,
+    t,
+  })
 
   const renderSortIcon = (key: SortColumn) => {
     if (sortConfig?.key !== key) return <ArrowUpDown size={14} className={styles['sort-icon']} />
@@ -184,192 +211,28 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }
 
   const effectiveTitle = title ?? t.transactions
-  const isIncome = variant === 'income'
-  const isExpense = variant === 'expense'
-
-  const customHeader = (
-    <div className={styles['modal-header-custom']}>
-      <div className={styles['header-left']}>
-        <div
-          className={`${styles['header-icon-box']} ${
-            isIncome ? styles['header-icon-income'] : isExpense ? styles['header-icon-expense'] : ''
-          }`}
-        >
-          {isIncome ? (
-            <TrendingUp size={20} />
-          ) : isExpense ? (
-            <TrendingDown size={20} />
-          ) : (
-            <Wallet size={20} />
-          )}
-        </div>
-        <div className={styles['header-titles']}>
-          <h2 className={styles['modal-title']} title={effectiveTitle}>
-            {effectiveTitle}
-          </h2>
-          <div className={styles['summary-chips']}>
-            <span className={styles['summary-chip']}>
-              {formatTransactionCount(filteredAndSortedTransactions.length)}
-            </span>
-            {isIncome ? (
-              <span
-                className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']}`}
-                data-testid="modal-total-income"
-              >
-                <TrendingUp size={12} aria-hidden="true" />
-                +{formatCurrency(totalInflows)}
-              </span>
-            ) : isExpense ? (
-              <span
-                className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']}`}
-                data-testid="modal-total-expense"
-              >
-                <TrendingDown size={12} aria-hidden="true" />
-                -{formatCurrency(totalOutflows)}
-              </span>
-            ) : (
-              <>
-                <span
-                  className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']}`}
-                  title={`${t.inflows || 'Inflows'}: +${formatCurrency(totalInflows)}`}
-                  data-testid="modal-total-inflow"
-                >
-                  <TrendingUp size={12} aria-hidden="true" />
-                  +{formatCurrency(totalInflows)}
-                </span>
-                <span
-                  className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']}`}
-                  title={`${t.outflows || 'Outflows'}: -${formatCurrency(totalOutflows)}`}
-                  data-testid="modal-total-outflow"
-                >
-                  <TrendingDown size={12} aria-hidden="true" />
-                  -{formatCurrency(totalOutflows)}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
 
   const rowContent = (index: number, tx: Transaction) => {
-    const isDuplicate = duplicateIds.has(tx.id)
-    const isInternalTransfer = tx.isGhost || internalTransferIds.has(tx.id)
-    const isEditable = Boolean(onUpdateTransaction && !isInternalTransfer)
-    const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
-    const isTxIncome = tx.type === 'income'
-
+    const isTxDuplicate = duplicateIds.has(tx.id)
     return (
-      <div
-        className={`${styles['tx-row']} ${
-          index % 2 === 0 ? styles['tx-row-even'] : ''
-        } ${isDuplicate ? styles['tx-row-duplicate'] : ''}`}
-      >
-        <div className={styles['row-main']}>
-          <div
-            className={styles['icon-avatar']}
-            style={{ '--cat-color': categoryColor } as React.CSSProperties}
-            aria-hidden="true"
-          >
-            {getCategoryIcon(tx.category || 'Other', 18, customCategories, tx.description)}
-          </div>
-
-          <div className={styles['row-text']}>
-            {isEditable ? (
-              <input
-                id={`tx-desc-${tx.id}`}
-                name={`tx-desc-${tx.id}`}
-                type="text"
-                aria-label={t.description || 'Description'}
-                className={styles['inline-input-desc']}
-                value={tx.description}
-                onChange={(e) => onUpdateTransaction?.(tx.id, { description: e.target.value })}
-                title={tx.description}
-              />
-            ) : (
-              <p className={styles['row-description']} title={tx.description}>
-                {tx.description}
-              </p>
-            )}
-
-            <div className={styles['row-meta']}>
-              {tx.institution && <span>{tx.institution}</span>}
-              {tx.institution && tx.category && <span>•</span>}
-              {tx.category && (
-                <span>{getCategoryLabel(tx.category, t, locale, customCategories)}</span>
-              )}
-              {isDuplicate && (
-                <span className={styles['duplicate-pill']}>{t.duplicate || 'Duplicate'}</span>
-              )}
-              {isInternalTransfer && (
-                <span className={styles['internal-transfer-pill']}>
-                  <Ghost size={11} aria-hidden="true" />
-                  {t.internalTransfer || 'Internal Transfer'}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className={styles['row-date']}>
-          {isEditable ? (
-            <div className={styles['inline-datepicker-wrapper']}>
-              <DatePicker
-                value={tx.date}
-                onChange={(date) => onUpdateTransaction?.(tx.id, { date })}
-              />
-            </div>
-          ) : (
-            <span>{formatDate(tx.date)}</span>
-          )}
-        </div>
-
-        <div
-          className={`${styles['row-amount']} ${
-            isTxIncome ? styles['amount-positive'] : styles['amount-negative']
-          }`}
-        >
-          {isEditable ? (
-            <input
-              id={`tx-amount-${tx.id}`}
-              name={`tx-amount-${tx.id}`}
-              type="number"
-              step="0.01"
-              aria-label={t.amount || 'Amount'}
-              className={styles['inline-input-amount']}
-              value={tx.amount === 0 ? '' : tx.amount}
-              onChange={(e) => {
-                const val = e.target.value
-                const num = val === '' ? 0 : parseFloat(val)
-                onUpdateTransaction?.(tx.id, {
-                  amount: isNaN(num) ? 0 : num,
-                  type: (isNaN(num) ? 0 : num) >= 0 ? 'income' : 'expense',
-                })
-              }}
-              title={formatCurrency(tx.amount)}
-            />
-          ) : (
-            <span>
-              {isTxIncome ? '+' : ''}
-              {formatCurrency(tx.amount)}
-            </span>
-          )}
-        </div>
-
-        {onRemoveTransaction && !isInternalTransfer && (
-          <div className={styles['row-actions']}>
-            <button
-              className={styles['remove-button']}
-              onClick={() => onRemoveTransaction(tx.id)}
-              aria-label={t.removeTransaction}
-              title={t.removeTransaction}
-            >
-              <Trash2 size={15} />
-            </button>
-          </div>
-        )}
-      </div>
+      <TransactionPreviewRow
+        key={tx.id}
+        index={index}
+        tx={tx}
+        isDuplicate={isTxDuplicate}
+        isInternalTransfer={!isTxDuplicate && (tx.isGhost || internalTransferIds.has(tx.id))}
+        isSpaceTransfer={!isTxDuplicate && spaceTransferIds.has(tx.id)}
+        isManuallyIncludedSpaceTransfer={!isTxDuplicate && manuallyIncludedIds.has(tx.id)}
+        showInstitution={showInstitution}
+        customCategories={customCategories}
+        t={t}
+        locale={locale}
+        formatCurrency={formatCurrency}
+        formatDate={formatDate}
+        onUpdateTransaction={onUpdateTransaction}
+        onRemoveTransaction={onRemoveTransaction}
+        onToggleSpaceTransferInclude={handleToggleSpaceTransferInclude}
+      />
     )
   }
 
@@ -377,14 +240,25 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={customHeader}
+      title={
+        <TransactionPreviewHeader
+          effectiveTitle={effectiveTitle}
+          variant={variant}
+          totalCount={filteredAndSortedTransactions.length}
+          totalInflows={totalInflows}
+          totalOutflows={totalOutflows}
+          formatCurrency={formatCurrency}
+          formatTransactionCount={formatTransactionCount}
+          t={t}
+        />
+      }
       maxWidth="880px"
       footer={
         <div className={styles['modal-footer']}>
           <span className={styles['footer-count-text']}>
             {(t.showingOf || 'Showing {shown} of {total} transactions')
               .replace('{shown}', String(filteredAndSortedTransactions.length))
-              .replace('{total}', String(transactions.length))}
+              .replace('{total}', String(scopedTransactions.length))}
           </span>
           <button
             className={`primary-button ${styles['done-button']}`}
@@ -397,110 +271,67 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         </div>
       }
     >
-      {duplicateIds.size > 0 && (
+      {duplicateIds.size > 0 && scopeFilter !== 'duplicates' && (
         <div className={styles['duplicate-banner']}>
           <AlertTriangle size={18} />
           <span>
             {duplicateIds.size === 1
-              ? t.duplicateTransactionsDetectedSingular
-              : t.duplicateTransactionsDetected.replace('{count}', String(duplicateIds.size))}
+              ? t.duplicateTransactionsDetectedSingular || '1 duplicate transaction detected.'
+              : (t.duplicateTransactionsDetected || '{count} duplicate transactions detected.').replace('{count}', String(duplicateIds.size))}
           </span>
         </div>
       )}
 
-      {internalTransferIds.size > 0 && (
-        <div className={styles['internal-transfer-banner']} data-testid="preview-internal-transfers-banner">
-          <Ghost size={18} />
-          <span>
-            {internalTransferIds.size === 1
-              ? t.internalTransfersDetectedBannerSingular
-              : t.internalTransfersDetectedBanner.replace('{count}', String(internalTransferIds.size))}
-          </span>
-        </div>
-      )}
-
-      {discardedSpaceCount > 0 && (
-        <div className={styles['space-transfer-banner']} data-testid="preview-space-transfers-banner">
-          <Info size={18} />
-          <span>
-            {discardedSpaceCount === 1
-              ? t.spaceTransfersExcludedSingular || '1 transaction between spaces was automatically excluded.'
-              : (t.spaceTransfersExcluded || '{count} transactions between spaces were automatically excluded.').replace('{count}', String(discardedSpaceCount))}
-          </span>
-        </div>
-      )}
-
-      {/* Modern Filter & Search Toolbar (only when multiple transactions exist) */}
-      {hasMultipleTransactions && (
-        <div className={styles.toolbar}>
-          <div className={styles['search-box']}>
-            <Search size={15} className={styles['search-icon']} />
-            <input
-              id="tx-modal-search"
-              name="tx-modal-search"
-              type="text"
-              className={styles['search-input']}
-              placeholder={t.searchTransactionsPlaceholder || 'Search description, merchant, amount…'}
-              title={t.searchTransactionsPlaceholder || 'Search description, merchant, amount…'}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
-              <button
-                className={styles['search-clear-btn']}
-                onClick={() => setSearchQuery('')}
-                title={t.clear || 'Clear'}
-                aria-label={t.clear || 'Clear'}
-              >
-                <X size={12} />
-              </button>
-            )}
-          </div>
-
-          <div className={styles['date-range-container']}>
-            <div className={styles['date-filter-wrapper']}>
-              <DatePicker
-                className={styles['date-filter-input']}
-                value={startDate}
-                onChange={setStartDate}
-                placeholder={t.fromDate || 'From date'}
-              />
-            </div>
-            <div className={styles['date-filter-wrapper']}>
-              <DatePicker
-                className={styles['date-filter-input']}
-                value={endDate}
-                onChange={setEndDate}
-                placeholder={t.toDate || 'To date'}
-              />
-            </div>
-          </div>
-
-          <Select
-            id="tx-modal-sort"
-            name="tx-modal-sort"
-            className={styles['sort-select-wrapper']}
-            value={sortConfig ? `${sortConfig.key}-${sortConfig.direction}` : 'default'}
-            onChange={handleSortChange}
-            options={sortOptions}
-            aria-label="Sort transactions"
-          />
-
-          {isFilterActive && (
-            <button
-              className={styles['clear-filters-btn']}
-              onClick={handleClearFilters}
-              title={t.clearFilters || 'Clear filters'}
-            >
-              <RotateCcw size={13} />
-              <span>{t.clearFilters || 'Clear filters'}</span>
-            </button>
-          )}
-        </div>
-      )}
+      {/* Modern Filter & Search Toolbar */}
+      <TransactionPreviewToolbar
+        hasMultipleTransactions={hasMultipleTransactions}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        sortConfig={sortConfig}
+        handleSortChange={handleSortChange}
+        sortOptions={sortOptions}
+        isFilterActive={isFilterActive}
+        handleClearFilters={handleClearFilters}
+        t={t}
+      />
 
       {/* Transactions Table */}
       <div className={styles['table-container']}>
+        {scopeFilter === 'space-transfers' && (
+          <div className={styles['space-transfers-notice']} data-testid="space-transfers-notice">
+            <Layers size={15} aria-hidden="true" />
+            <span>
+              {t.spaceTransfersExcludedNotice ||
+                'These transactions were automatically excluded to prevent double counting and will not be imported.'}
+            </span>
+            {activeExcluded.length > 0 && (
+              <button
+                type="button"
+                className={styles['include-all-btn']}
+                onClick={handleIncludeAllSpaceTransfers}
+                data-testid="include-all-space-transfers-btn"
+              >
+                <Plus size={13} aria-hidden="true" />
+                <span>{t.includeAllInImport || 'Include all in import'}</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {scopeFilter === 'internal-transfers' && (
+          <div className={styles['internal-transfers-notice']} data-testid="internal-transfers-notice">
+            <Ghost size={15} aria-hidden="true" />
+            <span>
+              {t.internalTransfersNotice ||
+                'These transactions are internal transfers between your own accounts. They are excluded from income and expenses and hidden from standard views.'}
+            </span>
+          </div>
+        )}
+
         <div className={styles['table-header']}>
           <div
             className={`${styles['col-main']} ${
@@ -535,16 +366,18 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             {hasMultipleTransactions && renderSortIcon('amount')}
           </div>
 
-          {onRemoveTransaction && <div className={styles['col-actions']} />}
+          {(onRemoveTransaction || hasSpaceTransfers) && <div className={styles['col-actions']} />}
         </div>
 
         {filteredAndSortedTransactions.length === 0 ? (
           <div className={styles['empty-state']}>
             <Search size={32} className={styles['empty-icon']} />
             <p className={styles['empty-text']}>
-              {transactions.length === 0 ? t.noTransactionsLeft : t.noTransactionsMatch}
+              {transactions.length === 0 && (excludedSpaceTransactions || []).length === 0
+                ? t.noTransactionsLeft
+                : t.noTransactionsMatch}
             </p>
-            {hasMultipleTransactions && isFilterActive && (
+            {isFilterActive && (
               <button
                 className={styles['clear-filters-btn']}
                 onClick={handleClearFilters}

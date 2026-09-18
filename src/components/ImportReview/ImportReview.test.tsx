@@ -207,7 +207,7 @@ describe('ImportReview', () => {
     expect(screen.getAllByText('€0').length).toBe(2) // Income and Expense
   })
 
-  it('renders reconciliation card and account badges when accounts have internal transfers', () => {
+  it('renders account badges and excludes internal transfers from totals when accounts have internal transfers', () => {
     mockState.importedAccounts = [
       {
         institutionId: '1',
@@ -260,11 +260,9 @@ describe('ImportReview', () => {
 
     render(<ImportReview />)
 
-    expect(screen.getByTestId('internal-transfers-reconciliation-card')).toBeInTheDocument()
-    expect(screen.getByText('Internal Transfers Reconciled')).toBeInTheDocument()
-    expect(
-      screen.getByText(/1 transfer between your accounts was recognized/i),
-    ).toBeInTheDocument()
+    // Static banner should no longer be rendered on the review screen
+    expect(screen.queryByTestId('internal-transfers-reconciliation-card')).not.toBeInTheDocument()
+    expect(screen.queryByText('Internal Transfers Reconciled')).not.toBeInTheDocument()
 
     // Both accounts should have internal transfer badges
     expect(screen.getAllByText(/1 internal transfer/i)).toHaveLength(2)
@@ -275,7 +273,7 @@ describe('ImportReview', () => {
     expect(screen.getByText('€0')).toBeInTheDocument() // expenses = 0
   })
 
-  it('correctly counts 2 transfer pairs from 4 ghost transactions across accounts', () => {
+  it('correctly displays internal transfer badges across accounts', () => {
     mockState.importedAccounts = [
       {
         institutionId: '1',
@@ -341,10 +339,8 @@ describe('ImportReview', () => {
 
     render(<ImportReview />)
 
-    // 4 ghost transactions across 2 accounts form exactly 2 transfer pairs
-    expect(
-      screen.getByText(/2 transfers between your accounts were recognized/i),
-    ).toBeInTheDocument()
+    expect(screen.queryByTestId('internal-transfers-reconciliation-card')).not.toBeInTheDocument()
     expect(screen.getAllByText(/2 internal transfers/i)).toHaveLength(2)
   })
 })
+

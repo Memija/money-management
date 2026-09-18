@@ -118,14 +118,39 @@ export const en: TranslationStrings = {
   duplicateImportProceed: 'Proceed with {newCount} transactions',
   duplicateImportCancel: 'Cancel',
   duplicateImportOk: 'OK',
-  duplicateTransactionsDetectedSingular:
-    '1 duplicate transaction detected (highlighted in yellow).',
-  duplicateTransactionsDetected: '{count} duplicate transactions detected (highlighted in yellow).',
+  duplicateTransactionsDetectedSingular: '1 duplicate transaction detected and will be skipped.',
+  duplicateTransactionsDetected: '{count} duplicate transactions detected and will be skipped.',
+  duplicateImportAllBannerSingular: '1 duplicate transaction detected. This transaction has already been imported.',
+  duplicateImportAllBanner: 'All {count} transactions in this file have already been imported (duplicates).',
+  duplicateImportPartialBanner: '{duplicateCount} duplicate transactions detected and will be skipped. {newCount} new transactions will be imported.',
+  allTransactionsAlreadyImported: 'All transactions already imported',
+  importNewTransactions: 'Import {count} new transactions',
+  filterDuplicates: 'Duplicates',
+  duplicatesSkippedNotice: 'These transactions already exist in your records and will be skipped to prevent double counting.',
+  viewDuplicates: 'View duplicates',
 
   spaceTransfersExcluded:
     '{count} internal space transfers were automatically excluded to prevent double counting.',
   spaceTransfersExcludedSingular:
     '1 internal space transfer was automatically excluded to prevent double counting.',
+  filterAll: 'All',
+  filterIncluded: 'To Import',
+  filterSpaceTransfers: 'Space Transfers',
+  filterInternalTransfers: 'Internal Transfers',
+  viewExcludedSpaceTransfers: 'View excluded',
+  viewInternalTransfers: 'View transfers',
+  viewTheseTransactions: 'View these transactions',
+  spaceTransfer: 'Space Transfer',
+  spaceTransferExcludedBadge: 'Excluded',
+  spaceTransfersExcludedNotice:
+    'These transactions were automatically excluded to prevent double counting and will not be imported.',
+  internalTransfersNotice:
+    'These transactions are internal transfers between your own accounts. They are excluded from income and expenses and hidden from standard views.',
+  includeInImport: 'Include in import',
+  includeAllInImport: 'Include all in import',
+  include: 'Include',
+  excludeFromImport: 'Exclude from import',
+  exclude: 'Exclude',
   internalTransfersDetectedSingular:
     '1 internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
   internalTransfersDetected:
@@ -143,6 +168,20 @@ export const en: TranslationStrings = {
   accountInternalTransfersSingular: '1 internal transfer',
   inflows: 'Inflows',
   outflows: 'Outflows',
+
+  transferWarningModalTitle: 'Internal Transfers Detected',
+  transferWarningModalSpaceMessage:
+    '{count} transfers between your sub-accounts or spaces were detected. They will be excluded from spending to prevent double counting. You can review them before importing.',
+  transferWarningModalSpaceMessageSingular:
+    '1 transfer between your sub-accounts or spaces was detected. It will be excluded from spending to prevent double counting. You can review it before importing.',
+  transferWarningModalInternalMessage:
+    '{count} transfers between your accounts were detected. They will be excluded from income and expenses to prevent double counting. You can review them before importing.',
+  transferWarningModalInternalMessageSingular:
+    '1 transfer between your accounts was detected. It will be excluded from income and expenses to prevent double counting. You can review it before importing.',
+  transferWarningModalBothMessage:
+    '{count} internal transfers (including sub-account space movements and cross-account transfers) were detected. They will be excluded from income and expenses to prevent double counting.',
+  transferWarningModalReview: 'Review Details',
+  transferWarningModalProceed: 'Proceed with Import',
 
   importSuccessTitle: 'Import Successful!',
   importSuccessSubtitle:

@@ -118,14 +118,39 @@ export const bs: TranslationStrings = {
   duplicateImportProceed: 'Nastavi sa {newCount} transakcija',
   duplicateImportOk: 'OK',
   duplicateImportCancel: 'Odustani',
-  duplicateTransactionsDetectedSingular:
-    '1 duplikatna transakcija otkrivena (označena žutom bojom).',
-  duplicateTransactionsDetected: '{count} duplikatne transakcije otkrivene (označene žutom bojom).',
+  duplicateTransactionsDetectedSingular: '1 duplikatna transakcija otkrivena i bit će preskočena.',
+  duplicateTransactionsDetected: '{count} duplikatne transakcije otkrivene i bit će preskočene.',
+  duplicateImportAllBannerSingular: 'Otkrivena je 1 duplirana transakcija. Ova transakcija je već uvezena.',
+  duplicateImportAllBanner: 'Svih {count} transakcija u ovoj datoteci je već uvezeno (duplikati).',
+  duplicateImportPartialBanner: 'Otkriveno je {duplicateCount} duplikata koji će biti preskočeni. {newCount} novih transakcija će biti uvezeno.',
+  allTransactionsAlreadyImported: 'Sve transakcije su već uvezene',
+  importNewTransactions: 'Uvezi {count} novih transakcija',
+  filterDuplicates: 'Duplikati',
+  duplicatesSkippedNotice: 'Ove transakcije već postoje u Vašoj evidenciji i bit će preskočene kako bi se spriječilo dvostruko računanje.',
+  viewDuplicates: 'Pregledaj duplikate',
 
   spaceTransfersExcluded:
     '{count} internih prijenosa između prostora (Spaces) je automatski isključeno radi izbjegavanja dvostrukog računanja.',
   spaceTransfersExcludedSingular:
     '1 interni prijenos između prostora (Spaces) je automatski isključen radi izbjegavanja dvostrukog računanja.',
+  filterAll: 'Sve',
+  filterIncluded: 'Za uvoz',
+  filterSpaceTransfers: 'Prijenosi između prostora',
+  filterInternalTransfers: 'Interni transferi',
+  viewExcludedSpaceTransfers: 'Prikaži isključene',
+  viewInternalTransfers: 'Prikaži transfere',
+  viewTheseTransactions: 'Prikaži ove transakcije',
+  spaceTransfer: 'Prijenos između prostora',
+  spaceTransferExcludedBadge: 'Isključeno',
+  spaceTransfersExcludedNotice:
+    'Ove transakcije su automatski isključene kako bi se spriječilo dvostruko računanje i neće biti uvezene.',
+  internalTransfersNotice:
+    'Ove transakcije su interni transferi između Vaših računa. Isključene su iz prihoda i rashoda te skrivene iz standardnih pregleda.',
+  includeInImport: 'Uključi u uvoz',
+  includeAllInImport: 'Uključi sve u uvoz',
+  include: 'Uključi',
+  excludeFromImport: 'Isključi iz uvoza',
+  exclude: 'Isključi',
   internalTransfersDetectedSingular:
     'Otkriven je 1 interni prijenos s vašim drugim računima (isključen iz prihoda/rashoda i sakriven iz standardnih pregleda).',
   internalTransfersDetected:
@@ -143,6 +168,20 @@ export const bs: TranslationStrings = {
   accountInternalTransfersSingular: '1 interni prijenos',
   inflows: 'Prilivi',
   outflows: 'Odlivi',
+
+  transferWarningModalTitle: 'Otkriveni interni prijenosi',
+  transferWarningModalSpaceMessage:
+    'Otkriveno je {count} prijenosa između vaših podračuna ili prostora. Biće isključeni iz troškova kako bi se spriječilo dvostruko računanje. Možete ih pregledati prije uvoza.',
+  transferWarningModalSpaceMessageSingular:
+    'Otkriven je 1 prijenos između vaših podračuna ili prostora. Biće isključen iz troškova kako bi se spriječilo dvostruko računanje. Možete ga pregledati prije uvoza.',
+  transferWarningModalInternalMessage:
+    'Otkriveno je {count} prijenosa između vaših računa. Biće isključeni iz prihoda i rashoda kako bi se spriječilo dvostruko računanje. Možete ih pregledati prije uvoza.',
+  transferWarningModalInternalMessageSingular:
+    'Otkriven je 1 prijenos između vaših računa. Biće isključen iz prihoda i rashoda kako bi se spriječilo dvostruko računanje. Možete ga pregledati prije uvoza.',
+  transferWarningModalBothMessage:
+    'Otkriveno je {count} internih prijenosa (uključujući prijenose između prostora i međuračunske prijenose). Biće isključeni iz prihoda i rashoda radi tačnog obračuna.',
+  transferWarningModalReview: 'Pregledaj detalje',
+  transferWarningModalProceed: 'Nastavi s uvozom',
 
   importSuccessTitle: 'Uvoz uspješan!',
   importSuccessSubtitle:

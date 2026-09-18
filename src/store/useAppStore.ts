@@ -39,6 +39,12 @@ export interface AppState {
   getDuplicateTransactionStats: (institutionId: string, transactions: Transaction[]) => { duplicateCount: number; newCount: number; duplicateIds: string[] }
 }
 
+export const toCanonicalTransactionKey = (t: { date: string; amount: number; description: string }) => {
+  const normDesc = (t.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
+  const normAmount = Number(t.amount).toFixed(2)
+  return `${t.date}|${normAmount}|${normDesc}`
+}
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -46,6 +52,7 @@ export const useAppStore = create<AppState>()(
       selectedCountry: null,
       selectedInstitution: null,
       importedAccounts: [],
+
       customKeywords: {},
       manualCategories: {},
       customCategories: [],
@@ -108,17 +115,14 @@ export const useAppStore = create<AppState>()(
             updatedList = [...state.importedAccounts, account]
           } else {
             // Same institution already has data — merge transactions to avoid data loss.
-            // Deduplicate by a canonical key (date|amount|description) so re-importing
-            // overlapping periods doesn't create duplicates.
+            // Deduplicate by canonical key (date|amount|normalized description) so re-importing
+            // overlapping periods or duplicate files doesn't create duplicates.
             const existing = state.importedAccounts[existingIdx]
             const existingKeys = new Set(
-              existing.transactions.map(
-                (t) => `${t.date}|${t.amount}|${t.description.trim().toLowerCase()}`,
-              ),
+              existing.transactions.map(toCanonicalTransactionKey),
             )
             const newUnique = account.transactions.filter(
-              (t) =>
-                !existingKeys.has(`${t.date}|${t.amount}|${t.description.trim().toLowerCase()}`),
+              (t) => !existingKeys.has(toCanonicalTransactionKey(t)),
             )
             // Accumulate ALL fingerprints so future re-imports of any previously seen file are detected
             const mergedFingerprints = Array.from(
@@ -201,23 +205,34 @@ export const useAppStore = create<AppState>()(
 
       getDuplicateTransactionStats: (institutionId, transactions) => {
         const { importedAccounts } = get()
-        const existingIdx = importedAccounts.findIndex((a) => a.institutionId === institutionId)
-        if (existingIdx < 0) {
+        const targetAccounts =
+          institutionId && institutionId !== 'unknown'
+            ? importedAccounts.filter((a) => a.institutionId === institutionId)
+            : importedAccounts
+
+        if (targetAccounts.length === 0) {
           return { duplicateCount: 0, newCount: transactions.length, duplicateIds: [] }
         }
-        const existing = importedAccounts[existingIdx]
-        const existingKeys = new Set(
-          existing.transactions.map(
-            (t) => `${t.date}|${t.amount}|${t.description.trim().toLowerCase()}`,
-          ),
-        )
+
+        const existingKeys = new Set<string>()
+        for (const account of targetAccounts) {
+          for (const tx of account.transactions) {
+            existingKeys.add(toCanonicalTransactionKey(tx))
+          }
+        }
+
         const duplicateIds: string[] = []
         for (const t of transactions) {
-          if (existingKeys.has(`${t.date}|${t.amount}|${t.description.trim().toLowerCase()}`)) {
+          if (existingKeys.has(toCanonicalTransactionKey(t))) {
             duplicateIds.push(t.id)
           }
         }
-        return { duplicateCount: duplicateIds.length, newCount: transactions.length - duplicateIds.length, duplicateIds }
+
+        return {
+          duplicateCount: duplicateIds.length,
+          newCount: transactions.length - duplicateIds.length,
+          duplicateIds,
+        }
       },
     }),
     {

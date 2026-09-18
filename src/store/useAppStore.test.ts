@@ -226,6 +226,13 @@ describe('useAppStore', () => {
     const statsChase = useAppStore.getState().getDuplicateTransactionStats('chase', incomingTransactions)
     expect(statsChase).toEqual({ duplicateCount: 1, newCount: 1, duplicateIds: ['1a'] })
 
+    // Check whitespace normalization and amount decimal equivalence
+    const whitespaceTransactions = [
+      { id: '1b', date: '2023-01-01', amount: 100.00, description: 'Test   1', category: '', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+    ]
+    const statsWhitespace = useAppStore.getState().getDuplicateTransactionStats('chase', whitespaceTransactions)
+    expect(statsWhitespace).toEqual({ duplicateCount: 1, newCount: 0, duplicateIds: ['1b'] })
+
     // Check against unknown institution (all should be new)
     const statsIng = useAppStore.getState().getDuplicateTransactionStats('ing', incomingTransactions)
     expect(statsIng).toEqual({ duplicateCount: 0, newCount: 2, duplicateIds: [] })

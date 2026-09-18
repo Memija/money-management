@@ -118,13 +118,39 @@ export const de: TranslationStrings = {
   duplicateImportProceed: 'Mit {newCount} Transaktionen fortfahren',
   duplicateImportCancel: 'Abbrechen',
   duplicateImportOk: 'OK',
-  duplicateTransactionsDetectedSingular: '1 doppelte Transaktion erkannt (gelb hervorgehoben).',
-  duplicateTransactionsDetected: '{count} doppelte Transaktionen erkannt (gelb hervorgehoben).',
+  duplicateTransactionsDetectedSingular: '1 doppelte Transaktion erkannt, die übersprungen wird.',
+  duplicateTransactionsDetected: '{count} doppelte Transaktionen erkannt, die übersprungen werden.',
+  duplicateImportAllBannerSingular: '1 doppelte Buchung erkannt. Diese Buchung wurde bereits importiert.',
+  duplicateImportAllBanner: 'Alle {count} Buchungen in dieser Datei wurden bereits importiert (Duplikate).',
+  duplicateImportPartialBanner: '{duplicateCount} doppelte Buchungen erkannt und werden übersprungen. {newCount} neue Buchungen werden importiert.',
+  allTransactionsAlreadyImported: 'Alle Buchungen bereits importiert',
+  importNewTransactions: '{count} neue Buchungen importieren',
+  filterDuplicates: 'Duplikate',
+  duplicatesSkippedNotice: 'Diese Buchungen existieren bereits in Ihren Daten und werden übersprungen, um Doppelzählungen zu verhindern.',
+  viewDuplicates: 'Duplikate anzeigen',
 
   spaceTransfersExcluded:
     '{count} interne Space-Umbuchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
   spaceTransfersExcludedSingular:
     '1 interne Space-Umbuchung wurde automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
+  filterAll: 'Alle',
+  filterIncluded: 'Zu importieren',
+  filterSpaceTransfers: 'Space-Umbuchungen',
+  filterInternalTransfers: 'Interne Überweisungen',
+  viewExcludedSpaceTransfers: 'Ausgeschlossene anzeigen',
+  viewInternalTransfers: 'Umbuchungen anzeigen',
+  viewTheseTransactions: 'Diese Umsätze anzeigen',
+  spaceTransfer: 'Space-Umbuchung',
+  spaceTransferExcludedBadge: 'Ausgeschlossen',
+  spaceTransfersExcludedNotice:
+    'Diese Buchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu verhindern, und werden nicht importiert.',
+  internalTransfersNotice:
+    'Diese Buchungen sind interne Umbuchungen zwischen Ihren eigenen Konten. Sie werden von Einnahmen/Ausgaben ausgeschlossen und in Standardansichten ausgeblendet.',
+  includeInImport: 'In Import aufnehmen',
+  includeAllInImport: 'Alle in Import aufnehmen',
+  include: 'Aufnehmen',
+  excludeFromImport: 'Vom Import ausschließen',
+  exclude: 'Ausschließen',
   internalTransfersDetectedSingular:
     '1 interne Umbuchung mit deinen anderen Konten erkannt (von Einnahmen/Ausgaben ausgeschlossen und in Standardansichten ausgeblendet).',
   internalTransfersDetected:
@@ -142,6 +168,20 @@ export const de: TranslationStrings = {
   accountInternalTransfersSingular: '1 interne Umbuchung',
   inflows: 'Einnahmen',
   outflows: 'Ausgaben',
+
+  transferWarningModalTitle: 'Interne Überweisungen erkannt',
+  transferWarningModalSpaceMessage:
+    '{count} Überweisungen zwischen deinen Unterkonten oder Spaces wurden erkannt. Sie werden von den Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden. Du kannst sie vor dem Import überprüfen.',
+  transferWarningModalSpaceMessageSingular:
+    '1 Überweisung zwischen deinen Unterkonten oder Spaces wurde erkannt. Sie wird von den Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden. Du kannst sie vor dem Import überprüfen.',
+  transferWarningModalInternalMessage:
+    '{count} Überweisungen zwischen deinen Konten wurden erkannt. Sie werden aus Einnahmen und Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden. Du kannst sie vor dem Import überprüfen.',
+  transferWarningModalInternalMessageSingular:
+    '1 Überweisung zwischen deinen Konten wurde erkannt. Sie wird aus Einnahmen und Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden. Du kannst sie vor dem Import überprüfen.',
+  transferWarningModalBothMessage:
+    '{count} interne Überweisungen (einschließlich Unterkonto-/Space-Umbuchungen und kontoübergreifenden Überweisungen) wurden erkannt. Sie werden aus Einnahmen und Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden.',
+  transferWarningModalReview: 'Details überprüfen',
+  transferWarningModalProceed: 'Mit Import fortfahren',
 
   importSuccessTitle: 'Import erfolgreich!',
   importSuccessSubtitle:

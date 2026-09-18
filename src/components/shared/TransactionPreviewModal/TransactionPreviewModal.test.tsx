@@ -24,6 +24,8 @@ vi.mock('../../../store/useLanguageStore', () => ({
         searchTransactionsPlaceholder: 'Search description, merchant, amount…',
         clearFilters: 'Clear filters',
         duplicate: 'Duplicate',
+        filterDuplicates: 'Duplicates',
+        duplicatesSkippedNotice: 'Duplicates notice',
         allDates: 'All dates',
         showingOf: 'Showing {shown} of {total} transactions',
         fromDate: 'From date',
@@ -144,6 +146,14 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.getByText('Supermarket Groceries')).toBeInTheDocument()
   })
 
+  it('does not display institution by default when importing, but displays when showInstitution is true', () => {
+    const { rerender } = render(<TransactionPreviewModal {...defaultProps} />)
+    expect(screen.queryByText('Sparkasse')).not.toBeInTheDocument()
+
+    rerender(<TransactionPreviewModal {...defaultProps} showInstitution={true} />)
+    expect(screen.getAllByText('Sparkasse').length).toBeGreaterThan(0)
+  })
+
   it('filters transactions when user types into the search box', () => {
     render(<TransactionPreviewModal {...defaultProps} />)
     const searchInput = screen.getByPlaceholderText('Search description, merchant, amount…')
@@ -172,26 +182,28 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.getByText('Duplicate')).toBeInTheDocument()
   })
 
-  it('highlights internal transfer transactions with badge and banner', () => {
+  it('highlights internal transfer transactions with internal transfer badge', () => {
     render(
       <TransactionPreviewModal
         {...defaultProps}
         internalTransferIds={new Set(['tx-2'])}
       />,
     )
-    expect(screen.getByTestId('preview-internal-transfers-banner')).toBeInTheDocument()
+    expect(screen.queryByTestId('preview-internal-transfers-banner')).not.toBeInTheDocument()
     expect(screen.getByText('Internal Transfer')).toBeInTheDocument()
   })
 
-  it('renders space transfers excluded banner when discardedSpaceCount is provided', () => {
+  it('renders space transfers notice when filtered to space transfers', () => {
     render(
       <TransactionPreviewModal
         {...defaultProps}
+        initialFilter="space-transfers"
         discardedSpaceCount={4}
+        excludedSpaceTransactions={mockTransactions}
       />,
     )
-    expect(screen.getByTestId('preview-space-transfers-banner')).toBeInTheDocument()
-    expect(screen.getByText(/4 transactions between spaces were automatically excluded/i)).toBeInTheDocument()
+    expect(screen.queryByTestId('preview-space-transfers-banner')).not.toBeInTheDocument()
+    expect(screen.getByTestId('space-transfers-notice')).toBeInTheDocument()
   })
 
   it('renders inline editable inputs when onUpdateTransaction is provided', () => {
@@ -349,6 +361,61 @@ describe('TransactionPreviewModal (Shared)', () => {
 
     // Remove button should NOT exist for internal transfer
     expect(screen.getAllByRole('button', { name: 'Remove transaction' })).toHaveLength(1)
+  })
+
+  it('renders duplicate preview rows with standard layout, standard inputs, and no secondary transfer badges or include buttons', () => {
+    const mockOnUpdate = vi.fn()
+    const mockOnRemove = vi.fn()
+
+    const duplicateTx: Transaction = {
+      id: 'tx-dup-1',
+      date: '2026-03-01',
+      description: 'Duplicate Salary',
+      amount: 2500,
+      currency: 'EUR',
+      type: 'income',
+      category: 'salary',
+      institution: 'Sparkasse',
+      isGhost: true, // even if marked isGhost previously, duplicate exclusivity must suppress it!
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={[duplicateTx, mockTransactions[1]]}
+        duplicateIds={new Set(['tx-dup-1'])}
+        internalTransferIds={new Set(['tx-dup-1'])} // even if passed in internalTransferIds, duplicate must take precedence!
+        excludedSpaceTransactions={[]}
+        initialFilter="duplicates"
+        onUpdateTransaction={mockOnUpdate}
+        onRemoveTransaction={mockOnRemove}
+      />,
+    )
+
+    // Duplicates notice inside table container is removed
+    expect(screen.queryByTestId('duplicates-notice')).not.toBeInTheDocument()
+
+    // Redundant top duplicate-banner should NOT be shown in duplicates view
+    expect(screen.queryByText(/1 duplicate transaction detected and will be skipped/i)).not.toBeInTheDocument()
+
+    // No type navigation tabs in toolbar
+    expect(screen.queryByTestId('filter-tab-duplicates')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-tab-all')).not.toBeInTheDocument()
+
+    // The duplicate row is read-only in this view (static text, not editable inputs)
+    expect(screen.queryByLabelText('Description', { selector: '#tx-desc-tx-dup-1' })).not.toBeInTheDocument()
+    expect(screen.getByText('Duplicate Salary')).toBeInTheDocument()
+
+    // Amount is read-only text, not editable input
+    expect(screen.queryByLabelText('Amount', { selector: '#tx-amount-tx-dup-1' })).not.toBeInTheDocument()
+
+    // No remove trash button for duplicate transactions
+    expect(screen.queryByRole('button', { name: 'Remove transaction' })).not.toBeInTheDocument()
+
+    // Must NOT have internal transfer pill or space transfer pill or include button
+    expect(screen.queryByText('Internal Transfer')).not.toBeInTheDocument()
+    expect(screen.queryByText('Space Transfer')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /include/i })).not.toBeInTheDocument()
   })
 })
 

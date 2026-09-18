@@ -119,14 +119,40 @@ export const sr: TranslationStrings = {
   duplicateImportOk: 'OK',
   duplicateImportCancel: 'Откажи',
   duplicateTransactionsDetectedSingular:
-    'Откривена 1 дупликатна трансакција (означена жутом бојом).',
+    'Откривена је 1 дупликатна трансакција и биће прескочена.',
   duplicateTransactionsDetected:
-    'Откривено {count} дупликатних трансакција (означене жутом бојом).',
+    'Откривено је {count} дупликатних трансакција и биће прескочене.',
+  duplicateImportAllBannerSingular: 'Откривена је 1 дуплирана трансакција. Ова трансакција је већ увезена.',
+  duplicateImportAllBanner: 'Свих {count} трансакција у овој датотеци је већ увезено (дупликати).',
+  duplicateImportPartialBanner: 'Откривено је {duplicateCount} дупликата који ће бити прескочени. {newCount} нових трансакција ће бити увезено.',
+  allTransactionsAlreadyImported: 'Све трансакције су већ увезене',
+  importNewTransactions: 'Увези {count} нових трансакција',
+  filterDuplicates: 'Дупликати',
+  duplicatesSkippedNotice: 'Ове трансакције већ постоје у Вашој евиденцији и биће прескочене како би се спречило двоструко рачунање.',
+  viewDuplicates: 'Прегледај дупликате',
 
   spaceTransfersExcluded:
     '{count} интерних преноса између простора (Spaces) је аутоматски искључено ради избегавања двоструког рачунања.',
   spaceTransfersExcludedSingular:
     '1 интерни пренос између простора (Spaces) је аутоматски искључен ради избегавања двоструког рачунања.',
+  filterAll: 'Све',
+  filterIncluded: 'За увоз',
+  filterSpaceTransfers: 'Преноси између простора',
+  filterInternalTransfers: 'Интерни трансфери',
+  viewExcludedSpaceTransfers: 'Прикажи искључене',
+  viewInternalTransfers: 'Прикажи трансфере',
+  viewTheseTransactions: 'Прикажи ове трансакције',
+  spaceTransfer: 'Пренос између простора',
+  spaceTransferExcludedBadge: 'Искључено',
+  spaceTransfersExcludedNotice:
+    'Ове трансакције су аутоматски искључене како би се спречило двоструко рачунање и неће бити увезене.',
+  internalTransfersNotice:
+    'Ове трансакције су интерни преноси између Ваших рачуна. Искључене су из прихода и расхода и сакривене из стандардних прегледа.',
+  includeInImport: 'Укључи у увоз',
+  includeAllInImport: 'Укључи све у увоз',
+  include: 'Укључи',
+  excludeFromImport: 'Искључи из увоза',
+  exclude: 'Искључи',
   internalTransfersDetectedSingular:
     'Откривен је 1 интерни пренос са вашим другим рачунима (искључен из прихода/расхода и сакривен из стандардних прегледа).',
   internalTransfersDetected:
@@ -144,6 +170,20 @@ export const sr: TranslationStrings = {
   accountInternalTransfersSingular: '1 интерни пренос',
   inflows: 'Приливи',
   outflows: 'Одливи',
+
+  transferWarningModalTitle: 'Откривени интерни преноси',
+  transferWarningModalSpaceMessage:
+    'Откривено је {count} преноса између ваших подрачуна или простора. Биће искључени из трошкова како би се спречило двоструко рачунање. Можете их прегледати пре увоза.',
+  transferWarningModalSpaceMessageSingular:
+    'Откривен је 1 пренос између ваших подрачуна или простора. Биће искључен из трошкова како би се спречило двоструко рачунање. Можете га прегледати пре увоза.',
+  transferWarningModalInternalMessage:
+    'Откривено је {count} преноса између ваших рачуна. Биће искључени из прихода и расхода како би се спречило двоструко рачунање. Можете их прегледати пре увоза.',
+  transferWarningModalInternalMessageSingular:
+    'Откривен је 1 пренос између ваших рачуна. Биће искључен из прихода и расхода како би се спречило двоструко рачунање. Можете га прегледати пре увоза.',
+  transferWarningModalBothMessage:
+    'Откривено је {count} интерних преноса (укључујући преносе између простора и међурачунске преносе). Биће искључени из прихода и расхода ради тачног обрачуна.',
+  transferWarningModalReview: 'Прегледај детаље',
+  transferWarningModalProceed: 'Настави са увозом',
 
   importSuccessTitle: 'Увоз успешан!',
   importSuccessSubtitle:

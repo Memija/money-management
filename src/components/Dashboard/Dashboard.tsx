@@ -292,6 +292,7 @@ const Dashboard: React.FC = () => {
         title={detailModalConfig?.title ?? ''}
         variant={detailModalConfig?.variant ?? 'expense'}
         transactions={detailModalConfig?.transactions ?? []}
+        showInstitution={true}
       />
 
       {/* Avg detail modal — opened from Avg. Transaction card rows */}

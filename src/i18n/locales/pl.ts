@@ -118,13 +118,39 @@ export const pl: TranslationStrings = {
   duplicateImportProceed: 'Kontynuuj z {newCount} transakcjami',
   duplicateImportOk: 'OK',
   duplicateImportCancel: 'Anuluj',
-  duplicateTransactionsDetectedSingular: 'Wykryto 1 zduplikowaną transakcję (zaznaczoną na żółto).',
-  duplicateTransactionsDetected: 'Wykryto {count} zduplikowane transakcje (zaznaczone na żółto).',
+  duplicateTransactionsDetectedSingular: 'Wykryto 1 zduplikowaną transakcję, która zostanie pominięta.',
+  duplicateTransactionsDetected: 'Wykryto {count} zduplikowane transakcje, które zostaną pominięte.',
+  duplicateImportAllBannerSingular: 'Wykryto 1 zduplikowaną transakcję. Ta transakcja została już zaimportowana.',
+  duplicateImportAllBanner: 'Wszystkie {count} transakcje w tym pliku zostały już zaimportowane (duplikaty).',
+  duplicateImportPartialBanner: 'Wykryto {duplicateCount} duplikatów, które zostaną pominięte. {newCount} nowych transakcji zostanie zaimportowanych.',
+  allTransactionsAlreadyImported: 'Wszystkie transakcje zostały już zaimportowane',
+  importNewTransactions: 'Zaimportuj {count} nowych transakcji',
+  filterDuplicates: 'Duplikaty',
+  duplicatesSkippedNotice: 'Te transakcje już istnieją w Twoich zapisach i zostaną pominięte, aby zapobiec podwójnemu liczeniu.',
+  viewDuplicates: 'Zobacz duplikaty',
 
   spaceTransfersExcluded:
     '{count} wewnętrznych transferów między przestrzeniami (Spaces) zostało automatycznie wykluczonych, aby uniknąć podwójnego liczenia.',
   spaceTransfersExcludedSingular:
     '1 wewnętrzny transfer między przestrzeniami (Spaces) został automatycznie wykluczony, aby uniknąć podwójnego liczenia.',
+  filterAll: 'Wszystkie',
+  filterIncluded: 'Do zaimportowania',
+  filterSpaceTransfers: 'Transfery Spaces',
+  filterInternalTransfers: 'Przelewy własne',
+  viewExcludedSpaceTransfers: 'Pokaż wykluczone',
+  viewInternalTransfers: 'Pokaż przelewy',
+  viewTheseTransactions: 'Pokaż te transakcje',
+  spaceTransfer: 'Transfer Spaces',
+  spaceTransferExcludedBadge: 'Wykluczono',
+  spaceTransfersExcludedNotice:
+    'Te transakcje zostały automatycznie wykluczone, aby zapobiec podwójnemu liczeniu i nie zostaną zaimportowane.',
+  internalTransfersNotice:
+    'Te transakcje to przelewy wewnętrzne między Twoimi kontami. Są one wykluczone z przychodów i wydatków oraz ukryte w widokach standardowych.',
+  includeInImport: 'Uwzględnij w imporcie',
+  includeAllInImport: 'Uwzględnij wszystkie w imporcie',
+  include: 'Uwzględnij',
+  excludeFromImport: 'Wyklucz z importu',
+  exclude: 'Wyklucz',
   internalTransfersDetectedSingular:
     'Wykryto 1 przelew własny między Twoimi kontami (wykluczony z przychodów/wydatków i ukryty w widokach standardowych).',
   internalTransfersDetected:
@@ -142,6 +168,20 @@ export const pl: TranslationStrings = {
   accountInternalTransfersSingular: '1 przelew własny',
   inflows: 'Wpływy',
   outflows: 'Wypływy',
+
+  transferWarningModalTitle: 'Wykryto przelewy własne',
+  transferWarningModalSpaceMessage:
+    'Wykryto {count} przelewów między Twoimi podkontami lub przestrzeniami (Spaces). Zostaną one wykluczone z wydatków, aby zapobiec podwójnemu liczeniu. Możesz je sprawdzić przed importem.',
+  transferWarningModalSpaceMessageSingular:
+    'Wykryto 1 przelew między Twoimi podkontami lub przestrzeniami (Spaces). Zostanie on wykluczony z wydatków, aby zapobiec podwójnemu liczeniu. Możesz go sprawdzić przed importem.',
+  transferWarningModalInternalMessage:
+    'Wykryto {count} przelewów między Twoimi kontami. Zostaną one wykluczone z przychodów i wydatków, aby zapobiec podwójnemu liczeniu. Możesz je sprawdzić przed importem.',
+  transferWarningModalInternalMessageSingular:
+    'Wykryto 1 przelew między Twoimi kontami. Zostanie on wykluczony z przychodów i wydatków, aby zapobiec podwójnemu liczeniu. Możesz go sprawdzić przed importem.',
+  transferWarningModalBothMessage:
+    'Wykryto {count} przelewów własnych (w tym ruchy między przestrzeniami oraz przelewy międzykontowe). Zostaną wykluczone z przychodów i wydatków.',
+  transferWarningModalReview: 'Sprawdź szczegóły',
+  transferWarningModalProceed: 'Kontynuuj import',
 
   importSuccessTitle: 'Import zakończony sukcesem!',
   importSuccessSubtitle:

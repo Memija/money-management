@@ -1,19 +1,8 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  AlertCircle,
-  ArrowLeft,
-  CheckCircle2,
-  ClipboardPaste,
-  FileSpreadsheet,
-  FileType,
-  Ghost,
-  Info,
-  Loader2,
-  TrendingDown,
-  TrendingUp,
-  Upload,
-  X,
+  AlertTriangle, ArrowLeft, CheckCircle2,
+  Ghost, Info, Layers, Loader2, TrendingDown, TrendingUp, Upload, X,
 } from 'lucide-react'
 
 import { useFormatters } from '../../hooks/useFormatters'
@@ -23,6 +12,8 @@ import type { ImportedAccount, ImportMethod } from '../../types'
 import { reconcileCrossAccountTransfers } from '../../utils/account-transfers'
 import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal'
 import { DuplicateImportWarningModal } from './DuplicateImportWarningModal'
+import { ImportMethodSelector } from './ImportMethodSelector'
+import { ImportUploadArea } from './ImportUploadArea'
 import { TransactionPreviewModal } from './TransactionPreviewModal'
 import { useTransactionImport } from './useTransactionImport'
 
@@ -36,15 +27,16 @@ const TransactionImporter: React.FC = () => {
   const institutionName = selectedInstitution?.name ?? 'Unknown'
 
   const [method, setMethod] = useState<ImportMethod | null>(null)
-  const [dragOver, setDragOver] = useState(false)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [previewFilter, setPreviewFilter] = useState<'all' | 'included' | 'space-transfers' | 'internal-transfers' | 'duplicates'>('all')
   const [showClearConfirmation, setShowClearConfirmation] = useState(false)
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const {
     transactions,
     discardedSpaceCount,
+    excludedSpaceTransactions,
     detectedAccountIbans,
     loading,
     error,
@@ -58,112 +50,115 @@ const TransactionImporter: React.FC = () => {
     handlePaste,
     handleRemoveTransaction,
     handleUpdateTransaction,
+    handleIncludeSpaceTransaction,
+    handleExcludeSpaceTransaction,
+    handleIncludeAllSpaceTransactions,
     handleClearAll,
   } = useTransactionImport(institutionName, method, t)
 
-  const duplicateStats = React.useMemo(() => {
-    return getDuplicateTransactionStats(selectedInstitution?.id ?? 'unknown', transactions || [])
-  }, [selectedInstitution?.id, transactions, getDuplicateTransactionStats])
+  const duplicateStats = React.useMemo(
+    () => getDuplicateTransactionStats(selectedInstitution?.id ?? 'unknown', transactions || []),
+    [selectedInstitution?.id, transactions, getDuplicateTransactionStats],
+  )
+
+  const isAllDuplicates = duplicateStats.duplicateCount > 0 && duplicateStats.newCount === 0
+  const isPartialDuplicates = duplicateStats.duplicateCount > 0 && duplicateStats.newCount > 0
+
+  const nonDuplicateTransactions = React.useMemo(() => {
+    const duplicateIdSet = new Set(duplicateStats.duplicateIds)
+    return transactions.filter((tx) => !duplicateIdSet.has(tx.id))
+  }, [transactions, duplicateStats.duplicateIds])
+
+  const otherImportedAccounts = React.useMemo(() => {
+    return (importedAccounts || []).filter(
+      (a) => a.institutionId !== (selectedInstitution?.id ?? ''),
+    )
+  }, [importedAccounts, selectedInstitution?.id])
 
   const internalTransferStats = React.useMemo(() => {
-    if (!transactions || transactions.length === 0 || !importedAccounts || importedAccounts.length === 0) {
-      return {
-        count: 0,
-        transferTxIds: new Set<string>(),
-      }
+    if (!nonDuplicateTransactions?.length || !otherImportedAccounts?.length) {
+      return { count: 0, transferTxIds: new Set<string>() }
     }
 
     const draftAccount: ImportedAccount = {
       institutionId: selectedInstitution?.id ?? 'draft',
       institutionName,
-      transactions,
+      transactions: nonDuplicateTransactions,
       importedAt: new Date().toISOString(),
       importedFingerprints: [],
       accountIbans: detectedAccountIbans,
     }
 
-    const reconciled = reconcileCrossAccountTransfers([...importedAccounts, draftAccount])
+    const reconciled = reconcileCrossAccountTransfers([...otherImportedAccounts, draftAccount])
     const reconciledDraft = reconciled[reconciled.length - 1]
-
     const ghostTxs = reconciledDraft.transactions.filter((tx) => tx.isGhost)
     const transferTxIds = new Set(ghostTxs.map((tx) => tx.id))
 
-    return {
-      count: transferTxIds.size,
-      transferTxIds,
+    return { count: transferTxIds.size, transferTxIds }
+  }, [nonDuplicateTransactions, otherImportedAccounts, selectedInstitution?.id, institutionName, detectedAccountIbans])
+
+  const previewModalTitle = React.useMemo(() => {
+    if (previewFilter === 'duplicates') {
+      return t.filterDuplicates || 'Duplicates'
     }
-  }, [transactions, importedAccounts, selectedInstitution?.id, institutionName, detectedAccountIbans])
+    if (previewFilter === 'space-transfers') {
+      return t.filterSpaceTransfers || 'Space Transfers'
+    }
+    if (previewFilter === 'internal-transfers') {
+      return t.filterInternalTransfers || 'Internal Transfers'
+    }
+    return t.transactions
+  }, [previewFilter, t])
 
   const importFlows = React.useMemo(() => {
     let inflows = 0
     let outflows = 0
+    const duplicateIdsSet = new Set(duplicateStats.duplicateIds)
     for (const tx of transactions) {
-      if (tx.isGhost || internalTransferStats.transferTxIds.has(tx.id)) {
+      if (
+        tx.isGhost ||
+        internalTransferStats.transferTxIds.has(tx.id) ||
+        duplicateIdsSet.has(tx.id)
+      ) {
         continue
       }
       const amt = Math.abs(tx.amount)
-      if (tx.type === 'income' || tx.amount > 0) {
-        inflows += amt
-      } else {
-        outflows += amt
-      }
+      if (tx.type === 'income' || tx.amount > 0) inflows += amt
+      else outflows += amt
     }
     return { inflows, outflows }
-  }, [transactions, internalTransferStats])
+  }, [transactions, internalTransferStats, duplicateStats.duplicateIds])
 
-  /* ─── import method cards ─── */
-  const importMethods: { key: ImportMethod; label: string; icon: React.ReactNode; desc: string }[] =
-    [
-      {
-        key: 'spreadsheet',
-        label: t.spreadsheetFile,
-        icon: <FileSpreadsheet size={24} />,
-        desc: t.spreadsheetFileDesc,
-      },
-      {
-        key: 'pdf',
-        label: t.pdfStatement,
-        icon: <FileType size={24} />,
-        desc: t.pdfStatementDesc,
-      },
-      {
-        key: 'paste',
-        label: t.copyPaste,
-        icon: <ClipboardPaste size={24} />,
-        desc: t.copyPasteDesc,
-      },
-    ]
+  const buildAccount = (): ImportedAccount => {
+    const duplicateIdSet = new Set(duplicateStats.duplicateIds)
+    const nonDuplicateTransactions = duplicateStats.duplicateCount > 0
+      ? transactions.filter((t) => !duplicateIdSet.has(t.id))
+      : transactions
 
-  /* ─── file handlers ─── */
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault()
-      setDragOver(false)
-      const file = e.dataTransfer.files[0]
-      if (file) handleFileChange(file)
-    },
-    [handleFileChange],
-  )
-
-  const buildAccount = (): ImportedAccount => ({
-    institutionId: selectedInstitution?.id ?? 'unknown',
-    institutionName,
-    transactions,
-    importedAt: new Date().toISOString(),
-    importedFingerprints: [importFingerprint],
-    accountIbans: detectedAccountIbans,
-  })
+    return {
+      institutionId: selectedInstitution?.id ?? 'unknown',
+      institutionName,
+      transactions: nonDuplicateTransactions,
+      importedAt: new Date().toISOString(),
+      importedFingerprints: [importFingerprint],
+      accountIbans: detectedAccountIbans,
+    }
+  }
 
   const handleConfirmImport = () => {
-    if (duplicateStats.duplicateCount > 0) {
+    if (isAllDuplicates || isSubmitted) {
+      return
+    }
+    if (isPartialDuplicates) {
       setShowDuplicateWarning(true)
       return
     }
+    setIsSubmitted(true)
     addImportedAccount(buildAccount())
   }
 
   const handleProceedDespiteDuplicate = () => {
-    // addImportedAccount automatically deduplicates transactions internally
+    setIsSubmitted(true)
     addImportedAccount(buildAccount())
   }
 
@@ -171,12 +166,6 @@ const TransactionImporter: React.FC = () => {
     handleClearAll()
     setShowClearConfirmation(false)
   }, [handleClearAll])
-
-  const acceptTypes: Record<ImportMethod, string> = {
-    spreadsheet: '.xlsx,.xls,.csv',
-    pdf: '.pdf',
-    paste: '',
-  }
 
   /* ─── render ─── */
   return (
@@ -225,112 +214,25 @@ const TransactionImporter: React.FC = () => {
       </div>
 
       {/* Step 1: Choose method */}
-      {!method && (
-        <div className={styles['import-methods-grid']}>
-          {importMethods.map((m, idx) => (
-            <motion.div
-              key={m.key}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.08 }}
-              className={styles['import-method-card']}
-              onClick={() => setMethod(m.key)}
-              id={`import-method-${m.key}`}
-            >
-              <div className={styles['import-method-icon']}>{m.icon}</div>
-              <div>
-                <p className={styles['import-method-label']}>{m.label}</p>
-                <p className={styles['import-method-desc']}>{m.desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+      {!method && <ImportMethodSelector t={t} onSelectMethod={setMethod} />}
 
       {/* Step 2: Upload area / Paste */}
       {method && transactions.length === 0 && !loading && (
-        <div className={styles['import-upload-area']}>
-          <button
-            className={`back-button ${styles['back-button-aligned']}`}
-            onClick={() => {
-              setMethod(null)
-              setError(null)
-              setFileName(null)
-            }}
-          >
-            <ArrowLeft size={18} />
-            <span>{t.chooseDifferentFormat}</span>
-          </button>
-
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={styles['import-error']}
-            >
-              <AlertCircle size={16} />
-              <span>{error}</span>
-            </motion.div>
-          )}
-
-          {method !== 'paste' ? (
-            <div
-              className={`${styles['drop-zone']} ${dragOver ? styles['drag-over'] : ''}`}
-              onDragOver={(e) => {
-                e.preventDefault()
-                setDragOver(true)
-              }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              id="drop-zone"
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept={acceptTypes[method]}
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) handleFileChange(file)
-                }}
-                className={styles['hidden']}
-                id="file-input"
-                name="file-input"
-                aria-label={t.dragDropFile}
-                title={t.dragDropFile}
-              />
-              <Upload size={40} className={styles['drop-zone-icon']} />
-              <p className={styles['drop-zone-title']}>{dragOver ? t.dropHere : t.dragDropFile}</p>
-              <p className={styles['drop-zone-subtitle']}>{t.orClickToBrowse}</p>
-              <p className={`${styles['drop-zone-subtitle']} ${styles['drop-zone-formats']}`}>
-                {t.acceptedFormats.replace('{accepted}', acceptTypes[method])}
-              </p>
-              {fileName && <p className={styles['file-name-label']}>{fileName}</p>}
-            </div>
-          ) : (
-            <div className={styles['paste-area-wrapper']}>
-              <textarea
-                className={styles['paste-textarea']}
-                placeholder={t.pasteDataPlaceholder}
-                value={pasteText}
-                onChange={(e) => setPasteText(e.target.value)}
-                rows={10}
-                id="paste-area"
-                name="paste-area"
-              />
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`primary-button ${!pasteText.trim() ? 'disabled' : ''}`}
-                onClick={handlePaste}
-                disabled={!pasteText.trim()}
-                id="parse-paste-button"
-              >
-                {t.parseTransactions}
-              </motion.button>
-            </div>
-          )}
-        </div>
+        <ImportUploadArea
+          method={method}
+          error={error}
+          fileName={fileName}
+          pasteText={pasteText}
+          t={t}
+          onBack={() => {
+            setMethod(null)
+            setError(null)
+            setFileName(null)
+          }}
+          onFileChange={handleFileChange}
+          onPasteTextChange={setPasteText}
+          onPasteSubmit={handlePaste}
+        />
       )}
 
       {/* Loading state */}
@@ -400,25 +302,108 @@ const TransactionImporter: React.FC = () => {
             </button>
           </div>
 
-          {discardedSpaceCount > 0 && (
-            <div className={styles['transfer-info-banner']} data-testid="space-transfers-banner">
-              <Info size={16} className={styles['transfer-info-icon']} />
-              <span>
-                {discardedSpaceCount === 1
-                  ? t.spaceTransfersExcludedSingular
-                  : t.spaceTransfersExcluded.replace('{count}', String(discardedSpaceCount))}
-              </span>
+          {/* First check: duplicate detection */}
+          {isAllDuplicates && (
+            <div className={styles['duplicate-all-banner']} data-testid="duplicate-all-banner">
+              <div className={styles['duplicate-banner-content']}>
+                <AlertTriangle size={18} className={styles['duplicate-banner-icon']} />
+                <span>
+                  {duplicateStats.duplicateCount === 1
+                    ? t.duplicateImportAllBannerSingular || '1 duplicate transaction detected. This transaction has already been imported.'
+                    : (t.duplicateImportAllBanner || 'All {count} transactions in this file have already been imported (duplicates).').replace('{count}', String(duplicateStats.duplicateCount))}
+                </span>
+              </div>
+              <button
+                type="button"
+                className={styles['duplicate-banner-action-btn']}
+                onClick={() => {
+                  setPreviewFilter('duplicates')
+                  setIsPreviewOpen(true)
+                }}
+                data-testid="view-duplicates-button"
+                title={t.viewDuplicates || 'View duplicates'}
+              >
+                <AlertTriangle size={13} aria-hidden="true" />
+                <span>{t.viewDuplicates || 'View duplicates'}</span>
+              </button>
             </div>
           )}
 
-          {internalTransferStats.count > 0 && (
+          {isPartialDuplicates && (
+            <div className={styles['duplicate-partial-banner']} data-testid="duplicate-partial-banner">
+              <div className={styles['duplicate-banner-content']}>
+                <AlertTriangle size={18} className={styles['duplicate-banner-icon']} />
+                <span>
+                  {(t.duplicateImportPartialBanner || '{duplicateCount} duplicate transactions detected and will be skipped. {newCount} new transactions will be imported.')
+                    .replace('{duplicateCount}', String(duplicateStats.duplicateCount))
+                    .replace('{newCount}', String(duplicateStats.newCount))}
+                </span>
+              </div>
+              <button
+                type="button"
+                className={styles['duplicate-banner-action-btn']}
+                onClick={() => {
+                  setPreviewFilter('duplicates')
+                  setIsPreviewOpen(true)
+                }}
+                data-testid="view-duplicates-button"
+                title={t.viewDuplicates || 'View duplicates'}
+              >
+                <AlertTriangle size={13} aria-hidden="true" />
+                <span>{t.viewDuplicates || 'View duplicates'}</span>
+              </button>
+            </div>
+          )}
+
+          {!isSubmitted && !isAllDuplicates && discardedSpaceCount > 0 && (
+            <div className={styles['transfer-info-banner']} data-testid="space-transfers-banner">
+              <div className={styles['transfer-info-content']}>
+                <Info size={16} className={styles['transfer-info-icon']} />
+                <span>
+                  {discardedSpaceCount === 1
+                    ? t.spaceTransfersExcludedSingular
+                    : t.spaceTransfersExcluded.replace('{count}', String(discardedSpaceCount))}
+                </span>
+              </div>
+              <button
+                type="button"
+                className={styles['banner-action-btn']}
+                onClick={() => {
+                  setPreviewFilter('space-transfers')
+                  setIsPreviewOpen(true)
+                }}
+                data-testid="view-space-transfers-button"
+                title={t.viewExcludedSpaceTransfers || 'View excluded'}
+              >
+                <Layers size={13} aria-hidden="true" />
+                <span>{t.viewExcludedSpaceTransfers || 'View excluded'}</span>
+              </button>
+            </div>
+          )}
+
+          {!isSubmitted && !isAllDuplicates && internalTransferStats.count > 0 && (
             <div className={styles['transfer-info-banner']} data-testid="internal-transfers-banner">
-              <Ghost size={16} className={styles['transfer-info-icon']} />
-              <span>
-                {internalTransferStats.count === 1
-                  ? t.internalTransfersDetectedSingular
-                  : t.internalTransfersDetected.replace('{count}', String(internalTransferStats.count))}
-              </span>
+              <div className={styles['transfer-info-content']}>
+                <Ghost size={16} className={styles['transfer-info-icon']} />
+                <span>
+                  {internalTransferStats.count === 1
+                    ? t.internalTransfersDetectedSingular
+                    : t.internalTransfersDetected.replace('{count}', String(internalTransferStats.count))}
+                </span>
+              </div>
+              <button
+                type="button"
+                className={styles['banner-action-btn']}
+                onClick={() => {
+                  setPreviewFilter('internal-transfers')
+                  setIsPreviewOpen(true)
+                }}
+                data-testid="view-internal-transfers-button"
+                title={t.viewInternalTransfers || 'View transfers'}
+              >
+                <Ghost size={13} aria-hidden="true" />
+                <span>{t.viewInternalTransfers || 'View transfers'}</span>
+              </button>
             </div>
           )}
 
@@ -427,21 +412,29 @@ const TransactionImporter: React.FC = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={`secondary-button ${styles['no-margin-top']}`}
-              onClick={() => setIsPreviewOpen(true)}
+              onClick={() => {
+                setPreviewFilter('all')
+                setIsPreviewOpen(true)
+              }}
             >
               {t.reviewTransactions}
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`primary-button ${styles['no-margin-top']}`}
+              whileHover={{ scale: isAllDuplicates ? 1 : 1.02 }}
+              whileTap={{ scale: isAllDuplicates ? 1 : 0.98 }}
+              className={`primary-button ${styles['no-margin-top']} ${isAllDuplicates ? styles['button-disabled'] : ''}`}
               onClick={handleConfirmImport}
               id="confirm-import"
-              disabled={loading || transactions.length === 0}
+              disabled={loading || transactions.length === 0 || isAllDuplicates || isSubmitted}
+              title={isAllDuplicates ? t.allTransactionsAlreadyImported : t.confirmImport}
             >
               <CheckCircle2 size={18} />
-              {t.confirmImport}
+              {isAllDuplicates
+                ? t.allTransactionsAlreadyImported
+                : isPartialDuplicates
+                ? t.importNewTransactions.replace('{count}', String(duplicateStats.newCount))
+                : t.confirmImport}
             </motion.button>
           </div>
         </motion.div>
@@ -454,8 +447,14 @@ const TransactionImporter: React.FC = () => {
         duplicateIds={new Set(duplicateStats.duplicateIds)}
         internalTransferIds={internalTransferStats.transferTxIds}
         discardedSpaceCount={discardedSpaceCount}
+        excludedSpaceTransactions={excludedSpaceTransactions}
+        initialFilter={previewFilter}
         onRemoveTransaction={handleRemoveTransaction}
         onUpdateTransaction={handleUpdateTransaction}
+        onIncludeSpaceTransaction={handleIncludeSpaceTransaction}
+        onExcludeSpaceTransaction={handleExcludeSpaceTransaction}
+        onIncludeAllSpaceTransactions={handleIncludeAllSpaceTransactions}
+        title={previewModalTitle}
       />
 
       <DeleteConfirmationModal
@@ -476,9 +475,7 @@ const TransactionImporter: React.FC = () => {
         message={
           duplicateStats?.newCount === 0
             ? t.duplicateImportMessageAll.replace('{duplicateCount}', String(duplicateStats.duplicateCount))
-            : t.duplicateImportMessagePartial
-                .replace('{duplicateCount}', String(duplicateStats?.duplicateCount))
-                .replace('{newCount}', String(duplicateStats?.newCount))
+            : t.duplicateImportMessagePartial.replace('{duplicateCount}', String(duplicateStats?.duplicateCount)).replace('{newCount}', String(duplicateStats?.newCount))
         }
         proceedText={
           duplicateStats?.newCount === 0

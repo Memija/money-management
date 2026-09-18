@@ -405,6 +405,7 @@ export interface ParsedCsvTransactionsResult {
   transactions: Transaction[]
   discardedSpaceCount: number
   detectedAccountIbans?: string[]
+  excludedSpaceTransactions?: Transaction[]
 }
 
 export function rowsToTransactionsWithMeta(
@@ -412,12 +413,12 @@ export function rowsToTransactionsWithMeta(
   institution: string,
   t?: TranslationStrings,
 ): ParsedCsvTransactionsResult {
-  if (rows.length < 2) return { transactions: [], discardedSpaceCount: 0, detectedAccountIbans: [] }
+  if (rows.length < 2) return { transactions: [], discardedSpaceCount: 0, detectedAccountIbans: [], excludedSpaceTransactions: [] }
 
   // Skip preamble rows
   const headerRowIdx = findHeaderRowIndex(rows)
   const dataRows = rows.slice(headerRowIdx)
-  if (dataRows.length < 2) return { transactions: [], discardedSpaceCount: 0, detectedAccountIbans: [] }
+  if (dataRows.length < 2) return { transactions: [], discardedSpaceCount: 0, detectedAccountIbans: [], excludedSpaceTransactions: [] }
 
   // Normalise header cells: lowercase, strip surrounding quotes
   const header = dataRows[0].map((h) => h?.toString().toLowerCase().trim() ?? '')
@@ -425,15 +426,20 @@ export function rowsToTransactionsWithMeta(
   const spaceTransferIndices = findSpaceTransferRowIndices(dataRows, indices)
 
   const transactions: Transaction[] = []
+  const excludedSpaceTransactions: Transaction[] = []
   const errors: string[] = []
 
   for (let i = 1; i < dataRows.length; i++) {
-    if (spaceTransferIndices.has(i)) {
-      continue
-    }
-
     const row = dataRows[i]
     if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) continue
+
+    if (spaceTransferIndices.has(i)) {
+      const transaction = parseRow(row, indices, institution)
+      if (transaction) {
+        excludedSpaceTransactions.push(transaction)
+      }
+      continue
+    }
 
     const rawDate = row[indices.dateIdx]?.toString() ?? ''
     if (rawDate && !isValidDateRaw(rawDate)) {
@@ -466,8 +472,15 @@ export function rowsToTransactionsWithMeta(
     throw new Error(errMsg)
   }
 
-  const { transactions: finalTransactions, discardedSpaceCount: additionalDiscarded } =
-    filterInternalSpaceTransfers(transactions)
+  const {
+    transactions: finalTransactions,
+    discardedSpaceCount: additionalDiscarded,
+    excludedTransactions: additionalExcluded,
+  } = filterInternalSpaceTransfers(transactions)
+
+  if (additionalExcluded && additionalExcluded.length > 0) {
+    excludedSpaceTransactions.push(...additionalExcluded)
+  }
 
   const detectedAccountIbans = Array.from(
     new Set(
@@ -481,6 +494,7 @@ export function rowsToTransactionsWithMeta(
     transactions: finalTransactions,
     discardedSpaceCount: spaceTransferIndices.size + additionalDiscarded,
     detectedAccountIbans,
+    excludedSpaceTransactions,
   }
 }
 
