@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import type { AppStep, Country, CustomCategory, FinancialInstitution, ImportedAccount, Transaction } from '../types'
+import type { AppStep, Country, CustomCategory, DuplicateOverrideRule, FinancialInstitution, ImportedAccount, Transaction } from '../types'
 import { reconcileCrossAccountTransfers } from '../utils/account-transfers'
 
 export interface AppState {
@@ -13,6 +13,7 @@ export interface AppState {
   customKeywords: Record<string, string[]>
   manualCategories: Record<string, string>
   customCategories: CustomCategory[]
+  duplicateOverrideRules: DuplicateOverrideRule[]
 
   setCustomKeywords: (category: string, keywords: string[]) => void
   setManualCategory: (transactionId: string, category: string) => void
@@ -20,6 +21,16 @@ export interface AppState {
   addCustomCategory: (category: CustomCategory) => void
   updateCustomCategory: (category: CustomCategory) => void
   deleteCustomCategory: (id: string) => void
+
+  addDuplicateOverrideRule: (
+    rule: Omit<DuplicateOverrideRule, 'id' | 'createdAt' | 'applyCount'> & {
+      id?: string
+      createdAt?: string
+      applyCount?: number
+    },
+  ) => void
+  removeDuplicateOverrideRule: (id: string) => void
+  clearDuplicateOverrideRules: () => void
 
   setStep: (step: AppStep) => void
   selectCountry: (country: Country) => void
@@ -45,6 +56,23 @@ export const toCanonicalTransactionKey = (t: { date: string; amount: number; des
   return `${t.date}|${normAmount}|${normDesc}`
 }
 
+export const matchesDuplicateOverrideRule = (
+  rule: DuplicateOverrideRule,
+  tx: { description?: string; amount?: number },
+  institutionId?: string,
+): boolean => {
+  if (rule.institutionId && institutionId && rule.institutionId !== institutionId) {
+    return false
+  }
+  if (rule.amount !== undefined && tx.amount !== undefined && Math.abs(Number(tx.amount) - Number(rule.amount)) >= 0.005) {
+    return false
+  }
+  const txDesc = (tx.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
+  const rulePattern = (rule.descriptionPattern || '').trim().toLowerCase().replace(/\s+/g, ' ')
+  if (!rulePattern) return false
+  return txDesc.includes(rulePattern) || rulePattern.includes(txDesc)
+}
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -56,6 +84,7 @@ export const useAppStore = create<AppState>()(
       customKeywords: {},
       manualCategories: {},
       customCategories: [],
+      duplicateOverrideRules: [],
 
       addCustomCategory: (category) =>
         set((state) => ({
@@ -71,6 +100,51 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           customCategories: state.customCategories.filter((c) => c.id !== id),
         })),
+
+      addDuplicateOverrideRule: (rule) =>
+        set((state) => {
+          const currentRules = state.duplicateOverrideRules || []
+          // Check if an identical pattern already exists
+          const existingIdx = currentRules.findIndex(
+            (r) =>
+              r.descriptionPattern.trim().toLowerCase() === rule.descriptionPattern.trim().toLowerCase() &&
+              (rule.amount === undefined || r.amount === rule.amount) &&
+              (rule.institutionId === undefined || r.institutionId === rule.institutionId),
+          )
+
+          if (existingIdx >= 0) {
+            // Update existing rule
+            const updated = [...currentRules]
+            updated[existingIdx] = {
+              ...updated[existingIdx],
+              applyCount: (updated[existingIdx].applyCount || 1) + 1,
+              lastAppliedAt: new Date().toISOString(),
+            }
+            return { duplicateOverrideRules: updated }
+          }
+
+          const newRule: DuplicateOverrideRule = {
+            id: rule.id || `drule_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+            institutionId: rule.institutionId,
+            institutionName: rule.institutionName,
+            descriptionPattern: rule.descriptionPattern.trim(),
+            amount: rule.amount,
+            createdAt: rule.createdAt || new Date().toISOString(),
+            lastAppliedAt: rule.lastAppliedAt || new Date().toISOString(),
+            applyCount: rule.applyCount ?? 1,
+          }
+          return {
+            duplicateOverrideRules: [newRule, ...currentRules],
+          }
+        }),
+
+      removeDuplicateOverrideRule: (id) =>
+        set((state) => ({
+          duplicateOverrideRules: (state.duplicateOverrideRules || []).filter((r) => r.id !== id),
+        })),
+
+      clearDuplicateOverrideRules: () =>
+        set({ duplicateOverrideRules: [] }),
 
       setCustomKeywords: (category, keywords) =>
         set((state) => ({
@@ -109,9 +183,17 @@ export const useAppStore = create<AppState>()(
             (a) => a.institutionId === account.institutionId,
           )
 
+          const duplicateRules = state.duplicateOverrideRules || []
+          const matchedRuleIds = new Set<string>()
+
           let updatedList: ImportedAccount[]
           if (existingIdx < 0) {
             // Brand-new institution — append
+            // Also check if any duplicate rules were matched
+            account.transactions.forEach((t) => {
+              const rule = duplicateRules.find((r) => matchesDuplicateOverrideRule(r, t, account.institutionId))
+              if (rule) matchedRuleIds.add(rule.id)
+            })
             updatedList = [...state.importedAccounts, account]
           } else {
             // Same institution already has data — merge transactions to avoid data loss.
@@ -121,9 +203,16 @@ export const useAppStore = create<AppState>()(
             const existingKeys = new Set(
               existing.transactions.map(toCanonicalTransactionKey),
             )
-            const newUnique = account.transactions.filter(
-              (t) => t.forceImport || !existingKeys.has(toCanonicalTransactionKey(t)),
-            )
+            const newUnique = account.transactions.filter((t) => {
+              if (t.forceImport) return true
+              if (!existingKeys.has(toCanonicalTransactionKey(t))) return true
+              const rule = duplicateRules.find((r) => matchesDuplicateOverrideRule(r, t, account.institutionId))
+              if (rule) {
+                matchedRuleIds.add(rule.id)
+                return true
+              }
+              return false
+            })
             // Accumulate ALL fingerprints so future re-imports of any previously seen file are detected
             const mergedFingerprints = Array.from(
               new Set([...existing.importedFingerprints, ...account.importedFingerprints]),
@@ -141,8 +230,23 @@ export const useAppStore = create<AppState>()(
             updatedList = state.importedAccounts.map((a, i) => (i === existingIdx ? merged : a))
           }
 
+          const updatedRules = duplicateRules.map((r) => {
+            if (matchedRuleIds.has(r.id)) {
+              return {
+                ...r,
+                applyCount: (r.applyCount || 0) + 1,
+                lastAppliedAt: new Date().toISOString(),
+              }
+            }
+            return r
+          })
+
           const reconciled = reconcileCrossAccountTransfers(updatedList)
-          return { importedAccounts: reconciled, currentStep: 'review' }
+          return {
+            importedAccounts: reconciled,
+            duplicateOverrideRules: updatedRules,
+            currentStep: 'review',
+          }
         }),
 
       // Force-replaces an existing account record — used by the "Import Anyway" path
@@ -187,6 +291,7 @@ export const useAppStore = create<AppState>()(
           customKeywords: {},
           manualCategories: {},
           customCategories: [],
+          duplicateOverrideRules: [],
         })
         try {
           useAppStore.persist?.clearStorage()
@@ -204,7 +309,7 @@ export const useAppStore = create<AppState>()(
       },
 
       getDuplicateTransactionStats: (institutionId, transactions) => {
-        const { importedAccounts } = get()
+        const { importedAccounts, duplicateOverrideRules } = get()
         const targetAccounts =
           institutionId && institutionId !== 'unknown'
             ? importedAccounts.filter((a) => a.institutionId === institutionId)
@@ -221,10 +326,14 @@ export const useAppStore = create<AppState>()(
           }
         }
 
+        const rules = duplicateOverrideRules || []
         const duplicateIds: string[] = []
         for (const t of transactions) {
           if (existingKeys.has(toCanonicalTransactionKey(t))) {
-            duplicateIds.push(t.id)
+            const isOverridden = rules.some((r) => matchesDuplicateOverrideRule(r, t, institutionId))
+            if (!isOverridden) {
+              duplicateIds.push(t.id)
+            }
           }
         }
 

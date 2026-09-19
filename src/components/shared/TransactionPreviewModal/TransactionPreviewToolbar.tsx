@@ -1,5 +1,5 @@
 import React from 'react'
-import { RotateCcw, Search, X } from 'lucide-react'
+import { RotateCcw, Search, Unlock, X } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/types'
 import { DatePicker } from '../DatePicker'
@@ -9,7 +9,7 @@ import styles from './TransactionPreviewModal.module.css'
 
 export type SortColumn = 'date' | 'description' | 'amount'
 export type SortDirection = 'asc' | 'desc'
-export type ScopeFilter = 'all' | 'included' | 'space-transfers' | 'internal-transfers' | 'duplicates'
+export type ScopeFilter = 'all' | 'included' | 'space-transfers' | 'internal-transfers' | 'duplicates' | 'unlocked'
 
 export interface TransactionPreviewToolbarProps {
   hasMultipleTransactions: boolean
@@ -24,6 +24,10 @@ export interface TransactionPreviewToolbarProps {
   sortOptions: SelectOption[]
   isFilterActive: boolean
   handleClearFilters: () => void
+  scopeFilter?: ScopeFilter
+  onScopeFilterChange?: (filter: ScopeFilter) => void
+  unlockedCount?: number
+  hasDuplicates?: boolean
   t: TranslationStrings
 }
 
@@ -40,6 +44,10 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
   sortOptions,
   isFilterActive,
   handleClearFilters,
+  scopeFilter = 'all',
+  onScopeFilterChange,
+  unlockedCount = 0,
+  hasDuplicates = false,
   t,
 }) => {
   if (!hasMultipleTransactions) {
@@ -100,6 +108,34 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
         options={sortOptions}
         aria-label="Sort transactions"
       />
+
+      {(hasDuplicates || unlockedCount > 0) && (
+        <button
+          type="button"
+          className={`${styles['unlocked-filter-btn']} ${
+            scopeFilter === 'unlocked' ? styles['unlocked-filter-btn-active'] : ''
+          } ${unlockedCount === 0 ? styles['unlocked-filter-btn-disabled'] : ''}`}
+          onClick={() => {
+            if (unlockedCount === 0) return
+            onScopeFilterChange?.(scopeFilter === 'unlocked' ? 'all' : 'unlocked')
+          }}
+          disabled={unlockedCount === 0}
+          title={
+            unlockedCount === 0
+              ? t.filterUnlocked || 'No unlocked transactions'
+              : scopeFilter === 'unlocked'
+              ? t.filterAll || 'Show all'
+              : t.filterUnlocked || 'Unlocked'
+          }
+          aria-label={t.filterUnlocked || 'Unlocked'}
+          aria-pressed={scopeFilter === 'unlocked'}
+          data-testid="filter-unlocked-btn"
+        >
+          <Unlock size={13} aria-hidden="true" />
+          <span>{t.filterUnlocked || 'Unlocked'}</span>
+          <span className={styles['unlocked-filter-badge']}>{unlockedCount}</span>
+        </button>
+      )}
 
       {isFilterActive && (
         <button

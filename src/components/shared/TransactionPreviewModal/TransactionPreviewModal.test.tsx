@@ -417,5 +417,62 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.queryByText('Space Transfer')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /include/i })).not.toBeInTheDocument()
   })
+
+  it('orders unlocked duplicate transactions to the top of the list', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-first', description: 'Standard Tx 1' }
+    const tx2 = { ...mockTransactions[1], id: 'tx-second', description: 'Duplicate Tx 2' }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-second'])}
+        unlockedDuplicateIds={new Set(['tx-second'])}
+      />,
+    )
+
+    // Items are in Virtuoso items
+    const item0 = screen.getByTestId('virtuoso-item-0')
+    const item1 = screen.getByTestId('virtuoso-item-1')
+
+    // tx-second (unlocked) must be ordered to the top (index 0)
+    expect(item0).toHaveTextContent('Duplicate Tx 2')
+    expect(item1).toHaveTextContent('Standard Tx 1')
+  })
+
+  it('filters transactions when the Unlocked filter button is clicked', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-std', description: 'Normal Transaction' }
+    const tx2 = { ...mockTransactions[1], id: 'tx-unlocked', description: 'Unlocked Duplicate' }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-unlocked'])}
+        unlockedDuplicateIds={new Set(['tx-unlocked'])}
+      />,
+    )
+
+    // Unlocked filter button is visible in the toolbar with count 1
+    const filterBtn = screen.getByTestId('filter-unlocked-btn')
+    expect(filterBtn).toBeInTheDocument()
+    expect(filterBtn).toHaveTextContent('1')
+
+    // Initially both are rendered
+    expect(screen.getByText('Normal Transaction')).toBeInTheDocument()
+    expect(screen.getByText('Unlocked Duplicate')).toBeInTheDocument()
+
+    // Click Unlocked filter
+    fireEvent.click(filterBtn)
+
+    // Now only unlocked duplicate is shown
+    expect(screen.getByText('Unlocked Duplicate')).toBeInTheDocument()
+    expect(screen.queryByText('Normal Transaction')).not.toBeInTheDocument()
+
+    // Clicking again toggles back to all
+    fireEvent.click(filterBtn)
+    expect(screen.getByText('Normal Transaction')).toBeInTheDocument()
+    expect(screen.getByText('Unlocked Duplicate')).toBeInTheDocument()
+  })
 })
 

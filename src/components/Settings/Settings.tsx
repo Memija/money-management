@@ -12,6 +12,7 @@ import { getCategoryLabel } from '../../utils/category-utils'
 import { CategorySelect } from '../shared/CategorySelect'
 import { CustomCategoriesSettings } from './CustomCategoriesSettings'
 import { DataManagement } from './DataManagement'
+import { DuplicateRulesSettings } from './DuplicateRulesSettings'
 
 import styles from './Settings.module.css'
 
@@ -283,6 +284,8 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <DuplicateRulesSettings />
     </div>
   )}
 

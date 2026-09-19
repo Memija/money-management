@@ -134,6 +134,23 @@ export const id: TranslationStrings = {
   unlockDuplicateConfirm: 'Buka Kunci & Edit',
   relockDuplicate: 'Kunci kembali sebagai duplikat',
   unlockedDuplicateBadge: 'Terbuka',
+  filterUnlocked: 'Terbuka',
+  cannotRelockModified: 'Tidak dapat mengunci kembali transaksi yang dimodifikasi. Kembalikan ke nilai asli untuk mengunci.',
+  resetToOriginal: 'Kembalikan ke nilai asli',
+  rememberDuplicateRule: 'Ingat pengecualian ini untuk impor berikutnya',
+  duplicateRulesTitle: 'Aturan & Pengecualian Duplikat',
+  duplicateRulesDesc:
+    'Aturan yang dipelajari otomatis dari keputusan membuka kunci duplikat. Transaksi yang cocok tidak akan ditandai sebagai duplikat pada impor mendatang.',
+  noDuplicateRules: 'Belum ada aturan pengecualian duplikat',
+  noDuplicateRulesDesc:
+    'Saat Anda membuka kunci transaksi duplikat saat impor dan memilih untuk mengingatnya, aturan akan muncul di sini.',
+  ruleAllowDuplicate: "Izinkan duplikat: '{desc}'",
+  ruleAppliedTimes: 'Diterapkan {count} kali',
+  ruleAppliedOnce: 'Diterapkan 1 kali',
+  anyAmount: 'Jumlah berapa pun',
+  allInstitutions: 'Semua institusi',
+  revokeRule: 'Cabut aturan',
+  clearAllRules: 'Hapus semua aturan',
 
   spaceTransfersExcluded:
     '{count} transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',

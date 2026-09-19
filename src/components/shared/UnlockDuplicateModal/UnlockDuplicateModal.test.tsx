@@ -100,7 +100,27 @@ describe('UnlockDuplicateModal', () => {
     )
 
     fireEvent.click(screen.getByTestId('confirm-unlock-duplicate-btn'))
-    expect(onConfirmUnlock).toHaveBeenCalledWith(mockTransaction)
+    expect(onConfirmUnlock).toHaveBeenCalledWith(mockTransaction, true)
     expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onConfirmUnlock with rememberRule=false when checkbox is unchecked', () => {
+    const onConfirmUnlock = vi.fn()
+    const onClose = vi.fn()
+    render(
+      <UnlockDuplicateModal
+        {...defaultProps}
+        onClose={onClose}
+        onConfirmUnlock={onConfirmUnlock}
+      />,
+    )
+
+    const checkbox = screen.getByTestId('remember-duplicate-rule-checkbox')
+    expect(checkbox).toBeChecked()
+    fireEvent.click(checkbox)
+    expect(checkbox).not.toBeChecked()
+
+    fireEvent.click(screen.getByTestId('confirm-unlock-duplicate-btn'))
+    expect(onConfirmUnlock).toHaveBeenCalledWith(mockTransaction, false)
   })
 })

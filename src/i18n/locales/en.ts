@@ -135,6 +135,23 @@ export const en: TranslationStrings = {
   unlockDuplicateConfirm: 'Unlock & Edit',
   relockDuplicate: 'Re-lock as duplicate',
   unlockedDuplicateBadge: 'Unlocked',
+  filterUnlocked: 'Unlocked',
+  cannotRelockModified: 'Cannot relock modified transaction. Reset to original values to relock.',
+  resetToOriginal: 'Reset to original values',
+  rememberDuplicateRule: 'Remember this override for future imports',
+  duplicateRulesTitle: 'Duplicate Rules & Overrides',
+  duplicateRulesDesc:
+    'Rules automatically learned from your duplicate unlock decisions. Transactions matching these rules will not be flagged as duplicates on future imports.',
+  noDuplicateRules: 'No duplicate override rules yet',
+  noDuplicateRulesDesc:
+    'When you unlock a duplicate transaction during import and choose to remember it, the rule will appear here.',
+  ruleAllowDuplicate: "Allow duplicate: '{desc}'",
+  ruleAppliedTimes: 'Applied {count} times',
+  ruleAppliedOnce: 'Applied 1 time',
+  anyAmount: 'Any amount',
+  allInstitutions: 'All institutions',
+  revokeRule: 'Revoke rule',
+  clearAllRules: 'Clear all rules',
 
   spaceTransfersExcluded:
     '{count} internal space transfers were automatically excluded to prevent double counting.',

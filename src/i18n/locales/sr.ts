@@ -137,6 +137,23 @@ export const sr: TranslationStrings = {
   unlockDuplicateConfirm: 'Откључај и уреди',
   relockDuplicate: 'Поново закључај као дупликат',
   unlockedDuplicateBadge: 'Откључано',
+  filterUnlocked: 'Откључано',
+  cannotRelockModified: 'Није могуће поново закључати измењену трансакцију. Вратите на оригиналне вредности за закључавање.',
+  resetToOriginal: 'Врати на оригиналне вредности',
+  rememberDuplicateRule: 'Запамти ово изузеће за будуће увозе',
+  duplicateRulesTitle: 'Правила и изузећа за дупликате',
+  duplicateRulesDesc:
+    'Правила аутоматски научена из ваших одлука о откључавању дупликата. Одговарајуће трансакције неће бити означене као дупликати при будућим увозима.',
+  noDuplicateRules: 'Још нема правила за изузеће дупликата',
+  noDuplicateRulesDesc:
+    'Када откључате дупликат током увоза и изаберете да га запамтите, правило ће се појавити овде.',
+  ruleAllowDuplicate: "Дозволи дупликат: '{desc}'",
+  ruleAppliedTimes: 'Примењено {count} пута',
+  ruleAppliedOnce: 'Примењено 1 пут',
+  anyAmount: 'Било који износ',
+  allInstitutions: 'Све институције',
+  revokeRule: 'Опозови правило',
+  clearAllRules: 'Обриши сва правила',
 
   spaceTransfersExcluded:
     '{count} интерних преноса између простора (Spaces) је аутоматски искључено ради избегавања двоструког рачунања.',

@@ -135,6 +135,23 @@ export const pl: TranslationStrings = {
   unlockDuplicateConfirm: 'Odblokuj i edytuj',
   relockDuplicate: 'Zablokuj ponownie jako duplikat',
   unlockedDuplicateBadge: 'Odblokowana',
+  filterUnlocked: 'Odblokowane',
+  cannotRelockModified: 'Nie można zablokować zmodyfikowanej transakcji. Przywróć wartości początkowe, aby zablokować.',
+  resetToOriginal: 'Przywróć wartości początkowe',
+  rememberDuplicateRule: 'Zapamiętaj ten wyjątek dla przyszłych importów',
+  duplicateRulesTitle: 'Reguły i wyjątki duplikatów',
+  duplicateRulesDesc:
+    'Reguły wyuczone automatycznie na podstawie decyzji o odblokowaniu duplikatów. Pasujące transakcje nie będą oznaczane jako duplikaty przy kolejnych importach.',
+  noDuplicateRules: 'Brak reguł wyjątków dla duplikatów',
+  noDuplicateRulesDesc:
+    'Gdy odblokujesz duplikat podczas importu i wybierzesz zapamiętanie reguły, pojawi się ona w tym miejscu.',
+  ruleAllowDuplicate: "Zezwalaj na duplikat: '{desc}'",
+  ruleAppliedTimes: 'Zastosowano {count} razy',
+  ruleAppliedOnce: 'Zastosowano 1 raz',
+  anyAmount: 'Dowolna kwota',
+  allInstitutions: 'Wszystkie instytucje',
+  revokeRule: 'Odwołaj regułę',
+  clearAllRules: 'Wyczyść wszystkie reguły',
 
   spaceTransfersExcluded:
     '{count} wewnętrznych transferów między przestrzeniami (Spaces) zostało automatycznie wykluczonych, aby uniknąć podwójnego liczenia.',

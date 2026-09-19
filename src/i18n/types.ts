@@ -160,6 +160,21 @@ export interface TranslationStrings {
   unlockDuplicateConfirm: string
   relockDuplicate: string
   unlockedDuplicateBadge: string
+  filterUnlocked: string
+  cannotRelockModified: string
+  resetToOriginal: string
+  rememberDuplicateRule: string
+  duplicateRulesTitle: string
+  duplicateRulesDesc: string
+  noDuplicateRules: string
+  noDuplicateRulesDesc: string
+  ruleAllowDuplicate: string
+  ruleAppliedTimes: string
+  ruleAppliedOnce: string
+  anyAmount: string
+  allInstitutions: string
+  revokeRule: string
+  clearAllRules: string
 
   // Internal & space transfers during import
   spaceTransfersExcluded: string

@@ -11,7 +11,7 @@ export interface UnlockDuplicateModalProps {
   isOpen: boolean
   transaction: Transaction | null
   onClose: () => void
-  onConfirmUnlock: (transaction: Transaction) => void
+  onConfirmUnlock: (transaction: Transaction, rememberRule?: boolean) => void
   formatCurrency?: (amount: number) => string
   formatDate?: (date: string) => string
 }
@@ -25,11 +25,12 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
   formatDate = (date) => date,
 }) => {
   const t = useLanguageStore((s) => s.t)
+  const [rememberRule, setRememberRule] = React.useState(true)
 
   if (!transaction) return null
 
   const handleConfirm = () => {
-    onConfirmUnlock(transaction)
+    onConfirmUnlock(transaction, rememberRule)
     onClose()
   }
 
@@ -54,7 +55,7 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
           </button>
           <button
             type="button"
-            className={`primary-button ${styles.unlockButton}`}
+            className={styles.unlockButton}
             onClick={handleConfirm}
             id="confirm-unlock-duplicate-btn"
             data-testid="confirm-unlock-duplicate-btn"
@@ -92,6 +93,24 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
             {formatCurrency(transaction.amount)}
           </div>
         </div>
+
+        <label
+          className={styles.rememberCheckboxLabel}
+          data-testid="remember-duplicate-rule-label"
+          htmlFor="remember-duplicate-rule-checkbox"
+        >
+          <input
+            type="checkbox"
+            checked={rememberRule}
+            onChange={(e) => setRememberRule(e.target.checked)}
+            className={styles.rememberCheckbox}
+            id="remember-duplicate-rule-checkbox"
+            data-testid="remember-duplicate-rule-checkbox"
+          />
+          <span className={styles.rememberCheckboxText}>
+            {t.rememberDuplicateRule || 'Remember this override for future imports'}
+          </span>
+        </label>
       </div>
     </Modal>
   )

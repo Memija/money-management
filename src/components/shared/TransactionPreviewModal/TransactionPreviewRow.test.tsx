@@ -89,8 +89,8 @@ describe('TransactionPreviewRow', () => {
       />,
     )
 
-    // Unlocked badge is displayed
-    expect(screen.getByTestId('unlocked-duplicate-badge-tx-1')).toHaveTextContent('Unlocked')
+    // Unlocked text label is NOT displayed (unlock padlock icon is sufficient)
+    expect(screen.queryByTestId('unlocked-duplicate-badge-tx-1')).not.toBeInTheDocument()
 
     // Duplicate pill is NOT displayed
     expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
@@ -106,5 +106,45 @@ describe('TransactionPreviewRow', () => {
     expect(relockBtn).toBeInTheDocument()
     fireEvent.click(relockBtn)
     expect(onRelock).toHaveBeenCalledWith(mockTx)
+  })
+
+  it('disables relock button and shows reset button when isUnlockedDuplicate and isModified are true', () => {
+    const onRelock = vi.fn()
+    const onReset = vi.fn()
+
+    render(
+      <TransactionPreviewRow
+        {...defaultProps}
+        isDuplicate={true}
+        isUnlockedDuplicate={true}
+        isModified={true}
+        onRelockDuplicate={onRelock}
+        onResetTransaction={onReset}
+        t={{
+          ...defaultProps.t,
+          cannotRelockModified: 'Cannot relock modified transaction. Reset to original values to relock.',
+          resetToOriginal: 'Reset to original values',
+        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+      />,
+    )
+
+    const relockBtn = screen.getByTestId('relock-duplicate-btn-tx-1')
+    expect(relockBtn).toBeDisabled()
+    expect(relockBtn).toHaveAttribute(
+      'title',
+      'Cannot relock modified transaction. Reset to original values to relock.',
+    )
+
+    // Attempting to click disabled relock button does NOT call onRelock
+    fireEvent.click(relockBtn)
+    expect(onRelock).not.toHaveBeenCalled()
+
+    // Reset button is visible and triggers onResetTransaction
+    const resetBtn = screen.getByTestId('reset-tx-btn-tx-1')
+    expect(resetBtn).toBeInTheDocument()
+    expect(resetBtn).toHaveAttribute('title', 'Reset to original values')
+
+    fireEvent.click(resetBtn)
+    expect(onReset).toHaveBeenCalledWith('tx-1')
   })
 })

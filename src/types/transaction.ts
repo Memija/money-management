@@ -18,3 +18,21 @@ export interface Transaction {
   /** True if the user manually unlocked this duplicate to force its import. */
   forceImport?: boolean
 }
+
+export interface DuplicateOverrideRule {
+  id: string
+  /** Specific institution this rule applies to, or undefined for all institutions. */
+  institutionId?: string
+  /** Institution display name if known, for readable UI badges. */
+  institutionName?: string
+  /** Description pattern or exact description from the transaction. */
+  descriptionPattern: string
+  /** Optional amount to match; if omitted, matches any amount with this description pattern. */
+  amount?: number
+  /** ISO date string when this rule was learned/created. */
+  createdAt: string
+  /** ISO date string when this rule was most recently matched and applied. */
+  lastAppliedAt?: string
+  /** Total number of times this rule was applied. */
+  applyCount: number
+}

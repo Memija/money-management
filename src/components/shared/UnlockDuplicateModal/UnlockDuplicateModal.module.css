@@ -6,15 +6,31 @@
 .unlockButton {
   margin-top: 0;
   width: auto;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.unlockButton:hover {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+.unlockButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  box-shadow: 0 6px 28px rgba(239, 68, 68, 0.45);
+  transform: translateY(-1px);
+}
+
+.unlockButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 12px rgba(239, 68, 68, 0.3);
 }
 
 .contentContainer {
@@ -30,8 +46,8 @@
 }
 
 .iconContainer {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.12);
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
   padding: 0.75rem;
   border-radius: 50%;
   flex-shrink: 0;
@@ -91,4 +107,35 @@
 
 .amountExpense {
   color: var(--text-main);
+}
+
+.rememberCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: var(--dropdown-item-hover);
+  border: 1px solid var(--card-border);
+  user-select: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.rememberCheckboxLabel:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.rememberCheckbox {
+  accent-color: #ef4444;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.rememberCheckboxText {
+  font-weight: 500;
+  line-height: 1.3;
 }

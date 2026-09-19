@@ -439,4 +439,105 @@ describe('useAppStore', () => {
     expect(n26Tx.isGhost).toBe(true)
     expect(n26Tx.linkedTransactionId).toBe('cb-tx-1')
   })
+
+  describe('Duplicate Override Rules', () => {
+    it('should add, remove, and clear duplicate override rules', () => {
+      useAppStore.setState({ duplicateOverrideRules: [] })
+
+      useAppStore.getState().addDuplicateOverrideRule({
+        id: 'rule-gym',
+        descriptionPattern: 'Gym Membership',
+        amount: -45,
+        institutionId: 'chase',
+        institutionName: 'Chase',
+      })
+
+      let rules = useAppStore.getState().duplicateOverrideRules
+      expect(rules).toHaveLength(1)
+      expect(rules[0].id).toBe('rule-gym')
+      expect(rules[0].descriptionPattern).toBe('Gym Membership')
+      expect(rules[0].applyCount).toBe(1)
+
+      // Adding identical rule increments applyCount instead of duplicating
+      useAppStore.getState().addDuplicateOverrideRule({
+        descriptionPattern: 'Gym Membership',
+        amount: -45,
+        institutionId: 'chase',
+      })
+
+      rules = useAppStore.getState().duplicateOverrideRules
+      expect(rules).toHaveLength(1)
+      expect(rules[0].applyCount).toBe(2)
+
+      // Remove rule
+      useAppStore.getState().removeDuplicateOverrideRule('rule-gym')
+      expect(useAppStore.getState().duplicateOverrideRules).toHaveLength(0)
+
+      // Clear all rules
+      useAppStore.setState({
+        duplicateOverrideRules: [
+          {
+            id: 'rule-1',
+            descriptionPattern: 'Spotify',
+            createdAt: '2026-01-01',
+            applyCount: 1,
+          },
+        ],
+      })
+      useAppStore.getState().clearDuplicateOverrideRules()
+      expect(useAppStore.getState().duplicateOverrideRules).toHaveLength(0)
+    })
+
+    it('should bypass duplicate detection in getDuplicateTransactionStats when matching rule exists', () => {
+      const existingTx = {
+        id: 'tx-1',
+        date: '2026-03-01',
+        description: 'Monthly Gym',
+        amount: -45,
+        currency: 'EUR',
+        type: 'expense' as const,
+        institution: 'Chase',
+      }
+
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            transactions: [existingTx],
+            importedAt: '2026-03-01T00:00:00Z',
+            importedFingerprints: ['fp-1'],
+          },
+        ],
+        duplicateOverrideRules: [],
+      })
+
+      const incomingTx = {
+        id: 'tx-new-1',
+        date: '2026-03-01',
+        description: 'Monthly Gym',
+        amount: -45,
+        currency: 'EUR',
+        type: 'expense' as const,
+        institution: 'Chase',
+      }
+
+      // Without rule: detected as duplicate
+      let stats = useAppStore.getState().getDuplicateTransactionStats('chase', [incomingTx])
+      expect(stats.duplicateCount).toBe(1)
+      expect(stats.duplicateIds).toEqual(['tx-new-1'])
+
+      // With matching override rule: allowed as new transaction
+      useAppStore.getState().addDuplicateOverrideRule({
+        descriptionPattern: 'Monthly Gym',
+        amount: -45,
+        institutionId: 'chase',
+      })
+
+      stats = useAppStore.getState().getDuplicateTransactionStats('chase', [incomingTx])
+      expect(stats.duplicateCount).toBe(0)
+      expect(stats.newCount).toBe(1)
+      expect(stats.duplicateIds).toEqual([])
+    })
+  })
 })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Ghost, Layers, Lock, Minus, Plus, Trash2, Unlock } from 'lucide-react'
+import { Ghost, Layers, Lock, Minus, Plus, RotateCcw, Trash2, Unlock } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/types'
 import type { CustomCategory, Transaction } from '../../../types'
@@ -15,6 +15,7 @@ export interface TransactionPreviewRowProps {
   tx: Transaction
   isDuplicate: boolean
   isUnlockedDuplicate?: boolean
+  isModified?: boolean
   hideDuplicateBadge?: boolean
   isInternalTransfer: boolean
   isSpaceTransfer: boolean
@@ -27,6 +28,7 @@ export interface TransactionPreviewRowProps {
   formatDate: (date: string) => string
   onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void
   onRemoveTransaction?: (id: string) => void
+  onResetTransaction?: (id: string) => void
   onToggleSpaceTransferInclude?: (tx: Transaction) => void
   onUnlockDuplicate?: (tx: Transaction) => void
   onRelockDuplicate?: (tx: Transaction) => void
@@ -37,6 +39,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   tx,
   isDuplicate,
   isUnlockedDuplicate = false,
+  isModified = false,
   hideDuplicateBadge = false,
   isInternalTransfer,
   isSpaceTransfer,
@@ -49,6 +52,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   formatDate,
   onUpdateTransaction,
   onRemoveTransaction,
+  onResetTransaction,
   onToggleSpaceTransferInclude,
   onUnlockDuplicate,
   onRelockDuplicate,
@@ -112,15 +116,6 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             )}
             {effectiveIsDuplicate && !hideDuplicateBadge && (
               <span className={styles['duplicate-pill']}>{t.duplicate || 'Duplicate'}</span>
-            )}
-            {isUnlockedDuplicate && (
-              <span
-                className={styles['unlocked-pill']}
-                data-testid={`unlocked-duplicate-badge-${tx.id}`}
-              >
-                <Unlock size={11} aria-hidden="true" />
-                <span>{t.unlockedDuplicateBadge || 'Unlocked'}</span>
-              </span>
             )}
             {effectiveIsInternalTransfer && (
               <span className={styles['internal-transfer-pill']}>
@@ -225,13 +220,40 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
           {isUnlockedDuplicate && onRelockDuplicate && (
             <button
               type="button"
-              className={styles['relock-duplicate-btn']}
-              onClick={() => onRelockDuplicate(tx)}
-              aria-label={t.relockDuplicate || 'Lock'}
-              title={t.relockDuplicate || 'Lock'}
+              className={`${styles['relock-duplicate-btn']} ${
+                isModified ? styles['relock-duplicate-btn-disabled'] : ''
+              }`}
+              onClick={isModified ? undefined : () => onRelockDuplicate(tx)}
+              disabled={isModified}
+              aria-disabled={isModified}
+              aria-label={
+                isModified
+                  ? t.cannotRelockModified ||
+                    'Cannot relock modified transaction. Reset to original values to relock.'
+                  : t.relockDuplicate || 'Lock'
+              }
+              title={
+                isModified
+                  ? t.cannotRelockModified ||
+                    'Cannot relock modified transaction. Reset to original values to relock.'
+                  : t.relockDuplicate || 'Lock'
+              }
               data-testid={`relock-duplicate-btn-${tx.id}`}
             >
               <Unlock size={15} aria-hidden="true" />
+            </button>
+          )}
+
+          {isUnlockedDuplicate && isModified && onResetTransaction && (
+            <button
+              type="button"
+              className={styles['reset-tx-btn']}
+              onClick={() => onResetTransaction(tx.id)}
+              aria-label={t.resetToOriginal || 'Reset to original values'}
+              title={t.resetToOriginal || 'Reset to original values'}
+              data-testid={`reset-tx-btn-${tx.id}`}
+            >
+              <RotateCcw size={14} aria-hidden="true" />
             </button>
           )}
 

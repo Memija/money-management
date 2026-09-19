@@ -9,6 +9,7 @@ export interface UsePreviewTransactionsFilterProps {
   scopedTransactions: Transaction[]
   hasMultipleTransactions: boolean
   duplicateIds?: Set<string>
+  unlockedDuplicateIds?: Set<string>
   internalTransferIds: Set<string>
   spaceTransferIds: Set<string>
   formatCurrency: (amount: number) => string
@@ -19,6 +20,7 @@ export function usePreviewTransactionsFilter({
   scopedTransactions,
   hasMultipleTransactions,
   duplicateIds,
+  unlockedDuplicateIds,
   internalTransferIds,
   spaceTransferIds,
   formatCurrency,
@@ -73,7 +75,14 @@ export function usePreviewTransactionsFilter({
   }
 
   const filteredAndSortedTransactions = useMemo(() => {
-    if (!hasMultipleTransactions && !startDate && !endDate && !searchQuery && sortConfig === null) {
+    if (
+      !hasMultipleTransactions &&
+      !startDate &&
+      !endDate &&
+      !searchQuery &&
+      sortConfig === null &&
+      (!unlockedDuplicateIds || unlockedDuplicateIds.size === 0)
+    ) {
       return scopedTransactions
     }
 
@@ -104,15 +113,38 @@ export function usePreviewTransactionsFilter({
       const { key, direction } = sortConfig
       const factor = direction === 'asc' ? 1 : -1
       result.sort((a, b) => {
+        const aUnlocked = unlockedDuplicateIds?.has(a.id) ?? false
+        const bUnlocked = unlockedDuplicateIds?.has(b.id) ?? false
+        if (aUnlocked !== bUnlocked) {
+          return aUnlocked ? -1 : 1
+        }
         if (key === 'date') return a.date.localeCompare(b.date) * factor
         if (key === 'description') return a.description.localeCompare(b.description) * factor
         if (key === 'amount') return (a.amount - b.amount) * factor
         return 0
       })
+    } else if (unlockedDuplicateIds && unlockedDuplicateIds.size > 0) {
+      result.sort((a, b) => {
+        const aUnlocked = unlockedDuplicateIds.has(a.id)
+        const bUnlocked = unlockedDuplicateIds.has(b.id)
+        if (aUnlocked !== bUnlocked) {
+          return aUnlocked ? -1 : 1
+        }
+        return 0
+      })
     }
 
     return result
-  }, [scopedTransactions, hasMultipleTransactions, startDate, endDate, searchQuery, sortConfig, formatCurrency])
+  }, [
+    scopedTransactions,
+    hasMultipleTransactions,
+    startDate,
+    endDate,
+    searchQuery,
+    sortConfig,
+    formatCurrency,
+    unlockedDuplicateIds,
+  ])
 
   const { totalInflows, totalOutflows } = useMemo(() => {
     let inflows = 0

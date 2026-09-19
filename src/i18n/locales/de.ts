@@ -135,6 +135,23 @@ export const de: TranslationStrings = {
   unlockDuplicateConfirm: 'Entsperren und bearbeiten',
   relockDuplicate: 'Wieder als Duplikat sperren',
   unlockedDuplicateBadge: 'Entsperrt',
+  filterUnlocked: 'Entsperrt',
+  cannotRelockModified: 'Geänderte Buchung kann nicht gesperrt werden. Auf Originalwerte zurücksetzen, um zu sperren.',
+  resetToOriginal: 'Auf Originalwerte zurücksetzen',
+  rememberDuplicateRule: 'Diese Ausnahme für künftige Importe merken',
+  duplicateRulesTitle: 'Duplikat-Regeln & Ausnahmen',
+  duplicateRulesDesc:
+    'Regeln, die automatisch aus Ihren Freigaben doppelter Buchungen gelernt wurden. Passende Buchungen werden bei zukünftigen Importen nicht mehr als Duplikate markiert.',
+  noDuplicateRules: 'Noch keine Duplikat-Ausnahmeregeln',
+  noDuplicateRulesDesc:
+    'Wenn Sie beim Import eine doppelte Buchung entsperren und die Regel speichern, wird sie hier angezeigt.',
+  ruleAllowDuplicate: "Duplikat zulassen: '{desc}'",
+  ruleAppliedTimes: '{count}-mal angewendet',
+  ruleAppliedOnce: '1-mal angewendet',
+  anyAmount: 'Beliebiger Betrag',
+  allInstitutions: 'Alle Bankinstitute',
+  revokeRule: 'Regel widerrufen',
+  clearAllRules: 'Alle Regeln löschen',
 
   spaceTransfersExcluded:
     '{count} interne Space-Umbuchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',

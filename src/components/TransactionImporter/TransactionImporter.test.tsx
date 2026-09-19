@@ -25,6 +25,7 @@ vi.mock('../../store/useAppStore', () => ({
       replaceImportedAccount: mockReplaceImportedAccount,
       setStep: mockSetStep,
       getDuplicateTransactionStats: mockGetDuplicateTransactionStats,
+      addDuplicateOverrideRule: vi.fn(),
       cancelImport: vi.fn(),
     }
     return typeof selector === 'function' ? selector(state as unknown as AppState) : state
@@ -994,9 +995,8 @@ Transfer from Bank B DE12345678901234567890
     const confirmUnlockBtn = screen.getByTestId('confirm-unlock-duplicate-btn')
     fireEvent.click(confirmUnlockBtn)
 
-    // The transaction should now have the "Unlocked" badge and relock button
+    // The transaction should now have the relock button (with unlock padlock icon, without redundant text label)
     await waitFor(() => {
-      expect(screen.getAllByText('Unlocked').length).toBeGreaterThan(0)
       expect(screen.getAllByTitle('Lock').length).toBeGreaterThan(0)
     })
 
