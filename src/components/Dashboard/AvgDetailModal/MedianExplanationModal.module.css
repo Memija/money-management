@@ -96,6 +96,7 @@
   font-weight: 600;
   color: var(--text-main);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .amount-highlight {

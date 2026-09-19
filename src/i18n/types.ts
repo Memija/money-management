@@ -154,6 +154,12 @@ export interface TranslationStrings {
   filterDuplicates: string
   duplicatesSkippedNotice: string
   viewDuplicates: string
+  unlockDuplicate: string
+  unlockDuplicateTitle: string
+  unlockDuplicateMessage: string
+  unlockDuplicateConfirm: string
+  relockDuplicate: string
+  unlockedDuplicateBadge: string
 
   // Internal & space transfers during import
   spaceTransfersExcluded: string

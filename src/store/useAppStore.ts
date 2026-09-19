@@ -122,7 +122,7 @@ export const useAppStore = create<AppState>()(
               existing.transactions.map(toCanonicalTransactionKey),
             )
             const newUnique = account.transactions.filter(
-              (t) => !existingKeys.has(toCanonicalTransactionKey(t)),
+              (t) => t.forceImport || !existingKeys.has(toCanonicalTransactionKey(t)),
             )
             // Accumulate ALL fingerprints so future re-imports of any previously seen file are detected
             const mergedFingerprints = Array.from(

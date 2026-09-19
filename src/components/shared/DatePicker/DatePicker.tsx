@@ -14,6 +14,7 @@ interface DatePickerProps {
   onChange: (date: string) => void
   className?: string
   placeholder?: string
+  clearable?: boolean
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -21,6 +22,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   onChange,
   className = '',
   placeholder,
+  clearable = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -162,13 +164,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           id={inputId}
           name={inputId}
           type="text"
-          className={styles.input}
+          className={`${styles.input} ${!clearable ? styles.inputCompact : ''}`}
           placeholder={placeholder || t.selectDatePlaceholder}
           aria-label={placeholder || t.selectDatePlaceholder}
           value={value ? formatDate(value) : ''}
           readOnly
         />
-        {value ? (
+        {clearable && value ? (
           <button
             className={styles['clear-button']}
             onClick={handleClear}
@@ -177,9 +179,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           >
             <X size={12} />
           </button>
-        ) : (
+        ) : !value ? (
           <Calendar size={14} className={styles.icon} />
-        )}
+        ) : null}
       </div>
 
       {isOpen && (

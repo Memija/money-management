@@ -130,6 +130,13 @@ export const sr: TranslationStrings = {
   filterDuplicates: 'Дупликати',
   duplicatesSkippedNotice: 'Ове трансакције већ постоје у Вашој евиденцији и биће прескочене како би се спречило двоструко рачунање.',
   viewDuplicates: 'Прегледај дупликате',
+  unlockDuplicate: 'Откључај',
+  unlockDuplicateTitle: 'Откључај дупликатну трансакцију',
+  unlockDuplicateMessage:
+    'Ова трансакција је означена као дупликат постојећег записа. Откључавањем ћете омогућити уређивање њених података и укључивање у увоз. Да ли сте сигурни да желите да је откључате?',
+  unlockDuplicateConfirm: 'Откључај и уреди',
+  relockDuplicate: 'Поново закључај као дупликат',
+  unlockedDuplicateBadge: 'Откључано',
 
   spaceTransfersExcluded:
     '{count} интерних преноса између простора (Spaces) је аутоматски искључено ради избегавања двоструког рачунања.',

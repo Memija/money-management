@@ -128,6 +128,13 @@ export const pl: TranslationStrings = {
   filterDuplicates: 'Duplikaty',
   duplicatesSkippedNotice: 'Te transakcje już istnieją w Twoich zapisach i zostaną pominięte, aby zapobiec podwójnemu liczeniu.',
   viewDuplicates: 'Zobacz duplikaty',
+  unlockDuplicate: 'Odblokuj',
+  unlockDuplicateTitle: 'Odblokuj zduplikowaną transakcję',
+  unlockDuplicateMessage:
+    'Ta transakcja została oznaczona jako duplikat istniejącego rekordu. Odblokowanie pozwoli na edycję jej danych i uwzględnienie jej w imporcie. Czy na pewno chcesz ją odblokować?',
+  unlockDuplicateConfirm: 'Odblokuj i edytuj',
+  relockDuplicate: 'Zablokuj ponownie jako duplikat',
+  unlockedDuplicateBadge: 'Odblokowana',
 
   spaceTransfersExcluded:
     '{count} wewnętrznych transferów między przestrzeniami (Spaces) zostało automatycznie wykluczonych, aby uniknąć podwójnego liczenia.',

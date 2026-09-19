@@ -128,6 +128,13 @@ export const en: TranslationStrings = {
   filterDuplicates: 'Duplicates',
   duplicatesSkippedNotice: 'These transactions already exist in your records and will be skipped to prevent double counting.',
   viewDuplicates: 'View duplicates',
+  unlockDuplicate: 'Unlock',
+  unlockDuplicateTitle: 'Unlock Duplicate Transaction',
+  unlockDuplicateMessage:
+    'This transaction was flagged as a duplicate of an existing record. Unlocking it will allow you to edit its details and include it in the import. Are you sure you want to unlock it?',
+  unlockDuplicateConfirm: 'Unlock & Edit',
+  relockDuplicate: 'Re-lock as duplicate',
+  unlockedDuplicateBadge: 'Unlocked',
 
   spaceTransfersExcluded:
     '{count} internal space transfers were automatically excluded to prevent double counting.',

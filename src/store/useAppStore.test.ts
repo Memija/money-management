@@ -155,6 +155,38 @@ describe('useAppStore', () => {
     expect(state.importedAccounts[0].transactions).toHaveLength(1)
   })
 
+  it('should import duplicate transaction when forceImport is true', () => {
+    const sharedTx = {
+      id: 'tx1',
+      date: '2026-01-01',
+      description: 'Shared transaction',
+      amount: -10,
+      currency: 'EUR',
+      type: 'expense' as const,
+      institution: 'Chase',
+    }
+    const firstImport: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: [sharedTx],
+      importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-1'],
+    }
+    const secondImportWithForce: ImportedAccount = {
+      institutionId: 'chase',
+      institutionName: 'Chase',
+      transactions: [{ ...sharedTx, id: 'tx1-unlocked', forceImport: true }],
+      importedAt: new Date().toISOString(),
+      importedFingerprints: ['fp-2'],
+    }
+
+    useAppStore.getState().addImportedAccount(firstImport)
+    useAppStore.getState().addImportedAccount(secondImportWithForce)
+
+    const state = useAppStore.getState()
+    expect(state.importedAccounts[0].transactions).toHaveLength(2)
+  })
+
   it('should fully replace existing account when replaceImportedAccount is called', () => {
     const firstImport: ImportedAccount = {
       institutionId: 'chase',

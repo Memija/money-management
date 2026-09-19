@@ -11,10 +11,10 @@ import { useLanguageStore } from '../../store/useLanguageStore'
 import type { ImportedAccount, ImportMethod } from '../../types'
 import { reconcileCrossAccountTransfers } from '../../utils/account-transfers'
 import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal'
+import { TransactionPreviewModal } from '../shared/TransactionPreviewModal'
 import { DuplicateImportWarningModal } from './DuplicateImportWarningModal'
 import { ImportMethodSelector } from './ImportMethodSelector'
 import { ImportUploadArea } from './ImportUploadArea'
-import { TransactionPreviewModal } from './TransactionPreviewModal'
 import { useTransactionImport } from './useTransactionImport'
 
 import styles from './TransactionImporter.module.css'
@@ -32,6 +32,7 @@ const TransactionImporter: React.FC = () => {
   const [showClearConfirmation, setShowClearConfirmation] = useState(false)
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [unlockedDuplicateIds, setUnlockedDuplicateIds] = useState<Set<string>>(new Set())
 
   const {
     transactions,
@@ -56,10 +57,30 @@ const TransactionImporter: React.FC = () => {
     handleClearAll,
   } = useTransactionImport(institutionName, method, t)
 
-  const duplicateStats = React.useMemo(
+  // Reset unlocked duplicates if transactions are cleared
+  React.useEffect(() => {
+    if (!transactions?.length) {
+      setUnlockedDuplicateIds(new Set())
+    }
+  }, [transactions?.length])
+
+  const rawDuplicateStats = React.useMemo(
     () => getDuplicateTransactionStats(selectedInstitution?.id ?? 'unknown', transactions || []),
     [selectedInstitution?.id, transactions, getDuplicateTransactionStats],
   )
+
+  const duplicateStats = React.useMemo(() => {
+    const activeDuplicateIds = rawDuplicateStats.duplicateIds.filter(
+      (id) => !unlockedDuplicateIds.has(id),
+    )
+    const duplicateCount = activeDuplicateIds.length
+    const newCount = (transactions || []).length - duplicateCount
+    return {
+      duplicateCount,
+      newCount,
+      duplicateIds: activeDuplicateIds,
+    }
+  }, [rawDuplicateStats, unlockedDuplicateIds, transactions])
 
   const isAllDuplicates = duplicateStats.duplicateCount > 0 && duplicateStats.newCount === 0
   const isPartialDuplicates = duplicateStats.duplicateCount > 0 && duplicateStats.newCount > 0
@@ -131,14 +152,14 @@ const TransactionImporter: React.FC = () => {
 
   const buildAccount = (): ImportedAccount => {
     const duplicateIdSet = new Set(duplicateStats.duplicateIds)
-    const nonDuplicateTransactions = duplicateStats.duplicateCount > 0
-      ? transactions.filter((t) => !duplicateIdSet.has(t.id))
-      : transactions
+    const transactionsToImport = transactions
+      .filter((t) => !duplicateIdSet.has(t.id))
+      .map((t) => (unlockedDuplicateIds.has(t.id) ? { ...t, forceImport: true } : t))
 
     return {
       institutionId: selectedInstitution?.id ?? 'unknown',
       institutionName,
-      transactions: nonDuplicateTransactions,
+      transactions: transactionsToImport,
       importedAt: new Date().toISOString(),
       importedFingerprints: [importFingerprint],
       accountIbans: detectedAccountIbans,
@@ -164,6 +185,7 @@ const TransactionImporter: React.FC = () => {
 
   const onClearAll = useCallback(() => {
     handleClearAll()
+    setUnlockedDuplicateIds(new Set())
     setShowClearConfirmation(false)
   }, [handleClearAll])
 
@@ -444,7 +466,8 @@ const TransactionImporter: React.FC = () => {
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         transactions={transactions}
-        duplicateIds={new Set(duplicateStats.duplicateIds)}
+        duplicateIds={new Set(rawDuplicateStats.duplicateIds)}
+        unlockedDuplicateIds={unlockedDuplicateIds}
         internalTransferIds={internalTransferStats.transferTxIds}
         discardedSpaceCount={discardedSpaceCount}
         excludedSpaceTransactions={excludedSpaceTransactions}
@@ -454,6 +477,16 @@ const TransactionImporter: React.FC = () => {
         onIncludeSpaceTransaction={handleIncludeSpaceTransaction}
         onExcludeSpaceTransaction={handleExcludeSpaceTransaction}
         onIncludeAllSpaceTransactions={handleIncludeAllSpaceTransactions}
+        onUnlockDuplicateTransaction={(tx) =>
+          setUnlockedDuplicateIds((prev) => new Set(prev).add(tx.id))
+        }
+        onRelockDuplicateTransaction={(tx) =>
+          setUnlockedDuplicateIds((prev) => {
+            const next = new Set(prev)
+            next.delete(tx.id)
+            return next
+          })
+        }
         title={previewModalTitle}
       />
 

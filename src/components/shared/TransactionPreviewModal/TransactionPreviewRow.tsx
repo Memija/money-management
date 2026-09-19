@@ -1,5 +1,5 @@
 import React from 'react'
-import { Ghost, Layers, Minus, Plus, Trash2 } from 'lucide-react'
+import { Ghost, Layers, Lock, Minus, Plus, Trash2, Unlock } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/types'
 import type { CustomCategory, Transaction } from '../../../types'
@@ -14,6 +14,8 @@ export interface TransactionPreviewRowProps {
   index: number
   tx: Transaction
   isDuplicate: boolean
+  isUnlockedDuplicate?: boolean
+  hideDuplicateBadge?: boolean
   isInternalTransfer: boolean
   isSpaceTransfer: boolean
   isManuallyIncludedSpaceTransfer?: boolean
@@ -26,12 +28,16 @@ export interface TransactionPreviewRowProps {
   onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void
   onRemoveTransaction?: (id: string) => void
   onToggleSpaceTransferInclude?: (tx: Transaction) => void
+  onUnlockDuplicate?: (tx: Transaction) => void
+  onRelockDuplicate?: (tx: Transaction) => void
 }
 
 export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   index,
   tx,
   isDuplicate,
+  isUnlockedDuplicate = false,
+  hideDuplicateBadge = false,
   isInternalTransfer,
   isSpaceTransfer,
   isManuallyIncludedSpaceTransfer,
@@ -44,9 +50,12 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   onUpdateTransaction,
   onRemoveTransaction,
   onToggleSpaceTransferInclude,
+  onUnlockDuplicate,
+  onRelockDuplicate,
 }) => {
   // When a transaction is marked as a duplicate, do not mark it as anything else
-  const effectiveIsDuplicate = isDuplicate
+  // If it was explicitly unlocked by the user, it is no longer an effective duplicate
+  const effectiveIsDuplicate = isDuplicate && !isUnlockedDuplicate
   const effectiveIsInternalTransfer = !effectiveIsDuplicate && isInternalTransfer
   const effectiveIsSpaceTransfer = !effectiveIsDuplicate && isSpaceTransfer
   const effectiveIsManuallyIncludedSpaceTransfer =
@@ -101,8 +110,17 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             {tx.category && (
               <span>{getCategoryLabel(tx.category, t, locale, customCategories)}</span>
             )}
-            {effectiveIsDuplicate && (
+            {effectiveIsDuplicate && !hideDuplicateBadge && (
               <span className={styles['duplicate-pill']}>{t.duplicate || 'Duplicate'}</span>
+            )}
+            {isUnlockedDuplicate && (
+              <span
+                className={styles['unlocked-pill']}
+                data-testid={`unlocked-duplicate-badge-${tx.id}`}
+              >
+                <Unlock size={11} aria-hidden="true" />
+                <span>{t.unlockedDuplicateBadge || 'Unlocked'}</span>
+              </span>
             )}
             {effectiveIsInternalTransfer && (
               <span className={styles['internal-transfer-pill']}>
@@ -143,6 +161,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
           <div className={styles['inline-datepicker-wrapper']}>
             <DatePicker
               value={tx.date}
+              clearable={false}
               onChange={(date) => onUpdateTransaction?.(tx.id, { date })}
             />
           </div>
@@ -176,56 +195,89 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             title={formatCurrency(tx.amount)}
           />
         ) : (
-          <span>
+          <span title={`${isTxIncome ? '+' : ''}${formatCurrency(tx.amount)}`}>
             {isTxIncome ? '+' : ''}
             {formatCurrency(tx.amount)}
           </span>
         )}
       </div>
 
-      <div className={styles['row-actions']}>
-        {effectiveIsSpaceTransfer && onToggleSpaceTransferInclude && (
-          <button
-            type="button"
-            className={styles['include-space-btn']}
-            onClick={() => onToggleSpaceTransferInclude(tx)}
-            aria-label={t.includeInImport || 'Include in import'}
-            title={t.includeInImport || 'Include in import'}
-            data-testid={`include-space-btn-${tx.id}`}
-          >
-            <Plus size={13} aria-hidden="true" />
-            <span>{t.include || 'Include'}</span>
-          </button>
-        )}
-
-        {effectiveIsManuallyIncludedSpaceTransfer && onToggleSpaceTransferInclude && (
-          <button
-            type="button"
-            className={styles['exclude-space-btn']}
-            onClick={() => onToggleSpaceTransferInclude(tx)}
-            aria-label={t.excludeFromImport || 'Exclude from import'}
-            title={t.excludeFromImport || 'Exclude from import'}
-            data-testid={`exclude-space-btn-${tx.id}`}
-          >
-            <Minus size={13} aria-hidden="true" />
-            <span>{t.exclude || 'Exclude'}</span>
-          </button>
-        )}
-
-        {onRemoveTransaction &&
-          !effectiveIsDuplicate &&
-          !effectiveIsInternalTransfer &&
-          !effectiveIsSpaceTransfer && (
+      {Boolean(
+        onRemoveTransaction ||
+          onToggleSpaceTransferInclude ||
+          onUnlockDuplicate ||
+          onRelockDuplicate,
+      ) && (
+        <div className={styles['row-actions']}>
+          {effectiveIsDuplicate && onUnlockDuplicate && (
             <button
-              className={styles['remove-button']}
-              onClick={() => onRemoveTransaction(tx.id)}
-              aria-label={t.removeTransaction}
-              title={t.removeTransaction}
+              type="button"
+              className={styles['unlock-duplicate-btn']}
+              onClick={() => onUnlockDuplicate(tx)}
+              aria-label={t.unlockDuplicate || 'Unlock'}
+              title={t.unlockDuplicate || 'Unlock'}
+              data-testid={`unlock-duplicate-btn-${tx.id}`}
             >
-              <Trash2 size={15} />
+              <Lock size={15} aria-hidden="true" />
             </button>
           )}
-      </div>
+
+          {isUnlockedDuplicate && onRelockDuplicate && (
+            <button
+              type="button"
+              className={styles['relock-duplicate-btn']}
+              onClick={() => onRelockDuplicate(tx)}
+              aria-label={t.relockDuplicate || 'Lock'}
+              title={t.relockDuplicate || 'Lock'}
+              data-testid={`relock-duplicate-btn-${tx.id}`}
+            >
+              <Unlock size={15} aria-hidden="true" />
+            </button>
+          )}
+
+          {effectiveIsSpaceTransfer && onToggleSpaceTransferInclude && (
+            <button
+              type="button"
+              className={styles['include-space-btn']}
+              onClick={() => onToggleSpaceTransferInclude(tx)}
+              aria-label={t.includeInImport || 'Include in import'}
+              title={t.includeInImport || 'Include in import'}
+              data-testid={`include-space-btn-${tx.id}`}
+            >
+              <Plus size={13} aria-hidden="true" />
+              <span>{t.include || 'Include'}</span>
+            </button>
+          )}
+
+          {effectiveIsManuallyIncludedSpaceTransfer && onToggleSpaceTransferInclude && (
+            <button
+              type="button"
+              className={styles['exclude-space-btn']}
+              onClick={() => onToggleSpaceTransferInclude(tx)}
+              aria-label={t.excludeFromImport || 'Exclude from import'}
+              title={t.excludeFromImport || 'Exclude from import'}
+              data-testid={`exclude-space-btn-${tx.id}`}
+            >
+              <Minus size={13} aria-hidden="true" />
+              <span>{t.exclude || 'Exclude'}</span>
+            </button>
+          )}
+
+          {onRemoveTransaction &&
+            !isDuplicate &&
+            !effectiveIsInternalTransfer &&
+            !effectiveIsSpaceTransfer && (
+              <button
+                className={styles['remove-button']}
+                onClick={() => onRemoveTransaction(tx.id)}
+                aria-label={t.removeTransaction}
+                title={t.removeTransaction}
+              >
+                <Trash2 size={15} />
+              </button>
+            )}
+        </div>
+      )}
     </div>
   )
 }

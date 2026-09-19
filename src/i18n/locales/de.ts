@@ -128,6 +128,13 @@ export const de: TranslationStrings = {
   filterDuplicates: 'Duplikate',
   duplicatesSkippedNotice: 'Diese Buchungen existieren bereits in Ihren Daten und werden übersprungen, um Doppelzählungen zu verhindern.',
   viewDuplicates: 'Duplikate anzeigen',
+  unlockDuplicate: 'Entsperren',
+  unlockDuplicateTitle: 'Doppelte Buchung entsperren',
+  unlockDuplicateMessage:
+    'Diese Buchung wurde als Duplikat eines bestehenden Datensatzes erkannt. Durch das Entsperren können Sie die Buchungsdaten bearbeiten und in den Import einbeziehen. Möchten Sie diese Buchung wirklich entsperren?',
+  unlockDuplicateConfirm: 'Entsperren und bearbeiten',
+  relockDuplicate: 'Wieder als Duplikat sperren',
+  unlockedDuplicateBadge: 'Entsperrt',
 
   spaceTransfersExcluded:
     '{count} interne Space-Umbuchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',

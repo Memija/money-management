@@ -128,6 +128,13 @@ export const bs: TranslationStrings = {
   filterDuplicates: 'Duplikati',
   duplicatesSkippedNotice: 'Ove transakcije već postoje u Vašoj evidenciji i bit će preskočene kako bi se spriječilo dvostruko računanje.',
   viewDuplicates: 'Pregledaj duplikate',
+  unlockDuplicate: 'Otključaj',
+  unlockDuplicateTitle: 'Otključaj duplikatnu transakciju',
+  unlockDuplicateMessage:
+    'Ova transakcija je označena kao duplikat postojećeg zapisa. Otključavanjem ćete omogućiti uređivanje njenih podataka i uključivanje u uvoz. Jeste li sigurni da je želite otključati?',
+  unlockDuplicateConfirm: 'Otključaj i uredi',
+  relockDuplicate: 'Ponovo zaključaj kao duplikat',
+  unlockedDuplicateBadge: 'Otključano',
 
   spaceTransfersExcluded:
     '{count} internih prijenosa između prostora (Spaces) je automatski isključeno radi izbjegavanja dvostrukog računanja.',

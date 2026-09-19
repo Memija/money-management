@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { TranslationStrings } from '../../i18n/translations'
 import { type AppState } from '../../store/useAppStore'
 import { type LanguageState, useLanguageStore } from '../../store/useLanguageStore'
+import type { ImportedAccount } from '../../types'
 import TransactionImporter from './TransactionImporter'
 
 const { mockAddImportedAccount, mockSetStep, mockGetDuplicateTransactionStats, mockReplaceImportedAccount, mockImportedAccounts } = vi.hoisted(() => ({
@@ -105,6 +106,13 @@ vi.mock('../../store/useLanguageStore', () => ({
         transferWarningModalReview: 'Review Details',
         transferWarningModalProceed: 'Proceed with Import',
         transferWarningModalNotice: 'These transactions are reconciled internally and will not affect your net totals.',
+        done: 'Done',
+        unlockDuplicate: 'Unlock duplicate',
+        unlockDuplicateTitle: 'Unlock Duplicate Transaction',
+        unlockDuplicateMessage: 'Unlock warning message',
+        unlockDuplicateConfirm: 'Unlock & Edit',
+        relockDuplicate: 'Relock duplicate',
+        unlockedDuplicateBadge: 'Unlocked',
       } as unknown as TranslationStrings,
     }
     return typeof selector === 'function' ? selector(state as LanguageState) : state
@@ -216,6 +224,13 @@ describe('TransactionImporter', () => {
     transferWarningModalReview: 'Review Details',
     transferWarningModalProceed: 'Proceed with Import',
     transferWarningModalNotice: 'These transactions are reconciled internally and will not affect your net totals.',
+    done: 'Done',
+    unlockDuplicate: 'Unlock',
+    unlockDuplicateTitle: 'Unlock Duplicate Transaction',
+    unlockDuplicateMessage: 'Unlock warning message',
+    unlockDuplicateConfirm: 'Unlock & Edit',
+    relockDuplicate: 'Lock',
+    unlockedDuplicateBadge: 'Unlocked',
   }
 
   beforeEach(() => {
@@ -927,6 +942,99 @@ Transfer from Bank B DE12345678901234567890
     // Verify NO internal transfer banner flashes or renders!
     expect(screen.queryByTestId('internal-transfers-banner')).not.toBeInTheDocument()
     expect(screen.queryByText(/internal transfer/i)).not.toBeInTheDocument()
+  })
+
+  it('allows unlocking duplicate transactions, updating stats and enabling import with forceImport', async () => {
+    mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: { id: string }[]) => {
+      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+      return {
+        duplicateCount: txs.length,
+        newCount: 0,
+        duplicateIds: txs.map((tx) => tx.id),
+      }
+    })
+
+    const tsvData = `Date\tDescription\tAmount
+2026-04-01\tCoffee Shop\t-4.5
+2026-04-02\tLunch\t-12`
+
+    render(<TransactionImporter />)
+    fireEvent.click(screen.getByText('Paste'))
+    fireEvent.change(screen.getByPlaceholderText('Paste here'), {
+      target: { value: tsvData },
+    })
+    fireEvent.click(screen.getByText('Parse'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('duplicate-all-banner')).toBeInTheDocument()
+    })
+
+    // Initially import button is disabled because all items are duplicates
+    const importBtn = screen.getByRole('button', { name: /all transactions already imported/i })
+    expect(importBtn).toBeDisabled()
+
+    // Click "View duplicates" to open preview modal
+    const viewDuplicatesBtn = screen.getByTestId('view-duplicates-button')
+    fireEvent.click(viewDuplicatesBtn)
+
+    // Ensure preview modal is open and shows duplicate rows
+    await waitFor(() => {
+      expect(screen.getByText('Duplicates')).toBeInTheDocument()
+    })
+
+    // Find unlock button for the first transaction
+    const unlockBtns = screen.getAllByTitle('Unlock')
+    expect(unlockBtns.length).toBeGreaterThan(0)
+    fireEvent.click(unlockBtns[0])
+
+    // Warning modal should open
+    expect(screen.getByText('Unlock Duplicate Transaction')).toBeInTheDocument()
+
+    // Confirm unlock
+    const confirmUnlockBtn = screen.getByTestId('confirm-unlock-duplicate-btn')
+    fireEvent.click(confirmUnlockBtn)
+
+    // The transaction should now have the "Unlocked" badge and relock button
+    await waitFor(() => {
+      expect(screen.getAllByText('Unlocked').length).toBeGreaterThan(0)
+      expect(screen.getAllByTitle('Lock').length).toBeGreaterThan(0)
+    })
+
+    // Close the preview modal by clicking Done
+    const doneBtn = screen.getByRole('button', { name: /Done/i })
+    fireEvent.click(doneBtn)
+
+    // Now back on the main view: duplicate count decreased to 1, newCount increased to 1
+    // Duplicate banner changes from all duplicates to partial duplicates
+    await waitFor(() => {
+      expect(screen.getByTestId('duplicate-partial-banner')).toBeInTheDocument()
+    })
+
+    // Import button should now be enabled for 1 new transaction!
+    const activeImportBtn = screen.getByRole('button', { name: /Import 1 new transactions/i })
+    expect(activeImportBtn).not.toBeDisabled()
+
+    // Click import
+    fireEvent.click(activeImportBtn)
+
+    // Warning modal for remaining duplicates appears
+    expect(screen.getByText(/We found 1 duplicate transactions/i)).toBeInTheDocument()
+
+    // Proceed through duplicate warning
+    const proceedBtn = screen.getByText('Proceed with 1 transactions')
+    fireEvent.click(proceedBtn)
+
+    // Verify addImportedAccount was called with forceImport: true on the unlocked transaction
+    expect(mockAddImportedAccount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        transactions: expect.arrayContaining([
+          expect.objectContaining({
+            description: 'Coffee Shop',
+            forceImport: true,
+          }),
+        ]),
+      }),
+    )
   })
 })
 

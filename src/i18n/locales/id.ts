@@ -127,6 +127,13 @@ export const id: TranslationStrings = {
   filterDuplicates: 'Duplikat',
   duplicatesSkippedNotice: 'Transaksi ini sudah ada dalam catatan Anda dan akan dilewati untuk mencegah penghitungan ganda.',
   viewDuplicates: 'Lihat duplikat',
+  unlockDuplicate: 'Buka Kunci',
+  unlockDuplicateTitle: 'Buka Kunci Transaksi Duplikat',
+  unlockDuplicateMessage:
+    'Transaksi ini ditandai sebagai duplikat dari data yang sudah ada. Membuka kuncinya memungkinkan Anda mengedit detailnya dan menyertakannya dalam impor. Apakah Anda yakin ingin membukanya?',
+  unlockDuplicateConfirm: 'Buka Kunci & Edit',
+  relockDuplicate: 'Kunci kembali sebagai duplikat',
+  unlockedDuplicateBadge: 'Terbuka',
 
   spaceTransfersExcluded:
     '{count} transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',

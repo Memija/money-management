@@ -15,4 +15,6 @@ export interface Transaction {
   counterpartyIban?: string
   /** Own account IBAN if present in the statement/row (e.g. IBAN Kontoinhaber). */
   ownIban?: string
+  /** True if the user manually unlocked this duplicate to force its import. */
+  forceImport?: boolean
 }
