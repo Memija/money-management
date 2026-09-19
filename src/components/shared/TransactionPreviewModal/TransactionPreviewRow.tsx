@@ -67,18 +67,17 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
 
   const isEditable = Boolean(
     onUpdateTransaction &&
-      !effectiveIsDuplicate &&
-      !effectiveIsInternalTransfer &&
-      (!effectiveIsSpaceTransfer || effectiveIsManuallyIncludedSpaceTransfer),
+    !effectiveIsDuplicate &&
+    !effectiveIsInternalTransfer &&
+    (!effectiveIsSpaceTransfer || effectiveIsManuallyIncludedSpaceTransfer),
   )
   const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
   const isTxIncome = tx.type === 'income'
 
   return (
     <div
-      className={`${styles['tx-row']} ${
-        index % 2 === 0 ? styles['tx-row-even'] : ''
-      } ${effectiveIsSpaceTransfer ? styles['tx-row-space-transfer'] : ''}`}
+      className={`${styles['tx-row']} ${index % 2 === 0 ? styles['tx-row-even'] : ''
+        } ${effectiveIsSpaceTransfer ? styles['tx-row-space-transfer'] : ''}`}
       data-testid={`preview-tx-row-${tx.id}`}
     >
       <div className={styles['row-main']}>
@@ -166,9 +165,8 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
       </div>
 
       <div
-        className={`${styles['row-amount']} ${
-          isTxIncome ? styles['amount-positive'] : styles['amount-negative']
-        }`}
+        className={`${styles['row-amount']} ${isTxIncome ? styles['amount-positive'] : styles['amount-negative']
+          }`}
       >
         {isEditable ? (
           <input
@@ -199,107 +197,105 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
 
       {Boolean(
         onRemoveTransaction ||
-          onToggleSpaceTransferInclude ||
-          onUnlockDuplicate ||
-          onRelockDuplicate,
+        onToggleSpaceTransferInclude ||
+        onUnlockDuplicate ||
+        onRelockDuplicate,
       ) && (
-        <div className={styles['row-actions']}>
-          {effectiveIsDuplicate && onUnlockDuplicate && (
-            <button
-              type="button"
-              className={styles['unlock-duplicate-btn']}
-              onClick={() => onUnlockDuplicate(tx)}
-              aria-label={t.unlockDuplicate || 'Unlock'}
-              title={t.unlockDuplicate || 'Unlock'}
-              data-testid={`unlock-duplicate-btn-${tx.id}`}
-            >
-              <Lock size={15} aria-hidden="true" />
-            </button>
-          )}
-
-          {isUnlockedDuplicate && onRelockDuplicate && (
-            <button
-              type="button"
-              className={`${styles['relock-duplicate-btn']} ${
-                isModified ? styles['relock-duplicate-btn-disabled'] : ''
-              }`}
-              onClick={isModified ? undefined : () => onRelockDuplicate(tx)}
-              disabled={isModified}
-              aria-disabled={isModified}
-              aria-label={
-                isModified
-                  ? t.cannotRelockModified ||
-                    'Cannot relock modified transaction. Reset to original values to relock.'
-                  : t.relockDuplicate || 'Lock'
-              }
-              title={
-                isModified
-                  ? t.cannotRelockModified ||
-                    'Cannot relock modified transaction. Reset to original values to relock.'
-                  : t.relockDuplicate || 'Lock'
-              }
-              data-testid={`relock-duplicate-btn-${tx.id}`}
-            >
-              <Unlock size={15} aria-hidden="true" />
-            </button>
-          )}
-
-          {isUnlockedDuplicate && isModified && onResetTransaction && (
-            <button
-              type="button"
-              className={styles['reset-tx-btn']}
-              onClick={() => onResetTransaction(tx.id)}
-              aria-label={t.resetToOriginal || 'Reset to original values'}
-              title={t.resetToOriginal || 'Reset to original values'}
-              data-testid={`reset-tx-btn-${tx.id}`}
-            >
-              <RotateCcw size={14} aria-hidden="true" />
-            </button>
-          )}
-
-          {effectiveIsSpaceTransfer && onToggleSpaceTransferInclude && (
-            <button
-              type="button"
-              className={styles['include-space-btn']}
-              onClick={() => onToggleSpaceTransferInclude(tx)}
-              aria-label={t.includeInImport || 'Include in import'}
-              title={t.includeInImport || 'Include in import'}
-              data-testid={`include-space-btn-${tx.id}`}
-            >
-              <Plus size={13} aria-hidden="true" />
-              <span>{t.include || 'Include'}</span>
-            </button>
-          )}
-
-          {effectiveIsManuallyIncludedSpaceTransfer && onToggleSpaceTransferInclude && (
-            <button
-              type="button"
-              className={styles['exclude-space-btn']}
-              onClick={() => onToggleSpaceTransferInclude(tx)}
-              aria-label={t.excludeFromImport || 'Exclude from import'}
-              title={t.excludeFromImport || 'Exclude from import'}
-              data-testid={`exclude-space-btn-${tx.id}`}
-            >
-              <Minus size={13} aria-hidden="true" />
-              <span>{t.exclude || 'Exclude'}</span>
-            </button>
-          )}
-
-          {onRemoveTransaction &&
-            !isDuplicate &&
-            !effectiveIsInternalTransfer &&
-            !effectiveIsSpaceTransfer && (
+          <div className={styles['row-actions']}>
+            {effectiveIsDuplicate && onUnlockDuplicate && (
               <button
-                className={styles['remove-button']}
-                onClick={() => onRemoveTransaction(tx.id)}
-                aria-label={t.removeTransaction}
-                title={t.removeTransaction}
+                type="button"
+                className={styles['unlock-duplicate-btn']}
+                onClick={() => onUnlockDuplicate(tx)}
+                aria-label={t.unlockDuplicate || 'Unlock'}
+                title={t.unlockDuplicate || 'Unlock'}
+                data-testid={`unlock-duplicate-btn-${tx.id}`}
               >
-                <Trash2 size={15} />
+                <Lock size={15} aria-hidden="true" />
               </button>
             )}
-        </div>
-      )}
+
+            {isUnlockedDuplicate && isModified && onResetTransaction ? (
+              <button
+                type="button"
+                className={styles['reset-tx-btn']}
+                onClick={() => onResetTransaction(tx.id)}
+                aria-label={t.resetToOriginal || 'Reset to original values'}
+                title={t.resetToOriginal || 'Reset to original values'}
+                data-testid={`reset-tx-btn-${tx.id}`}
+              >
+                <RotateCcw size={14} aria-hidden="true" />
+              </button>
+            ) : isUnlockedDuplicate && onRelockDuplicate ? (
+              <button
+                type="button"
+                className={`${styles['relock-duplicate-btn']} ${
+                  isModified ? styles['relock-duplicate-btn-disabled'] : ''
+                }`}
+                onClick={isModified ? undefined : () => onRelockDuplicate(tx)}
+                disabled={isModified}
+                aria-disabled={isModified}
+                aria-label={
+                  isModified
+                    ? t.cannotRelockModified ||
+                      'Cannot relock modified transaction. Reset to original values to relock.'
+                    : t.relockDuplicate || 'Lock'
+                }
+                title={
+                  isModified
+                    ? t.cannotRelockModified ||
+                      'Cannot relock modified transaction. Reset to original values to relock.'
+                    : t.relockDuplicate || 'Lock'
+                }
+                data-testid={`relock-duplicate-btn-${tx.id}`}
+              >
+                <Unlock size={15} aria-hidden="true" />
+              </button>
+            ) : null}
+
+            {effectiveIsSpaceTransfer && onToggleSpaceTransferInclude && (
+              <button
+                type="button"
+                className={styles['include-space-btn']}
+                onClick={() => onToggleSpaceTransferInclude(tx)}
+                aria-label={t.includeInImport || 'Include in import'}
+                title={t.includeInImport || 'Include in import'}
+                data-testid={`include-space-btn-${tx.id}`}
+              >
+                <Plus size={13} aria-hidden="true" />
+                <span>{t.include || 'Include'}</span>
+              </button>
+            )}
+
+            {effectiveIsManuallyIncludedSpaceTransfer && onToggleSpaceTransferInclude && (
+              <button
+                type="button"
+                className={styles['exclude-space-btn']}
+                onClick={() => onToggleSpaceTransferInclude(tx)}
+                aria-label={t.excludeFromImport || 'Exclude from import'}
+                title={t.excludeFromImport || 'Exclude from import'}
+                data-testid={`exclude-space-btn-${tx.id}`}
+              >
+                <Minus size={13} aria-hidden="true" />
+                <span>{t.exclude || 'Exclude'}</span>
+              </button>
+            )}
+
+            {onRemoveTransaction &&
+              !isDuplicate &&
+              !effectiveIsInternalTransfer &&
+              !effectiveIsSpaceTransfer && (
+                <button
+                  className={styles['remove-button']}
+                  onClick={() => onRemoveTransaction(tx.id)}
+                  aria-label={t.removeTransaction}
+                  title={t.removeTransaction}
+                >
+                  <Trash2 size={15} />
+                </button>
+              )}
+          </div>
+        )}
     </div>
   )
 }

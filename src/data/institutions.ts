@@ -449,3 +449,16 @@ export function getInstitutionTypeLabel(type: FinancialInstitution['type']): str
       return 'Other'
   }
 }
+
+export function findInstitution(identifier?: string): FinancialInstitution | undefined {
+  if (!identifier) return undefined
+  const norm = identifier.trim().toLowerCase()
+  const allInstitutions = Object.values(institutionsByCountry).flat()
+  return allInstitutions.find(
+    (inst) =>
+      inst.id.toLowerCase() === norm ||
+      inst.name.toLowerCase() === norm ||
+      inst.name.toLowerCase().includes(norm) ||
+      norm.includes(inst.name.toLowerCase()),
+  )
+}

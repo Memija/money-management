@@ -18,6 +18,11 @@ let mockDuplicateRules = [
   },
 ]
 
+let mockImportedAccounts: Array<{
+  institutionId: string
+  transactions: Array<{ id: string; importedByRuleId?: string; description: string; amount: number }>
+}> = []
+
 vi.mock('../../store/useLanguageStore', () => ({
   useLanguageStore: vi.fn((selector) => {
     const state = {
@@ -28,12 +33,31 @@ vi.mock('../../store/useLanguageStore', () => ({
         noDuplicateRules: 'No duplicate override rules yet',
         noDuplicateRulesDesc: 'When you unlock a duplicate transaction, it will appear here.',
         ruleAllowDuplicate: "Allow duplicate: '{desc}'",
+        ruleAllowDuplicateLabel: 'Allow duplicate',
         ruleAppliedTimes: 'Applied {count} times',
         ruleAppliedOnce: 'Applied 1 time',
+        ruleAppliedOnceOn: 'Applied 1 time • {date}',
+        ruleAppliedTimesLast: 'Applied {count} times • Last: {date}',
+        clearAllRulesConfirmDesc: 'Are you sure you want to remove all duplicate override rules?',
         anyAmount: 'Any amount',
         allInstitutions: 'All institutions',
         revokeRule: 'Revoke rule',
         clearAllRules: 'Clear all rules',
+        revokeRuleConfirmTitle: 'Revoke Duplicate Rule',
+        deleteRuleTransactionsOption: 'Also delete {count} transaction(s) imported by this rule',
+        deleteDuplicateBoth: 'Delete rule and imported data',
+        deleteDuplicateBothDesc: 'Revoke the rule and permanently delete {count} transaction(s) imported by it.',
+        deleteDuplicateRuleOnly: 'Delete rule only',
+        deleteDuplicateRuleOnlyDesc: 'Revoke the rule, but keep all {count} previously imported transaction(s) in your accounts.',
+        deleteDuplicateDataOnly: 'Delete imported data only',
+        deleteDuplicateDataOnlyDesc: 'Permanently delete {count} transaction(s) imported by this rule, but keep the rule active for future imports.',
+        deleteDuplicateBothBtn: 'Delete Rule and Data',
+        deleteDuplicateRuleOnlyBtn: 'Delete Rule Only',
+        deleteDuplicateDataOnlyBtn: 'Delete Imported Data Only',
+        clearAllDuplicateBothDesc: 'Delete all rules and permanently remove {count} transaction(s) imported by them.',
+        clearAllDuplicateRuleOnlyDesc: 'Delete all rules, but keep all {count} imported transaction(s) in your accounts.',
+        clearAllDuplicateDataOnlyDesc: 'Delete all {count} transaction(s) imported by rules, but keep all rules active.',
+        cancel: 'Cancel',
       },
     }
     return typeof selector === 'function' ? selector(state) : state
@@ -41,9 +65,11 @@ vi.mock('../../store/useLanguageStore', () => ({
 }))
 
 vi.mock('../../store/useAppStore', () => ({
+  matchesDuplicateOverrideRule: vi.fn(),
   useAppStore: vi.fn((selector) => {
     const state = {
       duplicateOverrideRules: mockDuplicateRules,
+      importedAccounts: mockImportedAccounts,
       removeDuplicateOverrideRule: mockRemoveDuplicateOverrideRule,
       clearDuplicateOverrideRules: mockClearDuplicateOverrideRules,
     }
@@ -72,38 +98,95 @@ describe('DuplicateRulesSettings', () => {
         applyCount: 3,
       },
     ]
+    mockImportedAccounts = [
+      {
+        institutionId: 'chase',
+        transactions: [
+          { id: 'tx-1', importedByRuleId: 'drule_1', description: 'Gym Membership', amount: -45.0 },
+          { id: 'tx-2', importedByRuleId: 'drule_1', description: 'Gym Membership', amount: -45.0 },
+        ],
+      },
+    ]
   })
 
   it('renders existing rules with description, amount, institution, and applied count', () => {
     render(<DuplicateRulesSettings />)
 
-    expect(screen.getByText("Allow duplicate: 'Gym Membership'")).toBeInTheDocument()
+    expect(screen.getByText('Allow duplicate')).toBeInTheDocument()
+    expect(screen.getByText('Gym Membership')).toBeInTheDocument()
     expect(screen.getByTestId('rule-amount-drule_1')).toHaveTextContent('€45.00')
     expect(screen.getByTestId('rule-inst-drule_1')).toHaveTextContent('Chase')
-    expect(screen.getByTestId('rule-applied-drule_1')).toHaveTextContent('Applied 3 times')
+    expect(screen.getByTestId('rule-applied-drule_1')).toHaveTextContent('Applied 3 times • Last: 2026-09-18')
     expect(screen.getByTestId('duplicate-rules-count')).toHaveTextContent('1')
   })
 
-  it('calls removeDuplicateOverrideRule when clicking revoke button', () => {
+  it('opens confirmation modal and calls removeDuplicateOverrideRule with "both" option by default', () => {
     render(<DuplicateRulesSettings />)
 
     const revokeBtn = screen.getByTestId('revoke-duplicate-rule-btn-drule_1')
     fireEvent.click(revokeBtn)
 
-    expect(mockRemoveDuplicateOverrideRule).toHaveBeenCalledWith('drule_1')
+    // Modal opens with 3 options
+    expect(screen.getByText('Revoke Duplicate Rule')).toBeInTheDocument()
+    expect(screen.getByTestId('delete-mode-both-radio')).toBeChecked()
+    expect(screen.getByText('Revoke the rule and permanently delete 2 transaction(s) imported by it.')).toBeInTheDocument()
+
+    // Confirm revoke
+    const confirmBtn = screen.getByTestId('confirm-revoke-rule-btn')
+    fireEvent.click(confirmBtn)
+
+    expect(mockRemoveDuplicateOverrideRule).toHaveBeenCalledWith('drule_1', 'both')
   })
 
-  it('calls clearDuplicateOverrideRules when clicking Clear all button', () => {
+  it('allows selecting "rule_only" option before confirming revocation', () => {
+    render(<DuplicateRulesSettings />)
+
+    const revokeBtn = screen.getByTestId('revoke-duplicate-rule-btn-drule_1')
+    fireEvent.click(revokeBtn)
+
+    const ruleOnlyRadio = screen.getByTestId('delete-mode-rule-only-radio')
+    fireEvent.click(ruleOnlyRadio)
+
+    const confirmBtn = screen.getByTestId('confirm-revoke-rule-btn')
+    fireEvent.click(confirmBtn)
+
+    expect(mockRemoveDuplicateOverrideRule).toHaveBeenCalledWith('drule_1', 'rule_only')
+  })
+
+  it('allows selecting "data_only" option before confirming revocation', () => {
+    render(<DuplicateRulesSettings />)
+
+    const revokeBtn = screen.getByTestId('revoke-duplicate-rule-btn-drule_1')
+    fireEvent.click(revokeBtn)
+
+    const dataOnlyRadio = screen.getByTestId('delete-mode-data-only-radio')
+    fireEvent.click(dataOnlyRadio)
+
+    const confirmBtn = screen.getByTestId('confirm-revoke-rule-btn')
+    fireEvent.click(confirmBtn)
+
+    expect(mockRemoveDuplicateOverrideRule).toHaveBeenCalledWith('drule_1', 'data_only')
+  })
+
+  it('opens confirmation modal when clicking Clear all button and handles 3 deletion modes', () => {
     render(<DuplicateRulesSettings />)
 
     const clearBtn = screen.getByTestId('clear-all-duplicate-rules-btn')
     fireEvent.click(clearBtn)
 
-    expect(mockClearDuplicateOverrideRules).toHaveBeenCalled()
+    expect(screen.getByTestId('confirm-clear-all-rules-btn')).toBeInTheDocument()
+    expect(screen.getByTestId('clear-all-mode-both-radio')).toBeChecked()
+
+    // Select data_only for clearing
+    fireEvent.click(screen.getByTestId('clear-all-mode-data-only-radio'))
+
+    fireEvent.click(screen.getByTestId('confirm-clear-all-rules-btn'))
+    expect(mockClearDuplicateOverrideRules).toHaveBeenCalledWith('data_only')
   })
 
   it('displays empty state when there are no duplicate override rules', () => {
     mockDuplicateRules = []
+    mockImportedAccounts = []
     render(<DuplicateRulesSettings />)
 
     expect(screen.getByText('No duplicate override rules yet')).toBeInTheDocument()

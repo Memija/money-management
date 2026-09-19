@@ -11,6 +11,9 @@ import {
   Plus,
   RotateCcw,
   Search,
+  Sliders,
+  Sparkles,
+  X,
 } from 'lucide-react'
 
 import { useFormatters } from '../../../hooks/useFormatters'
@@ -88,6 +91,21 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   const [manuallyIncludedIds, setManuallyIncludedIds] = useState<Set<string>>(new Set())
   const [localUnlockedDuplicateIds, setLocalUnlockedDuplicateIds] = useState<Set<string>>(new Set())
   const [unlockedTxToWarn, setUnlockedTxToWarn] = useState<Transaction | null>(null)
+  const [bulkApplyOffer, setBulkApplyOffer] = useState<{
+    sourceTxId: string
+    originalDescription: string
+    updates: Partial<Transaction>
+    unlockedTargetIds: string[]
+    identicalTargetIds: string[]
+  } | null>(null)
+
+  const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false)
+  const [selectedFieldsToApply, setSelectedFieldsToApply] = useState<{
+    description: boolean
+    date: boolean
+    amount: boolean
+  }>({ description: true, date: true, amount: true })
+  const [selectedTargetIds, setSelectedTargetIds] = useState<Set<string>>(new Set())
 
   const initialTransactionsRef = React.useRef<
     Map<string, { description: string; date: string; amount: number }>
@@ -124,6 +142,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         type: orig.amount >= 0 ? 'income' : 'expense',
       })
     }
+    setBulkApplyOffer((prev) => (prev?.sourceTxId === id ? null : prev))
   }
 
   useEffect(() => {
@@ -140,6 +159,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       setManuallyIncludedIds(new Set())
       setLocalUnlockedDuplicateIds(new Set())
       setUnlockedTxToWarn(null)
+      setBulkApplyOffer(null)
+      setIsAdjustModalOpen(false)
     }
   }, [isOpen, initialFilter])
 
@@ -149,6 +170,148 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     }
     return localUnlockedDuplicateIds
   }, [unlockedDuplicateIds, localUnlockedDuplicateIds])
+
+  const activeTransactions = onIncludeSpaceTransaction ? transactions : localTransactions
+  const activeExcluded = onIncludeSpaceTransaction
+    ? excludedSpaceTransactions
+    : localExcludedSpaceTransactions
+
+  const handleUpdateTransaction = onUpdateTransaction
+    ? (id: string, updates: Partial<Transaction>) => {
+        onUpdateTransaction(id, updates)
+
+        // If an unlocked duplicate is edited, offer to adjust other unlocked and identical transactions in bulk
+        if (effectiveUnlockedIds.has(id)) {
+          const orig = initialTransactionsRef.current.get(id)
+          const currentTx = activeTransactions.find((t) => t.id === id)
+
+          const cumulativeMods: Partial<Transaction> = { ...updates }
+          if (currentTx && orig) {
+            if (updates.description !== undefined) {
+              cumulativeMods.description = updates.description
+            } else if (currentTx.description !== orig.description) {
+              cumulativeMods.description = currentTx.description
+            }
+
+            if (updates.date !== undefined) {
+              cumulativeMods.date = updates.date
+            } else if (currentTx.date !== orig.date) {
+              cumulativeMods.date = currentTx.date
+            }
+
+            if (updates.amount !== undefined) {
+              cumulativeMods.amount = updates.amount
+              cumulativeMods.type = updates.amount >= 0 ? 'income' : 'expense'
+            } else if (Math.abs(currentTx.amount - orig.amount) >= 0.005) {
+              cumulativeMods.amount = currentTx.amount
+              cumulativeMods.type = currentTx.amount >= 0 ? 'income' : 'expense'
+            }
+          }
+
+          // 1. Other unlocked transactions
+          const otherUnlockedTxs = activeTransactions.filter(
+            (other) => other.id !== id && effectiveUnlockedIds.has(other.id),
+          )
+
+          // 2. Identical duplicate transactions that are not already unlocked
+          const otherIdenticalTxs = orig
+            ? activeTransactions.filter((other) => {
+                if (other.id === id || effectiveUnlockedIds.has(other.id)) return false
+                const otherOrig = initialTransactionsRef.current.get(other.id) || other
+                const descMatches =
+                  otherOrig.description.trim().toLowerCase() === orig.description.trim().toLowerCase()
+                const amountMatches = Math.abs(otherOrig.amount - orig.amount) < 0.005
+                return descMatches && amountMatches
+              })
+            : []
+
+          const unlockedTargetIds = otherUnlockedTxs.map((t) => t.id)
+          const identicalTargetIds = otherIdenticalTxs.map((t) => t.id)
+
+          if (unlockedTargetIds.length > 0 || identicalTargetIds.length > 0) {
+            setBulkApplyOffer({
+              sourceTxId: id,
+              originalDescription: orig?.description ?? currentTx?.description ?? '',
+              updates: cumulativeMods,
+              unlockedTargetIds,
+              identicalTargetIds,
+            })
+          }
+        }
+      }
+    : undefined
+
+  const handleApplyToAllUnlocked = () => {
+    if (!bulkApplyOffer) return
+    const { updates, unlockedTargetIds } = bulkApplyOffer
+    for (const txId of unlockedTargetIds) {
+      onUpdateTransaction?.(txId, updates)
+    }
+    setBulkApplyOffer(null)
+  }
+
+  const handleConfirmBulkApply = () => {
+    if (!bulkApplyOffer) return
+    const { updates, unlockedTargetIds, identicalTargetIds } = bulkApplyOffer
+    const allTargets = [...unlockedTargetIds, ...identicalTargetIds]
+    for (const txId of allTargets) {
+      onUpdateTransaction?.(txId, updates)
+      if (duplicateIds.has(txId) && !effectiveUnlockedIds.has(txId)) {
+        const matchingTx = activeTransactions.find((t) => t.id === txId)
+        if (matchingTx) {
+          setLocalUnlockedDuplicateIds((prev) => new Set(prev).add(txId))
+          onUnlockDuplicateTransaction?.(matchingTx)
+        }
+      }
+    }
+    setBulkApplyOffer(null)
+  }
+
+  const handleOpenAdjustModal = () => {
+    if (!bulkApplyOffer) return
+    setSelectedFieldsToApply({
+      description: bulkApplyOffer.updates.description !== undefined,
+      date: bulkApplyOffer.updates.date !== undefined,
+      amount: bulkApplyOffer.updates.amount !== undefined,
+    })
+    const allTargets = [
+      ...bulkApplyOffer.unlockedTargetIds,
+      ...bulkApplyOffer.identicalTargetIds,
+    ]
+    setSelectedTargetIds(new Set(allTargets))
+    setIsAdjustModalOpen(true)
+  }
+
+  const handleConfirmCustomAdjust = () => {
+    if (!bulkApplyOffer) return
+    const filteredUpdates: Partial<Transaction> = {}
+    if (selectedFieldsToApply.description && bulkApplyOffer.updates.description !== undefined) {
+      filteredUpdates.description = bulkApplyOffer.updates.description
+    }
+    if (selectedFieldsToApply.date && bulkApplyOffer.updates.date !== undefined) {
+      filteredUpdates.date = bulkApplyOffer.updates.date
+    }
+    if (selectedFieldsToApply.amount && bulkApplyOffer.updates.amount !== undefined) {
+      filteredUpdates.amount = bulkApplyOffer.updates.amount
+      filteredUpdates.type =
+        bulkApplyOffer.updates.type ??
+        (bulkApplyOffer.updates.amount >= 0 ? 'income' : 'expense')
+    }
+
+    for (const txId of selectedTargetIds) {
+      onUpdateTransaction?.(txId, filteredUpdates)
+      if (duplicateIds.has(txId) && !effectiveUnlockedIds.has(txId)) {
+        const matchingTx = activeTransactions.find((t) => t.id === txId)
+        if (matchingTx) {
+          setLocalUnlockedDuplicateIds((prev) => new Set(prev).add(txId))
+          onUnlockDuplicateTransaction?.(matchingTx)
+        }
+      }
+    }
+
+    setIsAdjustModalOpen(false)
+    setBulkApplyOffer(null)
+  }
 
   const handleRequestUnlockDuplicate = (tx: Transaction) => {
     setUnlockedTxToWarn(tx)
@@ -171,11 +334,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     })
     onRelockDuplicateTransaction?.(tx)
   }
-
-  const activeTransactions = onIncludeSpaceTransaction ? transactions : localTransactions
-  const activeExcluded = onIncludeSpaceTransaction
-    ? excludedSpaceTransactions
-    : localExcludedSpaceTransactions
 
   const handleToggleSpaceTransferInclude = (tx: Transaction) => {
     if (manuallyIncludedIds.has(tx.id)) {
@@ -337,7 +495,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         locale={locale}
         formatCurrency={formatCurrency}
         formatDate={formatDate}
-        onUpdateTransaction={onUpdateTransaction}
+        onUpdateTransaction={handleUpdateTransaction}
         onRemoveTransaction={onRemoveTransaction}
         onResetTransaction={handleResetTransaction}
         onToggleSpaceTransferInclude={handleToggleSpaceTransferInclude}
@@ -395,6 +553,73 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           </span>
         </div>
       )}
+
+      {bulkApplyOffer &&
+        (bulkApplyOffer.unlockedTargetIds.length > 0 ||
+          bulkApplyOffer.identicalTargetIds.length > 0) && (
+          <div className={styles['bulk-apply-banner']} data-testid="bulk-apply-banner">
+            <div className={styles['bulk-apply-info']}>
+              <Sparkles size={18} className={styles['bulk-apply-icon']} aria-hidden="true" />
+              <span>
+                {bulkApplyOffer.unlockedTargetIds.length > 0
+                  ? bulkApplyOffer.unlockedTargetIds.length === 1
+                    ? t.bulkApplyUnlockedOfferSingular || 'Apply changes to 1 other unlocked transaction?'
+                    : (t.bulkApplyUnlockedOffer || 'Apply changes to {count} other unlocked transactions?').replace(
+                        '{count}',
+                        String(bulkApplyOffer.unlockedTargetIds.length),
+                      )
+                  : (t.bulkApplyOffer || 'Apply this change to {count} other identical transaction(s)?').replace(
+                      '{count}',
+                      String(bulkApplyOffer.identicalTargetIds.length),
+                    )}
+              </span>
+            </div>
+            <div className={styles['bulk-apply-actions']}>
+              {bulkApplyOffer.unlockedTargetIds.length > 0 ? (
+                <button
+                  type="button"
+                  className={styles['bulk-apply-btn']}
+                  onClick={handleApplyToAllUnlocked}
+                  data-testid="apply-to-all-unlocked-btn"
+                  title={t.applyToAllUnlocked || 'Apply to all unlocked'}
+                >
+                  <Check size={14} aria-hidden="true" />
+                  <span>{t.applyToAllUnlocked || 'Apply to all unlocked'}</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className={styles['bulk-apply-btn']}
+                  onClick={handleConfirmBulkApply}
+                  data-testid="apply-bulk-changes-btn"
+                  title={t.applyToAll || 'Apply to all'}
+                >
+                  <Check size={14} aria-hidden="true" />
+                  <span>{t.applyToAll || 'Apply to all'}</span>
+                </button>
+              )}
+              <button
+                type="button"
+                className={styles['bulk-adjust-btn']}
+                onClick={handleOpenAdjustModal}
+                data-testid="adjust-unlocked-bulk-btn"
+                title={t.adjustUnlockedOptions || 'Adjust in bulk...'}
+              >
+                <Sliders size={13} aria-hidden="true" />
+                <span>{t.adjustUnlockedOptions || 'Adjust in bulk...'}</span>
+              </button>
+              <button
+                type="button"
+                className={styles['bulk-apply-dismiss-btn']}
+                onClick={() => setBulkApplyOffer(null)}
+                aria-label={t.dismiss || 'Dismiss'}
+                title={t.dismiss || 'Dismiss'}
+              >
+                <X size={14} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        )}
 
       {/* Modern Filter & Search Toolbar */}
       <TransactionPreviewToolbar
@@ -536,6 +761,223 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         formatCurrency={formatCurrency}
         formatDate={formatDate}
       />
+
+      {/* Bulk Adjust Modal */}
+      <Modal
+        isOpen={isAdjustModalOpen}
+        onClose={() => setIsAdjustModalOpen(false)}
+        title={t.adjustUnlockedModalTitle || 'Adjust Unlocked Transactions in Bulk'}
+        maxWidth="580px"
+        footer={
+          <div className={styles['modal-footer']}>
+            <button
+              type="button"
+              className={`secondary-button ${styles['modal-cancel-btn']}`}
+              onClick={() => setIsAdjustModalOpen(false)}
+            >
+              {t.cancel || 'Cancel'}
+            </button>
+            <button
+              type="button"
+              className={`primary-button ${styles['done-button']}`}
+              onClick={handleConfirmCustomAdjust}
+              disabled={
+                selectedTargetIds.size === 0 ||
+                (!selectedFieldsToApply.description &&
+                  !selectedFieldsToApply.date &&
+                  !selectedFieldsToApply.amount)
+              }
+              data-testid="confirm-custom-adjust-btn"
+            >
+              <Check size={14} aria-hidden="true" />
+              <span>
+                {(t.applyToSelectedCount || 'Apply to {count} selected').replace(
+                  '{count}',
+                  String(selectedTargetIds.size),
+                )}
+              </span>
+            </button>
+          </div>
+        }
+      >
+        {bulkApplyOffer && (() => {
+          const allTargetIds = [
+            ...bulkApplyOffer.unlockedTargetIds,
+            ...bulkApplyOffer.identicalTargetIds,
+          ]
+          const targetTxs = activeTransactions.filter((t) => allTargetIds.includes(t.id))
+          const allSelected = targetTxs.length > 0 && selectedTargetIds.size === targetTxs.length
+
+          const handleToggleSelectAll = () => {
+            if (allSelected) {
+              setSelectedTargetIds(new Set())
+            } else {
+              setSelectedTargetIds(new Set(targetTxs.map((t) => t.id)))
+            }
+          }
+
+          const handleToggleTarget = (txId: string) => {
+            setSelectedTargetIds((prev) => {
+              const next = new Set(prev)
+              if (next.has(txId)) next.delete(txId)
+              else next.add(txId)
+              return next
+            })
+          }
+
+          return (
+            <div className={styles['adjust-modal-body']}>
+              <div className={styles['adjust-section']}>
+                <span className={styles['adjust-section-title']}>
+                  {t.applyFieldsLabel || 'Modifications to apply'}
+                </span>
+                <div className={styles['adjust-fields-grid']}>
+                  {bulkApplyOffer.updates.description !== undefined && (
+                    <label
+                      className={`${styles['adjust-field-card']} ${
+                        selectedFieldsToApply.description ? styles['adjust-field-card-active'] : ''
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className={styles['adjust-field-checkbox']}
+                        checked={selectedFieldsToApply.description}
+                        data-testid="adjust-field-checkbox-description"
+                        onChange={(e) =>
+                          setSelectedFieldsToApply((prev) => ({
+                            ...prev,
+                            description: e.target.checked,
+                          }))
+                        }
+                      />
+                      <div className={styles['adjust-field-info']}>
+                        <span className={styles['adjust-field-name']}>{t.description || 'Description'}</span>
+                        <span className={styles['adjust-field-val']}>
+                          {bulkApplyOffer.updates.description}
+                        </span>
+                      </div>
+                    </label>
+                  )}
+
+                  {bulkApplyOffer.updates.date !== undefined && (
+                    <label
+                      className={`${styles['adjust-field-card']} ${
+                        selectedFieldsToApply.date ? styles['adjust-field-card-active'] : ''
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className={styles['adjust-field-checkbox']}
+                        checked={selectedFieldsToApply.date}
+                        data-testid="adjust-field-checkbox-date"
+                        onChange={(e) =>
+                          setSelectedFieldsToApply((prev) => ({
+                            ...prev,
+                            date: e.target.checked,
+                          }))
+                        }
+                      />
+                      <div className={styles['adjust-field-info']}>
+                        <span className={styles['adjust-field-name']}>{t.date || 'Date'}</span>
+                        <span className={styles['adjust-field-val']}>
+                          {formatDate(bulkApplyOffer.updates.date)}
+                        </span>
+                      </div>
+                    </label>
+                  )}
+
+                  {bulkApplyOffer.updates.amount !== undefined && (
+                    <label
+                      className={`${styles['adjust-field-card']} ${
+                        selectedFieldsToApply.amount ? styles['adjust-field-card-active'] : ''
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className={styles['adjust-field-checkbox']}
+                        checked={selectedFieldsToApply.amount}
+                        data-testid="adjust-field-checkbox-amount"
+                        onChange={(e) =>
+                          setSelectedFieldsToApply((prev) => ({
+                            ...prev,
+                            amount: e.target.checked,
+                          }))
+                        }
+                      />
+                      <div className={styles['adjust-field-info']}>
+                        <span className={styles['adjust-field-name']}>{t.amount || 'Amount'}</span>
+                        <span className={styles['adjust-field-val']}>
+                          {formatCurrency(bulkApplyOffer.updates.amount)}
+                        </span>
+                      </div>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles['adjust-section']}>
+                <div className={styles['adjust-section-header']}>
+                  <span className={styles['adjust-section-title']}>
+                    {t.targetTransactionsLabel || 'Target transactions'} ({selectedTargetIds.size}/{targetTxs.length})
+                  </span>
+                  <button
+                    type="button"
+                    className={styles['adjust-select-all-btn']}
+                    onClick={handleToggleSelectAll}
+                    data-testid="adjust-select-all-btn"
+                  >
+                    {allSelected ? t.deselectAll || 'Deselect all' : t.selectAll || 'Select all'}
+                  </button>
+                </div>
+
+                <div className={styles['adjust-tx-list']}>
+                  {targetTxs.map((target) => {
+                    const isTargetSelected = selectedTargetIds.has(target.id)
+                    const isTargetUnlocked = effectiveUnlockedIds.has(target.id)
+                    return (
+                      <label
+                        key={target.id}
+                        className={`${styles['adjust-tx-item']} ${
+                          isTargetSelected ? styles['adjust-tx-item-active'] : ''
+                        }`}
+                        data-testid={`adjust-target-item-${target.id}`}
+                      >
+                        <input
+                          type="checkbox"
+                          className={styles['adjust-tx-checkbox']}
+                          checked={isTargetSelected}
+                          data-testid={`adjust-target-checkbox-${target.id}`}
+                          onChange={() => handleToggleTarget(target.id)}
+                        />
+                        <div className={styles['adjust-tx-content']}>
+                          <div className={styles['adjust-tx-main']}>
+                            <span className={styles['adjust-tx-desc']} title={target.description}>
+                              {target.description}
+                            </span>
+                            <span className={styles['adjust-tx-date']}>
+                              {formatDate(target.date)}
+                            </span>
+                          </div>
+                          <div className={styles['adjust-tx-right']}>
+                            <span className={styles['adjust-tx-amount']}>
+                              {formatCurrency(target.amount)}
+                            </span>
+                            <span className={styles['adjust-tx-pill']}>
+                              {isTargetUnlocked
+                                ? t.unlockedDuplicateBadge || 'Unlocked'
+                                : t.duplicate || 'Duplicate'}
+                            </span>
+                          </div>
+                        </div>
+                      </label>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )
+        })()}
+      </Modal>
     </Modal>
   )
 }

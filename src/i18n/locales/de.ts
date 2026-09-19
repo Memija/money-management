@@ -139,6 +139,19 @@ export const de: TranslationStrings = {
   cannotRelockModified: 'Geänderte Buchung kann nicht gesperrt werden. Auf Originalwerte zurücksetzen, um zu sperren.',
   resetToOriginal: 'Auf Originalwerte zurücksetzen',
   rememberDuplicateRule: 'Diese Ausnahme für künftige Importe merken',
+  bulkApplyOffer: 'Diese Änderung auf {count} weitere identische Buchung(en) anwenden?',
+  applyToAll: 'Auf alle anwenden',
+  dismiss: 'Verwerfen',
+  bulkApplyUnlockedOffer: 'Änderungen auf {count} weitere entsperrte Buchungen anwenden?',
+  bulkApplyUnlockedOfferSingular: 'Änderungen auf 1 weitere entsperrte Buchung anwenden?',
+  applyToAllUnlocked: 'Auf alle entsperrten anwenden',
+  adjustUnlockedOptions: 'Im Bulk anpassen...',
+  adjustUnlockedModalTitle: 'Entsperrte Buchungen im Bulk anpassen',
+  adjustUnlockedModalSubtitle: 'Wählen Sie die zu übernehmenden Änderungen und die Zielbuchungen aus.',
+  applyFieldsLabel: 'Zu übernehmende Änderungen',
+  targetTransactionsLabel: 'Zielbuchungen',
+  applyToSelectedCount: 'Auf {count} ausgewählte anwenden',
+  duplicateRulesTab: 'Duplikat-Regeln',
   duplicateRulesTitle: 'Duplikat-Regeln & Ausnahmen',
   duplicateRulesDesc:
     'Regeln, die automatisch aus Ihren Freigaben doppelter Buchungen gelernt wurden. Passende Buchungen werden bei zukünftigen Importen nicht mehr als Duplikate markiert.',
@@ -146,12 +159,37 @@ export const de: TranslationStrings = {
   noDuplicateRulesDesc:
     'Wenn Sie beim Import eine doppelte Buchung entsperren und die Regel speichern, wird sie hier angezeigt.',
   ruleAllowDuplicate: "Duplikat zulassen: '{desc}'",
+  ruleAllowDuplicateLabel: 'Duplikat zulassen',
   ruleAppliedTimes: '{count}-mal angewendet',
   ruleAppliedOnce: '1-mal angewendet',
+  ruleAppliedOnceOn: '1-mal angewendet • {date}',
+  ruleAppliedTimesLast: '{count}-mal angewendet • Zuletzt: {date}',
+  clearAllRulesConfirmDesc:
+    'Möchten Sie wirklich alle Duplikat-Regeln entfernen? Wählen Sie aus, wie mit den durch diese Regeln importierten Buchungen verfahren werden soll.',
   anyAmount: 'Beliebiger Betrag',
   allInstitutions: 'Alle Bankinstitute',
   revokeRule: 'Regel widerrufen',
   clearAllRules: 'Alle Regeln löschen',
+  revokeRuleConfirmTitle: 'Duplikat-Regel widerrufen',
+  deleteRuleTransactionsOption: 'Auch {count} durch diese Regel importierte Buchung(en) löschen',
+  deleteDuplicateBoth: 'Regel & importierte Daten löschen',
+  deleteDuplicateBothDesc:
+    'Die Regel widerrufen und alle dadurch importierten {count} Buchung(en) dauerhaft löschen.',
+  deleteDuplicateRuleOnly: 'Nur Regel löschen',
+  deleteDuplicateRuleOnlyDesc:
+    'Die Regel widerrufen, aber alle zuvor importierten {count} Buchung(en) behalten.',
+  deleteDuplicateDataOnly: 'Nur importierte Daten löschen',
+  deleteDuplicateDataOnlyDesc:
+    'Alle {count} durch diese Regel importierten Buchung(en) löschen, die Regel für künftige Importe jedoch beibehalten.',
+  deleteDuplicateBothBtn: 'Regel & Daten löschen',
+  deleteDuplicateRuleOnlyBtn: 'Nur Regel löschen',
+  deleteDuplicateDataOnlyBtn: 'Nur importierte Daten löschen',
+  clearAllDuplicateBothDesc:
+    'Alle Regeln und alle {count} dadurch importierten Buchung(en) dauerhaft löschen.',
+  clearAllDuplicateRuleOnlyDesc:
+    'Alle Regeln löschen, aber alle {count} importierten Buchung(en) behalten.',
+  clearAllDuplicateDataOnlyDesc:
+    'Alle {count} importierten Buchung(en) löschen, alle Regeln jedoch beibehalten.',
 
   spaceTransfersExcluded:
     '{count} interne Space-Umbuchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',

@@ -139,6 +139,19 @@ export const en: TranslationStrings = {
   cannotRelockModified: 'Cannot relock modified transaction. Reset to original values to relock.',
   resetToOriginal: 'Reset to original values',
   rememberDuplicateRule: 'Remember this override for future imports',
+  bulkApplyOffer: 'Apply this change to {count} other identical transaction(s)?',
+  applyToAll: 'Apply to all',
+  dismiss: 'Dismiss',
+  bulkApplyUnlockedOffer: 'Apply changes to {count} other unlocked transactions?',
+  bulkApplyUnlockedOfferSingular: 'Apply changes to 1 other unlocked transaction?',
+  applyToAllUnlocked: 'Apply to all unlocked',
+  adjustUnlockedOptions: 'Adjust in bulk...',
+  adjustUnlockedModalTitle: 'Adjust Unlocked Transactions in Bulk',
+  adjustUnlockedModalSubtitle: 'Select the modifications to apply and target unlocked transactions.',
+  applyFieldsLabel: 'Modifications to apply',
+  targetTransactionsLabel: 'Target transactions',
+  applyToSelectedCount: 'Apply to {count} selected',
+  duplicateRulesTab: 'Duplicate Rules',
   duplicateRulesTitle: 'Duplicate Rules & Overrides',
   duplicateRulesDesc:
     'Rules automatically learned from your duplicate unlock decisions. Transactions matching these rules will not be flagged as duplicates on future imports.',
@@ -146,12 +159,37 @@ export const en: TranslationStrings = {
   noDuplicateRulesDesc:
     'When you unlock a duplicate transaction during import and choose to remember it, the rule will appear here.',
   ruleAllowDuplicate: "Allow duplicate: '{desc}'",
+  ruleAllowDuplicateLabel: 'Allow duplicate',
   ruleAppliedTimes: 'Applied {count} times',
   ruleAppliedOnce: 'Applied 1 time',
+  ruleAppliedOnceOn: 'Applied 1 time • {date}',
+  ruleAppliedTimesLast: 'Applied {count} times • Last: {date}',
+  clearAllRulesConfirmDesc:
+    'Are you sure you want to remove all duplicate override rules? Choose how to handle transactions that were imported by these rules.',
   anyAmount: 'Any amount',
   allInstitutions: 'All institutions',
   revokeRule: 'Revoke rule',
   clearAllRules: 'Clear all rules',
+  revokeRuleConfirmTitle: 'Revoke Duplicate Rule',
+  deleteRuleTransactionsOption: 'Also delete {count} transaction(s) imported by this rule',
+  deleteDuplicateBoth: 'Delete rule and imported data',
+  deleteDuplicateBothDesc:
+    'Revoke the rule and permanently delete {count} transaction(s) imported by it.',
+  deleteDuplicateRuleOnly: 'Delete rule only',
+  deleteDuplicateRuleOnlyDesc:
+    'Revoke the rule, but keep all {count} previously imported transaction(s) in your accounts.',
+  deleteDuplicateDataOnly: 'Delete imported data only',
+  deleteDuplicateDataOnlyDesc:
+    'Permanently delete {count} transaction(s) imported by this rule, but keep the rule active for future imports.',
+  deleteDuplicateBothBtn: 'Delete Rule and Data',
+  deleteDuplicateRuleOnlyBtn: 'Delete Rule Only',
+  deleteDuplicateDataOnlyBtn: 'Delete Imported Data Only',
+  clearAllDuplicateBothDesc:
+    'Delete all rules and permanently remove {count} transaction(s) imported by them.',
+  clearAllDuplicateRuleOnlyDesc:
+    'Delete all rules, but keep all {count} imported transaction(s) in your accounts.',
+  clearAllDuplicateDataOnlyDesc:
+    'Delete all {count} transaction(s) imported by rules, but keep all rules active.',
 
   spaceTransfersExcluded:
     '{count} internal space transfers were automatically excluded to prevent double counting.',

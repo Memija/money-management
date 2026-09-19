@@ -474,5 +474,120 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.getByText('Normal Transaction')).toBeInTheDocument()
     expect(screen.getByText('Unlocked Duplicate')).toBeInTheDocument()
   })
+
+  it('offers to bulk apply changes when an unlocked transaction is edited and matching identical transactions exist', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Gym Membership', amount: -45 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Gym Membership', amount: -45 }
+    const tx3 = { ...mockTransactions[0], id: 'tx-other', description: 'Coffee', amount: -5 }
+    const onUpdate = vi.fn()
+    const onUnlock = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={[tx1, tx2, tx3]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1'])}
+        onUpdateTransaction={onUpdate}
+        onUnlockDuplicateTransaction={onUnlock}
+      />,
+    )
+
+    // tx-dup-1 is unlocked, so it has editable description input
+    const input = screen.getByDisplayValue('Gym Membership')
+    fireEvent.change(input, { target: { value: 'Gym Membership Updated' } })
+
+    // Bulk apply banner appears offering to apply to 1 other identical transaction
+    expect(screen.getByTestId('bulk-apply-banner')).toBeInTheDocument()
+    expect(screen.getByText(/Apply this change to 1 other identical transaction/i)).toBeInTheDocument()
+
+    // Clicking "Apply to all"
+    const applyBtn = screen.getByTestId('apply-bulk-changes-btn')
+    fireEvent.click(applyBtn)
+
+    // Verify onUpdateTransaction was called for matching tx-dup-2 with the new description
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-2', { description: 'Gym Membership Updated' })
+
+    // Banner is dismissed
+    expect(screen.queryByTestId('bulk-apply-banner')).not.toBeInTheDocument()
+  })
+
+  it('offers to apply changes to all other unlocked transactions when an unlocked transaction is modified', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Credit Rate Loan', amount: -1000 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Gym Membership', amount: -45 }
+    const onUpdate = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Modify tx-dup-1 description
+    const input = screen.getByDisplayValue('Credit Rate Loan')
+    fireEvent.change(input, { target: { value: 'Credit Rate Loan Paid' } })
+
+    // Bulk apply banner offers to apply to 1 other unlocked transaction
+    expect(screen.getByTestId('bulk-apply-banner')).toBeInTheDocument()
+    expect(screen.getByTestId('apply-to-all-unlocked-btn')).toBeInTheDocument()
+
+    // Clicking "Apply to all unlocked"
+    fireEvent.click(screen.getByTestId('apply-to-all-unlocked-btn'))
+
+    // Expect onUpdate called for tx-dup-2 with the modified description
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-2', { description: 'Credit Rate Loan Paid' })
+    expect(screen.queryByTestId('bulk-apply-banner')).not.toBeInTheDocument()
+  })
+
+  it('allows granular bulk adjustments via modal selecting specific fields and target transactions', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Monthly Retainer', amount: 2000, date: '2026-03-01' }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Consulting Fee', amount: 1500, date: '2026-03-02' }
+    const tx3 = { ...mockTransactions[0], id: 'tx-3', description: 'Advisory Fee', amount: 800, date: '2026-03-03' }
+    const onUpdate = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={[tx1, tx2, tx3]}
+        duplicateIds={new Set(['tx-1', 'tx-2', 'tx-3'])}
+        unlockedDuplicateIds={new Set(['tx-1', 'tx-2', 'tx-3'])}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Edit tx-1 description
+    const input = screen.getByDisplayValue('Monthly Retainer')
+    fireEvent.change(input, { target: { value: 'Shared Retainer' } })
+
+    // Banner is visible
+    expect(screen.getByTestId('bulk-apply-banner')).toBeInTheDocument()
+
+    // Click "Adjust in bulk..." button
+    const adjustBtn = screen.getByTestId('adjust-unlocked-bulk-btn')
+    fireEvent.click(adjustBtn)
+
+    // Adjust modal opens
+    expect(screen.getByText('Adjust Unlocked Transactions in Bulk')).toBeInTheDocument()
+    expect(screen.getByTestId('confirm-custom-adjust-btn')).toBeInTheDocument()
+
+    // Deselect tx-3 so only tx-2 is targeted
+    const tx3Checkbox = screen.getByTestId('adjust-target-checkbox-tx-3')
+    fireEvent.click(tx3Checkbox)
+
+    // Confirm bulk adjustment
+    fireEvent.click(screen.getByTestId('confirm-custom-adjust-btn'))
+
+    // Verify onUpdate called for tx-2 with 'Shared Retainer' but NOT for tx-3
+    expect(onUpdate).toHaveBeenCalledWith('tx-2', { description: 'Shared Retainer' })
+    expect(onUpdate).not.toHaveBeenCalledWith('tx-3', { description: 'Shared Retainer' })
+
+    // Banner is dismissed
+    expect(screen.queryByTestId('bulk-apply-banner')).not.toBeInTheDocument()
+  })
 })
+
 

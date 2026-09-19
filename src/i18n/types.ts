@@ -164,17 +164,48 @@ export interface TranslationStrings {
   cannotRelockModified: string
   resetToOriginal: string
   rememberDuplicateRule: string
+  bulkApplyOffer: string
+  applyToAll: string
+  dismiss: string
+  bulkApplyUnlockedOffer: string
+  bulkApplyUnlockedOfferSingular: string
+  applyToAllUnlocked: string
+  adjustUnlockedOptions: string
+  adjustUnlockedModalTitle: string
+  adjustUnlockedModalSubtitle: string
+  applyFieldsLabel: string
+  targetTransactionsLabel: string
+  applyToSelectedCount: string
+  duplicateRulesTab: string
   duplicateRulesTitle: string
   duplicateRulesDesc: string
   noDuplicateRules: string
   noDuplicateRulesDesc: string
   ruleAllowDuplicate: string
+  ruleAllowDuplicateLabel: string
   ruleAppliedTimes: string
   ruleAppliedOnce: string
+  ruleAppliedOnceOn: string
+  ruleAppliedTimesLast: string
+  clearAllRulesConfirmDesc: string
   anyAmount: string
   allInstitutions: string
   revokeRule: string
   clearAllRules: string
+  revokeRuleConfirmTitle: string
+  deleteRuleTransactionsOption: string
+  deleteDuplicateBoth: string
+  deleteDuplicateBothDesc: string
+  deleteDuplicateRuleOnly: string
+  deleteDuplicateRuleOnlyDesc: string
+  deleteDuplicateDataOnly: string
+  deleteDuplicateDataOnlyDesc: string
+  deleteDuplicateBothBtn: string
+  deleteDuplicateRuleOnlyBtn: string
+  deleteDuplicateDataOnlyBtn: string
+  clearAllDuplicateBothDesc: string
+  clearAllDuplicateRuleOnlyDesc: string
+  clearAllDuplicateDataOnlyDesc: string
 
   // Internal & space transfers during import
   spaceTransfersExcluded: string

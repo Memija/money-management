@@ -134,18 +134,22 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .ruleItem {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.85rem 1.15rem;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.95rem 1.15rem;
   border-radius: var(--radius-md);
   background: var(--dropdown-item-hover);
   border: 1px solid var(--card-border);
   transition: all 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .ruleItem:hover {
@@ -154,33 +158,35 @@
   box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.15);
 }
 
-.ruleLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  min-width: 0;
-  flex: 1;
-}
-
-.rulePatternRow {
+.ruleTopRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
 }
 
-.ruleIcon {
+.ruleActionBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--primary);
-  flex-shrink: 0;
+  background: var(--glow-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  letter-spacing: 0.01em;
 }
 
 .rulePattern {
   font-size: 0.925rem;
   font-weight: 600;
   color: var(--text-main);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+  width: 100%;
 }
 
 .badgeRow {
@@ -188,19 +194,29 @@
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .metaPill {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.15rem 0.5rem;
+  gap: 0.35rem;
+  padding: 0.18rem 0.55rem;
   border-radius: 9999px;
   font-size: 0.725rem;
   font-weight: 500;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   color: var(--text-muted);
+  max-width: 100%;
+}
+
+.pillBankLogo {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .amountPill {
@@ -237,6 +253,217 @@
   border-color: rgba(239, 68, 68, 0.35);
   color: var(--danger);
   transform: translateY(-1px);
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+.modalInfoBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border-radius: var(--radius-md);
+  background: var(--dropdown-item-hover);
+  border: 1px solid var(--card-border);
+}
+
+.modalWarningIcon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.modalInfoText {
+  min-width: 0;
+  flex: 1;
+}
+
+.modalRuleTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.modalRuleMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.modalAmount {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.modalDotSeparator {
+  color: var(--text-dim);
+}
+
+.modalBankWithLogo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.modalBankLogo {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.modalRuleSub {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.modalNoTxNote {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--danger);
+  cursor: pointer;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-top: 0.25rem;
+}
+
+.optionCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.optionCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.optionCardActive {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.1);
+}
+
+.radioWrapper {
+  margin-top: 0.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radioInput {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--danger);
+  cursor: pointer;
+  margin: 0;
+}
+
+.optionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.optionTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.optionDesc {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.modalCancelBtn {
+  margin-top: 0;
+  width: auto;
+  padding: 0.5rem 1rem;
+}
+
+.modalConfirmBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.15rem;
+  border-radius: var(--radius-sm);
+  background: var(--danger);
+  color: #ffffff;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalConfirmBtn:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.modalConfirmBtn:active {
+  transform: translateY(1px);
 }
 
 @media (max-width: 640px) {

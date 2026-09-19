@@ -12,6 +12,7 @@ vi.mock('../../store/useLanguageStore', () => ({
         back: 'Back',
         settingsTitle: 'Settings',
         categoriesAndRules: 'Categories & Rules',
+        duplicateRulesTab: 'Duplicate Rules',
         dataManagementTitle: 'Data Management',
         createCustomRule: 'Create Custom Rule',
         createCustomRuleDesc: 'Add specific keywords to automatically categorize transactions.',
@@ -135,6 +136,22 @@ describe('Settings Component', () => {
 
     expect(screen.getByRole('tab', { name: 'Categories & Rules' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('Target Category')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Delete All Data' })).not.toBeInTheDocument()
+  })
+
+  it('switches to dedicated Duplicate Rules tab', () => {
+    render(<Settings />)
+
+    const dupRulesTab = screen.getByRole('tab', { name: 'Duplicate Rules' })
+    expect(dupRulesTab).toBeInTheDocument()
+    expect(dupRulesTab).toHaveAttribute('aria-selected', 'false')
+
+    // Switch to Duplicate Rules tab
+    fireEvent.click(dupRulesTab)
+
+    expect(dupRulesTab).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByTestId('duplicate-rules-settings')).toBeInTheDocument()
+    expect(screen.queryByText('Target Category')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Delete All Data' })).not.toBeInTheDocument()
   })
 })

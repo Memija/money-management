@@ -138,6 +138,19 @@ export const id: TranslationStrings = {
   cannotRelockModified: 'Tidak dapat mengunci kembali transaksi yang dimodifikasi. Kembalikan ke nilai asli untuk mengunci.',
   resetToOriginal: 'Kembalikan ke nilai asli',
   rememberDuplicateRule: 'Ingat pengecualian ini untuk impor berikutnya',
+  bulkApplyOffer: 'Terapkan perubahan ini ke {count} transaksi serupa lainnya?',
+  applyToAll: 'Terapkan ke semua',
+  dismiss: 'Abaikan',
+  bulkApplyUnlockedOffer: 'Terapkan perubahan ke {count} transaksi tidak terkunci lainnya?',
+  bulkApplyUnlockedOfferSingular: 'Terapkan perubahan ke 1 transaksi tidak terkunci lainnya?',
+  applyToAllUnlocked: 'Terapkan ke semua yang tidak terkunci',
+  adjustUnlockedOptions: 'Sesuaikan massal...',
+  adjustUnlockedModalTitle: 'Sesuaikan Transaksi Tidak Terkunci Secara Massal',
+  adjustUnlockedModalSubtitle: 'Pilih modifikasi yang akan diterapkan dan transaksi target yang tidak terkunci.',
+  applyFieldsLabel: 'Modifikasi untuk diterapkan',
+  targetTransactionsLabel: 'Transaksi target',
+  applyToSelectedCount: 'Terapkan ke {count} yang dipilih',
+  duplicateRulesTab: 'Aturan Duplikat',
   duplicateRulesTitle: 'Aturan & Pengecualian Duplikat',
   duplicateRulesDesc:
     'Aturan yang dipelajari otomatis dari keputusan membuka kunci duplikat. Transaksi yang cocok tidak akan ditandai sebagai duplikat pada impor mendatang.',
@@ -145,12 +158,37 @@ export const id: TranslationStrings = {
   noDuplicateRulesDesc:
     'Saat Anda membuka kunci transaksi duplikat saat impor dan memilih untuk mengingatnya, aturan akan muncul di sini.',
   ruleAllowDuplicate: "Izinkan duplikat: '{desc}'",
+  ruleAllowDuplicateLabel: 'Izinkan duplikat',
   ruleAppliedTimes: 'Diterapkan {count} kali',
   ruleAppliedOnce: 'Diterapkan 1 kali',
+  ruleAppliedOnceOn: 'Diterapkan 1 kali • {date}',
+  ruleAppliedTimesLast: 'Diterapkan {count} kali • Terakhir: {date}',
+  clearAllRulesConfirmDesc:
+    'Apakah Anda yakin ingin menghapus semua aturan duplikat? Pilih tindakan untuk transaksi yang diimpor oleh aturan tersebut.',
   anyAmount: 'Jumlah berapa pun',
   allInstitutions: 'Semua institusi',
   revokeRule: 'Cabut aturan',
   clearAllRules: 'Hapus semua aturan',
+  revokeRuleConfirmTitle: 'Cabut Aturan Duplikat',
+  deleteRuleTransactionsOption: 'Hapus juga {count} transaksi yang diimpor oleh aturan ini',
+  deleteDuplicateBoth: 'Hapus aturan & data terimpor',
+  deleteDuplicateBothDesc:
+    'Cabut aturan dan hapus permanen {count} transaksi yang diimpor olehnya.',
+  deleteDuplicateRuleOnly: 'Hapus aturan saja',
+  deleteDuplicateRuleOnlyDesc:
+    'Cabut aturan, tetapi pertahankan {count} transaksi terimpor di akun Anda.',
+  deleteDuplicateDataOnly: 'Hapus data terimpor saja',
+  deleteDuplicateDataOnlyDesc:
+    'Hapus permanen {count} transaksi yang diimpor aturan ini, tetapi pertahankan aturan untuk impor mendatang.',
+  deleteDuplicateBothBtn: 'Hapus Aturan & Data',
+  deleteDuplicateRuleOnlyBtn: 'Hapus Aturan Saja',
+  deleteDuplicateDataOnlyBtn: 'Hapus Data Terimpor Saja',
+  clearAllDuplicateBothDesc:
+    'Hapus semua aturan dan hapus permanen {count} transaksi yang diimpor oleh aturan tersebut.',
+  clearAllDuplicateRuleOnlyDesc:
+    'Hapus semua aturan, tetapi pertahankan {count} transaksi terimpor di akun Anda.',
+  clearAllDuplicateDataOnlyDesc:
+    'Hapus semua {count} transaksi terimpor oleh aturan, tetapi pertahankan semua aturan.',
 
   spaceTransfersExcluded:
     '{count} transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',

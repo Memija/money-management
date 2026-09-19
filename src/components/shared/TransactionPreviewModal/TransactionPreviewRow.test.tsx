@@ -108,11 +108,11 @@ describe('TransactionPreviewRow', () => {
     expect(onRelock).toHaveBeenCalledWith(mockTx)
   })
 
-  it('disables relock button and shows reset button when isUnlockedDuplicate and isModified are true', () => {
+  it('replaces relock padlock with reset button when isUnlockedDuplicate and isModified are true', () => {
     const onRelock = vi.fn()
     const onReset = vi.fn()
 
-    render(
+    const { rerender } = render(
       <TransactionPreviewRow
         {...defaultProps}
         isDuplicate={true}
@@ -128,16 +128,8 @@ describe('TransactionPreviewRow', () => {
       />,
     )
 
-    const relockBtn = screen.getByTestId('relock-duplicate-btn-tx-1')
-    expect(relockBtn).toBeDisabled()
-    expect(relockBtn).toHaveAttribute(
-      'title',
-      'Cannot relock modified transaction. Reset to original values to relock.',
-    )
-
-    // Attempting to click disabled relock button does NOT call onRelock
-    fireEvent.click(relockBtn)
-    expect(onRelock).not.toHaveBeenCalled()
+    // Padlock relock button is NOT present when modified (replaced by reset icon to avoid squishing amount column)
+    expect(screen.queryByTestId('relock-duplicate-btn-tx-1')).not.toBeInTheDocument()
 
     // Reset button is visible and triggers onResetTransaction
     const resetBtn = screen.getByTestId('reset-tx-btn-tx-1')
@@ -146,5 +138,21 @@ describe('TransactionPreviewRow', () => {
 
     fireEvent.click(resetBtn)
     expect(onReset).toHaveBeenCalledWith('tx-1')
+
+    // After reset is complete (isModified becomes false), padlock icon replaces the reset button
+    rerender(
+      <TransactionPreviewRow
+        {...defaultProps}
+        isDuplicate={true}
+        isUnlockedDuplicate={true}
+        isModified={false}
+        onRelockDuplicate={onRelock}
+        onResetTransaction={onReset}
+      />,
+    )
+    expect(screen.queryByTestId('reset-tx-btn-tx-1')).not.toBeInTheDocument()
+    const restoredRelockBtn = screen.getByTestId('relock-duplicate-btn-tx-1')
+    expect(restoredRelockBtn).toBeInTheDocument()
+    expect(restoredRelockBtn).not.toBeDisabled()
   })
 })

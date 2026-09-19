@@ -2,6 +2,9 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .header {
@@ -9,6 +12,8 @@
   align-items: center;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .tabNav {
@@ -18,6 +23,16 @@
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--card-border);
   padding-bottom: 0.75rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.tabNav::-webkit-scrollbar {
+  display: none;
 }
 
 .tabButton {
@@ -34,6 +49,8 @@
   cursor: pointer;
   transition: var(--transition);
   font-family: inherit;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .tabButton:hover {

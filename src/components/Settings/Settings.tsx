@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Database, Info, Plus, Settings as SettingsIcon, Sliders, Tag, Type, X } from 'lucide-react'
+import { ArrowLeft, CopyCheck, Database, Info, Plus, Settings as SettingsIcon, Sliders, Tag, Type, X } from 'lucide-react'
 
 import { POPULAR_MERCHANTS } from '../../data/merchants'
 import { DEFAULT_CATEGORY_KEYS } from '../../i18n/categories'
@@ -24,7 +24,7 @@ export const Settings: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>(DEFAULT_CATEGORY_KEYS[0])
   const [newKeyword, setNewKeyword] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const [activeTab, setActiveTab] = useState<'categories' | 'data'>('categories')
+  const [activeTab, setActiveTab] = useState<'categories' | 'duplicate-rules' | 'data'>('categories')
 
   const handleAddKeyword = (e: React.FormEvent) => {
     e.preventDefault()
@@ -96,6 +96,20 @@ export const Settings: React.FC = () => {
         >
           <Sliders size={16} aria-hidden="true" />
           <span>{t.categoriesAndRules || 'Categories & Rules'}</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          id="tab-duplicate-rules"
+          aria-selected={activeTab === 'duplicate-rules'}
+          aria-controls="tabpanel-duplicate-rules"
+          className={`${styles.tabButton} ${activeTab === 'duplicate-rules' ? styles.tabButtonActive : ''}`}
+          onClick={() => setActiveTab('duplicate-rules')}
+          data-testid="tab-duplicate-rules"
+        >
+          <CopyCheck size={16} aria-hidden="true" />
+          <span>{t.duplicateRulesTab || 'Duplicate Rules'}</span>
         </button>
 
         <button
@@ -284,7 +298,11 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
+  )}
 
+  {activeTab === 'duplicate-rules' && (
+    <div role="tabpanel" id="tabpanel-duplicate-rules" aria-labelledby="tab-duplicate-rules">
       <DuplicateRulesSettings />
     </div>
   )}

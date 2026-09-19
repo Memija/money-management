@@ -57,6 +57,14 @@ describe('useFormatters', () => {
     const formatted = result.current.formatDate('2024-05-15')
     // en date format is usually 05/15/2024
     expect(formatted).toBe('05/15/2024')
+
+    // ISO datetime string
+    const formattedIso = result.current.formatDate('2026-09-19T09:20:15.123Z')
+    expect(formattedIso).not.toBe('Invalid Date')
+    expect(formattedIso).toContain('2026')
+
+    // Empty string
+    expect(result.current.formatDate('')).toBe('')
   })
 
   it('should format month year correctly', () => {

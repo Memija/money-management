@@ -139,6 +139,19 @@ export const pl: TranslationStrings = {
   cannotRelockModified: 'Nie można zablokować zmodyfikowanej transakcji. Przywróć wartości początkowe, aby zablokować.',
   resetToOriginal: 'Przywróć wartości początkowe',
   rememberDuplicateRule: 'Zapamiętaj ten wyjątek dla przyszłych importów',
+  bulkApplyOffer: 'Zastosować tę zmianę do {count} innych identycznych transakcji?',
+  applyToAll: 'Zastosuj do wszystkich',
+  dismiss: 'Odrzuć',
+  bulkApplyUnlockedOffer: 'Zastosować zmiany do {count} innych odblokowanych transakcji?',
+  bulkApplyUnlockedOfferSingular: 'Zastosować zmiany do 1 innej odblokowanej transakcji?',
+  applyToAllUnlocked: 'Zastosuj do wszystkich odblokowanych',
+  adjustUnlockedOptions: 'Dostosuj zbiorczo...',
+  adjustUnlockedModalTitle: 'Zbiorcze dostosowywanie odblokowanych transakcji',
+  adjustUnlockedModalSubtitle: 'Wybierz modyfikacje do zastosowania oraz docelowe odblokowane transakcje.',
+  applyFieldsLabel: 'Modyfikacje do zastosowania',
+  targetTransactionsLabel: 'Docelowe transakcje',
+  applyToSelectedCount: 'Zastosuj do {count} wybranych',
+  duplicateRulesTab: 'Reguły duplikatów',
   duplicateRulesTitle: 'Reguły i wyjątki duplikatów',
   duplicateRulesDesc:
     'Reguły wyuczone automatycznie na podstawie decyzji o odblokowaniu duplikatów. Pasujące transakcje nie będą oznaczane jako duplikaty przy kolejnych importach.',
@@ -146,12 +159,37 @@ export const pl: TranslationStrings = {
   noDuplicateRulesDesc:
     'Gdy odblokujesz duplikat podczas importu i wybierzesz zapamiętanie reguły, pojawi się ona w tym miejscu.',
   ruleAllowDuplicate: "Zezwalaj na duplikat: '{desc}'",
+  ruleAllowDuplicateLabel: 'Zezwalaj na duplikat',
   ruleAppliedTimes: 'Zastosowano {count} razy',
   ruleAppliedOnce: 'Zastosowano 1 raz',
+  ruleAppliedOnceOn: 'Zastosowano 1 raz • {date}',
+  ruleAppliedTimesLast: 'Zastosowano {count} razy • Ostatnio: {date}',
+  clearAllRulesConfirmDesc:
+    'Czy na pewno chcesz usunąć wszystkie reguły duplikatów? Wybierz, co zrobić z transakcjami zaimportowanymi przez te reguły.',
   anyAmount: 'Dowolna kwota',
   allInstitutions: 'Wszystkie instytucje',
   revokeRule: 'Odwołaj regułę',
   clearAllRules: 'Wyczyść wszystkie reguły',
+  revokeRuleConfirmTitle: 'Odwołaj regułę duplikatu',
+  deleteRuleTransactionsOption: 'Usuń także {count} transakcji zaimportowanych przez tę regułę',
+  deleteDuplicateBoth: 'Usuń regułę i zaimportowane dane',
+  deleteDuplicateBothDesc:
+    'Odwołaj regułę i trwale usuń {count} transakcji zaimportowanych przez nią.',
+  deleteDuplicateRuleOnly: 'Usuń tylko regułę',
+  deleteDuplicateRuleOnlyDesc:
+    'Odwołaj regułę, ale zachowaj {count} zaimportowanych transakcji na kontach.',
+  deleteDuplicateDataOnly: 'Usuń tylko zaimportowane dane',
+  deleteDuplicateDataOnlyDesc:
+    'Trwale usuń {count} transakcji zaimportowanych przez tę regułę, zachowując regułę na przyszłość.',
+  deleteDuplicateBothBtn: 'Usuń regułę i dane',
+  deleteDuplicateRuleOnlyBtn: 'Usuń tylko regułę',
+  deleteDuplicateDataOnlyBtn: 'Usuń tylko zaimportowane dane',
+  clearAllDuplicateBothDesc:
+    'Usuń wszystkie reguły i trwale usuń {count} zaimportowanych przez nie transakcji.',
+  clearAllDuplicateRuleOnlyDesc:
+    'Usuń wszystkie reguły, ale zachowaj {count} zaimportowanych transakcji na kontach.',
+  clearAllDuplicateDataOnlyDesc:
+    'Usuń wszystkie {count} transakcji zaimportowanych przez reguły, zachowując reguły aktywne.',
 
   spaceTransfersExcluded:
     '{count} wewnętrznych transferów między przestrzeniami (Spaces) zostało automatycznie wykluczonych, aby uniknąć podwójnego liczenia.',

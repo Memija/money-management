@@ -28,7 +28,16 @@ export const useFormatters = () => {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString + 'T00:00:00').toLocaleDateString(intlLocale, {
+    if (!dateString) return ''
+    const dateToParse = dateString.includes('T') ? dateString : `${dateString}T00:00:00`
+    let d = new Date(dateToParse)
+    if (isNaN(d.getTime())) {
+      d = new Date(dateString)
+    }
+    if (isNaN(d.getTime())) {
+      return dateString
+    }
+    return d.toLocaleDateString(intlLocale, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

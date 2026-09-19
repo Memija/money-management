@@ -539,5 +539,211 @@ describe('useAppStore', () => {
       expect(stats.newCount).toBe(1)
       expect(stats.duplicateIds).toEqual([])
     })
+
+    it('stamps importedByRuleId on transactions allowed by duplicate override rules when imported', () => {
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            transactions: [
+              {
+                id: 'tx-existing',
+                date: '2026-03-01',
+                description: 'Monthly Gym',
+                amount: -45,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Chase',
+              },
+            ],
+            importedAt: '2026-03-01T00:00:00Z',
+            importedFingerprints: ['fp-1'],
+          },
+        ],
+        duplicateOverrideRules: [
+          {
+            id: 'rule-gym',
+            descriptionPattern: 'Monthly Gym',
+            amount: -45,
+            institutionId: 'chase',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 0,
+          },
+        ],
+      })
+
+      const duplicateBatch = {
+        institutionId: 'chase',
+        institutionName: 'Chase',
+        transactions: [
+          {
+            id: 'tx-dup',
+            date: '2026-03-01',
+            description: 'Monthly Gym',
+            amount: -45,
+            currency: 'EUR',
+            type: 'expense' as const,
+            institution: 'Chase',
+          },
+        ],
+        importedAt: '2026-03-02T00:00:00Z',
+        importedFingerprints: ['fp-2'],
+      }
+
+      useAppStore.getState().addImportedAccount(duplicateBatch)
+
+      const accounts = useAppStore.getState().importedAccounts
+      const importedTx = accounts[0].transactions.find((t) => t.id === 'tx-dup')
+      expect(importedTx).toBeDefined()
+      expect(importedTx?.importedByRuleId).toBe('rule-gym')
+    })
+
+    it('removes imported transactions when revoking a rule with deleteImportedTransactions = true', () => {
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            transactions: [
+              {
+                id: 'tx-normal',
+                date: '2026-03-01',
+                description: 'Salary',
+                amount: 3000,
+                currency: 'EUR',
+                type: 'income',
+                institution: 'Chase',
+              },
+              {
+                id: 'tx-by-rule',
+                date: '2026-03-01',
+                description: 'Monthly Gym',
+                amount: -45,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Chase',
+                importedByRuleId: 'rule-gym',
+              },
+            ],
+            importedAt: '2026-03-01T00:00:00Z',
+            importedFingerprints: ['fp-1'],
+          },
+        ],
+        duplicateOverrideRules: [
+          {
+            id: 'rule-gym',
+            descriptionPattern: 'Monthly Gym',
+            amount: -45,
+            institutionId: 'chase',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+        ],
+      })
+
+      // Revoke rule and delete transactions imported by it (both)
+      useAppStore.getState().removeDuplicateOverrideRule('rule-gym', 'both')
+
+      const state = useAppStore.getState()
+      expect(state.duplicateOverrideRules).toHaveLength(0)
+      expect(state.importedAccounts[0].transactions).toHaveLength(1)
+      expect(state.importedAccounts[0].transactions[0].id).toBe('tx-normal')
+    })
+
+    it('deletes imported transactions only and keeps rule when mode = "data_only"', () => {
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            transactions: [
+              {
+                id: 'tx-normal',
+                date: '2026-03-01',
+                description: 'Salary',
+                amount: 3000,
+                currency: 'EUR',
+                type: 'income',
+                institution: 'Chase',
+              },
+              {
+                id: 'tx-by-rule',
+                date: '2026-03-01',
+                description: 'Monthly Gym',
+                amount: -45,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Chase',
+                importedByRuleId: 'rule-gym',
+              },
+            ],
+            importedAt: '2026-03-01T00:00:00Z',
+            importedFingerprints: ['fp-1'],
+          },
+        ],
+        duplicateOverrideRules: [
+          {
+            id: 'rule-gym',
+            descriptionPattern: 'Monthly Gym',
+            amount: -45,
+            institutionId: 'chase',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+        ],
+      })
+
+      // Delete data only: keep rule, delete transactions
+      useAppStore.getState().removeDuplicateOverrideRule('rule-gym', 'data_only')
+
+      const state = useAppStore.getState()
+      expect(state.duplicateOverrideRules).toHaveLength(1)
+      expect(state.duplicateOverrideRules[0].id).toBe('rule-gym')
+      expect(state.importedAccounts[0].transactions).toHaveLength(1)
+      expect(state.importedAccounts[0].transactions[0].id).toBe('tx-normal')
+    })
+
+    it('deletes rule only and keeps transactions when mode = "rule_only"', () => {
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            transactions: [
+              {
+                id: 'tx-by-rule',
+                date: '2026-03-01',
+                description: 'Monthly Gym',
+                amount: -45,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Chase',
+                importedByRuleId: 'rule-gym',
+              },
+            ],
+            importedAt: '2026-03-01T00:00:00Z',
+            importedFingerprints: ['fp-1'],
+          },
+        ],
+        duplicateOverrideRules: [
+          {
+            id: 'rule-gym',
+            descriptionPattern: 'Monthly Gym',
+            amount: -45,
+            institutionId: 'chase',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+        ],
+      })
+
+      // Delete rule only: remove rule, keep transactions
+      useAppStore.getState().removeDuplicateOverrideRule('rule-gym', 'rule_only')
+
+      const state = useAppStore.getState()
+      expect(state.duplicateOverrideRules).toHaveLength(0)
+      expect(state.importedAccounts[0].transactions).toHaveLength(1)
+    })
   })
 })

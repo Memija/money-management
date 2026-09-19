@@ -17,6 +17,8 @@ export interface Transaction {
   ownIban?: string
   /** True if the user manually unlocked this duplicate to force its import. */
   forceImport?: boolean
+  /** ID of the duplicate override rule that permitted importing this transaction. */
+  importedByRuleId?: string
 }
 
 export interface DuplicateOverrideRule {
@@ -36,3 +38,5 @@ export interface DuplicateOverrideRule {
   /** Total number of times this rule was applied. */
   applyCount: number
 }
+
+export type DuplicateDeleteMode = 'both' | 'rule_only' | 'data_only'

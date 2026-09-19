@@ -4,14 +4,34 @@
 }
 
 .proceedButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 0;
   width: auto;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  box-shadow: 0 4px 24px rgba(245, 158, 11, 0.25);
 }
 
 .proceedButton:hover {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  background: linear-gradient(135deg, #d97706, #b45309) !important;
+  border-color: rgba(217, 119, 6, 0.6) !important;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4) !important;
+  color: #ffffff !important;
+}
+
+.proceedButton:active {
+  transform: translateY(1px);
+  background: #b45309 !important;
 }
 
 .contentContainer {

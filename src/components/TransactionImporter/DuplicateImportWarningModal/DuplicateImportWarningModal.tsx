@@ -44,7 +44,7 @@ export const DuplicateImportWarningModal: React.FC<DuplicateImportWarningModalPr
           </button>
           {showProceedButton && (
             <button
-              className={`primary-button ${styles.proceedButton}`}
+              className={styles.proceedButton}
               onClick={handleProceed}
               id="duplicate-import-proceed"
             >

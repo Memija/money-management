@@ -139,6 +139,19 @@ export const bs: TranslationStrings = {
   cannotRelockModified: 'Nije moguće ponovo zaključati izmijenjenu transakciju. Vratite na originalne vrijednosti za zaključavanje.',
   resetToOriginal: 'Vrati na originalne vrijednosti',
   rememberDuplicateRule: 'Zapamti ovo izuzeće za buduće uvoze',
+  bulkApplyOffer: 'Primijeni ovu izmjenu na još {count} identičnih transakcija?',
+  applyToAll: 'Primijeni na sve',
+  dismiss: 'Odbaci',
+  bulkApplyUnlockedOffer: 'Primijeni izmjene na još {count} otključanih transakcija?',
+  bulkApplyUnlockedOfferSingular: 'Primijeni izmjene na još 1 otključanu transakciju?',
+  applyToAllUnlocked: 'Primijeni na sve otključane',
+  adjustUnlockedOptions: 'Prilagodi grupno...',
+  adjustUnlockedModalTitle: 'Grupno prilagođavanje otključanih transakcija',
+  adjustUnlockedModalSubtitle: 'Odaberite izmjene koje želite primijeniti i ciljane otključane transakcije.',
+  applyFieldsLabel: 'Izmjene za primjenu',
+  targetTransactionsLabel: 'Ciljane transakcije',
+  applyToSelectedCount: 'Primijeni na {count} odabranih',
+  duplicateRulesTab: 'Pravila za duplikate',
   duplicateRulesTitle: 'Pravila i izuzeća za duplikate',
   duplicateRulesDesc:
     'Pravila automatski naučena iz vaših odluka o otključavanju duplikata. Odgovarajuće transakcije neće biti označene kao duplikati pri budućim uvozima.',
@@ -146,12 +159,37 @@ export const bs: TranslationStrings = {
   noDuplicateRulesDesc:
     'Kada otključate duplikat tokom uvoza i odaberete da ga zapamtite, pravilo će se pojaviti ovdje.',
   ruleAllowDuplicate: "Dozvoli duplikat: '{desc}'",
+  ruleAllowDuplicateLabel: 'Dozvoli duplikat',
   ruleAppliedTimes: 'Primijenjeno {count} puta',
   ruleAppliedOnce: 'Primijenjeno 1 put',
+  ruleAppliedOnceOn: 'Primijenjeno 1 put • {date}',
+  ruleAppliedTimesLast: 'Primijenjeno {count} puta • Posljednje: {date}',
+  clearAllRulesConfirmDesc:
+    'Jeste li sigurni da želite ukloniti sva pravila za duplikate? Odaberite kako postupiti s transakcijama uvezenim ovim pravilima.',
   anyAmount: 'Bilo koji iznos',
   allInstitutions: 'Sve institucije',
   revokeRule: 'Opozovi pravilo',
   clearAllRules: 'Obriši sva pravila',
+  revokeRuleConfirmTitle: 'Opozovi pravilo za duplikate',
+  deleteRuleTransactionsOption: 'Također obriši {count} transakcija uvezenih ovim pravilom',
+  deleteDuplicateBoth: 'Obriši pravilo i uvezene podatke',
+  deleteDuplicateBothDesc:
+    'Ukloni pravilo i trajno obriši {count} transakciju/a uvezenu/ih ovim pravilom.',
+  deleteDuplicateRuleOnly: 'Obriši samo pravilo',
+  deleteDuplicateRuleOnlyDesc:
+    'Ukloni pravilo, ali zadrži {count} prethodno uvezenu/ih transakciju/a na računima.',
+  deleteDuplicateDataOnly: 'Obriši samo uvezene podatke',
+  deleteDuplicateDataOnlyDesc:
+    'Trajno obriši {count} transakciju/a uvezenu/ih ovim pravilom, ali zadrži pravilo za buduće uvoze.',
+  deleteDuplicateBothBtn: 'Obriši pravilo i podatke',
+  deleteDuplicateRuleOnlyBtn: 'Obriši samo pravilo',
+  deleteDuplicateDataOnlyBtn: 'Obriši samo uvezene podatke',
+  clearAllDuplicateBothDesc:
+    'Ukloni sva pravila i trajno obriši {count} transakciju/a uvezenih pravilima.',
+  clearAllDuplicateRuleOnlyDesc:
+    'Ukloni sva pravila, ali zadrži {count} uvezenih transakcija na računima.',
+  clearAllDuplicateDataOnlyDesc:
+    'Trajno obriši {count} transakciju/a uvezenih pravilima, ali zadrži sva pravila.',
 
   spaceTransfersExcluded:
     '{count} internih prijenosa između prostora (Spaces) je automatski isključeno radi izbjegavanja dvostrukog računanja.',
