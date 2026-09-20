@@ -15,7 +15,10 @@ export function useTransactions(period?: PeriodFilter) {
 
   const allTransactions: Transaction[] = useMemo(() => {
     return importedAccounts.flatMap((a) =>
-      a.transactions.map((t) => ({ ...t, category: getTransactionCategory(t, customKeywords, manualCategories) })),
+      [...(a.transactions || []), ...(a.duplicateTransactions || [])].map((t) => ({
+        ...t,
+        category: getTransactionCategory(t, customKeywords, manualCategories),
+      })),
     )
   }, [importedAccounts, customKeywords, manualCategories])
 

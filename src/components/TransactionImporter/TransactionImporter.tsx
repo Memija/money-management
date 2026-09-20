@@ -176,25 +176,31 @@ const TransactionImporter: React.FC = () => {
 
   const buildAccount = (ruleIdsByTxId?: Map<string, string>): ImportedAccount => {
     const duplicateIdSet = new Set(duplicateStats.duplicateIds)
-    const transactionsToImport = transactions
-      .filter((t) => !duplicateIdSet.has(t.id))
-      .map((t) => {
-        if (unlockedDuplicateIds.has(t.id)) {
-          const ruleId = ruleIdsByTxId?.get(t.id)
-          return {
-            ...t,
-            forceImport: true,
-            isDuplicate: true,
-            ...(ruleId ? { importedByRuleId: ruleId } : {}),
-          }
-        }
-        return t
-      })
+    const cleanTransactions: Transaction[] = []
+    const duplicateTransactions: Transaction[] = []
+
+    transactions.forEach((t) => {
+      if (duplicateIdSet.has(t.id)) {
+        return
+      }
+      if (unlockedDuplicateIds.has(t.id)) {
+        const ruleId = ruleIdsByTxId?.get(t.id)
+        duplicateTransactions.push({
+          ...t,
+          forceImport: true,
+          isDuplicate: true,
+          ...(ruleId ? { importedByRuleId: ruleId } : {}),
+        })
+        return
+      }
+      cleanTransactions.push(t)
+    })
 
     return {
       institutionId: selectedInstitution?.id ?? 'unknown',
       institutionName,
-      transactions: transactionsToImport,
+      transactions: cleanTransactions,
+      duplicateTransactions: duplicateTransactions.length > 0 ? duplicateTransactions : undefined,
       importedAt: new Date().toISOString(),
       importedFingerprints: [importFingerprint],
       accountIbans: detectedAccountIbans,

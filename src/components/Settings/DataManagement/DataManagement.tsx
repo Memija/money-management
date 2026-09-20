@@ -20,7 +20,12 @@ export const DataManagement: React.FC<DataManagementProps> = ({ className }) => 
 
   const accountsCount = (importedAccounts || []).length
   const transactionsCount = useMemo(
-    () => (importedAccounts || []).reduce((sum, acc) => sum + (acc.transactions?.length || 0), 0),
+    () =>
+      (importedAccounts || []).reduce(
+        (sum, acc) =>
+          sum + (acc.transactions?.length || 0) + (acc.duplicateTransactions?.length || 0),
+        0,
+      ),
     [importedAccounts],
   )
   const categoriesCount = (customCategories || []).length

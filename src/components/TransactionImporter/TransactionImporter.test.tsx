@@ -1028,13 +1028,14 @@ Transfer from Bank B DE12345678901234567890
     const proceedBtn = screen.getByText('Proceed with 1 transactions')
     fireEvent.click(proceedBtn)
 
-    // Verify addImportedAccount was called with forceImport: true on the unlocked transaction
+    // Verify addImportedAccount was called with forceImport: true on the unlocked transaction in duplicateTransactions
     expect(mockAddImportedAccount).toHaveBeenCalledWith(
       expect.objectContaining({
-        transactions: expect.arrayContaining([
+        duplicateTransactions: expect.arrayContaining([
           expect.objectContaining({
             description: 'Coffee Shop',
             forceImport: true,
+            isDuplicate: true,
           }),
         ]),
       }),

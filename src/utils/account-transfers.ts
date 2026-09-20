@@ -511,6 +511,9 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
       transactions: acc.transactions.map((tx) =>
         tx.isGhost ? { ...tx, isGhost: false, linkedTransactionId: undefined } : tx,
       ),
+      duplicateTransactions: acc.duplicateTransactions?.map((tx) =>
+        tx.isGhost ? { ...tx, isGhost: false, linkedTransactionId: undefined } : tx,
+      ),
     }))
   }
 
@@ -523,6 +526,9 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
   const allIndexed: IndexedTx[] = []
   accounts.forEach((acc, accIdx) => {
     acc.transactions.forEach((tx) => {
+      allIndexed.push({ accIdx, tx })
+    })
+    acc.duplicateTransactions?.forEach((tx) => {
       allIndexed.push({ accIdx, tx })
     })
   })
@@ -593,6 +599,11 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
         ibanSet.add(tx.ownIban.toUpperCase().replace(/\s+/g, ''))
       }
     })
+    acc.duplicateTransactions?.forEach((tx) => {
+      if (tx.ownIban) {
+        ibanSet.add(tx.ownIban.toUpperCase().replace(/\s+/g, ''))
+      }
+    })
     knownAccountIbans.set(accIdx, ibanSet)
   })
 
@@ -652,33 +663,36 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
     }
   }
 
+  const reconcileTx = (tx: Transaction): Transaction => {
+    const linkedId = matchedPairsMap.get(tx.id)
+    if (linkedId) {
+      return {
+        ...tx,
+        isGhost: true,
+        linkedTransactionId: linkedId,
+      }
+    }
+    if (singleLeggedGhostTxIds.has(tx.id)) {
+      return {
+        ...tx,
+        isGhost: true,
+        linkedTransactionId: undefined,
+      }
+    }
+    if (tx.isGhost) {
+      return {
+        ...tx,
+        isGhost: false,
+        linkedTransactionId: undefined,
+      }
+    }
+    return tx
+  }
+
   // Update all accounts with the reconciled ghost status
   return accounts.map((acc) => ({
     ...acc,
-    transactions: acc.transactions.map((tx) => {
-      const linkedId = matchedPairsMap.get(tx.id)
-      if (linkedId) {
-        return {
-          ...tx,
-          isGhost: true,
-          linkedTransactionId: linkedId,
-        }
-      }
-      if (singleLeggedGhostTxIds.has(tx.id)) {
-        return {
-          ...tx,
-          isGhost: true,
-          linkedTransactionId: undefined,
-        }
-      }
-      if (tx.isGhost) {
-        return {
-          ...tx,
-          isGhost: false,
-          linkedTransactionId: undefined,
-        }
-      }
-      return tx
-    }),
+    transactions: acc.transactions.map(reconcileTx),
+    duplicateTransactions: acc.duplicateTransactions?.map(reconcileTx),
   }))
 }

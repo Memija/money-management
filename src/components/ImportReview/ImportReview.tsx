@@ -14,6 +14,7 @@ import {
 import { useFormatters } from '../../hooks/useFormatters'
 import { countDuplicateTransactionsInAccounts, useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
+import type { ImportedAccount } from '../../types'
 
 import styles from './ImportReview.module.css'
 
@@ -24,21 +25,31 @@ const ImportReview: React.FC = () => {
   // Map bs/sr to de-DE consistent with useFormatters (Chromium stripped ICU data for these)
   const intlLocale = locale === 'bs' || locale === 'sr' ? 'de-DE' : locale
 
+  const getAllAccountTransactions = (acc: ImportedAccount) => [
+    ...(acc.transactions || []),
+    ...(acc.duplicateTransactions || []),
+  ]
+
   const hasDuplicateTransactions = React.useMemo(() => {
     return (
-      importedAccounts.some((acc) =>
-        acc.transactions.some(
-          (tx) => Boolean(tx.forceImport) || Boolean(tx.importedByRuleId),
-        ),
+      importedAccounts.some(
+        (acc) =>
+          Boolean(acc.duplicateTransactions?.length) ||
+          acc.transactions.some(
+            (tx) => Boolean(tx.forceImport) || Boolean(tx.importedByRuleId),
+          ),
       ) || countDuplicateTransactionsInAccounts(importedAccounts, duplicateOverrideRules || []) > 0
     )
   }, [importedAccounts, duplicateOverrideRules])
 
-  const totalTransactions = importedAccounts.reduce((sum, acc) => sum + acc.transactions.length, 0)
+  const totalTransactions = importedAccounts.reduce(
+    (sum, acc) => sum + acc.transactions.length + (acc.duplicateTransactions?.length || 0),
+    0,
+  )
   const totalIncome = importedAccounts.reduce(
     (sum, acc) =>
       sum +
-      acc.transactions
+      getAllAccountTransactions(acc)
         .filter((t) => t.type === 'income' && !t.isGhost)
         .reduce((s, t) => s + t.amount, 0),
     0,
@@ -46,7 +57,7 @@ const ImportReview: React.FC = () => {
   const totalExpenses = importedAccounts.reduce(
     (sum, acc) =>
       sum +
-      acc.transactions
+      getAllAccountTransactions(acc)
         .filter((t) => t.type === 'expense' && !t.isGhost)
         .reduce((s, t) => s + Math.abs(t.amount), 0),
     0,
@@ -131,7 +142,8 @@ const ImportReview: React.FC = () => {
       {/* Imported Accounts List */}
       <div className={styles['imported-accounts-list']}>
         {importedAccounts.map((acc, idx) => {
-          const internalCount = acc.transactions.filter((tx) => tx.isGhost).length
+          const allTxs = getAllAccountTransactions(acc)
+          const internalCount = allTxs.filter((tx) => tx.isGhost).length
 
           return (
             <motion.div
@@ -148,7 +160,7 @@ const ImportReview: React.FC = () => {
                 <div>
                   <p className={styles['imported-account-name']}>{acc.institutionName}</p>
                   <p className={styles['imported-account-meta']}>
-                    {formatTransactionCount(acc.transactions.length)} • {t.imported}{' '}
+                    {formatTransactionCount(allTxs.length)} • {t.imported}{' '}
                     {new Date(acc.importedAt).toLocaleTimeString(intlLocale, {
                       hour: '2-digit',
                       minute: '2-digit',

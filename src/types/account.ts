@@ -4,6 +4,8 @@ export interface ImportedAccount {
   institutionId: string
   institutionName: string
   transactions: Transaction[]
+  /** Duplicated transactions imported under override rules or manual unlock. */
+  duplicateTransactions?: Transaction[]
   importedAt: string
   /** All fingerprints ever imported for this institution (used for duplicate detection). */
   importedFingerprints: string[]

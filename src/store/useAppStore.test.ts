@@ -184,7 +184,9 @@ describe('useAppStore', () => {
     useAppStore.getState().addImportedAccount(secondImportWithForce)
 
     const state = useAppStore.getState()
-    expect(state.importedAccounts[0].transactions).toHaveLength(2)
+    expect(state.importedAccounts[0].transactions).toHaveLength(1)
+    expect(state.importedAccounts[0].duplicateTransactions).toHaveLength(1)
+    expect(state.importedAccounts[0].duplicateTransactions?.[0].id).toBe('tx1-unlocked')
   })
 
   it('should fully replace existing account when replaceImportedAccount is called', () => {
@@ -620,7 +622,7 @@ describe('useAppStore', () => {
       useAppStore.getState().addImportedAccount(duplicateBatch)
 
       const accounts = useAppStore.getState().importedAccounts
-      const importedTx = accounts[0].transactions.find((t) => t.id === 'tx-dup')
+      const importedTx = accounts[0].duplicateTransactions?.find((t) => t.id === 'tx-dup')
       expect(importedTx).toBeDefined()
       expect(importedTx?.importedByRuleId).toBe('rule-gym')
     })
@@ -788,6 +790,8 @@ describe('useAppStore', () => {
                 type: 'expense',
                 institution: 'Commerzbank',
               },
+            ],
+            duplicateTransactions: [
               {
                 id: 'tx-mod',
                 date: '2026-09-20',
@@ -818,22 +822,20 @@ describe('useAppStore', () => {
             },
           },
         ],
-        trashedTransactions: [],
       })
 
       useAppStore.getState().removeDuplicateOverrideRule('drule-kredit', 'both')
 
       const state = useAppStore.getState()
       expect(state.duplicateOverrideRules).toHaveLength(0)
-      // Original transaction must remain in place
+      // Original transaction must remain in place in transactions array
       expect(state.importedAccounts[0].transactions).toHaveLength(1)
       expect(state.importedAccounts[0].transactions[0].id).toBe('tx-orig')
-      // Duplicate modified transaction moved to trash
-      expect(state.trashedTransactions).toHaveLength(1)
-      expect(state.trashedTransactions[0].id).toBe('tx-mod')
+      // Duplicate modified transaction completely removed from duplicateTransactions and not moved anywhere else
+      expect(state.importedAccounts[0].duplicateTransactions ?? []).toHaveLength(0)
     })
 
-    it('removes 50 duplicate transactions to trash and preserves 50 original transactions in place when revoking duplicate rule', () => {
+    it('completely removes 50 duplicate transactions from duplicateTransactions array and preserves 50 original transactions in place when revoking duplicate rule', () => {
       const origTxs: Transaction[] = Array.from({ length: 50 }, (_, i) => ({
         id: `tx-orig-${i}`,
         date: `2026-03-${String((i % 28) + 1).padStart(2, '0')}`,
@@ -861,7 +863,8 @@ describe('useAppStore', () => {
           {
             institutionId: 'chase',
             institutionName: 'Chase',
-            transactions: [...origTxs, ...modTxs],
+            transactions: origTxs,
+            duplicateTransactions: modTxs,
             importedAt: '2026-03-01T00:00:00Z',
             importedFingerprints: ['fp-1'],
           },
@@ -880,10 +883,10 @@ describe('useAppStore', () => {
             },
           },
         ],
-        trashedTransactions: [],
       })
 
-      expect(useAppStore.getState().importedAccounts[0].transactions).toHaveLength(100)
+      expect(useAppStore.getState().importedAccounts[0].transactions).toHaveLength(50)
+      expect(useAppStore.getState().importedAccounts[0].duplicateTransactions).toHaveLength(50)
 
       useAppStore.getState().removeDuplicateOverrideRule('rule-salary-mod', 'both')
 
@@ -892,9 +895,8 @@ describe('useAppStore', () => {
       // Original 50 transactions remain strictly in place
       expect(state.importedAccounts[0].transactions).toHaveLength(50)
       expect(state.importedAccounts[0].transactions.map((t) => t.id)).toEqual(origTxs.map((t) => t.id))
-      // 50 duplicate transactions moved to trash
-      expect(state.trashedTransactions).toHaveLength(50)
-      expect(state.trashedTransactions.map((t) => t.id)).toEqual(modTxs.map((t) => t.id))
+      // 50 duplicate transactions completely removed from duplicateTransactions array and not moved anywhere else
+      expect(state.importedAccounts[0].duplicateTransactions ?? []).toHaveLength(0)
     })
 
     it('preserves original transaction in place and deletes identical duplicate when revoking allow duplicate rule', () => {
@@ -946,6 +948,115 @@ describe('useAppStore', () => {
       expect(state.duplicateOverrideRules).toHaveLength(0)
       expect(state.importedAccounts[0].transactions).toHaveLength(1)
       expect(state.importedAccounts[0].transactions[0].id).toBe('tx-orig-1')
+    })
+
+    it('imports duplicate transactions into duplicateTransactions array, and restores balance to pre-duplicate state upon rule deletion', () => {
+      // Step 1: Initial import of genuine clean transactions
+      const initialAccount: ImportedAccount = {
+        institutionId: 'bank-1',
+        institutionName: 'Bank One',
+        transactions: [
+          {
+            id: 't-1',
+            date: '2026-09-01',
+            description: 'Salary',
+            amount: 3000,
+            currency: 'EUR',
+            type: 'income',
+            institution: 'Bank One',
+          },
+          {
+            id: 't-2',
+            date: '2026-09-02',
+            description: 'Rent',
+            amount: -1000,
+            currency: 'EUR',
+            type: 'expense',
+            institution: 'Bank One',
+          },
+        ],
+        importedAt: '2026-09-01T00:00:00Z',
+        importedFingerprints: ['fp-1'],
+      }
+
+      useAppStore.getState().addImportedAccount(initialAccount)
+
+      // Calculate initial pre-duplicate balance
+      const initialStore = useAppStore.getState()
+      const initialAllTxs = [
+        ...initialStore.importedAccounts[0].transactions,
+        ...(initialStore.importedAccounts[0].duplicateTransactions || []),
+      ]
+      const initialBalance = initialAllTxs.reduce((sum, t) => sum + t.amount, 0)
+      expect(initialBalance).toBe(2000)
+
+      // Step 2: Create a duplicate override rule (user modified amount on duplicate import)
+      const ruleId = 'rule-rent-modified'
+      useAppStore.getState().addDuplicateOverrideRule({
+        id: ruleId,
+        institutionId: 'bank-1',
+        institutionName: 'Bank One',
+        descriptionPattern: 'Rent',
+        amount: -1000,
+        createdAt: '2026-09-02T00:00:00Z',
+        applyCount: 1,
+        modifications: {
+          amount: -1200,
+        },
+      })
+
+      // Step 3: Second import with the modified duplicate transaction
+      const secondAccount: ImportedAccount = {
+        institutionId: 'bank-1',
+        institutionName: 'Bank One',
+        transactions: [],
+        duplicateTransactions: [
+          {
+            id: 't-2-dup',
+            date: '2026-09-02',
+            description: 'Rent',
+            amount: -1200,
+            currency: 'EUR',
+            type: 'expense',
+            institution: 'Bank One',
+            importedByRuleId: ruleId,
+            isDuplicate: true,
+            forceImport: true,
+          },
+        ],
+        importedAt: '2026-09-02T00:00:00Z',
+        importedFingerprints: ['fp-2'],
+      }
+
+      useAppStore.getState().addImportedAccount(secondAccount)
+
+      const withDupStore = useAppStore.getState()
+      expect(withDupStore.importedAccounts[0].transactions).toHaveLength(2)
+      expect(withDupStore.importedAccounts[0].duplicateTransactions).toHaveLength(1)
+
+      const withDupAllTxs = [
+        ...withDupStore.importedAccounts[0].transactions,
+        ...(withDupStore.importedAccounts[0].duplicateTransactions || []),
+      ]
+      const withDupBalance = withDupAllTxs.reduce((sum, t) => sum + t.amount, 0)
+      expect(withDupBalance).toBe(800) // 2000 - 1200 = 800
+
+      // Step 4: Delete the duplicate override rule from Settings
+      useAppStore.getState().removeDuplicateOverrideRule(ruleId, 'both')
+
+      const restoredStore = useAppStore.getState()
+      expect(restoredStore.duplicateOverrideRules).toHaveLength(0)
+      expect(restoredStore.importedAccounts[0].duplicateTransactions ?? []).toHaveLength(0)
+      expect(restoredStore.importedAccounts[0].transactions).toHaveLength(2)
+
+      // Balance and calculations are restored to exact pre-duplicate state
+      const restoredAllTxs = [
+        ...restoredStore.importedAccounts[0].transactions,
+        ...(restoredStore.importedAccounts[0].duplicateTransactions || []),
+      ]
+      const restoredBalance = restoredAllTxs.reduce((sum, t) => sum + t.amount, 0)
+      expect(restoredBalance).toBe(initialBalance)
+      expect(restoredBalance).toBe(2000)
     })
   })
 

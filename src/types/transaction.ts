@@ -21,8 +21,6 @@ export interface Transaction {
   importedByRuleId?: string
   /** True if this transaction was imported as a duplicate override. */
   isDuplicate?: boolean
-  /** Timestamp if this transaction was moved to trash. */
-  deletedAt?: string
 }
 
 export interface RuleModifications {

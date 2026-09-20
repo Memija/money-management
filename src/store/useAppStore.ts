@@ -14,7 +14,6 @@ export interface AppState {
   manualCategories: Record<string, string>
   customCategories: CustomCategory[]
   duplicateOverrideRules: DuplicateOverrideRule[]
-  trashedTransactions: Transaction[]
 
   setCustomKeywords: (category: string, keywords: string[]) => void
   setManualCategory: (transactionId: string, category: string) => void
@@ -32,8 +31,6 @@ export interface AppState {
   ) => void
   removeDuplicateOverrideRule: (id: string, mode?: boolean | DuplicateDeleteMode) => void
   clearDuplicateOverrideRules: (mode?: boolean | DuplicateDeleteMode) => void
-  emptyTrash: () => void
-  restoreFromTrash: (ids: string[]) => void
 
   setStep: (step: AppStep) => void
   selectCountry: (country: Country) => void
@@ -187,9 +184,12 @@ export const countDuplicateTransactionsInAccounts = (
 ): number => {
   let count = 0
   for (const account of importedAccounts) {
+    if (account.duplicateTransactions?.length) {
+      count += account.duplicateTransactions.length
+    }
     const seenKeys = new Map<string, number>()
     for (const tx of account.transactions) {
-      if (tx.forceImport) {
+      if (tx.forceImport || tx.isDuplicate) {
         count++
         continue
       }
@@ -223,37 +223,6 @@ export const useAppStore = create<AppState>()(
       manualCategories: {},
       customCategories: [],
       duplicateOverrideRules: [],
-      trashedTransactions: [],
-
-      emptyTrash: () => set({ trashedTransactions: [] }),
-
-      restoreFromTrash: (ids) =>
-        set((state) => {
-          const idSet = new Set(ids)
-          const toRestore = (state.trashedTransactions || []).filter((t) => idSet.has(t.id))
-          const remainingTrash = (state.trashedTransactions || []).filter((t) => !idSet.has(t.id))
-          if (toRestore.length === 0) return state
-
-          const updatedAccounts = state.importedAccounts.map((account) => {
-            const matchingTxs = toRestore
-              .filter((t) => t.institution === account.institutionName || !t.institution)
-              .map((tx) => {
-                const copy = { ...tx }
-                delete copy.deletedAt
-                return copy
-              })
-            if (matchingTxs.length === 0) return account
-            return {
-              ...account,
-              transactions: [...account.transactions, ...matchingTxs],
-            }
-          })
-
-          return {
-            importedAccounts: reconcileCrossAccountTransfers(updatedAccounts),
-            trashedTransactions: remainingTrash,
-          }
-        }),
 
       addCustomCategory: (category) =>
         set((state) => ({
@@ -338,53 +307,28 @@ export const useAppStore = create<AppState>()(
             return { duplicateOverrideRules: newRules }
           }
 
-          const removedTransactions: Transaction[] = []
-          const now = new Date().toISOString()
           const updatedAccounts = state.importedAccounts.map((account) => {
-            const seenRuleKeys = new Map<string, number>()
-            const filteredTxs = account.transactions.filter((tx) => {
-              // 1. Delete if imported specifically by this rule
-              if (tx.importedByRuleId === id) {
-                removedTransactions.push({ ...tx, deletedAt: now })
-                return false
-              }
-
-              // 2. Delete if modified by this rule (and was imported as duplicate/override)
-              if (isModifiedTransactionForRule(ruleToDelete, tx, account.institutionId)) {
-                removedTransactions.push({ ...tx, deletedAt: now })
-                return false
-              }
-
-              // 3. Delete if orphaned by an already deleted rule
-              if (tx.importedByRuleId && !newRules.some((r) => r.id === tx.importedByRuleId)) {
-                removedTransactions.push({ ...tx, deletedAt: now })
-                return false
-              }
-
-              // 4. If transaction matches original criteria of this rule:
-              if (isOriginalTransactionMatchForRule(ruleToDelete, tx, account.institutionId)) {
-                // If explicitly stamped as a duplicate or force imported, move to trash!
-                if (tx.isDuplicate || tx.forceImport || tx.importedByRuleId === id) {
-                  removedTransactions.push({ ...tx, deletedAt: now })
-                  return false
-                }
-
-                // If legacy duplicate without flags, keep first occurrence and remove subsequent copies
-                const key = toCanonicalTransactionKey(tx)
-                const count = seenRuleKeys.get(key) || 0
-                seenRuleKeys.set(key, count + 1)
-                if (count > 0 && tx.importedByRuleId) {
-                  removedTransactions.push({ ...tx, deletedAt: now })
-                  return false
-                }
-                return true
-              }
-
+            // Completely remove matching transactions from duplicateTransactions (no trash)
+            const filteredDuplicates = (account.duplicateTransactions || []).filter((tx) => {
+              if (tx.importedByRuleId === id) return false
+              if (isModifiedTransactionForRule(ruleToDelete, tx, account.institutionId)) return false
+              if (isOriginalTransactionMatchForRule(ruleToDelete, tx, account.institutionId)) return false
+              if (tx.importedByRuleId && !newRules.some((r) => r.id === tx.importedByRuleId)) return false
               return true
             })
+
+            // Clean any legacy duplicates in account.transactions if present
+            const filteredClean = account.transactions.filter((tx) => {
+              if (tx.importedByRuleId === id) return false
+              if (tx.isDuplicate && isModifiedTransactionForRule(ruleToDelete, tx, account.institutionId)) return false
+              if (tx.isDuplicate && isOriginalTransactionMatchForRule(ruleToDelete, tx, account.institutionId)) return false
+              return true
+            })
+
             return {
               ...account,
-              transactions: filteredTxs,
+              transactions: filteredClean,
+              duplicateTransactions: filteredDuplicates.length > 0 ? filteredDuplicates : undefined,
             }
           })
 
@@ -392,7 +336,6 @@ export const useAppStore = create<AppState>()(
           return {
             duplicateOverrideRules: newRules,
             importedAccounts: reconciled,
-            trashedTransactions: [...(state.trashedTransactions || []), ...removedTransactions],
           }
         }),
 
@@ -408,60 +351,32 @@ export const useAppStore = create<AppState>()(
           }
 
           const rules = state.duplicateOverrideRules || []
-          const removedTransactions: Transaction[] = []
-          const now = new Date().toISOString()
           const updatedAccounts = state.importedAccounts.map((account) => {
-            const seenRuleKeys = new Map<string, number>()
-            const filteredTxs = account.transactions.filter((tx) => {
-              // 1. Delete if modified by any rule being cleared
-              if (rules.some((r) => isModifiedTransactionForRule(r, tx, account.institutionId))) {
-                removedTransactions.push({ ...tx, deletedAt: now })
-                return false
-              }
-
-              // 2. Delete if imported by any rule being cleared
-              if (tx.importedByRuleId && rules.some((r) => r.id === tx.importedByRuleId)) {
-                removedTransactions.push({ ...tx, deletedAt: now })
-                return false
-              }
-
-              // 3. Delete if orphaned
-              if (tx.importedByRuleId && !newRules.some((r) => r.id === tx.importedByRuleId)) {
-                removedTransactions.push({ ...tx, deletedAt: now })
-                return false
-              }
-
-              // 4. If matching original pattern of any rule being cleared:
-              const matchingRule = rules.find((r) =>
-                isOriginalTransactionMatchForRule(r, tx, account.institutionId),
-              )
-              if (matchingRule) {
-                if (tx.isDuplicate || tx.forceImport || tx.importedByRuleId) {
-                  removedTransactions.push({ ...tx, deletedAt: now })
-                  return false
-                }
-                const key = toCanonicalTransactionKey(tx)
-                const count = seenRuleKeys.get(key) || 0
-                seenRuleKeys.set(key, count + 1)
-                if (count > 0 && tx.importedByRuleId) {
-                  removedTransactions.push({ ...tx, deletedAt: now })
-                  return false
-                }
-                return true
-              }
-
+            const filteredDuplicates = (account.duplicateTransactions || []).filter((tx) => {
+              if (tx.importedByRuleId && rules.some((r) => r.id === tx.importedByRuleId)) return false
+              if (rules.some((r) => isModifiedTransactionForRule(r, tx, account.institutionId))) return false
+              if (rules.some((r) => isOriginalTransactionMatchForRule(r, tx, account.institutionId))) return false
+              if (tx.importedByRuleId && !newRules.some((r) => r.id === tx.importedByRuleId)) return false
               return true
             })
+
+            const filteredClean = account.transactions.filter((tx) => {
+              if (tx.importedByRuleId && rules.some((r) => r.id === tx.importedByRuleId)) return false
+              if (tx.isDuplicate && rules.some((r) => isModifiedTransactionForRule(r, tx, account.institutionId))) return false
+              if (tx.isDuplicate && rules.some((r) => isOriginalTransactionMatchForRule(r, tx, account.institutionId))) return false
+              return true
+            })
+
             return {
               ...account,
-              transactions: filteredTxs,
+              transactions: filteredClean,
+              duplicateTransactions: filteredDuplicates.length > 0 ? filteredDuplicates : undefined,
             }
           })
           const reconciled = reconcileCrossAccountTransfers(updatedAccounts)
           return {
             duplicateOverrideRules: newRules,
             importedAccounts: reconciled,
-            trashedTransactions: [...(state.trashedTransactions || []), ...removedTransactions],
           }
         }),
 
@@ -470,9 +385,11 @@ export const useAppStore = create<AppState>()(
         set((state) => {
           const rules = state.duplicateOverrideRules || []
           const updatedAccounts = state.importedAccounts.map((account) => {
+            const dups = account.duplicateTransactions || []
+            removedCount += dups.length
             const seenKeys = new Map<string, number>()
             const filteredTxs = account.transactions.filter((tx) => {
-              if (tx.forceImport) {
+              if (tx.forceImport || tx.isDuplicate) {
                 removedCount++
                 return false
               }
@@ -495,6 +412,7 @@ export const useAppStore = create<AppState>()(
             return {
               ...account,
               transactions: filteredTxs,
+              duplicateTransactions: [],
             }
           })
           const reconciled = reconcileCrossAccountTransfers(updatedAccounts)
@@ -546,51 +464,90 @@ export const useAppStore = create<AppState>()(
           let updatedList: ImportedAccount[]
           if (existingIdx < 0) {
             // Brand-new institution — append
-            // Also check if any duplicate rules were matched
-            const stampedTxs = account.transactions.map((t) => {
-              const rule = duplicateRules.find((r) => matchesDuplicateOverrideRule(r, t, account.institutionId))
+            const cleanTxs: Transaction[] = []
+            const dupTxs: Transaction[] = [...(account.duplicateTransactions || [])]
+
+            account.transactions.forEach((t) => {
+              const rule = duplicateRules.find((r) =>
+                matchesDuplicateOverrideRule(r, t, account.institutionId),
+              )
               if (rule) {
                 matchedRuleIds.add(rule.id)
-                return { ...t, importedByRuleId: rule.id, isDuplicate: true }
+                dupTxs.push({ ...t, importedByRuleId: rule.id, isDuplicate: true })
+                return
               }
-              if (t.forceImport) {
-                return { ...t, isDuplicate: true }
+              if (t.forceImport || t.isDuplicate) {
+                dupTxs.push({ ...t, isDuplicate: true })
+                return
               }
-              return t
+              cleanTxs.push(t)
             })
-            updatedList = [...state.importedAccounts, { ...account, transactions: stampedTxs }]
+
+            updatedList = [
+              ...state.importedAccounts,
+              {
+                ...account,
+                transactions: cleanTxs,
+                duplicateTransactions: dupTxs.length > 0 ? dupTxs : undefined,
+              },
+            ]
           } else {
-            // Same institution already has data — merge transactions to avoid data loss.
-            // Deduplicate by canonical key (date|amount|normalized description) so re-importing
-            // overlapping periods or duplicate files doesn't create duplicates.
+            // Same institution already has data — merge transactions.
             const existing = state.importedAccounts[existingIdx]
-            const existingKeys = new Set(
+            const existingCleanKeys = new Set(
               existing.transactions.map(toCanonicalTransactionKey),
             )
-            const newUnique: Transaction[] = []
+            const existingDupKeys = new Set(
+              (existing.duplicateTransactions || []).map(toCanonicalTransactionKey),
+            )
+
+            const newClean: Transaction[] = []
+            const newDups: Transaction[] = [...(existing.duplicateTransactions || [])]
+
+            // 1. Incorporate incoming duplicateTransactions
+            if (account.duplicateTransactions) {
+              account.duplicateTransactions.forEach((t) => {
+                const rule = duplicateRules.find((r) =>
+                  matchesDuplicateOverrideRule(r, t, account.institutionId),
+                )
+                if (rule) {
+                  matchedRuleIds.add(rule.id)
+                }
+                newDups.push({
+                  ...t,
+                  isDuplicate: true,
+                  ...(rule && !t.importedByRuleId ? { importedByRuleId: rule.id } : {}),
+                })
+              })
+            }
+
+            // 2. Incorporate incoming account.transactions
             account.transactions.forEach((t) => {
-              const rule = duplicateRules.find((r) => matchesDuplicateOverrideRule(r, t, account.institutionId))
-              const isDup = Boolean(t.isDuplicate || t.forceImport || rule)
-              const stampedTx: Transaction = {
-                ...t,
-                ...(isDup ? { isDuplicate: true } : {}),
-                ...(rule ? { importedByRuleId: rule.id } : {}),
-              }
+              const rule = duplicateRules.find((r) =>
+                matchesDuplicateOverrideRule(r, t, account.institutionId),
+              )
+              const isDuplicateOfExisting =
+                existingCleanKeys.has(toCanonicalTransactionKey(t)) ||
+                existingDupKeys.has(toCanonicalTransactionKey(t))
+
               if (rule) {
                 matchedRuleIds.add(rule.id)
               }
-              if (t.forceImport) {
-                newUnique.push(stampedTx)
+
+              // Duplicates (matching rule, matching existing transaction, or flagged) must go to duplicateTransactions
+              if (rule || isDuplicateOfExisting || t.isDuplicate || t.forceImport) {
+                newDups.push({
+                  ...t,
+                  isDuplicate: true,
+                  ...(rule && !t.importedByRuleId ? { importedByRuleId: rule.id } : {}),
+                })
                 return
               }
-              if (!existingKeys.has(toCanonicalTransactionKey(t))) {
-                newUnique.push(stampedTx)
-                return
-              }
-              if (rule) {
-                newUnique.push(stampedTx)
-              }
+
+              // Unique non-duplicate clean transaction
+              newClean.push(t)
             })
+
             // Accumulate ALL fingerprints so future re-imports of any previously seen file are detected
             const mergedFingerprints = Array.from(
               new Set([...existing.importedFingerprints, ...account.importedFingerprints]),
@@ -601,7 +558,8 @@ export const useAppStore = create<AppState>()(
             const merged: ImportedAccount = {
               ...existing,
               accountIbans: mergedIbans,
-              transactions: [...existing.transactions, ...newUnique],
+              transactions: [...existing.transactions, ...newClean],
+              duplicateTransactions: newDups.length > 0 ? newDups : undefined,
               importedAt: account.importedAt,
               importedFingerprints: mergedFingerprints,
             }
@@ -670,7 +628,6 @@ export const useAppStore = create<AppState>()(
           manualCategories: {},
           customCategories: [],
           duplicateOverrideRules: [],
-          trashedTransactions: [],
         })
         try {
           useAppStore.persist?.clearStorage()
@@ -702,6 +659,11 @@ export const useAppStore = create<AppState>()(
         for (const account of targetAccounts) {
           for (const tx of account.transactions) {
             existingKeys.add(toCanonicalTransactionKey(tx))
+          }
+          if (account.duplicateTransactions) {
+            for (const tx of account.duplicateTransactions) {
+              existingKeys.add(toCanonicalTransactionKey(tx))
+            }
           }
         }
 

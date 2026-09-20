@@ -38,7 +38,8 @@ export const DuplicateRulesSettings: React.FC = () => {
   const getRuleImportedTransactionCount = (rule: DuplicateOverrideRule): number => {
     let count = 0
     for (const acc of importedAccounts) {
-      for (const tx of acc.transactions) {
+      const allTxs = [...(acc.transactions || []), ...(acc.duplicateTransactions || [])]
+      for (const tx of allTxs) {
         if (tx.importedByRuleId === rule.id) {
           count++
         } else if (!tx.importedByRuleId && matchesDuplicateOverrideRule(rule, tx, acc.institutionId)) {
@@ -52,7 +53,8 @@ export const DuplicateRulesSettings: React.FC = () => {
   const getTotalRulesImportedCount = (): number => {
     let count = 0
     for (const acc of importedAccounts) {
-      for (const tx of acc.transactions) {
+      const allTxs = [...(acc.transactions || []), ...(acc.duplicateTransactions || [])]
+      for (const tx of allTxs) {
         if (tx.importedByRuleId) {
           count++
         } else if (
