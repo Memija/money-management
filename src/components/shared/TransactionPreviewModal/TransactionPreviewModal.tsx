@@ -6,13 +6,14 @@ import {
   ArrowUp,
   ArrowUpDown,
   Check,
+  CopyCheck,
   Ghost,
   Layers,
+  Lock,
   Plus,
   RotateCcw,
   Search,
   Sliders,
-  Sparkles,
   X,
 } from 'lucide-react'
 
@@ -106,6 +107,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     amount: boolean
   }>({ description: true, date: true, amount: true })
   const [selectedTargetIds, setSelectedTargetIds] = useState<Set<string>>(new Set())
+  const [pendingResetTxId, setPendingResetTxId] = useState<string | null>(null)
+  const [alsoLockAsDuplicate, setAlsoLockAsDuplicate] = useState(true)
 
   const initialTransactionsRef = React.useRef<
     Map<string, { description: string; date: string; amount: number }>
@@ -123,27 +126,14 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     }
   }, [transactions])
 
-  const getIsModified = (tx: Transaction): boolean => {
+  const getIsModified = React.useCallback((tx: Transaction): boolean => {
     const orig = initialTransactionsRef.current.get(tx.id)
     if (!orig) return false
     const descChanged = tx.description !== orig.description
     const dateChanged = tx.date !== orig.date
     const amountChanged = Math.abs(tx.amount - orig.amount) >= 0.005
     return descChanged || dateChanged || amountChanged
-  }
-
-  const handleResetTransaction = (id: string) => {
-    const orig = initialTransactionsRef.current.get(id)
-    if (orig && onUpdateTransaction) {
-      onUpdateTransaction(id, {
-        description: orig.description,
-        date: orig.date,
-        amount: orig.amount,
-        type: orig.amount >= 0 ? 'income' : 'expense',
-      })
-    }
-    setBulkApplyOffer((prev) => (prev?.sourceTxId === id ? null : prev))
-  }
+  }, [])
 
   useEffect(() => {
     setLocalTransactions(transactions)
@@ -153,17 +143,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     setLocalExcludedSpaceTransactions(excludedSpaceTransactions || [])
   }, [excludedSpaceTransactions])
 
-  useEffect(() => {
-    if (isOpen) {
-      setScopeFilter(initialFilter)
-      setManuallyIncludedIds(new Set())
-      setLocalUnlockedDuplicateIds(new Set())
-      setUnlockedTxToWarn(null)
-      setBulkApplyOffer(null)
-      setIsAdjustModalOpen(false)
-    }
-  }, [isOpen, initialFilter])
-
   const effectiveUnlockedIds = useMemo(() => {
     if (unlockedDuplicateIds) {
       return new Set([...unlockedDuplicateIds, ...localUnlockedDuplicateIds])
@@ -171,71 +150,218 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     return localUnlockedDuplicateIds
   }, [unlockedDuplicateIds, localUnlockedDuplicateIds])
 
-  const activeTransactions = onIncludeSpaceTransaction ? transactions : localTransactions
-  const activeExcluded = onIncludeSpaceTransaction
-    ? excludedSpaceTransactions
-    : localExcludedSpaceTransactions
+  const activeTransactions = useMemo(
+    () => (onIncludeSpaceTransaction ? transactions : localTransactions),
+    [onIncludeSpaceTransaction, transactions, localTransactions],
+  )
+
+  const activeExcluded = useMemo(
+    () => (onIncludeSpaceTransaction ? excludedSpaceTransactions : localExcludedSpaceTransactions) ?? [],
+    [onIncludeSpaceTransaction, excludedSpaceTransactions, localExcludedSpaceTransactions],
+  )
+
+  const modifiedTransactions = useMemo(() => {
+    return activeTransactions.filter((tx) => getIsModified(tx))
+  }, [activeTransactions, getIsModified])
+
+  const executeResetTransaction = (id: string, alsoLock: boolean = false) => {
+    const orig = initialTransactionsRef.current.get(id)
+    if (orig && onUpdateTransaction) {
+      const resetData = {
+        description: orig.description,
+        date: orig.date,
+        amount: orig.amount,
+        type: (orig.amount >= 0 ? 'income' : 'expense') as 'income' | 'expense',
+      }
+      onUpdateTransaction(id, resetData)
+      setLocalTransactions((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, ...resetData } : t)),
+      )
+      if (alsoLock && effectiveUnlockedIds.has(id)) {
+        setLocalUnlockedDuplicateIds((prev) => {
+          const next = new Set(prev)
+          next.delete(id)
+          return next
+        })
+        const targetTx = activeTransactions.find((t) => t.id === id)
+        const fullResetTx = { ...(targetTx || {}), ...orig, ...resetData, id } as Transaction
+        onRelockDuplicateTransaction?.(fullResetTx)
+      }
+    }
+    setBulkApplyOffer((prev) => (prev?.sourceTxId === id ? null : prev))
+  }
+
+  const executeResetAllModified = (alsoLock: boolean = false) => {
+    if (!onUpdateTransaction) return
+    const resetMap = new Map<string, Partial<Transaction>>()
+    for (const tx of modifiedTransactions) {
+      const orig = initialTransactionsRef.current.get(tx.id)
+      if (orig) {
+        const resetData = {
+          description: orig.description,
+          date: orig.date,
+          amount: orig.amount,
+          type: (orig.amount >= 0 ? 'income' : 'expense') as 'income' | 'expense',
+        }
+        onUpdateTransaction(tx.id, resetData)
+        resetMap.set(tx.id, resetData)
+      }
+    }
+    setLocalTransactions((prev) =>
+      prev.map((t) => {
+        const resetData = resetMap.get(t.id)
+        return resetData ? { ...t, ...resetData } : t
+      }),
+    )
+
+    if (alsoLock) {
+      const idsToRelock = modifiedTransactions
+        .filter((tx) => effectiveUnlockedIds.has(tx.id))
+        .map((tx) => tx.id)
+
+      if (idsToRelock.length > 0) {
+        setLocalUnlockedDuplicateIds((prev) => {
+          const next = new Set(prev)
+          idsToRelock.forEach((id) => next.delete(id))
+          return next
+        })
+        for (const id of idsToRelock) {
+          const orig = initialTransactionsRef.current.get(id)
+          const targetTx = activeTransactions.find((t) => t.id === id)
+          const resetData = resetMap.get(id) || {}
+          const fullResetTx = { ...(targetTx || {}), ...orig, ...resetData, id } as Transaction
+          onRelockDuplicateTransaction?.(fullResetTx)
+        }
+      }
+    }
+
+    setBulkApplyOffer(null)
+  }
+
+  const handleResetTransaction = (id: string) => {
+    setPendingResetTxId(id)
+  }
+
+  const getBulkApplyOfferForTx = React.useCallback(
+    (
+      txId: string,
+      customUpdates?: Partial<Transaction>,
+    ): {
+      sourceTxId: string
+      originalDescription: string
+      updates: Partial<Transaction>
+      unlockedTargetIds: string[]
+      identicalTargetIds: string[]
+    } | null => {
+      if (!effectiveUnlockedIds.has(txId)) return null
+      const currentTx = activeTransactions.find((t) => t.id === txId)
+      if (!currentTx) return null
+      const orig = initialTransactionsRef.current.get(txId)
+      if (!orig) return null
+
+      const cumulativeMods: Partial<Transaction> = customUpdates ? { ...customUpdates } : {}
+      if (customUpdates?.description !== undefined) {
+        cumulativeMods.description = customUpdates.description
+      } else if (currentTx.description !== orig.description) {
+        cumulativeMods.description = currentTx.description
+      }
+
+      if (customUpdates?.date !== undefined) {
+        cumulativeMods.date = customUpdates.date
+      } else if (currentTx.date !== orig.date) {
+        cumulativeMods.date = currentTx.date
+      }
+
+      if (customUpdates?.amount !== undefined) {
+        cumulativeMods.amount = customUpdates.amount
+        cumulativeMods.type = customUpdates.amount >= 0 ? 'income' : 'expense'
+      } else if (Math.abs(currentTx.amount - orig.amount) >= 0.005) {
+        cumulativeMods.amount = currentTx.amount
+        cumulativeMods.type = currentTx.amount >= 0 ? 'income' : 'expense'
+      }
+
+      if (
+        cumulativeMods.description === undefined &&
+        cumulativeMods.date === undefined &&
+        cumulativeMods.amount === undefined
+      ) {
+        return null
+      }
+
+      // 1. Other unlocked transactions that don't already have all modifications applied
+      const otherUnlockedTxs = activeTransactions.filter((other) => {
+        if (other.id === txId || !effectiveUnlockedIds.has(other.id)) return false
+        const matchesDesc =
+          cumulativeMods.description === undefined || other.description === cumulativeMods.description
+        const matchesDate =
+          cumulativeMods.date === undefined || other.date === cumulativeMods.date
+        const matchesAmount =
+          cumulativeMods.amount === undefined || Math.abs(other.amount - cumulativeMods.amount) < 0.005
+        return !(matchesDesc && matchesDate && matchesAmount)
+      })
+
+      // 2. Identical duplicate transactions that are not already unlocked
+      const otherIdenticalTxs = activeTransactions.filter((other) => {
+        if (other.id === txId || effectiveUnlockedIds.has(other.id)) return false
+        const otherOrig = initialTransactionsRef.current.get(other.id) || other
+        const descMatches =
+          otherOrig.description.trim().toLowerCase() === orig.description.trim().toLowerCase()
+        const amountMatches = Math.abs(otherOrig.amount - orig.amount) < 0.005
+        return descMatches && amountMatches
+      })
+
+      const unlockedTargetIds = otherUnlockedTxs.map((t) => t.id)
+      const identicalTargetIds = otherIdenticalTxs.map((t) => t.id)
+
+      if (unlockedTargetIds.length === 0 && identicalTargetIds.length === 0) {
+        return null
+      }
+
+      return {
+        sourceTxId: txId,
+        originalDescription: orig.description,
+        updates: cumulativeMods,
+        unlockedTargetIds,
+        identicalTargetIds,
+      }
+    },
+    [activeTransactions, effectiveUnlockedIds],
+  )
+
+  useEffect(() => {
+    if (isOpen) {
+      setScopeFilter(initialFilter)
+      setManuallyIncludedIds(new Set())
+      setLocalUnlockedDuplicateIds(new Set())
+      setUnlockedTxToWarn(null)
+      setIsAdjustModalOpen(false)
+
+      // Restore bulk apply offer on modal open if any unlocked transaction is modified and has pending targets
+      const modifiedUnlockedTx = activeTransactions.find(
+        (tx) => effectiveUnlockedIds.has(tx.id) && getIsModified(tx),
+      )
+      if (modifiedUnlockedTx) {
+        const offer = getBulkApplyOfferForTx(modifiedUnlockedTx.id)
+        setBulkApplyOffer(offer)
+      } else {
+        setBulkApplyOffer(null)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialFilter])
 
   const handleUpdateTransaction = onUpdateTransaction
     ? (id: string, updates: Partial<Transaction>) => {
         onUpdateTransaction(id, updates)
+        setLocalTransactions((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+        )
 
         // If an unlocked duplicate is edited, offer to adjust other unlocked and identical transactions in bulk
         if (effectiveUnlockedIds.has(id)) {
-          const orig = initialTransactionsRef.current.get(id)
-          const currentTx = activeTransactions.find((t) => t.id === id)
-
-          const cumulativeMods: Partial<Transaction> = { ...updates }
-          if (currentTx && orig) {
-            if (updates.description !== undefined) {
-              cumulativeMods.description = updates.description
-            } else if (currentTx.description !== orig.description) {
-              cumulativeMods.description = currentTx.description
-            }
-
-            if (updates.date !== undefined) {
-              cumulativeMods.date = updates.date
-            } else if (currentTx.date !== orig.date) {
-              cumulativeMods.date = currentTx.date
-            }
-
-            if (updates.amount !== undefined) {
-              cumulativeMods.amount = updates.amount
-              cumulativeMods.type = updates.amount >= 0 ? 'income' : 'expense'
-            } else if (Math.abs(currentTx.amount - orig.amount) >= 0.005) {
-              cumulativeMods.amount = currentTx.amount
-              cumulativeMods.type = currentTx.amount >= 0 ? 'income' : 'expense'
-            }
-          }
-
-          // 1. Other unlocked transactions
-          const otherUnlockedTxs = activeTransactions.filter(
-            (other) => other.id !== id && effectiveUnlockedIds.has(other.id),
-          )
-
-          // 2. Identical duplicate transactions that are not already unlocked
-          const otherIdenticalTxs = orig
-            ? activeTransactions.filter((other) => {
-                if (other.id === id || effectiveUnlockedIds.has(other.id)) return false
-                const otherOrig = initialTransactionsRef.current.get(other.id) || other
-                const descMatches =
-                  otherOrig.description.trim().toLowerCase() === orig.description.trim().toLowerCase()
-                const amountMatches = Math.abs(otherOrig.amount - orig.amount) < 0.005
-                return descMatches && amountMatches
-              })
-            : []
-
-          const unlockedTargetIds = otherUnlockedTxs.map((t) => t.id)
-          const identicalTargetIds = otherIdenticalTxs.map((t) => t.id)
-
-          if (unlockedTargetIds.length > 0 || identicalTargetIds.length > 0) {
-            setBulkApplyOffer({
-              sourceTxId: id,
-              originalDescription: orig?.description ?? currentTx?.description ?? '',
-              updates: cumulativeMods,
-              unlockedTargetIds,
-              identicalTargetIds,
-            })
+          const offer = getBulkApplyOfferForTx(id, updates)
+          if (offer) {
+            setBulkApplyOffer(offer)
           }
         }
       }
@@ -256,11 +382,20 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     const allTargets = [...unlockedTargetIds, ...identicalTargetIds]
     for (const txId of allTargets) {
       onUpdateTransaction?.(txId, updates)
-      if (duplicateIds.has(txId) && !effectiveUnlockedIds.has(txId)) {
+    }
+
+    if (identicalTargetIds.length > 0) {
+      setLocalUnlockedDuplicateIds((prev) => {
+        const next = new Set(prev)
+        for (const id of identicalTargetIds) {
+          next.add(id)
+        }
+        return next
+      })
+      for (const txId of identicalTargetIds) {
         const matchingTx = activeTransactions.find((t) => t.id === txId)
         if (matchingTx) {
-          setLocalUnlockedDuplicateIds((prev) => new Set(prev).add(txId))
-          onUnlockDuplicateTransaction?.(matchingTx)
+          onUnlockDuplicateTransaction?.({ ...matchingTx, ...updates }, true)
         }
       }
     }
@@ -300,11 +435,24 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
     for (const txId of selectedTargetIds) {
       onUpdateTransaction?.(txId, filteredUpdates)
-      if (duplicateIds.has(txId) && !effectiveUnlockedIds.has(txId)) {
+    }
+
+    const targetsToUnlock = [...selectedTargetIds].filter(
+      (txId) => bulkApplyOffer.identicalTargetIds.includes(txId) || !effectiveUnlockedIds.has(txId),
+    )
+
+    if (targetsToUnlock.length > 0) {
+      setLocalUnlockedDuplicateIds((prev) => {
+        const next = new Set(prev)
+        for (const id of targetsToUnlock) {
+          next.add(id)
+        }
+        return next
+      })
+      for (const txId of targetsToUnlock) {
         const matchingTx = activeTransactions.find((t) => t.id === txId)
         if (matchingTx) {
-          setLocalUnlockedDuplicateIds((prev) => new Set(prev).add(txId))
-          onUnlockDuplicateTransaction?.(matchingTx)
+          onUnlockDuplicateTransaction?.({ ...matchingTx, ...filteredUpdates }, true)
         }
       }
     }
@@ -317,9 +465,42 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     setUnlockedTxToWarn(tx)
   }
 
-  const handleConfirmUnlockDuplicate = (tx: Transaction, rememberRule?: boolean) => {
-    setLocalUnlockedDuplicateIds((prev) => new Set(prev).add(tx.id))
-    onUnlockDuplicateTransaction?.(tx, rememberRule)
+  const sameLockedDuplicates = useMemo(() => {
+    if (!unlockedTxToWarn) return []
+    const orig = initialTransactionsRef.current.get(unlockedTxToWarn.id) || unlockedTxToWarn
+    const origDesc = orig.description.trim().toLowerCase()
+    const origAmt = orig.amount
+
+    return activeTransactions.filter((other) => {
+      if (other.id !== unlockedTxToWarn.id && effectiveUnlockedIds.has(other.id)) return false
+      if (!duplicateIds.has(other.id) && other.id !== unlockedTxToWarn.id) return false
+      const otherOrig = initialTransactionsRef.current.get(other.id) || other
+      return (
+        otherOrig.description.trim().toLowerCase() === origDesc &&
+        Math.abs(otherOrig.amount - origAmt) < 0.005
+      )
+    })
+  }, [unlockedTxToWarn, activeTransactions, effectiveUnlockedIds, duplicateIds])
+
+  const handleConfirmUnlockDuplicate = (
+    tx: Transaction,
+    rememberRule?: boolean,
+    unlockAllIdentical?: boolean,
+  ) => {
+    if (unlockAllIdentical && sameLockedDuplicates.length > 1) {
+      const idsToUnlock = sameLockedDuplicates.map((t) => t.id)
+      setLocalUnlockedDuplicateIds((prev) => {
+        const next = new Set(prev)
+        idsToUnlock.forEach((id) => next.add(id))
+        return next
+      })
+      sameLockedDuplicates.forEach((item) => {
+        onUnlockDuplicateTransaction?.(item, rememberRule)
+      })
+    } else {
+      setLocalUnlockedDuplicateIds((prev) => new Set(prev).add(tx.id))
+      onUnlockDuplicateTransaction?.(tx, rememberRule)
+    }
   }
 
   const handleRelockDuplicate = (tx: Transaction) => {
@@ -470,13 +651,15 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     onRemoveTransaction ||
       hasSpaceTransfers ||
       onUnlockDuplicateTransaction ||
-      onRelockDuplicateTransaction,
+      onRelockDuplicateTransaction ||
+      effectiveUnlockedIds.size > 0 ||
+      modifiedTransactions.length > 0,
   )
 
   const rowContent = (index: number, tx: Transaction) => {
     const isTxUnlockedDuplicate = effectiveUnlockedIds.has(tx.id)
     const isTxDuplicate = duplicateIds.has(tx.id) || isTxUnlockedDuplicate
-    const isTxModified = isTxUnlockedDuplicate && getIsModified(tx)
+    const isTxModified = getIsModified(tx)
     return (
       <TransactionPreviewRow
         key={tx.id}
@@ -559,7 +742,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           bulkApplyOffer.identicalTargetIds.length > 0) && (
           <div className={styles['bulk-apply-banner']} data-testid="bulk-apply-banner">
             <div className={styles['bulk-apply-info']}>
-              <Sparkles size={18} className={styles['bulk-apply-icon']} aria-hidden="true" />
+              <CopyCheck size={18} className={styles['bulk-apply-icon']} aria-hidden="true" />
               <span>
                 {bulkApplyOffer.unlockedTargetIds.length > 0
                   ? bulkApplyOffer.unlockedTargetIds.length === 1
@@ -582,6 +765,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                   onClick={handleApplyToAllUnlocked}
                   data-testid="apply-to-all-unlocked-btn"
                   title={t.applyToAllUnlocked || 'Apply to all unlocked'}
+                  aria-label={t.applyToAllUnlocked || 'Apply to all unlocked'}
                 >
                   <Check size={14} aria-hidden="true" />
                   <span>{t.applyToAllUnlocked || 'Apply to all unlocked'}</span>
@@ -593,6 +777,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                   onClick={handleConfirmBulkApply}
                   data-testid="apply-bulk-changes-btn"
                   title={t.applyToAll || 'Apply to all'}
+                  aria-label={t.applyToAll || 'Apply to all'}
                 >
                   <Check size={14} aria-hidden="true" />
                   <span>{t.applyToAll || 'Apply to all'}</span>
@@ -604,10 +789,32 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 onClick={handleOpenAdjustModal}
                 data-testid="adjust-unlocked-bulk-btn"
                 title={t.adjustUnlockedOptions || 'Adjust in bulk...'}
+                aria-label={t.adjustUnlockedOptions || 'Adjust in bulk...'}
               >
                 <Sliders size={13} aria-hidden="true" />
                 <span>{t.adjustUnlockedOptions || 'Adjust in bulk...'}</span>
               </button>
+              {modifiedTransactions.length > 1 && (
+                <button
+                  type="button"
+                  className={styles['bulk-reset-all-btn']}
+                  onClick={() => setPendingResetTxId(bulkApplyOffer.sourceTxId)}
+                  data-testid="bulk-reset-all-banner-btn"
+                  title={t.resetAllModified || 'Reset all modified transactions'}
+                  aria-label={(t.resetAllModifiedCount || 'Reset all ({count}) in bulk').replace(
+                    '{count}',
+                    String(modifiedTransactions.length),
+                  )}
+                >
+                  <RotateCcw size={13} aria-hidden="true" />
+                  <span>
+                    {(t.resetAllModifiedCount || 'Reset all ({count}) in bulk').replace(
+                      '{count}',
+                      String(modifiedTransactions.length),
+                    )}
+                  </span>
+                </button>
+              )}
               <button
                 type="button"
                 className={styles['bulk-apply-dismiss-btn']}
@@ -756,6 +963,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       <UnlockDuplicateModal
         isOpen={Boolean(unlockedTxToWarn)}
         transaction={unlockedTxToWarn}
+        sameDuplicateCount={sameLockedDuplicates.length > 1 ? sameLockedDuplicates.length : undefined}
         onClose={() => setUnlockedTxToWarn(null)}
         onConfirmUnlock={handleConfirmUnlockDuplicate}
         formatCurrency={formatCurrency}
@@ -769,17 +977,17 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         title={t.adjustUnlockedModalTitle || 'Adjust Unlocked Transactions in Bulk'}
         maxWidth="580px"
         footer={
-          <div className={styles['modal-footer']}>
+          <div className={styles['adjust-modal-footer']}>
             <button
               type="button"
-              className={`secondary-button ${styles['modal-cancel-btn']}`}
+              className={styles['adjust-cancel-btn']}
               onClick={() => setIsAdjustModalOpen(false)}
             >
               {t.cancel || 'Cancel'}
             </button>
             <button
               type="button"
-              className={`primary-button ${styles['done-button']}`}
+              className={styles['adjust-confirm-btn']}
               onClick={handleConfirmCustomAdjust}
               disabled={
                 selectedTargetIds.size === 0 ||
@@ -922,7 +1130,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                   </span>
                   <button
                     type="button"
-                    className={styles['adjust-select-all-btn']}
+                    className={`${styles['adjust-select-all-btn']} ${
+                      !allSelected ? styles['adjust-select-all-btn-orange'] : ''
+                    }`}
                     onClick={handleToggleSelectAll}
                     data-testid="adjust-select-all-btn"
                   >
@@ -933,7 +1143,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 <div className={styles['adjust-tx-list']}>
                   {targetTxs.map((target) => {
                     const isTargetSelected = selectedTargetIds.has(target.id)
-                    const isTargetUnlocked = effectiveUnlockedIds.has(target.id)
                     return (
                       <label
                         key={target.id}
@@ -962,17 +1171,129 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                             <span className={styles['adjust-tx-amount']}>
                               {formatCurrency(target.amount)}
                             </span>
-                            <span className={styles['adjust-tx-pill']}>
-                              {isTargetUnlocked
-                                ? t.unlockedDuplicateBadge || 'Unlocked'
-                                : t.duplicate || 'Duplicate'}
-                            </span>
                           </div>
                         </div>
                       </label>
                     )
                   })}
                 </div>
+              </div>
+            </div>
+          )
+        })()}
+      </Modal>
+
+      {/* Reset Confirmation Modal */}
+      <Modal
+        isOpen={Boolean(pendingResetTxId)}
+        onClose={() => setPendingResetTxId(null)}
+        title={t.resetTransactionModalTitle || 'Reset Transactions'}
+        maxWidth="540px"
+        footer={
+          <div className={styles['reset-modal-footer']}>
+            <button
+              type="button"
+              className={`${styles['reset-dialog-btn']} ${styles['reset-cancel-btn']}`}
+              onClick={() => setPendingResetTxId(null)}
+              data-testid="cancel-reset-modal-btn"
+            >
+              {t.cancel || 'Cancel'}
+            </button>
+            <button
+              type="button"
+              className={`${styles['reset-dialog-btn']} ${styles['reset-single-btn']}`}
+              onClick={() => {
+                if (pendingResetTxId) {
+                  executeResetTransaction(pendingResetTxId, alsoLockAsDuplicate)
+                }
+                setPendingResetTxId(null)
+              }}
+              data-testid="confirm-reset-single-btn"
+            >
+              {alsoLockAsDuplicate && (pendingResetTxId ? effectiveUnlockedIds.has(pendingResetTxId) : false)
+                ? t.resetAndLockSingle || 'Reset and lock'
+                : modifiedTransactions.length > 1
+                ? t.resetOnlyThis || 'Reset only this'
+                : t.resetToOriginal || 'Reset'}
+            </button>
+            {modifiedTransactions.length > 1 && (
+              <button
+                type="button"
+                className={`${styles['reset-dialog-btn']} ${styles['reset-all-btn']}`}
+                onClick={() => {
+                  executeResetAllModified(alsoLockAsDuplicate)
+                  setPendingResetTxId(null)
+                }}
+                data-testid="confirm-reset-all-btn"
+              >
+                <RotateCcw size={14} aria-hidden="true" />
+                <span>
+                  {alsoLockAsDuplicate && modifiedTransactions.some((t) => effectiveUnlockedIds.has(t.id))
+                    ? (t.resetAndLockBulkCount || 'Reset and lock all ({count})').replace(
+                        '{count}',
+                        String(modifiedTransactions.length),
+                      )
+                    : (t.resetAllModifiedCount || 'Reset all ({count}) in bulk').replace(
+                        '{count}',
+                        String(modifiedTransactions.length),
+                      )}
+                </span>
+              </button>
+            )}
+          </div>
+        }
+      >
+        {pendingResetTxId && (() => {
+          const targetTx = activeTransactions.find((t) => t.id === pendingResetTxId)
+          const isTargetUnlockedDuplicate = effectiveUnlockedIds.has(pendingResetTxId)
+          const hasAnyUnlockedDuplicates = modifiedTransactions.some((t) =>
+            effectiveUnlockedIds.has(t.id),
+          )
+          const showLockCheckbox = isTargetUnlockedDuplicate || hasAnyUnlockedDuplicates
+
+          return (
+            <div className={styles['reset-modal-body']}>
+              <div className={styles['reset-modal-icon-wrap']}>
+                <RotateCcw size={22} aria-hidden="true" />
+              </div>
+              <div className={styles['reset-modal-text']}>
+                <p className={styles['reset-modal-message']}>
+                  {modifiedTransactions.length > 1
+                    ? (
+                        t.resetBulkPrompt ||
+                        'You have modified {count} transactions. Would you like to reset only this transaction or reset all modified transactions in bulk back to their original values?'
+                      ).replace('{count}', String(modifiedTransactions.length))
+                    : t.resetSinglePrompt ||
+                      'Are you sure you want to reset this transaction back to its original values?'}
+                </p>
+                {targetTx && (
+                  <div className={styles['reset-modal-tx-preview']}>
+                    <span className={styles['reset-modal-tx-desc']} title={targetTx.description}>
+                      {targetTx.description}
+                    </span>
+                    <span className={styles['reset-modal-tx-amount']}>
+                      {formatCurrency(targetTx.amount)}
+                    </span>
+                  </div>
+                )}
+                {showLockCheckbox && (
+                  <label
+                    className={styles['reset-lock-checkbox-label']}
+                    data-testid="reset-also-lock-checkbox-label"
+                  >
+                    <input
+                      type="checkbox"
+                      className={styles['reset-lock-checkbox']}
+                      checked={alsoLockAsDuplicate}
+                      onChange={(e) => setAlsoLockAsDuplicate(e.target.checked)}
+                      data-testid="reset-also-lock-checkbox"
+                    />
+                    <Lock size={14} className={styles['reset-lock-icon']} aria-hidden="true" />
+                    <span className={styles['reset-lock-checkbox-text']}>
+                      {t.alsoLockAsDuplicate || 'Also lock as duplicate'}
+                    </span>
+                  </label>
+                )}
               </div>
             </div>
           )

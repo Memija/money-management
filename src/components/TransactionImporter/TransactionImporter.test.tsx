@@ -7,12 +7,13 @@ import { type LanguageState, useLanguageStore } from '../../store/useLanguageSto
 import type { ImportedAccount } from '../../types'
 import TransactionImporter from './TransactionImporter'
 
-const { mockAddImportedAccount, mockSetStep, mockGetDuplicateTransactionStats, mockReplaceImportedAccount, mockImportedAccounts } = vi.hoisted(() => ({
+const { mockAddImportedAccount, mockSetStep, mockGetDuplicateTransactionStats, mockReplaceImportedAccount, mockImportedAccounts, mockAddDuplicateOverrideRule } = vi.hoisted(() => ({
   mockAddImportedAccount: vi.fn(),
   mockSetStep: vi.fn(),
   mockGetDuplicateTransactionStats: vi.fn().mockReturnValue({ duplicateCount: 0, newCount: 0 }),
   mockReplaceImportedAccount: vi.fn(),
   mockImportedAccounts: { current: [] as unknown[] },
+  mockAddDuplicateOverrideRule: vi.fn(),
 }))
 
 // Mock the stores
@@ -25,7 +26,7 @@ vi.mock('../../store/useAppStore', () => ({
       replaceImportedAccount: mockReplaceImportedAccount,
       setStep: mockSetStep,
       getDuplicateTransactionStats: mockGetDuplicateTransactionStats,
-      addDuplicateOverrideRule: vi.fn(),
+      addDuplicateOverrideRule: mockAddDuplicateOverrideRule,
       cancelImport: vi.fn(),
     }
     return typeof selector === 'function' ? selector(state as unknown as AppState) : state
@@ -995,6 +996,9 @@ Transfer from Bank B DE12345678901234567890
     const confirmUnlockBtn = screen.getByTestId('confirm-unlock-duplicate-btn')
     fireEvent.click(confirmUnlockBtn)
 
+    // The rule should not be prematurely saved before the import is actually committed
+    expect(mockAddDuplicateOverrideRule).not.toHaveBeenCalled()
+
     // The transaction should now have the relock button (with unlock padlock icon, without redundant text label)
     await waitFor(() => {
       expect(screen.getAllByTitle('Lock').length).toBeGreaterThan(0)
@@ -1035,6 +1039,73 @@ Transfer from Bank B DE12345678901234567890
         ]),
       }),
     )
+    expect(mockAddDuplicateOverrideRule).toHaveBeenCalledWith(
+      expect.objectContaining({
+        descriptionPattern: 'Coffee Shop',
+        amount: -4.5,
+      }),
+    )
+  })
+
+  it('does not save duplicate override rules if the import is canceled or cleared', async () => {
+    mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: { id: string }[]) => {
+      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+      return {
+        duplicateCount: txs.length,
+        newCount: 0,
+        duplicateIds: txs.map((tx) => tx.id),
+      }
+    })
+
+    const { unmount } = render(<TransactionImporter />)
+
+    // Select copy paste method
+    const pasteButton = screen.getByText('Paste')
+    fireEvent.click(pasteButton)
+
+    // Paste data containing duplicates
+    const pasteInput = screen.getByPlaceholderText('Paste here')
+    const samplePaste = `Date\tDescription\tAmount
+2026-04-01\tCoffee Shop\t-4.50
+2026-04-02\tGrocery Store\t-25.00`
+    fireEvent.change(pasteInput, { target: { value: samplePaste } })
+
+    const parseBtn = screen.getByRole('button', { name: 'Parse' })
+    fireEvent.click(parseBtn)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('view-duplicates-button')).toBeInTheDocument()
+    })
+
+    // Open duplicate preview and unlock one
+    fireEvent.click(screen.getByTestId('view-duplicates-button'))
+    await waitFor(() => {
+      expect(screen.getByText('Duplicates')).toBeInTheDocument()
+    })
+
+    const unlockBtns = screen.getAllByTitle('Unlock')
+    fireEvent.click(unlockBtns[0])
+
+    const confirmUnlockBtn = screen.getByTestId('confirm-unlock-duplicate-btn')
+    fireEvent.click(confirmUnlockBtn)
+
+    // Close preview modal
+    fireEvent.click(screen.getByRole('button', { name: /Done/i }))
+
+    // Now click clear import
+    const clearBtn = screen.getByRole('button', { name: /Clear/i })
+    fireEvent.click(clearBtn)
+
+    // Confirm clear all
+    const confirmDeleteBtn = screen.getByRole('button', { name: /Delete/i })
+    fireEvent.click(confirmDeleteBtn)
+
+    // Ensure override rule was NOT saved
+    expect(mockAddDuplicateOverrideRule).not.toHaveBeenCalled()
+
+    // Unmount should also clean up without saving
+    unmount()
+    expect(mockAddDuplicateOverrideRule).not.toHaveBeenCalled()
   })
 })
 

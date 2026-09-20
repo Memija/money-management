@@ -123,4 +123,43 @@ describe('UnlockDuplicateModal', () => {
     fireEvent.click(screen.getByTestId('confirm-unlock-duplicate-btn'))
     expect(onConfirmUnlock).toHaveBeenCalledWith(mockTransaction, false)
   })
+
+  it('renders identical duplicates notice and bulk unlock button when sameDuplicateCount > 1', () => {
+    const onConfirmUnlock = vi.fn()
+    const onClose = vi.fn()
+    render(
+      <UnlockDuplicateModal
+        {...defaultProps}
+        sameDuplicateCount={3}
+        onClose={onClose}
+        onConfirmUnlock={onConfirmUnlock}
+      />,
+    )
+
+    expect(screen.getByTestId('identical-duplicates-notice')).toBeInTheDocument()
+    expect(screen.getByTestId('confirm-unlock-single-btn')).toHaveTextContent('Unlock only this')
+    expect(screen.getByTestId('confirm-unlock-all-btn')).toHaveTextContent('Unlock all 3 identical transactions')
+
+    // Click "Unlock all 3 identical transactions"
+    fireEvent.click(screen.getByTestId('confirm-unlock-all-btn'))
+    expect(onConfirmUnlock).toHaveBeenCalledWith(mockTransaction, true, true)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('allows unlocking only the current transaction when sameDuplicateCount > 1', () => {
+    const onConfirmUnlock = vi.fn()
+    const onClose = vi.fn()
+    render(
+      <UnlockDuplicateModal
+        {...defaultProps}
+        sameDuplicateCount={3}
+        onClose={onClose}
+        onConfirmUnlock={onConfirmUnlock}
+      />,
+    )
+
+    fireEvent.click(screen.getByTestId('confirm-unlock-single-btn'))
+    expect(onConfirmUnlock).toHaveBeenCalledWith(mockTransaction, true)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
 })

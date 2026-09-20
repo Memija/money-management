@@ -155,4 +155,17 @@ describe('TransactionPreviewRow', () => {
     expect(restoredRelockBtn).toBeInTheDocument()
     expect(restoredRelockBtn).not.toBeDisabled()
   })
+
+  it('does not render row-level bulk adjust button', () => {
+    render(
+      <TransactionPreviewRow
+        {...defaultProps}
+        isDuplicate={true}
+        isUnlockedDuplicate={true}
+        isModified={true}
+      />,
+    )
+
+    expect(screen.queryByTestId('row-bulk-adjust-btn-tx-1')).not.toBeInTheDocument()
+  })
 })

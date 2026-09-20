@@ -8,7 +8,7 @@ import {
 import { useFormatters } from '../../hooks/useFormatters'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
-import type { ImportedAccount, ImportMethod } from '../../types'
+import type { ImportedAccount, ImportMethod, RuleModifications, Transaction } from '../../types'
 import { reconcileCrossAccountTransfers } from '../../utils/account-transfers'
 import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal'
 import { TransactionPreviewModal } from '../shared/TransactionPreviewModal'
@@ -42,6 +42,7 @@ const TransactionImporter: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [unlockedDuplicateIds, setUnlockedDuplicateIds] = useState<Set<string>>(new Set())
   const [pendingOverrideRules, setPendingOverrideRules] = useState<Map<string, Transaction>>(new Map())
+  const originalTransactionsRef = React.useRef<Map<string, Transaction>>(new Map())
 
   const {
     transactions,
@@ -66,12 +67,26 @@ const TransactionImporter: React.FC = () => {
     handleClearAll,
   } = useTransactionImport(institutionName, method, t)
 
-  // Reset unlocked duplicates if transactions are cleared
+  const onUpdateTransaction = useCallback(
+    (id: string, updates: Partial<Transaction>) => {
+      handleUpdateTransaction(id, updates)
+    },
+    [handleUpdateTransaction],
+  )
+
+  // Cache original transactions and reset unlocked duplicates if transactions are cleared
   React.useEffect(() => {
     if (!transactions?.length) {
       setUnlockedDuplicateIds(new Set())
+      originalTransactionsRef.current.clear()
+    } else {
+      for (const t of transactions) {
+        if (!originalTransactionsRef.current.has(t.id)) {
+          originalTransactionsRef.current.set(t.id, { ...t })
+        }
+      }
     }
-  }, [transactions?.length])
+  }, [transactions])
 
   const rawDuplicateStats = React.useMemo(
     () => getDuplicateTransactionStats(selectedInstitution?.id ?? 'unknown', transactions || []),
@@ -159,11 +174,22 @@ const TransactionImporter: React.FC = () => {
     return { inflows, outflows }
   }, [transactions, internalTransferStats, duplicateStats.duplicateIds])
 
-  const buildAccount = (): ImportedAccount => {
+  const buildAccount = (ruleIdsByTxId?: Map<string, string>): ImportedAccount => {
     const duplicateIdSet = new Set(duplicateStats.duplicateIds)
     const transactionsToImport = transactions
       .filter((t) => !duplicateIdSet.has(t.id))
-      .map((t) => (unlockedDuplicateIds.has(t.id) ? { ...t, forceImport: true } : t))
+      .map((t) => {
+        if (unlockedDuplicateIds.has(t.id)) {
+          const ruleId = ruleIdsByTxId?.get(t.id)
+          return {
+            ...t,
+            forceImport: true,
+            isDuplicate: true,
+            ...(ruleId ? { importedByRuleId: ruleId } : {}),
+          }
+        }
+        return t
+      })
 
     return {
       institutionId: selectedInstitution?.id ?? 'unknown',
@@ -177,17 +203,52 @@ const TransactionImporter: React.FC = () => {
 
   const commitImport = () => {
     setIsSubmitted(true)
-    pendingOverrideRules.forEach((tx) => {
+    const currentTxMap = new Map((transactions || []).map((t) => [t.id, t]))
+    const ruleIdsByTxId = new Map<string, string>()
+
+    pendingOverrideRules.forEach((origTx, txId) => {
+      const finalTx = currentTxMap.get(txId) || origTx
+      const mods: RuleModifications = {}
+      if (finalTx.description && origTx.description && finalTx.description !== origTx.description) {
+        mods.description = finalTx.description
+      }
+      if (finalTx.amount !== undefined && origTx.amount !== undefined && Math.abs(finalTx.amount - origTx.amount) >= 0.005) {
+        mods.amount = finalTx.amount
+      }
+      if (finalTx.category && origTx.category && finalTx.category !== origTx.category) {
+        mods.category = finalTx.category
+      }
+      if (finalTx.date && origTx.date && finalTx.date !== origTx.date) {
+        mods.date = finalTx.date
+      }
+
+      const sameGroup = (transactions || []).filter((t) => {
+        const tOrig = originalTransactionsRef.current.get(t.id) || t
+        return (
+          tOrig.description.trim().toLowerCase() === origTx.description.trim().toLowerCase() &&
+          Math.abs(tOrig.amount - origTx.amount) < 0.005 &&
+          (unlockedDuplicateIds.has(t.id) || t.id === txId)
+        )
+      })
+
+      const ruleId = `drule_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+      sameGroup.forEach((t) => {
+        ruleIdsByTxId.set(t.id, ruleId)
+      })
+      ruleIdsByTxId.set(txId, ruleId)
+
       addDuplicateOverrideRule?.({
+        id: ruleId,
         institutionId: selectedInstitution?.id,
-        institutionName: selectedInstitution?.name,
-        descriptionPattern: tx.description,
-        amount: tx.amount,
+        institutionName: selectedInstitution?.name ?? institutionName,
+        descriptionPattern: origTx.description,
+        amount: origTx.amount,
         createdAt: new Date().toISOString(),
-        applyCount: 1,
+        applyCount: Math.max(1, sameGroup.length),
+        modifications: Object.keys(mods).length > 0 ? mods : undefined,
       })
     })
-    addImportedAccount(buildAccount())
+    addImportedAccount(buildAccount(ruleIdsByTxId))
   }
 
   const handleConfirmImport = () => {
@@ -209,8 +270,22 @@ const TransactionImporter: React.FC = () => {
     handleClearAll()
     setUnlockedDuplicateIds(new Set())
     setPendingOverrideRules(new Map())
+    originalTransactionsRef.current.clear()
     setShowClearConfirmation(false)
   }, [handleClearAll])
+
+  // Cleanup on unmount if import is not completed/submitted
+  React.useEffect(() => {
+    const origMap = originalTransactionsRef.current
+    return () => {
+      if (!isSubmitted) {
+        handleClearAll()
+        setUnlockedDuplicateIds(new Set())
+        setPendingOverrideRules(new Map())
+        origMap.clear()
+      }
+    }
+  }, [isSubmitted, handleClearAll])
 
   /* ─── render ─── */
   return (
@@ -224,14 +299,24 @@ const TransactionImporter: React.FC = () => {
       <div className={styles['nav-actions-wrapper']}>
         <button
           className={`back-button ${styles['back-button-clean']}`}
-          onClick={() => setStep('institution')}
+          onClick={() => {
+            onClearAll()
+            setStep('institution')
+          }}
           id="back-to-institution"
         >
           <ArrowLeft size={18} />
           <span>{t.back}</span>
         </button>
         {(importedAccounts || []).length > 0 && (
-          <button className={`back-button ${styles['back-button-clean']}`} onClick={() => cancelImport?.()} id="cancel-import">
+          <button
+            className={`back-button ${styles['back-button-clean']}`}
+            onClick={() => {
+              onClearAll()
+              cancelImport?.()
+            }}
+            id="cancel-import"
+          >
             <ArrowLeft size={18} />
             <span>{t.cancel}</span>
           </button>
@@ -270,6 +355,7 @@ const TransactionImporter: React.FC = () => {
           pasteText={pasteText}
           t={t}
           onBack={() => {
+            onClearAll()
             setMethod(null)
             setError(null)
             setFileName(null)
@@ -468,7 +554,13 @@ const TransactionImporter: React.FC = () => {
             <motion.button
               whileHover={{ scale: isAllDuplicates ? 1 : 1.02 }}
               whileTap={{ scale: isAllDuplicates ? 1 : 0.98 }}
-              className={`primary-button ${styles['no-margin-top']} ${isAllDuplicates ? styles['button-disabled'] : ''}`}
+              className={`primary-button ${styles['no-margin-top']} ${
+                isAllDuplicates
+                  ? styles['button-disabled']
+                  : unlockedDuplicateIds.size > 0
+                  ? styles['button-warning-orange']
+                  : styles['button-clean-green']
+              }`}
               onClick={handleConfirmImport}
               id="confirm-import"
               disabled={loading || transactions.length === 0 || isAllDuplicates || isSubmitted}
@@ -496,14 +588,15 @@ const TransactionImporter: React.FC = () => {
         excludedSpaceTransactions={excludedSpaceTransactions}
         initialFilter={previewFilter}
         onRemoveTransaction={handleRemoveTransaction}
-        onUpdateTransaction={handleUpdateTransaction}
+        onUpdateTransaction={onUpdateTransaction}
         onIncludeSpaceTransaction={handleIncludeSpaceTransaction}
         onExcludeSpaceTransaction={handleExcludeSpaceTransaction}
         onIncludeAllSpaceTransactions={handleIncludeAllSpaceTransactions}
         onUnlockDuplicateTransaction={(tx, rememberRule) => {
           setUnlockedDuplicateIds((prev) => new Set(prev).add(tx.id))
           if (rememberRule) {
-            setPendingOverrideRules((prev) => new Map(prev).set(tx.id, tx))
+            const orig = originalTransactionsRef.current.get(tx.id) || tx
+            setPendingOverrideRules((prev) => new Map(prev).set(tx.id, orig))
           }
         }}
         onRelockDuplicateTransaction={(tx) => {

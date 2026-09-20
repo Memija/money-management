@@ -199,7 +199,8 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
         onRemoveTransaction ||
         onToggleSpaceTransferInclude ||
         onUnlockDuplicate ||
-        onRelockDuplicate,
+        onRelockDuplicate ||
+        onResetTransaction,
       ) && (
           <div className={styles['row-actions']}>
             {effectiveIsDuplicate && onUnlockDuplicate && (
@@ -215,7 +216,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
               </button>
             )}
 
-            {isUnlockedDuplicate && isModified && onResetTransaction ? (
+            {isModified && onResetTransaction ? (
               <button
                 type="button"
                 className={styles['reset-tx-btn']}

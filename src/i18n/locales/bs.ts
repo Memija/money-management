@@ -138,6 +138,19 @@ export const bs: TranslationStrings = {
   filterUnlocked: 'Otključano',
   cannotRelockModified: 'Nije moguće ponovo zaključati izmijenjenu transakciju. Vratite na originalne vrijednosti za zaključavanje.',
   resetToOriginal: 'Vrati na originalne vrijednosti',
+  resetTransactionModalTitle: 'Vrati transakcije na izvorno',
+  resetBulkPrompt:
+    'Izmijenili ste {count} transakcija. Želite li vratiti samo ovu transakciju ili sve izmijenjene transakcije grupno na izvorne vrijednosti?',
+  resetSinglePrompt: 'Želite li vratiti ovu transakciju na njene izvorne vrijednosti?',
+  resetOnlyThis: 'Vrati samo ovu',
+  resetAllModifiedCount: 'Vrati sve ({count}) grupno',
+  resetAllModified: 'Vrati sve izmijenjene transakcije',
+  alsoLockAsDuplicate: 'Također zaključaj kao duplikat',
+  resetAndLockSingle: 'Vrati i zaključaj',
+  resetAndLockBulkCount: 'Vrati i zaključaj sve ({count}) grupno',
+  unlockAllIdenticalCount: 'Otključaj svih {count} identičnih transakcija',
+  unlockOnlyThis: 'Otključaj samo ovu',
+  identicalDuplicatesDetected: 'Pronađeno {count} identičnih duplih transakcija.',
   rememberDuplicateRule: 'Zapamti ovo izuzeće za buduće uvoze',
   bulkApplyOffer: 'Primijeni ovu izmjenu na još {count} identičnih transakcija?',
   applyToAll: 'Primijeni na sve',
@@ -164,6 +177,7 @@ export const bs: TranslationStrings = {
   ruleAppliedOnce: 'Primijenjeno 1 put',
   ruleAppliedOnceOn: 'Primijenjeno 1 put • {date}',
   ruleAppliedTimesLast: 'Primijenjeno {count} puta • Posljednje: {date}',
+  ruleModificationsTitle: 'Primijenjene izmjene',
   clearAllRulesConfirmDesc:
     'Jeste li sigurni da želite ukloniti sva pravila za duplikate? Odaberite kako postupiti s transakcijama uvezenim ovim pravilima.',
   anyAmount: 'Bilo koji iznos',
@@ -190,6 +204,12 @@ export const bs: TranslationStrings = {
     'Ukloni sva pravila, ali zadrži {count} uvezenih transakcija na računima.',
   clearAllDuplicateDataOnlyDesc:
     'Trajno obriši {count} transakciju/a uvezenih pravilima, ali zadrži sva pravila.',
+  duplicateTransactionsDetectedTitle: 'Otkrivene duple transakcije',
+  duplicateTransactionsDetectedDesc:
+    'Pronađeno {count} duplih transakcija na vašim računima. Resetovanjem ćete ukloniti duplikate i preračunati saldo na kontrolnoj tabli.',
+  resetDuplicateCalculations: 'Resetuj proračune i ukloni duplikate',
+  duplicatesResetSuccess:
+    'Proračuni uspješno resetovani. Uklonjeno {count} duplih transakcija.',
 
   spaceTransfersExcluded:
     '{count} internih prijenosa između prostora (Spaces) je automatski isključeno radi izbjegavanja dvostrukog računanja.',
@@ -273,7 +293,6 @@ export const bs: TranslationStrings = {
   cumulativeBalance: 'Kumulativno stanje',
   allTransactions: 'Sve transakcije',
   search: 'Pretraži…',
-  allInstitutions: 'Sve institucije',
   sortOrder: 'Podrazumijevano',
   newestFirst: 'Najnovije',
   oldestFirst: 'Najstarije',

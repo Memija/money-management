@@ -163,6 +163,18 @@ export interface TranslationStrings {
   filterUnlocked: string
   cannotRelockModified: string
   resetToOriginal: string
+  resetTransactionModalTitle: string
+  resetBulkPrompt: string
+  resetSinglePrompt: string
+  resetOnlyThis: string
+  resetAllModifiedCount: string
+  resetAllModified: string
+  alsoLockAsDuplicate: string
+  resetAndLockSingle: string
+  resetAndLockBulkCount: string
+  unlockAllIdenticalCount: string
+  unlockOnlyThis: string
+  identicalDuplicatesDetected: string
   rememberDuplicateRule: string
   bulkApplyOffer: string
   applyToAll: string
@@ -187,6 +199,7 @@ export interface TranslationStrings {
   ruleAppliedOnce: string
   ruleAppliedOnceOn: string
   ruleAppliedTimesLast: string
+  ruleModificationsTitle: string
   clearAllRulesConfirmDesc: string
   anyAmount: string
   allInstitutions: string
@@ -206,6 +219,10 @@ export interface TranslationStrings {
   clearAllDuplicateBothDesc: string
   clearAllDuplicateRuleOnlyDesc: string
   clearAllDuplicateDataOnlyDesc: string
+  duplicateTransactionsDetectedTitle: string
+  duplicateTransactionsDetectedDesc: string
+  resetDuplicateCalculations: string
+  duplicatesResetSuccess: string
 
   // Internal & space transfers during import
   spaceTransfersExcluded: string
@@ -277,7 +294,6 @@ export interface TranslationStrings {
   cumulativeBalance: string
   allTransactions: string
   search: string
-  allInstitutions: string
   sortOrder: string
   newestFirst: string
   oldestFirst: string

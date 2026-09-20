@@ -58,6 +58,8 @@ const mockSetCustomKeywords = vi.fn()
 const mockSetStep = vi.fn()
 
 vi.mock('../../store/useAppStore', () => ({
+  countDuplicateTransactionsInAccounts: vi.fn(() => 0),
+  matchesDuplicateOverrideRule: vi.fn(),
   useAppStore: vi.fn((selector) => {
     const state = {
       customKeywords: {},
@@ -67,6 +69,9 @@ vi.mock('../../store/useAppStore', () => ({
       addCustomCategory: vi.fn(),
       updateCustomCategory: vi.fn(),
       deleteCustomCategory: vi.fn(),
+      duplicateOverrideRules: [],
+      importedAccounts: [],
+      resetDuplicateTransactions: vi.fn(() => ({ removedCount: 0 })),
     }
     return typeof selector === 'function' ? selector(state) : state
   }),

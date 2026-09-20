@@ -18,11 +18,13 @@ vi.mock('../../store/useAppStore', () => ({
   useAppStore: vi.fn((selector) => {
     const state = {
       importedAccounts: mockState.importedAccounts,
+      duplicateOverrideRules: [],
       startNewInstitution: mockStartNewInstitution,
       setStep: mockSetStep,
     } as unknown as AppState
     return typeof selector === 'function' ? selector(state) : state
   }),
+  countDuplicateTransactionsInAccounts: vi.fn(() => 0),
 }))
 
 vi.mock('../../hooks/useFormatters', () => ({
@@ -342,5 +344,42 @@ describe('ImportReview', () => {
     expect(screen.queryByTestId('internal-transfers-reconciliation-card')).not.toBeInTheDocument()
     expect(screen.getAllByText(/2 internal transfers/i)).toHaveLength(2)
   })
+
+  it('proceed button is green when no duplicates are imported', () => {
+    render(<ImportReview />)
+    const proceedBtn = screen.getByTestId('proceed-to-dashboard-btn')
+    expect(proceedBtn.className).toContain('primary-button')
+    expect(proceedBtn.className).toContain('button-clean-green')
+    expect(proceedBtn.className).not.toContain('button-warning-orange')
+  })
+
+  it('proceed button becomes orange when duplicate transactions are imported', () => {
+    mockState.importedAccounts = [
+      {
+        institutionId: '1',
+        institutionName: 'Bank A',
+        importedAt: new Date().toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 't1',
+            amount: 1000,
+            type: 'income',
+            date: '2024-01-01',
+            description: 'Salary',
+            currency: 'EUR',
+            institution: 'Bank A',
+            forceImport: true,
+          },
+        ],
+      },
+    ]
+
+    render(<ImportReview />)
+    const proceedBtn = screen.getByTestId('proceed-to-dashboard-btn')
+    expect(proceedBtn.className).toContain('button-warning-orange')
+    expect(proceedBtn.className).not.toContain('button-clean-green')
+  })
 })
+
 

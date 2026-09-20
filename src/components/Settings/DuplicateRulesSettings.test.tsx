@@ -1,12 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { DuplicateOverrideRule } from '../../types/transaction'
 import { DuplicateRulesSettings } from './DuplicateRulesSettings'
 
 const mockRemoveDuplicateOverrideRule = vi.fn()
 const mockClearDuplicateOverrideRules = vi.fn()
 
-let mockDuplicateRules = [
+let mockDuplicateRules: DuplicateOverrideRule[] = [
   {
     id: 'drule_1',
     descriptionPattern: 'Gym Membership',
@@ -28,7 +29,7 @@ vi.mock('../../store/useLanguageStore', () => ({
     const state = {
       locale: 'en',
       t: {
-        duplicateRulesTitle: 'Duplicate Rules & Overrides',
+        duplicateRulesTitle: 'Duplicate Rules and Overrides',
         duplicateRulesDesc: 'Rules automatically learned from duplicate decisions.',
         noDuplicateRules: 'No duplicate override rules yet',
         noDuplicateRulesDesc: 'When you unlock a duplicate transaction, it will appear here.',
@@ -57,6 +58,12 @@ vi.mock('../../store/useLanguageStore', () => ({
         clearAllDuplicateBothDesc: 'Delete all rules and permanently remove {count} transaction(s) imported by them.',
         clearAllDuplicateRuleOnlyDesc: 'Delete all rules, but keep all {count} imported transaction(s) in your accounts.',
         clearAllDuplicateDataOnlyDesc: 'Delete all {count} transaction(s) imported by rules, but keep all rules active.',
+        duplicateTransactionsDetectedTitle: 'Duplicate transactions detected',
+        duplicateTransactionsDetectedDesc:
+          'Found {count} duplicate transaction(s) in your accounts. Resetting will remove duplicates and recalculate your Dashboard balance.',
+        resetDuplicateCalculations: 'Reset Calculations and Remove Duplicates',
+        duplicatesResetSuccess:
+          'Calculations reset successfully. {count} duplicate transaction(s) removed.',
         cancel: 'Cancel',
       },
     }
@@ -191,5 +198,60 @@ describe('DuplicateRulesSettings', () => {
 
     expect(screen.getByText('No duplicate override rules yet')).toBeInTheDocument()
     expect(screen.queryByTestId('clear-all-duplicate-rules-btn')).not.toBeInTheDocument()
+  })
+
+  it('renders exact changes made and apply count when rule has modifications', () => {
+    mockDuplicateRules = [
+      {
+        id: 'drule_mod_1',
+        descriptionPattern: 'ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE',
+        amount: -502.58,
+        institutionId: 'commerzbank',
+        institutionName: 'Commerzbank',
+        createdAt: '2026-09-20T10:00:00.000Z',
+        lastAppliedAt: '2026-09-20T12:00:00.000Z',
+        applyCount: 57,
+        modifications: {
+          amount: 502.58,
+          description: 'ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE ADJUSTED',
+          category: 'Loans',
+          date: '2026-09-20',
+        },
+      },
+    ]
+
+    render(<DuplicateRulesSettings />)
+
+    // Original transaction values shown
+    expect(screen.getByTestId('rule-pattern-drule_mod_1')).toHaveTextContent('ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE')
+    expect(screen.getByTestId('rule-amount-drule_mod_1')).toHaveTextContent('€502.58')
+    expect(screen.getByTestId('rule-applied-drule_mod_1')).toHaveTextContent('Applied 57 times • Last: 2026-09-20')
+
+    // Exact changes applied card
+    expect(screen.getByTestId('rule-modifications-drule_mod_1')).toBeInTheDocument()
+    expect(screen.getByText('Changes applied')).toBeInTheDocument()
+
+    // Amount modification row: shows old amount and new amount
+    const amountMod = screen.getByTestId('rule-mod-amount-drule_mod_1')
+    expect(amountMod).toBeInTheDocument()
+    expect(amountMod).toHaveTextContent('Amount:')
+    expect(amountMod).toHaveTextContent('→')
+    expect(amountMod).toHaveTextContent('€502.58')
+
+    // Description modification row
+    const descMod = screen.getByTestId('rule-mod-desc-drule_mod_1')
+    expect(descMod).toBeInTheDocument()
+    expect(descMod).toHaveTextContent('ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE ADJUSTED')
+
+    // Category and Date modification rows
+    expect(screen.getByTestId('rule-mod-cat-drule_mod_1')).toHaveTextContent('Loans')
+    expect(screen.getByTestId('rule-mod-date-drule_mod_1')).toHaveTextContent('2026-09-20')
+  })
+
+  it('does not render duplicate-cleanup-banner and keeps settings page clean', () => {
+    render(<DuplicateRulesSettings />)
+
+    expect(screen.queryByTestId('duplicate-cleanup-banner')).not.toBeInTheDocument()
+    expect(screen.queryByText('Duplicate transactions detected')).not.toBeInTheDocument()
   })
 })

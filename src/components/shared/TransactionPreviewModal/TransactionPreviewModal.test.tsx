@@ -507,9 +507,66 @@ describe('TransactionPreviewModal (Shared)', () => {
 
     // Verify onUpdateTransaction was called for matching tx-dup-2 with the new description
     expect(onUpdate).toHaveBeenCalledWith('tx-dup-2', { description: 'Gym Membership Updated' })
+    expect(onUnlock).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'tx-dup-2', description: 'Gym Membership Updated' }),
+      true,
+    )
 
     // Banner is dismissed
     expect(screen.queryByTestId('bulk-apply-banner')).not.toBeInTheDocument()
+  })
+
+  it('unlocks ALL identical transactions in bulk even if not in duplicateIds set', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Loan Repayment', amount: -502.58 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Loan Repayment', amount: -502.58 }
+    const tx3 = { ...mockTransactions[0], id: 'tx-dup-3', description: 'Loan Repayment', amount: -502.58 }
+    const onUpdate = vi.fn()
+    const onUnlock = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={[tx1, tx2, tx3]}
+        // Note: tx-dup-2 and tx-dup-3 might be excluded from duplicateIds because a rule matched them
+        duplicateIds={new Set(['tx-dup-1'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1'])}
+        onUpdateTransaction={onUpdate}
+        onUnlockDuplicateTransaction={onUnlock}
+      />,
+    )
+
+    // Initial unlocked count in toolbar is 1
+    const filterUnlockedBtn = screen.getByTestId('filter-unlocked-btn')
+    expect(filterUnlockedBtn).toHaveTextContent('1')
+
+    // Modify tx-dup-1 amount from -502.58 to 502.58
+    const amountInput = screen.getAllByDisplayValue('-502.58')[0]
+    fireEvent.change(amountInput, { target: { value: '502.58' } })
+
+    // Bulk apply banner appears offering to apply to 2 other identical transactions
+    expect(screen.getByTestId('bulk-apply-banner')).toBeInTheDocument()
+    expect(screen.getByText(/Apply this change to 2 other identical transaction/i)).toBeInTheDocument()
+
+    // Click "Apply to all"
+    const applyBtn = screen.getByTestId('apply-bulk-changes-btn')
+    fireEvent.click(applyBtn)
+
+    // Both identical transactions are updated
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-2', expect.objectContaining({ amount: 502.58 }))
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-3', expect.objectContaining({ amount: 502.58 }))
+
+    // BOTH identical transactions are unlocked via onUnlock callback
+    expect(onUnlock).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'tx-dup-2', amount: 502.58 }),
+      true,
+    )
+    expect(onUnlock).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'tx-dup-3', amount: 502.58 }),
+      true,
+    )
+
+    // Unlocked count in toolbar now shows all 3 transactions as unlocked!
+    expect(filterUnlockedBtn).toHaveTextContent('3')
   })
 
   it('offers to apply changes to all other unlocked transactions when an unlocked transaction is modified', () => {
@@ -588,6 +645,386 @@ describe('TransactionPreviewModal (Shared)', () => {
     // Banner is dismissed
     expect(screen.queryByTestId('bulk-apply-banner')).not.toBeInTheDocument()
   })
+
+  it('restores bulk apply offer when modal is closed and reopened with a modified unlocked transaction', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Netflix Subscription', amount: -15 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Netflix Subscription', amount: -15 }
+    const onUpdate = vi.fn()
+
+    const { rerender } = render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1'])}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Modify tx-dup-1 description
+    const input = screen.getByDisplayValue('Netflix Subscription')
+    fireEvent.change(input, { target: { value: 'Netflix Premium 4K' } })
+
+    // Bulk apply banner appears
+    expect(screen.getByTestId('bulk-apply-banner')).toBeInTheDocument()
+
+    // Close the modal
+    rerender(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={false}
+        transactions={[{ ...tx1, description: 'Netflix Premium 4K' }, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1'])}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    expect(screen.queryByTestId('bulk-apply-banner')).not.toBeInTheDocument()
+
+    // Reopen the modal
+    rerender(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[{ ...tx1, description: 'Netflix Premium 4K' }, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1'])}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Banner is restored upon reopening!
+    expect(screen.getByTestId('bulk-apply-banner')).toBeInTheDocument()
+    expect(screen.getByTestId('apply-bulk-changes-btn')).toBeInTheDocument()
+    expect(screen.getByTestId('adjust-unlocked-bulk-btn')).toBeInTheDocument()
+  })
+
+  it('opens adjust modal from banner adjust button and verifies Select All orange style', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Monthly Cloud Storage', amount: -9.99 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Monthly Cloud Storage', amount: -9.99 }
+    const onUpdate = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1'])}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Modify tx-dup-1
+    const input = screen.getByDisplayValue('Monthly Cloud Storage')
+    fireEvent.change(input, { target: { value: 'Google One 2TB' } })
+
+    // Clicking banner adjust button opens adjust modal
+    const bannerAdjustBtn = screen.getByTestId('adjust-unlocked-bulk-btn')
+    fireEvent.click(bannerAdjustBtn)
+    expect(screen.getByText('Adjust Unlocked Transactions in Bulk')).toBeInTheDocument()
+    expect(screen.getByTestId('confirm-custom-adjust-btn')).toBeInTheDocument()
+
+    // Select all / Deselect all button check
+    const selectAllBtn = screen.getByTestId('adjust-select-all-btn')
+    expect(selectAllBtn).toHaveTextContent('Deselect all')
+    expect(selectAllBtn.className).not.toContain('adjust-select-all-btn-orange')
+
+    // Click Deselect all -> button text changes to Select all and turns orange
+    fireEvent.click(selectAllBtn)
+    expect(selectAllBtn).toHaveTextContent('Select all')
+    expect(selectAllBtn.className).toContain('adjust-select-all-btn-orange')
+  })
+
+  it('does not mark target transactions as duplicate in Adjust Unlocked Transactions in Bulk modal', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Web Hosting', amount: -20 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Web Hosting', amount: -20 }
+    const onUpdate = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1'])}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Modify tx-dup-1
+    const input = screen.getByDisplayValue('Web Hosting')
+    fireEvent.change(input, { target: { value: 'Dedicated Server' } })
+
+    // Open Adjust modal
+    const adjustBtn = screen.getByTestId('adjust-unlocked-bulk-btn')
+    fireEvent.click(adjustBtn)
+
+    expect(screen.getByText('Adjust Unlocked Transactions in Bulk')).toBeInTheDocument()
+
+    // The target item should be visible with description and amount, but NO duplicate pill
+    const targetItem = screen.getByTestId('adjust-target-item-tx-dup-2')
+    expect(targetItem).toBeInTheDocument()
+    expect(targetItem).not.toHaveTextContent('Duplicate')
+  })
+
+  it('prompts to reset single or all modified transactions when multiple transactions have been modified', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Item 1', amount: -10 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Item 2', amount: -20 }
+    const onUpdate = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Modify tx-1
+    const input1 = screen.getByDisplayValue('Item 1')
+    fireEvent.change(input1, { target: { value: 'Item 1 Modified' } })
+
+    // Modify tx-2
+    const input2 = screen.getByDisplayValue('Item 2')
+    fireEvent.change(input2, { target: { value: 'Item 2 Modified' } })
+
+    // Click reset button on tx-1
+    const resetBtn1 = screen.getByTestId('reset-tx-btn-tx-1')
+    fireEvent.click(resetBtn1)
+
+    // Confirmation modal should appear offering single or bulk reset
+    expect(screen.getByText('Reset Transactions')).toBeInTheDocument()
+    expect(screen.getByTestId('confirm-reset-single-btn')).toBeInTheDocument()
+    expect(screen.getByTestId('confirm-reset-all-btn')).toHaveTextContent('Reset all (2) in bulk')
+
+    // Click "Reset only this"
+    fireEvent.click(screen.getByTestId('confirm-reset-single-btn'))
+
+    // onUpdate should be called for tx-1 to reset, but tx-2 should not be reset
+    expect(onUpdate).toHaveBeenCalledWith('tx-1', {
+      description: 'Item 1',
+      date: tx1.date,
+      amount: -10,
+      type: 'expense',
+    })
+    expect(onUpdate).not.toHaveBeenCalledWith('tx-2', {
+      description: 'Item 2',
+      date: tx2.date,
+      amount: -20,
+      type: 'expense',
+    })
+  })
+
+  it('resets all modified transactions when choosing Reset All in confirmation modal', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Coffee', amount: -4 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Lunch', amount: -15 }
+    const onUpdate = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Modify tx-1 and tx-2
+    fireEvent.change(screen.getByDisplayValue('Coffee'), { target: { value: 'Espresso' } })
+    fireEvent.change(screen.getByDisplayValue('Lunch'), { target: { value: 'Steak Lunch' } })
+
+    // Click reset on tx-2
+    fireEvent.click(screen.getByTestId('reset-tx-btn-tx-2'))
+
+    // Click "Reset all (2) in bulk"
+    fireEvent.click(screen.getByTestId('confirm-reset-all-btn'))
+
+    expect(onUpdate).toHaveBeenCalledWith('tx-1', {
+      description: 'Coffee',
+      date: tx1.date,
+      amount: -4,
+      type: 'expense',
+    })
+    expect(onUpdate).toHaveBeenCalledWith('tx-2', {
+      description: 'Lunch',
+      date: tx2.date,
+      amount: -15,
+      type: 'expense',
+    })
+  })
+
+  it('allows bulk resetting modified transactions from the banner button', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Gym Membership', amount: -50 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Gym Membership', amount: -50 }
+    const onUpdate = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        onUpdateTransaction={onUpdate}
+      />,
+    )
+
+    // Modify tx-dup-1 and tx-dup-2
+    const inputs = screen.getAllByDisplayValue('Gym Membership')
+    fireEvent.change(inputs[0], { target: { value: 'Gym Membership Premium' } })
+    fireEvent.change(inputs[1], { target: { value: 'Gym Membership VIP' } })
+
+    // Banner shows bulk reset button
+    const bannerResetBtn = screen.getByTestId('bulk-reset-all-banner-btn')
+    expect(bannerResetBtn).toBeInTheDocument()
+
+    // Clicking it opens confirmation modal
+    fireEvent.click(bannerResetBtn)
+    expect(screen.getByText('Reset Transactions')).toBeInTheDocument()
+
+    // Confirm bulk reset
+    fireEvent.click(screen.getByTestId('confirm-reset-all-btn'))
+
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-1', {
+      description: 'Gym Membership',
+      date: tx1.date,
+      amount: -50,
+      type: 'expense',
+    })
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-2', {
+      description: 'Gym Membership',
+      date: tx2.date,
+      amount: -50,
+      type: 'expense',
+    })
+  })
+
+  it('unlocks all identical duplicates when user chooses to unlock all in UnlockDuplicateModal', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Monthly Netflix', amount: -15.99 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Monthly Netflix', amount: -15.99 }
+    const onUnlock = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set()}
+        onUnlockDuplicateTransaction={onUnlock}
+      />,
+    )
+
+    // Click unlock on tx-dup-1
+    fireEvent.click(screen.getByTestId('unlock-duplicate-btn-tx-dup-1'))
+
+    // The modal should detect 2 identical duplicates
+    expect(screen.getByTestId('identical-duplicates-notice')).toBeInTheDocument()
+    const unlockAllBtn = screen.getByTestId('confirm-unlock-all-btn')
+    expect(unlockAllBtn).toBeInTheDocument()
+
+    // Click unlock all
+    fireEvent.click(unlockAllBtn)
+
+    // onUnlock should be called for both tx-dup-1 and tx-dup-2
+    expect(onUnlock).toHaveBeenCalledWith(expect.objectContaining({ id: 'tx-dup-1' }), true)
+    expect(onUnlock).toHaveBeenCalledWith(expect.objectContaining({ id: 'tx-dup-2' }), true)
+  })
+
+  it('resets and locks a modified duplicate when "Also lock as duplicate" is selected', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Monthly Gym', amount: -50 }
+    const onUpdate = vi.fn()
+    const onRelock = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1]}
+        duplicateIds={new Set(['tx-dup-1'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1'])}
+        onUpdateTransaction={onUpdate}
+        onRelockDuplicateTransaction={onRelock}
+      />,
+    )
+
+    // Modify tx-dup-1
+    fireEvent.change(screen.getByDisplayValue('Monthly Gym'), { target: { value: 'Annual Gym' } })
+
+    // Reset button should be visible
+    const resetBtn = screen.getByTestId('reset-tx-btn-tx-dup-1')
+    fireEvent.click(resetBtn)
+
+    // Confirmation modal appears with "Also lock as duplicate" checked by default
+    expect(screen.getByTestId('reset-also-lock-checkbox')).toBeChecked()
+    const confirmBtn = screen.getByTestId('confirm-reset-single-btn')
+    expect(confirmBtn).toHaveTextContent('Reset and lock')
+
+    // Confirm reset and lock
+    fireEvent.click(confirmBtn)
+
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-1', {
+      description: 'Monthly Gym',
+      date: tx1.date,
+      amount: -50,
+      type: 'expense',
+    })
+    expect(onRelock).toHaveBeenCalledWith(expect.objectContaining({ id: 'tx-dup-1' }))
+  })
+
+  it('resets and locks all modified duplicates in bulk when "Also lock as duplicate" is selected', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Coffee', amount: -4 }
+    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Lunch', amount: -15 }
+    const onUpdate = vi.fn()
+    const onRelock = vi.fn()
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        unlockedDuplicateIds={new Set(['tx-dup-1', 'tx-dup-2'])}
+        onUpdateTransaction={onUpdate}
+        onRelockDuplicateTransaction={onRelock}
+      />,
+    )
+
+    // Modify both
+    fireEvent.change(screen.getByDisplayValue('Coffee'), { target: { value: 'Latte' } })
+    fireEvent.change(screen.getByDisplayValue('Lunch'), { target: { value: 'Dinner' } })
+
+    // Click reset on tx-dup-1
+    fireEvent.click(screen.getByTestId('reset-tx-btn-tx-dup-1'))
+
+    // Checkbox is checked
+    expect(screen.getByTestId('reset-also-lock-checkbox')).toBeChecked()
+    const bulkResetBtn = screen.getByTestId('confirm-reset-all-btn')
+    expect(bulkResetBtn).toHaveTextContent('Reset and lock all (2)')
+
+    // Click bulk reset and lock
+    fireEvent.click(bulkResetBtn)
+
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-1', {
+      description: 'Coffee',
+      date: tx1.date,
+      amount: -4,
+      type: 'expense',
+    })
+    expect(onUpdate).toHaveBeenCalledWith('tx-dup-2', {
+      description: 'Lunch',
+      date: tx2.date,
+      amount: -15,
+      type: 'expense',
+    })
+    expect(onRelock).toHaveBeenCalledWith(expect.objectContaining({ id: 'tx-dup-1' }))
+    expect(onRelock).toHaveBeenCalledWith(expect.objectContaining({ id: 'tx-dup-2' }))
+  })
 })
+
 
 

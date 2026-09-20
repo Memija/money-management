@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import type { Country, FinancialInstitution, ImportedAccount } from '../types'
-import { useAppStore } from './useAppStore'
+import type { Country, FinancialInstitution, ImportedAccount, Transaction } from '../types'
+import { countDuplicateTransactionsInAccounts, useAppStore } from './useAppStore'
 
 describe('useAppStore', () => {
   beforeEach(() => {
@@ -473,6 +473,32 @@ describe('useAppStore', () => {
       useAppStore.getState().removeDuplicateOverrideRule('rule-gym')
       expect(useAppStore.getState().duplicateOverrideRules).toHaveLength(0)
 
+      // Add rule and then update with modifications and applyCount
+      useAppStore.getState().addDuplicateOverrideRule({
+        id: 'rule-kredit',
+        descriptionPattern: 'KREDITRATE',
+        amount: -502.58,
+        institutionId: 'commerzbank',
+        institutionName: 'Commerzbank',
+        applyCount: 1,
+      })
+
+      useAppStore.getState().addDuplicateOverrideRule({
+        descriptionPattern: 'KREDITRATE',
+        amount: -502.58,
+        institutionId: 'commerzbank',
+        applyCount: 57,
+        modifications: {
+          amount: 502.58,
+        },
+      })
+
+      const kreditRules = useAppStore.getState().duplicateOverrideRules
+      expect(kreditRules).toHaveLength(1)
+      expect(kreditRules[0].amount).toBe(-502.58) // original preserved
+      expect(kreditRules[0].applyCount).toBe(57) // count updated
+      expect(kreditRules[0].modifications).toEqual({ amount: 502.58 })
+
       // Clear all rules
       useAppStore.setState({
         duplicateOverrideRules: [
@@ -744,6 +770,280 @@ describe('useAppStore', () => {
       const state = useAppStore.getState()
       expect(state.duplicateOverrideRules).toHaveLength(0)
       expect(state.importedAccounts[0].transactions).toHaveLength(1)
+    })
+
+    it('removes modified duplicate transactions to trash and preserves original transactions in place when revoking rule with modifications', () => {
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'commerzbank',
+            institutionName: 'Commerzbank',
+            transactions: [
+              {
+                id: 'tx-orig',
+                date: '2026-09-20',
+                description: 'ANEL O. BILJANA MEMIC KREDITRATE',
+                amount: -502.58,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Commerzbank',
+              },
+              {
+                id: 'tx-mod',
+                date: '2026-09-20',
+                description: 'ANEL O. BILJANA MEMIC KREDITRATE',
+                amount: 502.58,
+                currency: 'EUR',
+                type: 'income',
+                institution: 'Commerzbank',
+                importedByRuleId: 'drule-kredit',
+                isDuplicate: true,
+              },
+            ],
+            importedAt: '2026-09-20T00:00:00Z',
+            importedFingerprints: ['fp-cb'],
+          },
+        ],
+        duplicateOverrideRules: [
+          {
+            id: 'drule-kredit',
+            descriptionPattern: 'ANEL O. BILJANA MEMIC KREDITRATE',
+            amount: -502.58,
+            institutionId: 'commerzbank',
+            institutionName: 'Commerzbank',
+            createdAt: '2026-09-20T00:00:00Z',
+            applyCount: 1,
+            modifications: {
+              amount: 502.58,
+            },
+          },
+        ],
+        trashedTransactions: [],
+      })
+
+      useAppStore.getState().removeDuplicateOverrideRule('drule-kredit', 'both')
+
+      const state = useAppStore.getState()
+      expect(state.duplicateOverrideRules).toHaveLength(0)
+      // Original transaction must remain in place
+      expect(state.importedAccounts[0].transactions).toHaveLength(1)
+      expect(state.importedAccounts[0].transactions[0].id).toBe('tx-orig')
+      // Duplicate modified transaction moved to trash
+      expect(state.trashedTransactions).toHaveLength(1)
+      expect(state.trashedTransactions[0].id).toBe('tx-mod')
+    })
+
+    it('removes 50 duplicate transactions to trash and preserves 50 original transactions in place when revoking duplicate rule', () => {
+      const origTxs: Transaction[] = Array.from({ length: 50 }, (_, i) => ({
+        id: `tx-orig-${i}`,
+        date: `2026-03-${String((i % 28) + 1).padStart(2, '0')}`,
+        description: 'Monthly Salary',
+        amount: 2500,
+        currency: 'EUR',
+        type: 'income',
+        institution: 'Chase',
+      }))
+
+      const modTxs: Transaction[] = Array.from({ length: 50 }, (_, i) => ({
+        id: `tx-mod-${i}`,
+        date: `2026-03-${String((i % 28) + 1).padStart(2, '0')}`,
+        description: 'Monthly Salary',
+        amount: 3000,
+        currency: 'EUR',
+        type: 'income',
+        institution: 'Chase',
+        importedByRuleId: 'rule-salary-mod',
+        isDuplicate: true,
+      }))
+
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            transactions: [...origTxs, ...modTxs],
+            importedAt: '2026-03-01T00:00:00Z',
+            importedFingerprints: ['fp-1'],
+          },
+        ],
+        duplicateOverrideRules: [
+          {
+            id: 'rule-salary-mod',
+            descriptionPattern: 'Monthly Salary',
+            amount: 2500,
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 50,
+            modifications: {
+              amount: 3000,
+            },
+          },
+        ],
+        trashedTransactions: [],
+      })
+
+      expect(useAppStore.getState().importedAccounts[0].transactions).toHaveLength(100)
+
+      useAppStore.getState().removeDuplicateOverrideRule('rule-salary-mod', 'both')
+
+      const state = useAppStore.getState()
+      expect(state.duplicateOverrideRules).toHaveLength(0)
+      // Original 50 transactions remain strictly in place
+      expect(state.importedAccounts[0].transactions).toHaveLength(50)
+      expect(state.importedAccounts[0].transactions.map((t) => t.id)).toEqual(origTxs.map((t) => t.id))
+      // 50 duplicate transactions moved to trash
+      expect(state.trashedTransactions).toHaveLength(50)
+      expect(state.trashedTransactions.map((t) => t.id)).toEqual(modTxs.map((t) => t.id))
+    })
+
+    it('preserves original transaction in place and deletes identical duplicate when revoking allow duplicate rule', () => {
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'commerzbank',
+            institutionName: 'Commerzbank',
+            transactions: [
+              {
+                id: 'tx-orig-1',
+                date: '2026-09-20',
+                description: 'KREDITRATE 502',
+                amount: -502.58,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Commerzbank',
+              },
+              {
+                id: 'tx-dup-1',
+                date: '2026-09-20',
+                description: 'KREDITRATE 502',
+                amount: -502.58,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Commerzbank',
+                importedByRuleId: 'drule-dup',
+              },
+            ],
+            importedAt: '2026-09-20T00:00:00Z',
+            importedFingerprints: ['fp-cb'],
+          },
+        ],
+        duplicateOverrideRules: [
+          {
+            id: 'drule-dup',
+            descriptionPattern: 'KREDITRATE 502',
+            amount: -502.58,
+            institutionId: 'commerzbank',
+            createdAt: '2026-09-20T00:00:00Z',
+            applyCount: 1,
+          },
+        ],
+      })
+
+      useAppStore.getState().removeDuplicateOverrideRule('drule-dup', 'both')
+
+      const state = useAppStore.getState()
+      expect(state.duplicateOverrideRules).toHaveLength(0)
+      expect(state.importedAccounts[0].transactions).toHaveLength(1)
+      expect(state.importedAccounts[0].transactions[0].id).toBe('tx-orig-1')
+    })
+  })
+
+  describe('resetDuplicateTransactions & countDuplicateTransactionsInAccounts', () => {
+    it('accurately counts duplicate transactions including forceImport, orphaned rule IDs, and duplicate content', () => {
+      const accounts: ImportedAccount[] = [
+        {
+          institutionId: 'commerzbank',
+          institutionName: 'Commerzbank',
+          importedAt: '2026-09-20T10:00:00Z',
+          importedFingerprints: ['fp-1'],
+          transactions: [
+            {
+              id: 'tx-1',
+              date: '2026-09-20',
+              description: 'KREDITRATE',
+              amount: -502.58,
+              currency: 'EUR',
+              type: 'expense',
+              institution: 'Commerzbank',
+            },
+            {
+              id: 'tx-2',
+              date: '2026-09-20',
+              description: 'KREDITRATE',
+              amount: 502.58,
+              currency: 'EUR',
+              type: 'income',
+              institution: 'Commerzbank',
+              forceImport: true,
+            },
+            {
+              id: 'tx-3',
+              date: '2026-09-20',
+              description: 'KREDITRATE',
+              amount: -502.58,
+              currency: 'EUR',
+              type: 'expense',
+              institution: 'Commerzbank',
+              importedByRuleId: 'deleted-rule-xyz',
+            },
+          ],
+        },
+      ]
+
+      const count = countDuplicateTransactionsInAccounts(accounts, [])
+      expect(count).toBe(2) // tx-2 (forceImport) and tx-3 (orphaned rule or duplicate content)
+    })
+
+    it('resets duplicate transactions and recalculates accounts, keeping original transactions', () => {
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'commerzbank',
+            institutionName: 'Commerzbank',
+            importedAt: '2026-09-20T10:00:00Z',
+            importedFingerprints: ['fp-1'],
+            transactions: [
+              {
+                id: 'tx-original',
+                date: '2026-09-20',
+                description: 'KREDITRATE',
+                amount: -502.58,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Commerzbank',
+              },
+              {
+                id: 'tx-duplicate-forced',
+                date: '2026-09-20',
+                description: 'KREDITRATE',
+                amount: 502.58,
+                currency: 'EUR',
+                type: 'income',
+                institution: 'Commerzbank',
+                forceImport: true,
+              },
+              {
+                id: 'tx-duplicate-identical',
+                date: '2026-09-20',
+                description: 'KREDITRATE',
+                amount: -502.58,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Commerzbank',
+              },
+            ],
+          },
+        ],
+        duplicateOverrideRules: [],
+      })
+
+      const result = useAppStore.getState().resetDuplicateTransactions()
+      expect(result.removedCount).toBe(2)
+
+      const remaining = useAppStore.getState().importedAccounts[0].transactions
+      expect(remaining).toHaveLength(1)
+      expect(remaining[0].id).toBe('tx-original')
     })
   })
 })

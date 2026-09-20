@@ -11,7 +11,12 @@ export interface UnlockDuplicateModalProps {
   isOpen: boolean
   transaction: Transaction | null
   onClose: () => void
-  onConfirmUnlock: (transaction: Transaction, rememberRule?: boolean) => void
+  onConfirmUnlock: (
+    transaction: Transaction,
+    rememberRule?: boolean,
+    unlockAllIdentical?: boolean,
+  ) => void
+  sameDuplicateCount?: number
   formatCurrency?: (amount: number) => string
   formatDate?: (date: string) => string
 }
@@ -21,6 +26,7 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
   transaction,
   onClose,
   onConfirmUnlock,
+  sameDuplicateCount = 0,
   formatCurrency = (amt) => String(amt),
   formatDate = (date) => date,
 }) => {
@@ -29,12 +35,17 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
 
   if (!transaction) return null
 
-  const handleConfirm = () => {
-    onConfirmUnlock(transaction, rememberRule)
+  const handleConfirm = (unlockAll = false) => {
+    if (unlockAll) {
+      onConfirmUnlock(transaction, rememberRule, true)
+    } else {
+      onConfirmUnlock(transaction, rememberRule)
+    }
     onClose()
   }
 
   const isIncome = transaction.type === 'income' || transaction.amount > 0
+  const hasMultipleIdentical = Boolean(sameDuplicateCount && sameDuplicateCount > 1)
 
   return (
     <Modal
@@ -43,7 +54,7 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
       title={t.unlockDuplicateTitle || 'Unlock Duplicate Transaction'}
       maxWidth="480px"
       footer={
-        <>
+        <div className={styles.modalFooterActions}>
           <button
             type="button"
             className={`secondary-button ${styles.cancelButton}`}
@@ -53,22 +64,71 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
           >
             {t.duplicateImportCancel || 'Cancel'}
           </button>
-          <button
-            type="button"
-            className={styles.unlockButton}
-            onClick={handleConfirm}
-            id="confirm-unlock-duplicate-btn"
-            data-testid="confirm-unlock-duplicate-btn"
-            title={t.unlockDuplicateConfirm || 'Unlock & Edit'}
-            aria-label={t.unlockDuplicateConfirm || 'Unlock & Edit'}
-          >
-            <Unlock size={15} aria-hidden="true" />
-            <span>{t.unlockDuplicateConfirm || 'Unlock & Edit'}</span>
-          </button>
-        </>
+          {hasMultipleIdentical ? (
+            <>
+              <button
+                type="button"
+                className={`secondary-button ${styles.unlockSingleButton}`}
+                onClick={() => handleConfirm(false)}
+                id="confirm-unlock-duplicate-btn"
+                data-testid="confirm-unlock-single-btn"
+                title={t.unlockOnlyThis || 'Unlock only this'}
+                aria-label={t.unlockOnlyThis || 'Unlock only this'}
+              >
+                <span>{t.unlockOnlyThis || 'Unlock only this'}</span>
+              </button>
+              <button
+                type="button"
+                className={styles.unlockButton}
+                onClick={() => handleConfirm(true)}
+                id="confirm-unlock-all-btn"
+                data-testid="confirm-unlock-all-btn"
+                title={(t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions').replace(
+                  '{count}',
+                  String(sameDuplicateCount),
+                )}
+                aria-label={(t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions').replace(
+                  '{count}',
+                  String(sameDuplicateCount),
+                )}
+              >
+                <Unlock size={15} aria-hidden="true" />
+                <span>
+                  {(t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions').replace(
+                    '{count}',
+                    String(sameDuplicateCount),
+                  )}
+                </span>
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className={styles.unlockButton}
+              onClick={() => handleConfirm(false)}
+              id="confirm-unlock-duplicate-btn"
+              data-testid="confirm-unlock-duplicate-btn"
+              title={t.unlockDuplicateConfirm || 'Unlock & Edit'}
+              aria-label={t.unlockDuplicateConfirm || 'Unlock & Edit'}
+            >
+              <Unlock size={15} aria-hidden="true" />
+              <span>{t.unlockDuplicateConfirm || 'Unlock & Edit'}</span>
+            </button>
+          )}
+        </div>
       }
     >
       <div className={styles.contentContainer}>
+        {hasMultipleIdentical && (
+          <div className={styles.identicalNotice} data-testid="identical-duplicates-notice">
+            <span>
+              {(t.identicalDuplicatesDetected || 'Found {count} identical duplicate transactions.').replace(
+                '{count}',
+                String(sameDuplicateCount),
+              )}
+            </span>
+          </div>
+        )}
         <div className={styles.headerRow}>
           <div className={styles.iconContainer} aria-hidden="true">
             <AlertTriangle size={24} />

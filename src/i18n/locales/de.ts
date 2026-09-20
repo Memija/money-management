@@ -138,6 +138,19 @@ export const de: TranslationStrings = {
   filterUnlocked: 'Entsperrt',
   cannotRelockModified: 'Geänderte Buchung kann nicht gesperrt werden. Auf Originalwerte zurücksetzen, um zu sperren.',
   resetToOriginal: 'Auf Originalwerte zurücksetzen',
+  resetTransactionModalTitle: 'Transaktionen zurücksetzen',
+  resetBulkPrompt:
+    'Sie haben {count} Transaktionen geändert. Möchten Sie nur diese Transaktion zurücksetzen oder alle geänderten Transaktionen auf ihre Originalwerte zurücksetzen?',
+  resetSinglePrompt: 'Möchten Sie diese Transaktion auf ihre ursprünglichen Werte zurücksetzen?',
+  resetOnlyThis: 'Nur diese zurücksetzen',
+  resetAllModifiedCount: 'Alle ({count}) zurücksetzen',
+  resetAllModified: 'Alle geänderten Transaktionen zurücksetzen',
+  alsoLockAsDuplicate: 'Auch als Duplikat sperren',
+  resetAndLockSingle: 'Zurücksetzen und sperren',
+  resetAndLockBulkCount: 'Alle ({count}) zurücksetzen und sperren',
+  unlockAllIdenticalCount: 'Alle {count} identischen Transaktionen entsperren',
+  unlockOnlyThis: 'Nur diese entsperren',
+  identicalDuplicatesDetected: '{count} identische Duplikat-Transaktionen gefunden.',
   rememberDuplicateRule: 'Diese Ausnahme für künftige Importe merken',
   bulkApplyOffer: 'Diese Änderung auf {count} weitere identische Buchung(en) anwenden?',
   applyToAll: 'Auf alle anwenden',
@@ -152,7 +165,7 @@ export const de: TranslationStrings = {
   targetTransactionsLabel: 'Zielbuchungen',
   applyToSelectedCount: 'Auf {count} ausgewählte anwenden',
   duplicateRulesTab: 'Duplikat-Regeln',
-  duplicateRulesTitle: 'Duplikat-Regeln & Ausnahmen',
+  duplicateRulesTitle: 'Duplikat-Regeln und Ausnahmen',
   duplicateRulesDesc:
     'Regeln, die automatisch aus Ihren Freigaben doppelter Buchungen gelernt wurden. Passende Buchungen werden bei zukünftigen Importen nicht mehr als Duplikate markiert.',
   noDuplicateRules: 'Noch keine Duplikat-Ausnahmeregeln',
@@ -164,6 +177,7 @@ export const de: TranslationStrings = {
   ruleAppliedOnce: '1-mal angewendet',
   ruleAppliedOnceOn: '1-mal angewendet • {date}',
   ruleAppliedTimesLast: '{count}-mal angewendet • Zuletzt: {date}',
+  ruleModificationsTitle: 'Angewendete Änderungen',
   clearAllRulesConfirmDesc:
     'Möchten Sie wirklich alle Duplikat-Regeln entfernen? Wählen Sie aus, wie mit den durch diese Regeln importierten Buchungen verfahren werden soll.',
   anyAmount: 'Beliebiger Betrag',
@@ -181,7 +195,7 @@ export const de: TranslationStrings = {
   deleteDuplicateDataOnly: 'Nur importierte Daten löschen',
   deleteDuplicateDataOnlyDesc:
     'Alle {count} durch diese Regel importierten Buchung(en) löschen, die Regel für künftige Importe jedoch beibehalten.',
-  deleteDuplicateBothBtn: 'Regel & Daten löschen',
+  deleteDuplicateBothBtn: 'Regel und Daten löschen',
   deleteDuplicateRuleOnlyBtn: 'Nur Regel löschen',
   deleteDuplicateDataOnlyBtn: 'Nur importierte Daten löschen',
   clearAllDuplicateBothDesc:
@@ -190,6 +204,12 @@ export const de: TranslationStrings = {
     'Alle Regeln löschen, aber alle {count} importierten Buchung(en) behalten.',
   clearAllDuplicateDataOnlyDesc:
     'Alle {count} importierten Buchung(en) löschen, alle Regeln jedoch beibehalten.',
+  duplicateTransactionsDetectedTitle: 'Duplizierte Transaktionen erkannt',
+  duplicateTransactionsDetectedDesc:
+    '{count} duplizierte Transaktion(en) in Ihren Konten gefunden. Durch das Zurücksetzen werden Duplikate entfernt und Ihr Dashboard-Saldo neu berechnet.',
+  resetDuplicateCalculations: 'Berechnungen zurücksetzen und Duplikate entfernen',
+  duplicatesResetSuccess:
+    'Berechnungen erfolgreich zurückgesetzt. {count} duplizierte Transaktion(en) entfernt.',
 
   spaceTransfersExcluded:
     '{count} interne Space-Umbuchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
@@ -273,7 +293,6 @@ export const de: TranslationStrings = {
   cumulativeBalance: 'Kumulierter Saldo',
   allTransactions: 'Alle Transaktionen',
   search: 'Suchen…',
-  allInstitutions: 'Alle Institute',
   sortOrder: 'Standard',
   newestFirst: 'Neueste zuerst',
   oldestFirst: 'Älteste zuerst',

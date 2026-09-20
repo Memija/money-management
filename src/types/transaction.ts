@@ -19,6 +19,17 @@ export interface Transaction {
   forceImport?: boolean
   /** ID of the duplicate override rule that permitted importing this transaction. */
   importedByRuleId?: string
+  /** True if this transaction was imported as a duplicate override. */
+  isDuplicate?: boolean
+  /** Timestamp if this transaction was moved to trash. */
+  deletedAt?: string
+}
+
+export interface RuleModifications {
+  description?: string
+  amount?: number
+  category?: string
+  date?: string
 }
 
 export interface DuplicateOverrideRule {
@@ -37,6 +48,8 @@ export interface DuplicateOverrideRule {
   lastAppliedAt?: string
   /** Total number of times this rule was applied. */
   applyCount: number
+  /** Modifications applied to matching transactions (e.g. adjusted amount, category, description). */
+  modifications?: RuleModifications
 }
 
 export type DuplicateDeleteMode = 'both' | 'rule_only' | 'data_only'

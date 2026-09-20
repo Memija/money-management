@@ -138,6 +138,19 @@ export const en: TranslationStrings = {
   filterUnlocked: 'Unlocked',
   cannotRelockModified: 'Cannot relock modified transaction. Reset to original values to relock.',
   resetToOriginal: 'Reset to original values',
+  resetTransactionModalTitle: 'Reset Transactions',
+  resetBulkPrompt:
+    'You have modified {count} transactions. Would you like to reset only this transaction or reset all modified transactions in bulk back to their original values?',
+  resetSinglePrompt: 'Would you like to reset this transaction back to its original values?',
+  resetOnlyThis: 'Reset only this',
+  resetAllModifiedCount: 'Reset all ({count}) in bulk',
+  resetAllModified: 'Reset all modified transactions',
+  alsoLockAsDuplicate: 'Also lock as duplicate',
+  resetAndLockSingle: 'Reset & Lock',
+  resetAndLockBulkCount: 'Reset & lock all ({count}) in bulk',
+  unlockAllIdenticalCount: 'Unlock all {count} identical transactions',
+  unlockOnlyThis: 'Unlock only this',
+  identicalDuplicatesDetected: 'Found {count} identical duplicate transactions.',
   rememberDuplicateRule: 'Remember this override for future imports',
   bulkApplyOffer: 'Apply this change to {count} other identical transaction(s)?',
   applyToAll: 'Apply to all',
@@ -152,7 +165,7 @@ export const en: TranslationStrings = {
   targetTransactionsLabel: 'Target transactions',
   applyToSelectedCount: 'Apply to {count} selected',
   duplicateRulesTab: 'Duplicate Rules',
-  duplicateRulesTitle: 'Duplicate Rules & Overrides',
+  duplicateRulesTitle: 'Duplicate Rules and Overrides',
   duplicateRulesDesc:
     'Rules automatically learned from your duplicate unlock decisions. Transactions matching these rules will not be flagged as duplicates on future imports.',
   noDuplicateRules: 'No duplicate override rules yet',
@@ -164,6 +177,7 @@ export const en: TranslationStrings = {
   ruleAppliedOnce: 'Applied 1 time',
   ruleAppliedOnceOn: 'Applied 1 time • {date}',
   ruleAppliedTimesLast: 'Applied {count} times • Last: {date}',
+  ruleModificationsTitle: 'Changes applied',
   clearAllRulesConfirmDesc:
     'Are you sure you want to remove all duplicate override rules? Choose how to handle transactions that were imported by these rules.',
   anyAmount: 'Any amount',
@@ -190,6 +204,11 @@ export const en: TranslationStrings = {
     'Delete all rules, but keep all {count} imported transaction(s) in your accounts.',
   clearAllDuplicateDataOnlyDesc:
     'Delete all {count} transaction(s) imported by rules, but keep all rules active.',
+  duplicateTransactionsDetectedTitle: 'Duplicate transactions detected',
+  duplicateTransactionsDetectedDesc:
+    'Found {count} duplicate transaction(s) in your accounts. Resetting will remove duplicates and recalculate your Dashboard balance.',
+  resetDuplicateCalculations: 'Reset Calculations and Remove Duplicates',
+  duplicatesResetSuccess: 'Calculations reset successfully. {count} duplicate transaction(s) removed.',
 
   spaceTransfersExcluded:
     '{count} internal space transfers were automatically excluded to prevent double counting.',
@@ -273,7 +292,6 @@ export const en: TranslationStrings = {
   cumulativeBalance: 'Cumulative Balance',
   allTransactions: 'All Transactions',
   search: 'Search…',
-  allInstitutions: 'All Institutions',
   sortOrder: 'Default',
   newestFirst: 'Newest First',
   oldestFirst: 'Oldest First',

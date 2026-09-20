@@ -140,6 +140,19 @@ export const sr: TranslationStrings = {
   filterUnlocked: 'Откључано',
   cannotRelockModified: 'Није могуће поново закључати измењену трансакцију. Вратите на оригиналне вредности за закључавање.',
   resetToOriginal: 'Врати на оригиналне вредности',
+  resetTransactionModalTitle: 'Врати трансакције на изворно',
+  resetBulkPrompt:
+    'Изменили сте {count} трансакција. Желите ли да вратите само ову трансакцију или све измењене трансакције групно на изворне вредности?',
+  resetSinglePrompt: 'Желите ли да вратите ову трансакцију на њене изворне вредности?',
+  resetOnlyThis: 'Врати само ову',
+  resetAllModifiedCount: 'Врати све ({count}) групно',
+  resetAllModified: 'Врати све измењене трансакције',
+  alsoLockAsDuplicate: 'Такође закључај као дупликат',
+  resetAndLockSingle: 'Врати и закључај',
+  resetAndLockBulkCount: 'Врати и закључај све ({count}) групно',
+  unlockAllIdenticalCount: 'Откључај свих {count} идентичних трансакција',
+  unlockOnlyThis: 'Откључај само ову',
+  identicalDuplicatesDetected: 'Пронађено {count} идентичних дуплих трансакција.',
   rememberDuplicateRule: 'Запамти ово изузеће за будуће увозе',
   bulkApplyOffer: 'Примени ову измену на још {count} идентичних трансакција?',
   applyToAll: 'Примени на све',
@@ -166,6 +179,7 @@ export const sr: TranslationStrings = {
   ruleAppliedOnce: 'Примењено 1 пут',
   ruleAppliedOnceOn: 'Примењено 1 пут • {date}',
   ruleAppliedTimesLast: 'Примењено {count} пута • Последње: {date}',
+  ruleModificationsTitle: 'Примењене измене',
   clearAllRulesConfirmDesc:
     'Да ли сте сигурни да желите да уклоните сва правила за дупликате? Изаберите како поступити са трансакцијама увезеним овим правилима.',
   anyAmount: 'Било који износ',
@@ -192,6 +206,12 @@ export const sr: TranslationStrings = {
     'Уклони сва правила, али задржи {count} увезених трансакција на рачунима.',
   clearAllDuplicateDataOnlyDesc:
     'Трајно обриши {count} трансакцију/а увезених правилима, али задржи сва правила.',
+  duplicateTransactionsDetectedTitle: 'Откривене дупле трансакције',
+  duplicateTransactionsDetectedDesc:
+    'Пронађено {count} дуплих трансакција на вашим рачунима. Ресетовањем ћете уклонити дупликате и прерачунати салдо на контролној табли.',
+  resetDuplicateCalculations: 'Ресетуј прорачуне и уклони дупликате',
+  duplicatesResetSuccess:
+    'Прорачуни успешно ресетовани. Уклоњено {count} дуплих трансакција.',
 
   spaceTransfersExcluded:
     '{count} интерних преноса између простора (Spaces) је аутоматски искључено ради избегавања двоструког рачунања.',
@@ -275,7 +295,6 @@ export const sr: TranslationStrings = {
   cumulativeBalance: 'Кумулативно стање',
   allTransactions: 'Све трансакције',
   search: 'Претражи…',
-  allInstitutions: 'Све институције',
   sortOrder: 'Подразумевано',
   newestFirst: 'Најновије',
   oldestFirst: 'Најстарије',

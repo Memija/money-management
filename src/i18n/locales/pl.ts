@@ -138,6 +138,19 @@ export const pl: TranslationStrings = {
   filterUnlocked: 'Odblokowane',
   cannotRelockModified: 'Nie można zablokować zmodyfikowanej transakcji. Przywróć wartości początkowe, aby zablokować.',
   resetToOriginal: 'Przywróć wartości początkowe',
+  resetTransactionModalTitle: 'Przywróć transakcje',
+  resetBulkPrompt:
+    'Zmodyfikowano {count} transakcji. Czy chcesz przywrócić tylko tę transakcję, czy wszystkie zmodyfikowane transakcje zbiorczo do wartości początkowych?',
+  resetSinglePrompt: 'Czy chcesz przywrócić tę transakcję do wartości początkowych?',
+  resetOnlyThis: 'Przywróć tylko tę',
+  resetAllModifiedCount: 'Przywróć wszystkie ({count}) zbiorczo',
+  resetAllModified: 'Przywróć wszystkie zmodyfikowane transakcje',
+  alsoLockAsDuplicate: 'Zablokuj również jako duplikat',
+  resetAndLockSingle: 'Przywróć i zablokuj',
+  resetAndLockBulkCount: 'Przywróć i zablokuj wszystkie ({count}) zbiorczo',
+  unlockAllIdenticalCount: 'Odblokuj wszystkie {count} identyczne transakcje',
+  unlockOnlyThis: 'Odblokuj tylko tę',
+  identicalDuplicatesDetected: 'Znaleziono {count} identyczne transakcje zduplikowane.',
   rememberDuplicateRule: 'Zapamiętaj ten wyjątek dla przyszłych importów',
   bulkApplyOffer: 'Zastosować tę zmianę do {count} innych identycznych transakcji?',
   applyToAll: 'Zastosuj do wszystkich',
@@ -164,6 +177,7 @@ export const pl: TranslationStrings = {
   ruleAppliedOnce: 'Zastosowano 1 raz',
   ruleAppliedOnceOn: 'Zastosowano 1 raz • {date}',
   ruleAppliedTimesLast: 'Zastosowano {count} razy • Ostatnio: {date}',
+  ruleModificationsTitle: 'Zastosowane zmiany',
   clearAllRulesConfirmDesc:
     'Czy na pewno chcesz usunąć wszystkie reguły duplikatów? Wybierz, co zrobić z transakcjami zaimportowanymi przez te reguły.',
   anyAmount: 'Dowolna kwota',
@@ -190,6 +204,12 @@ export const pl: TranslationStrings = {
     'Usuń wszystkie reguły, ale zachowaj {count} zaimportowanych transakcji na kontach.',
   clearAllDuplicateDataOnlyDesc:
     'Usuń wszystkie {count} transakcji zaimportowanych przez reguły, zachowując reguły aktywne.',
+  duplicateTransactionsDetectedTitle: 'Wykryto zduplikowane transakcje',
+  duplicateTransactionsDetectedDesc:
+    'Znaleziono {count} zduplikowanych transakcji na Twoich kontach. Zresetowanie usunie duplikaty i przeliczy saldo w panelu głównym.',
+  resetDuplicateCalculations: 'Zresetuj obliczenia i usuń duplikaty',
+  duplicatesResetSuccess:
+    'Obliczenia zostały pomyślnie zresetowane. Usunięto {count} zduplikowanych transakcji.',
 
   spaceTransfersExcluded:
     '{count} wewnętrznych transferów między przestrzeniami (Spaces) zostało automatycznie wykluczonych, aby uniknąć podwójnego liczenia.',
@@ -273,7 +293,6 @@ export const pl: TranslationStrings = {
   cumulativeBalance: 'Saldo Skumulowane',
   allTransactions: 'Wszystkie transakcje',
   search: 'Szukaj…',
-  allInstitutions: 'Wszystkie instytucje',
   sortOrder: 'Domyślne',
   newestFirst: 'Najnowsze',
   oldestFirst: 'Najstarsze',

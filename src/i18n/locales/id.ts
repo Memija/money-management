@@ -137,6 +137,19 @@ export const id: TranslationStrings = {
   filterUnlocked: 'Terbuka',
   cannotRelockModified: 'Tidak dapat mengunci kembali transaksi yang dimodifikasi. Kembalikan ke nilai asli untuk mengunci.',
   resetToOriginal: 'Kembalikan ke nilai asli',
+  resetTransactionModalTitle: 'Atur Ulang Transaksi',
+  resetBulkPrompt:
+    'Anda telah mengubah {count} transaksi. Apakah Anda ingin mengatur ulang transaksi ini saja atau mengatur ulang semua transaksi yang diubah secara massal ke nilai awal?',
+  resetSinglePrompt: 'Apakah Anda ingin mereset transaksi ini kembali ke nilai aslinya?',
+  resetOnlyThis: 'Atur ulang ini saja',
+  resetAllModifiedCount: 'Atur ulang semua ({count}) secara massal',
+  resetAllModified: 'Atur ulang semua transaksi yang diubah',
+  alsoLockAsDuplicate: 'Kunci juga sebagai duplikat',
+  resetAndLockSingle: 'Reset dan Kunci',
+  resetAndLockBulkCount: 'Reset dan kunci semua ({count}) secara massal',
+  unlockAllIdenticalCount: 'Buka kunci semua {count} transaksi yang identik',
+  unlockOnlyThis: 'Buka kunci ini saja',
+  identicalDuplicatesDetected: 'Ditemukan {count} transaksi duplikat yang identik.',
   rememberDuplicateRule: 'Ingat pengecualian ini untuk impor berikutnya',
   bulkApplyOffer: 'Terapkan perubahan ini ke {count} transaksi serupa lainnya?',
   applyToAll: 'Terapkan ke semua',
@@ -151,7 +164,7 @@ export const id: TranslationStrings = {
   targetTransactionsLabel: 'Transaksi target',
   applyToSelectedCount: 'Terapkan ke {count} yang dipilih',
   duplicateRulesTab: 'Aturan Duplikat',
-  duplicateRulesTitle: 'Aturan & Pengecualian Duplikat',
+  duplicateRulesTitle: 'Aturan dan Pengecualian Duplikat',
   duplicateRulesDesc:
     'Aturan yang dipelajari otomatis dari keputusan membuka kunci duplikat. Transaksi yang cocok tidak akan ditandai sebagai duplikat pada impor mendatang.',
   noDuplicateRules: 'Belum ada aturan pengecualian duplikat',
@@ -163,6 +176,7 @@ export const id: TranslationStrings = {
   ruleAppliedOnce: 'Diterapkan 1 kali',
   ruleAppliedOnceOn: 'Diterapkan 1 kali • {date}',
   ruleAppliedTimesLast: 'Diterapkan {count} kali • Terakhir: {date}',
+  ruleModificationsTitle: 'Perubahan yang diterapkan',
   clearAllRulesConfirmDesc:
     'Apakah Anda yakin ingin menghapus semua aturan duplikat? Pilih tindakan untuk transaksi yang diimpor oleh aturan tersebut.',
   anyAmount: 'Jumlah berapa pun',
@@ -171,7 +185,7 @@ export const id: TranslationStrings = {
   clearAllRules: 'Hapus semua aturan',
   revokeRuleConfirmTitle: 'Cabut Aturan Duplikat',
   deleteRuleTransactionsOption: 'Hapus juga {count} transaksi yang diimpor oleh aturan ini',
-  deleteDuplicateBoth: 'Hapus aturan & data terimpor',
+  deleteDuplicateBoth: 'Hapus aturan dan data terimpor',
   deleteDuplicateBothDesc:
     'Cabut aturan dan hapus permanen {count} transaksi yang diimpor olehnya.',
   deleteDuplicateRuleOnly: 'Hapus aturan saja',
@@ -180,7 +194,7 @@ export const id: TranslationStrings = {
   deleteDuplicateDataOnly: 'Hapus data terimpor saja',
   deleteDuplicateDataOnlyDesc:
     'Hapus permanen {count} transaksi yang diimpor aturan ini, tetapi pertahankan aturan untuk impor mendatang.',
-  deleteDuplicateBothBtn: 'Hapus Aturan & Data',
+  deleteDuplicateBothBtn: 'Hapus Aturan dan Data',
   deleteDuplicateRuleOnlyBtn: 'Hapus Aturan Saja',
   deleteDuplicateDataOnlyBtn: 'Hapus Data Terimpor Saja',
   clearAllDuplicateBothDesc:
@@ -189,6 +203,12 @@ export const id: TranslationStrings = {
     'Hapus semua aturan, tetapi pertahankan {count} transaksi terimpor di akun Anda.',
   clearAllDuplicateDataOnlyDesc:
     'Hapus semua {count} transaksi terimpor oleh aturan, tetapi pertahankan semua aturan.',
+  duplicateTransactionsDetectedTitle: 'Transaksi duplikat terdeteksi',
+  duplicateTransactionsDetectedDesc:
+    'Ditemukan {count} transaksi duplikat di akun Anda. Mengatur ulang akan menghapus duplikat dan menghitung ulang saldo Dashboard Anda.',
+  resetDuplicateCalculations: 'Atur Ulang Perhitungan dan Hapus Duplikat',
+  duplicatesResetSuccess:
+    'Perhitungan berhasil diatur ulang. {count} transaksi duplikat dihapus.',
 
   spaceTransfersExcluded:
     '{count} transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',
@@ -272,7 +292,6 @@ export const id: TranslationStrings = {
   cumulativeBalance: 'Saldo Kumulatif',
   allTransactions: 'Semua Transaksi',
   search: 'Cari…',
-  allInstitutions: 'Semua Institusi',
   sortOrder: 'Default',
   newestFirst: 'Terbaru',
   oldestFirst: 'Terlama',

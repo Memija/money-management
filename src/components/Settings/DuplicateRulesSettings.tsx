@@ -1,10 +1,13 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { AlertTriangle, Building2, CopyCheck, Repeat, Sparkles, Trash2 } from 'lucide-react'
+import { AlertTriangle, Building2, CopyCheck, Pencil, Repeat, Sparkles, Trash2 } from 'lucide-react'
 
 import { findInstitution } from '../../data/institutions'
 import { useFormatters } from '../../hooks/useFormatters'
-import { matchesDuplicateOverrideRule, useAppStore } from '../../store/useAppStore'
+import {
+  matchesDuplicateOverrideRule,
+  useAppStore,
+} from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import type { DuplicateDeleteMode, DuplicateOverrideRule } from '../../types'
 import { Modal } from '../shared/Modal'
@@ -14,8 +17,10 @@ import styles from './DuplicateRulesSettings.module.css'
 export const DuplicateRulesSettings: React.FC = () => {
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatDate } = useFormatters()
-  const duplicateOverrideRules = useAppStore((s) => s.duplicateOverrideRules) || []
-  const importedAccounts = useAppStore((s) => s.importedAccounts) || []
+  const rawRules = useAppStore((s) => s.duplicateOverrideRules)
+  const rawAccounts = useAppStore((s) => s.importedAccounts)
+  const duplicateOverrideRules = useMemo(() => rawRules ?? [], [rawRules])
+  const importedAccounts = useMemo(() => rawAccounts ?? [], [rawAccounts])
   const removeDuplicateOverrideRule = useAppStore((s) => s.removeDuplicateOverrideRule)
   const clearDuplicateOverrideRules = useAppStore((s) => s.clearDuplicateOverrideRules)
 
@@ -63,7 +68,7 @@ export const DuplicateRulesSettings: React.FC = () => {
   const handleRequestRevoke = (rule: DuplicateOverrideRule) => {
     const count = getRuleImportedTransactionCount(rule)
     setRuleToRevoke({ rule, count })
-    setSingleDeleteMode(count > 0 ? 'both' : 'rule_only')
+    setSingleDeleteMode('both')
   }
 
   const handleConfirmRevoke = () => {
@@ -73,9 +78,8 @@ export const DuplicateRulesSettings: React.FC = () => {
   }
 
   const handleRequestClearAll = () => {
-    const total = getTotalRulesImportedCount()
     setIsClearingAll(true)
-    setClearAllDeleteMode(total > 0 ? 'both' : 'rule_only')
+    setClearAllDeleteMode('both')
   }
 
   const handleConfirmClearAll = () => {
@@ -90,7 +94,7 @@ export const DuplicateRulesSettings: React.FC = () => {
           <div className={styles.headerTitleWrapper}>
             <div className={styles.titleRow}>
               <CopyCheck size={20} className={styles.titleIcon} aria-hidden="true" />
-              <h3 className={styles.title}>{t.duplicateRulesTitle || 'Duplicate Rules & Overrides'}</h3>
+              <h3 className={styles.title}>{t.duplicateRulesTitle || 'Duplicate Rules and Overrides'}</h3>
               <span className={styles.countBadge} data-testid="duplicate-rules-count">
                 {duplicateOverrideRules.length}
               </span>
@@ -153,6 +157,15 @@ export const DuplicateRulesSettings: React.FC = () => {
                     .replace('{count}', String(rule.applyCount || 1))
                     .replace('{date}', executionDate)
 
+              const hasModifications = Boolean(
+                rule.modifications &&
+                  (rule.modifications.amount !== undefined ||
+                    (rule.modifications.description !== undefined &&
+                      rule.modifications.description !== rule.descriptionPattern) ||
+                    rule.modifications.category !== undefined ||
+                    rule.modifications.date !== undefined),
+              )
+
               return (
                 <motion.div
                   key={rule.id}
@@ -211,6 +224,52 @@ export const DuplicateRulesSettings: React.FC = () => {
                       <span>{appliedWithDateText}</span>
                     </span>
                   </div>
+
+                  {hasModifications && rule.modifications && (
+                    <div className={styles.modificationsCard} data-testid={`rule-modifications-${rule.id}`}>
+                      <div className={styles.modificationsHeader}>
+                        <Pencil size={12} className={styles.modIcon} aria-hidden="true" />
+                        <span className={styles.modificationsTitle}>
+                          {t.ruleModificationsTitle || 'Changes applied'}
+                        </span>
+                      </div>
+                      <div className={styles.modificationsList}>
+                        {rule.modifications.amount !== undefined && (
+                          <div className={styles.modRow} data-testid={`rule-mod-amount-${rule.id}`}>
+                            <span className={styles.modFieldLabel}>{t.amount || 'Amount'}:</span>
+                            <span className={styles.modOldVal}>
+                              {rule.amount !== undefined ? formatCurrency(rule.amount) : '—'}
+                            </span>
+                            <span className={styles.modArrow} aria-hidden="true">→</span>
+                            <span className={styles.modNewVal}>
+                              {formatCurrency(rule.modifications.amount)}
+                            </span>
+                          </div>
+                        )}
+                        {rule.modifications.description !== undefined &&
+                          rule.modifications.description !== rule.descriptionPattern && (
+                            <div className={styles.modRow} data-testid={`rule-mod-desc-${rule.id}`}>
+                              <span className={styles.modFieldLabel}>{t.description || 'Description'}:</span>
+                              <span className={styles.modOldVal}>{rule.descriptionPattern}</span>
+                              <span className={styles.modArrow} aria-hidden="true">→</span>
+                              <span className={styles.modNewVal}>{rule.modifications.description}</span>
+                            </div>
+                          )}
+                        {rule.modifications.category !== undefined && (
+                          <div className={styles.modRow} data-testid={`rule-mod-cat-${rule.id}`}>
+                            <span className={styles.modFieldLabel}>{t.category || 'Category'}:</span>
+                            <span className={styles.modNewVal}>{rule.modifications.category}</span>
+                          </div>
+                        )}
+                        {rule.modifications.date !== undefined && (
+                          <div className={styles.modRow} data-testid={`rule-mod-date-${rule.id}`}>
+                            <span className={styles.modFieldLabel}>{t.date || 'Date'}:</span>
+                            <span className={styles.modNewVal}>{formatDate(rule.modifications.date)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               )
             })}
@@ -407,7 +466,7 @@ export const DuplicateRulesSettings: React.FC = () => {
               <Trash2 size={14} aria-hidden="true" />
               <span>
                 {clearAllDeleteMode === 'both'
-                  ? t.deleteDuplicateBothBtn || 'Delete Rules & Data'
+                  ? t.deleteDuplicateBothBtn || 'Delete Rules and Data'
                   : clearAllDeleteMode === 'data_only'
                     ? t.deleteDuplicateDataOnlyBtn || 'Delete Imported Data Only'
                     : t.deleteDuplicateRuleOnlyBtn || 'Delete Rules Only'}
@@ -444,7 +503,7 @@ export const DuplicateRulesSettings: React.FC = () => {
                   />
                 </div>
                 <div className={styles.optionContent}>
-                  <span className={styles.optionTitle}>{t.deleteDuplicateBoth || 'Delete rules & imported data'}</span>
+                  <span className={styles.optionTitle}>{t.deleteDuplicateBoth || 'Delete rules and imported data'}</span>
                   <span className={styles.optionDesc}>
                     {(t.clearAllDuplicateBothDesc || 'Delete all rules and permanently remove {count} transaction(s) imported by them.').replace(
                       '{count}',

@@ -337,6 +337,15 @@ h3 {
   transform: translateY(0);
 }
 
+[data-theme='light'] .secondary-button {
+  border-color: rgba(15, 23, 42, 0.22);
+}
+
+[data-theme='light'] .secondary-button:hover {
+  border-color: rgba(15, 23, 42, 0.45);
+  background: rgba(15, 23, 42, 0.06);
+}
+
 .back-button {
   display: inline-flex;
   align-items: center;

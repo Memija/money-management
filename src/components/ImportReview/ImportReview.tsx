@@ -12,17 +12,27 @@ import {
 } from 'lucide-react'
 
 import { useFormatters } from '../../hooks/useFormatters'
-import { useAppStore } from '../../store/useAppStore'
+import { countDuplicateTransactionsInAccounts, useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 
 import styles from './ImportReview.module.css'
 
 const ImportReview: React.FC = () => {
-  const { importedAccounts, startNewInstitution, setStep } = useAppStore()
+  const { importedAccounts, duplicateOverrideRules, startNewInstitution, setStep } = useAppStore()
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatTransactionCount, locale } = useFormatters()
   // Map bs/sr to de-DE consistent with useFormatters (Chromium stripped ICU data for these)
   const intlLocale = locale === 'bs' || locale === 'sr' ? 'de-DE' : locale
+
+  const hasDuplicateTransactions = React.useMemo(() => {
+    return (
+      importedAccounts.some((acc) =>
+        acc.transactions.some(
+          (tx) => Boolean(tx.forceImport) || Boolean(tx.importedByRuleId),
+        ),
+      ) || countDuplicateTransactionsInAccounts(importedAccounts, duplicateOverrideRules || []) > 0
+    )
+  }, [importedAccounts, duplicateOverrideRules])
 
   const totalTransactions = importedAccounts.reduce((sum, acc) => sum + acc.transactions.length, 0)
   const totalIncome = importedAccounts.reduce(
@@ -176,9 +186,10 @@ const ImportReview: React.FC = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="primary-button"
+          className={`primary-button ${hasDuplicateTransactions ? styles['button-warning-orange'] : styles['button-clean-green']}`}
           onClick={() => setStep('dashboard')}
           id="proceed-to-dashboard"
+          data-testid="proceed-to-dashboard-btn"
         >
           {t.proceedToAnalysis}
           <ArrowRight size={18} />
