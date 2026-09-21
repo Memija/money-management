@@ -5,6 +5,8 @@
   flex-direction: column;
   gap: 1.25rem;
   overflow: visible !important;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* ─────────────────────────────────────────────────
@@ -130,6 +132,8 @@
   flex-wrap: wrap;
   gap: 0.75rem;
   padding-bottom: 0.25rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .typeFilters {
@@ -139,6 +143,16 @@
   padding: 3px;
   border-radius: 10px;
   border: 1px solid var(--card-border);
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  flex-shrink: 0;
+}
+
+.typeFilters::-webkit-scrollbar {
+  display: none;
 }
 
 [data-theme='light'] .typeFilters {
@@ -149,7 +163,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.35rem 0.75rem;
+  padding: 0.35rem 0.65rem;
   border-radius: 8px;
   border: none;
   background: transparent;
@@ -158,6 +172,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .typeFilterBtn:hover {
@@ -196,6 +212,8 @@
   flex-wrap: wrap;
   flex: 1;
   justify-content: flex-end;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ghostToggleBtn {
@@ -225,6 +243,34 @@
   background: rgba(99, 102, 241, 0.15);
   border-color: rgba(99, 102, 241, 0.5);
   color: var(--primary);
+}
+
+.duplicateFilterBtn:hover {
+  color: #f59e0b;
+}
+
+.duplicateTypeBadge {
+  background: rgba(245, 158, 11, 0.18);
+  color: #f59e0b;
+}
+
+[data-theme='light'] .duplicateTypeBadge {
+  background: rgba(245, 158, 11, 0.14);
+  color: #d97706;
+}
+
+.modifiedFilterBtn:hover {
+  color: #f97316;
+}
+
+.modifiedTypeBadge {
+  background: rgba(249, 115, 22, 0.18);
+  color: #f97316;
+}
+
+[data-theme='light'] .modifiedTypeBadge {
+  background: rgba(249, 115, 22, 0.14);
+  color: #ea580c;
 }
 
 .transfersNotice {
@@ -363,6 +409,8 @@
   flex-direction: column;
   gap: 0.65rem;
   overflow: visible !important;
+  min-width: 0;
+  width: 100%;
 }
 
 .emptyStateCard {
@@ -568,14 +616,21 @@
 
   .typeFilters {
     width: 100%;
-    justify-content: space-between;
+    max-width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 3px;
+    gap: 0.25rem;
   }
 
   .typeFilterBtn {
-    flex: 1;
+    flex: 0 0 auto;
     justify-content: center;
-    padding: 0.4rem 0.5rem;
+    padding: 0.35rem 0.6rem;
     font-size: 0.76rem;
+    white-space: nowrap;
   }
 
   .controlsRight {

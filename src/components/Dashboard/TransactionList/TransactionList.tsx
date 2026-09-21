@@ -3,11 +3,13 @@ import { motion } from 'framer-motion'
 import {
   ChevronLeft,
   ChevronRight,
+  Copy,
   Ghost,
   Receipt,
   RotateCcw,
   Search,
   SearchX,
+  Sliders,
   X,
 } from 'lucide-react'
 
@@ -36,7 +38,7 @@ interface TransactionListProps {
   ghostCount?: number
 }
 
-type TypeFilter = 'all' | 'income' | 'expense' | 'transfers'
+type TypeFilter = 'all' | 'income' | 'expense' | 'transfers' | 'duplicates' | 'modified'
 
 const DEFAULT_PAGE_SIZE = 10
 
@@ -66,6 +68,16 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
   const normalTx = useMemo(() => filteredTx.filter((tx) => !tx.isGhost), [filteredTx])
   const ghostTx = useMemo(() => filteredTx.filter((tx) => tx.isGhost), [filteredTx])
+  const duplicateTx = useMemo(
+    () =>
+      normalTx.filter(
+        (tx) => (tx.isDuplicate || tx.forceImport || tx.importedByRuleId) && !tx.isModified,
+      ),
+    [normalTx],
+  )
+  const modifiedTx = useMemo(() => normalTx.filter((tx) => tx.isModified), [normalTx])
+  const duplicateCount = duplicateTx.length
+  const modifiedCount = modifiedTx.length
 
   // Calculate summary counts & values (excluding internal ghost transfers from financial totals)
   const { incomeCount, expenseCount, netBalance, visibleGhostCount } = useMemo(() => {
@@ -100,13 +112,15 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     }
   }, [filteredTx])
 
-  // Filter transactions by Type (All / Income / Expense / Transfers)
-  // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', or 'expense'!
+  // Filter transactions by Type (All / Income / Expense / Transfers / Duplicates / Modified)
+  // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', 'expense', 'duplicates', or 'modified'!
   const effectiveTx = useMemo(() => {
     if (typeFilter === 'all') return normalTx
     if (typeFilter === 'transfers') return ghostTx
+    if (typeFilter === 'duplicates') return duplicateTx
+    if (typeFilter === 'modified') return modifiedTx
     return normalTx.filter((tx) => tx.type === typeFilter)
-  }, [normalTx, ghostTx, typeFilter])
+  }, [normalTx, ghostTx, duplicateTx, modifiedTx, typeFilter])
 
   // Total pages and sliced page transactions
   const totalPages = Math.max(1, Math.ceil(effectiveTx.length / pageSize))
@@ -169,10 +183,18 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         <div className={styles.statPillsGroup}>
           <div className={styles.statPill}>
             <span className={styles.statLabel}>
-              {typeFilter === 'transfers' ? (t.internalTransfers || 'Transfers') : t.all}
+              {typeFilter === 'transfers'
+                ? (t.internalTransfers || 'Transfers')
+                : typeFilter === 'duplicates'
+                  ? (t.duplicate || 'Duplicates')
+                  : t.all}
             </span>
             <span className={styles.statValue}>
-              {typeFilter === 'transfers' ? (ghostCount || visibleGhostCount) : normalTx.length}
+              {typeFilter === 'transfers'
+                ? (ghostCount || visibleGhostCount)
+                : typeFilter === 'duplicates'
+                  ? duplicateCount
+                  : normalTx.length}
             </span>
           </div>
           <div className={styles.statPill}>
@@ -262,6 +284,48 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             >
               {t.internalTransfers || 'Transfers'}
               <span className={styles.typeBadge}>{ghostCount || visibleGhostCount}</span>
+            </button>
+          )}
+          {duplicateCount > 0 && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={typeFilter === 'duplicates'}
+              onClick={() => {
+                setTypeFilter('duplicates')
+                setCurrentPage(1)
+              }}
+              className={`${styles.typeFilterBtn} ${
+                typeFilter === 'duplicates' ? styles.typeFilterBtnActive : ''
+              } ${styles.duplicateFilterBtn}`}
+              data-testid="filter-duplicates-tab"
+            >
+              <Copy size={13} aria-hidden="true" />
+              {t.duplicate || 'Duplicates'}
+              <span className={`${styles.typeBadge} ${styles.duplicateTypeBadge}`}>
+                {duplicateCount}
+              </span>
+            </button>
+          )}
+          {modifiedCount > 0 && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={typeFilter === 'modified'}
+              onClick={() => {
+                setTypeFilter('modified')
+                setCurrentPage(1)
+              }}
+              className={`${styles.typeFilterBtn} ${
+                typeFilter === 'modified' ? styles.typeFilterBtnActive : ''
+              } ${styles.modifiedFilterBtn}`}
+              data-testid="filter-modified-tab"
+            >
+              <Sliders size={13} aria-hidden="true" />
+              {t.modified || 'Modified'}
+              <span className={`${styles.typeBadge} ${styles.modifiedTypeBadge}`}>
+                {modifiedCount}
+              </span>
             </button>
           )}
         </div>

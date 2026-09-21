@@ -475,6 +475,40 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.getByText('Unlocked Duplicate')).toBeInTheDocument()
   })
 
+  it('filters transactions when the duplicate filter button is clicked and toggles back', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Transaction' }
+    const tx2 = { ...mockTransactions[1], id: 'tx-duplicate', description: 'Duplicate Transaction' }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-duplicate'])}
+      />,
+    )
+
+    // Duplicates filter button is visible in the toolbar with count 1
+    const filterBtn = screen.getByTestId('filter-duplicates-btn')
+    expect(filterBtn).toBeInTheDocument()
+    expect(filterBtn).toHaveTextContent('1')
+
+    // Initially both are rendered
+    expect(screen.getByText('Normal Transaction')).toBeInTheDocument()
+    expect(screen.getByText('Duplicate Transaction')).toBeInTheDocument()
+
+    // Click Duplicates filter
+    fireEvent.click(filterBtn)
+
+    // Now only duplicate is shown
+    expect(screen.getByText('Duplicate Transaction')).toBeInTheDocument()
+    expect(screen.queryByText('Normal Transaction')).not.toBeInTheDocument()
+
+    // Clicking again toggles back to all
+    fireEvent.click(filterBtn)
+    expect(screen.getByText('Normal Transaction')).toBeInTheDocument()
+    expect(screen.getByText('Duplicate Transaction')).toBeInTheDocument()
+  })
+
   it('offers to bulk apply changes when an unlocked transaction is edited and matching identical transactions exist', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Gym Membership', amount: -45 }
     const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Gym Membership', amount: -45 }
@@ -1023,6 +1057,170 @@ describe('TransactionPreviewModal (Shared)', () => {
     })
     expect(onRelock).toHaveBeenCalledWith(expect.objectContaining({ id: 'tx-dup-1' }))
     expect(onRelock).toHaveBeenCalledWith(expect.objectContaining({ id: 'tx-dup-2' }))
+  })
+
+  it('renders duplicate filter button in toolbar and filters duplicates on click', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-2'])}
+      />,
+    )
+
+    // Button should be visible with badge '1'
+    const dupFilterBtn = screen.getByTestId('filter-duplicates-btn')
+    expect(dupFilterBtn).toBeInTheDocument()
+    expect(dupFilterBtn).toHaveTextContent('1')
+
+    // Both should initially be rendered
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+    expect(screen.getByText('Groceries Dup')).toBeInTheDocument()
+
+    // Click duplicate filter button
+    fireEvent.click(dupFilterBtn)
+
+    // Only duplicate transaction should remain
+    expect(screen.getByText('Groceries Dup')).toBeInTheDocument()
+    expect(screen.queryByText('Salary')).not.toBeInTheDocument()
+
+    // Click duplicate filter button again to show all
+    fireEvent.click(dupFilterBtn)
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+    expect(screen.getByText('Groceries Dup')).toBeInTheDocument()
+  })
+
+  it('allows toggling between duplicates and all transactions when opened with initialFilter="duplicates"', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Normal Transaction' }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Duplicate Transaction', isDuplicate: true }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        initialFilter="duplicates"
+        duplicateIds={new Set(['tx-2'])}
+      />,
+    )
+
+    // Should only show duplicate initially
+    expect(screen.getByText('Duplicate Transaction')).toBeInTheDocument()
+    expect(screen.queryByText('Normal Transaction')).not.toBeInTheDocument()
+
+    // Filter button is active and displays count 1
+    const dupFilterBtn = screen.getByTestId('filter-duplicates-btn')
+    expect(dupFilterBtn).toBeInTheDocument()
+    expect(dupFilterBtn).toHaveAttribute('aria-pressed', 'true')
+
+    // Click to toggle to all
+    fireEvent.click(dupFilterBtn)
+
+    // Both should now be visible
+    expect(screen.getByText('Duplicate Transaction')).toBeInTheDocument()
+    expect(screen.getByText('Normal Transaction')).toBeInTheDocument()
+  })
+
+  it('does not render Unlocked filter button when isImport is false, even if duplicate transactions exist', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        isImport={false}
+      />,
+    )
+
+    // Duplicates filter button is visible because duplicates exist
+    expect(screen.getByTestId('filter-duplicates-btn')).toBeInTheDocument()
+
+    // Unlocked filter button must NOT appear on dashboard-related generic modal view
+    expect(screen.queryByTestId('filter-unlocked-btn')).not.toBeInTheDocument()
+  })
+
+  it('renders Unlocked filter button during import when duplicates exist', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        isImport={true}
+        duplicateIds={new Set(['tx-2'])}
+      />,
+    )
+
+    // During import, Unlocked button should appear
+    expect(screen.getByTestId('filter-unlocked-btn')).toBeInTheDocument()
+  })
+
+  it('renders Modified filter button and filters to modified duplicates', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true, isModified: false }
+    const tx3 = { ...mockTransactions[1], id: 'tx-3', description: 'Groceries Modified', isDuplicate: true, isModified: true }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2, tx3]}
+        duplicateIds={new Set(['tx-2', 'tx-3'])}
+      />,
+    )
+
+    // Modified filter button appears
+    const modBtn = screen.getByTestId('filter-modified-btn')
+    expect(modBtn).toBeInTheDocument()
+    expect(modBtn).toHaveTextContent('1')
+
+    // Click to filter by modified
+    fireEvent.click(modBtn)
+
+    expect(screen.getByText('Groceries Modified')).toBeInTheDocument()
+    expect(screen.queryByText('Salary')).not.toBeInTheDocument()
+    expect(screen.queryByText('Groceries Dup')).not.toBeInTheDocument()
+  })
+
+  it('renders duplicate pill on transaction level when filtered by duplicates, matching modified pill in modified view', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true, isModified: false }
+    const tx3 = { ...mockTransactions[1], id: 'tx-3', description: 'Groceries Modified', isDuplicate: true, isModified: true }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2, tx3]}
+        duplicateIds={new Set(['tx-2', 'tx-3'])}
+      />,
+    )
+
+    // Click to filter by duplicates
+    const dupBtn = screen.getByTestId('filter-duplicates-btn')
+    fireEvent.click(dupBtn)
+
+    // Purely duplicated transaction has the duplicate badge on the row level
+    const dupBadge = screen.getByTestId('preview-duplicate-badge-tx-2')
+    expect(dupBadge).toBeInTheDocument()
+    expect(dupBadge).toHaveTextContent('Duplicate')
+
+    // Click to filter by modified
+    const modBtn = screen.getByTestId('filter-modified-btn')
+    fireEvent.click(modBtn)
+
+    // Modified transaction has the modified badge on the row level
+    const modBadge = screen.getByTestId('preview-modified-badge-tx-3')
+    expect(modBadge).toBeInTheDocument()
+    expect(modBadge).toHaveTextContent('Modified')
   })
 })
 

@@ -353,7 +353,82 @@ describe('ImportReview', () => {
     expect(proceedBtn.className).not.toContain('button-warning-orange')
   })
 
-  it('proceed button becomes orange when duplicate transactions are imported', () => {
+  it('proceed button remains green on fresh import even if multiple transactions have identical date, amount, and description', () => {
+    mockState.importedAccounts = [
+      {
+        institutionId: '1',
+        institutionName: 'Bank A',
+        importedAt: new Date().toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 't1',
+            amount: -3.5,
+            type: 'expense',
+            date: '2024-01-01',
+            description: 'Coffee',
+            currency: 'EUR',
+            institution: 'Bank A',
+          },
+          {
+            id: 't2',
+            amount: -3.5,
+            type: 'expense',
+            date: '2024-01-01',
+            description: 'Coffee',
+            currency: 'EUR',
+            institution: 'Bank A',
+          },
+        ],
+      },
+    ]
+
+    render(<ImportReview />)
+    const proceedBtn = screen.getByTestId('proceed-to-dashboard-btn')
+    expect(proceedBtn.className).toContain('button-clean-green')
+    expect(proceedBtn.className).not.toContain('button-warning-orange')
+  })
+
+  it('proceed button becomes orange when duplicateTransactions array is populated', () => {
+    mockState.importedAccounts = [
+      {
+        institutionId: '1',
+        institutionName: 'Bank A',
+        importedAt: new Date().toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 't1',
+            amount: 1000,
+            type: 'income',
+            date: '2024-01-01',
+            description: 'Salary',
+            currency: 'EUR',
+            institution: 'Bank A',
+          },
+        ],
+        duplicateTransactions: [
+          {
+            id: 't2',
+            amount: 50,
+            type: 'expense',
+            date: '2024-01-01',
+            description: 'Gym',
+            currency: 'EUR',
+            institution: 'Bank A',
+            isDuplicate: true,
+          },
+        ],
+      },
+    ]
+
+    render(<ImportReview />)
+    const proceedBtn = screen.getByTestId('proceed-to-dashboard-btn')
+    expect(proceedBtn.className).toContain('button-warning-orange')
+    expect(proceedBtn.className).not.toContain('button-clean-green')
+  })
+
+  it('proceed button becomes orange when duplicate transactions are imported with forceImport', () => {
     mockState.importedAccounts = [
       {
         institutionId: '1',

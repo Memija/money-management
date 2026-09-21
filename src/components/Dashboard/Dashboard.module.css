@@ -167,7 +167,7 @@
 ───────────────────────────────────────────────── */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
 }

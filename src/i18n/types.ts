@@ -130,6 +130,7 @@ export interface TranslationStrings {
   searchTransactionsPlaceholder: string
   clearFilters: string
   duplicate: string
+  modified: string
   allDates: string
   fromDate: string
   toDate: string
@@ -152,6 +153,7 @@ export interface TranslationStrings {
   allTransactionsAlreadyImported: string
   importNewTransactions: string
   filterDuplicates: string
+  filterModified: string
   duplicatesSkippedNotice: string
   viewDuplicates: string
   unlockDuplicate: string

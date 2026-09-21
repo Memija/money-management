@@ -15,7 +15,15 @@ export function useTransactions(period?: PeriodFilter) {
 
   const allTransactions: Transaction[] = useMemo(() => {
     return importedAccounts.flatMap((a) =>
-      [...(a.transactions || []), ...(a.duplicateTransactions || [])].map((t) => ({
+      [
+        ...(a.transactions || []).map((t) => ({
+          ...t,
+          isDuplicate: Boolean(t.isDuplicate || t.forceImport || t.importedByRuleId),
+          isModified: Boolean(t.isModified),
+        })),
+        ...(a.duplicateTransactions || []).map((t) => ({ ...t, isDuplicate: true, isModified: false })),
+        ...(a.modifiedTransactions || []).map((t) => ({ ...t, isDuplicate: true, isModified: true })),
+      ].map((t) => ({
         ...t,
         category: getTransactionCategory(t, customKeywords, manualCategories),
       })),

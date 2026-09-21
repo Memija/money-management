@@ -981,7 +981,7 @@ Transfer from Bank B DE12345678901234567890
 
     // Ensure preview modal is open and shows duplicate rows
     await waitFor(() => {
-      expect(screen.getByText('Duplicates')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Duplicates' })).toBeInTheDocument()
     })
 
     // Find unlock button for the first transaction
@@ -1081,7 +1081,7 @@ Transfer from Bank B DE12345678901234567890
     // Open duplicate preview and unlock one
     fireEvent.click(screen.getByTestId('view-duplicates-button'))
     await waitFor(() => {
-      expect(screen.getByText('Duplicates')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Duplicates' })).toBeInTheDocument()
     })
 
     const unlockBtns = screen.getAllByTitle('Unlock')

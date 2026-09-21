@@ -48,6 +48,20 @@ describe('TransactionPreviewRow', () => {
     expect(screen.getByText('Duplicate')).toBeInTheDocument()
   })
 
+  it('renders modified pill when isDuplicate is true, isModified is true, and hideDuplicateBadge is false', () => {
+    render(
+      <TransactionPreviewRow
+        {...defaultProps}
+        t={{ ...defaultProps.t, modified: 'Modified' }}
+        isDuplicate={true}
+        isModified={true}
+        hideDuplicateBadge={false}
+      />,
+    )
+    expect(screen.getByText('Modified')).toBeInTheDocument()
+    expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
+  })
+
   it('does NOT render duplicate pill when hideDuplicateBadge is true (e.g. in duplicates view)', () => {
     render(
       <TransactionPreviewRow

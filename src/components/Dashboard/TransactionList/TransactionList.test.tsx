@@ -76,6 +76,7 @@ const mockTranslations = {
   perPage: 'Per page:',
   internalTransfer: 'Internal Transfer',
   internalTransfers: 'Transfers',
+  duplicate: 'Duplicate',
   ghostTransfersHidden: '{count} internal transfers hidden',
   ghostTransfersShown: 'Showing internal transfers',
   showInternalTransfers: 'Show internal transfers',
@@ -589,5 +590,214 @@ describe('TransactionList Component', () => {
     const expenseTab = screen.getByRole('tab', { name: /Expenses/i })
     fireEvent.click(expenseTab)
     expect(screen.queryByText('Internal Transfer Expense')).not.toBeInTheDocument()
+  })
+
+  it('marks duplicated transactions with a duplicate badge and icon', () => {
+    const transactionsWithDuplicate: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'tx-dup-1',
+        date: '2023-01-03',
+        description: 'Duplicate Subscription',
+        amount: -15,
+        currency: 'USD',
+        type: 'expense',
+        institution: 'Bank A',
+        isDuplicate: true,
+      },
+    ]
+
+    render(
+      <TransactionList
+        filteredTx={transactionsWithDuplicate}
+        institutionNames={['Bank A']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    const badge = screen.getByTestId('tx-duplicate-badge-tx-dup-1')
+    expect(badge).toBeInTheDocument()
+    expect(badge).toHaveAttribute('title', 'Duplicate')
+    expect(badge).toHaveAttribute('aria-label', 'Duplicate')
+  })
+
+  it('renders duplicate badge for forceImport or importedByRuleId transactions even if isDuplicate flag is omitted', () => {
+    const transactionsWithForceImport: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'tx-force-1',
+        date: '2023-01-03',
+        description: 'Force Imported Subscription',
+        amount: -15,
+        currency: 'USD',
+        type: 'expense',
+        institution: 'Bank A',
+        forceImport: true,
+      },
+    ]
+
+    render(
+      <TransactionList
+        filteredTx={transactionsWithForceImport}
+        institutionNames={['Bank A']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    const badge = screen.getByTestId('tx-duplicate-badge-tx-force-1')
+    expect(badge).toBeInTheDocument()
+    expect(badge).toHaveAttribute('title', 'Duplicate')
+  })
+
+  it('renders modified transactions with an icon-only badge having title and aria-label', () => {
+    const transactionsWithModified: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'tx-mod-1',
+        date: '2023-01-04',
+        description: 'Modified Subscription',
+        amount: -25,
+        currency: 'USD',
+        type: 'expense',
+        institution: 'Bank A',
+        isDuplicate: true,
+        isModified: true,
+      },
+    ]
+
+    render(
+      <TransactionList
+        filteredTx={transactionsWithModified}
+        institutionNames={['Bank A']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    const badge = screen.getByTestId('tx-modified-badge-tx-mod-1')
+    expect(badge).toBeInTheDocument()
+    expect(badge).toHaveAttribute('title', 'Modified')
+    expect(badge).toHaveAttribute('aria-label', 'Modified')
+  })
+
+  it('renders Duplicates filter tab when duplicate transactions exist and filters accurately', () => {
+    const transactionsWithDuplicate: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'tx-dup-1',
+        date: '2023-01-03',
+        description: 'Duplicate Subscription',
+        amount: -15,
+        currency: 'USD',
+        type: 'expense',
+        institution: 'Bank A',
+        isDuplicate: true,
+      },
+    ]
+
+    render(
+      <TransactionList
+        filteredTx={transactionsWithDuplicate}
+        institutionNames={['Bank A']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    const dupTab = screen.getByTestId('filter-duplicates-tab')
+    expect(dupTab).toBeInTheDocument()
+    expect(dupTab).toHaveTextContent('1')
+
+    // Click Duplicates filter tab
+    fireEvent.click(dupTab)
+
+    // Only duplicate transaction should be visible
+    expect(screen.getByText('Duplicate Subscription')).toBeInTheDocument()
+    expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
+    expect(screen.queryByText('Salary')).not.toBeInTheDocument()
+
+    // Click All tab to return
+    const allTab = screen.getByRole('tab', { name: /All/i })
+    fireEvent.click(allTab)
+    expect(screen.getByText('Groceries')).toBeInTheDocument()
+    expect(screen.getByText('Duplicate Subscription')).toBeInTheDocument()
+  })
+
+  it('does not render Duplicates filter tab when no duplicate transactions exist', () => {
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByTestId('filter-duplicates-tab')).not.toBeInTheDocument()
+  })
+
+  it('renders Modified filter tab when modified duplicate transactions exist and filters properly', () => {
+    const txWithModified: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'dup-mod-1',
+        date: '2026-03-01',
+        description: 'Modified Subscription',
+        amount: -29.99,
+        currency: 'EUR',
+        category: 'Entertainment',
+        type: 'expense',
+        institution: 'Bank A',
+        isDuplicate: true,
+        isModified: true,
+      },
+    ]
+
+    render(
+      <TransactionList
+        filteredTx={txWithModified}
+        institutionNames={['Bank A']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    const modTab = screen.getByTestId('filter-modified-tab')
+    expect(modTab).toBeInTheDocument()
+    expect(modTab).toHaveTextContent('1')
+
+    // Click Modified filter tab
+    fireEvent.click(modTab)
+
+    // Only modified transaction should be visible
+    expect(screen.getByText('Modified Subscription')).toBeInTheDocument()
+    expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
+    expect(screen.queryByText('Salary')).not.toBeInTheDocument()
   })
 })

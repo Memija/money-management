@@ -12,14 +12,14 @@ import {
 } from 'lucide-react'
 
 import { useFormatters } from '../../hooks/useFormatters'
-import { countDuplicateTransactionsInAccounts, useAppStore } from '../../store/useAppStore'
+import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import type { ImportedAccount } from '../../types'
 
 import styles from './ImportReview.module.css'
 
 const ImportReview: React.FC = () => {
-  const { importedAccounts, duplicateOverrideRules, startNewInstitution, setStep } = useAppStore()
+  const { importedAccounts, startNewInstitution, setStep } = useAppStore()
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatTransactionCount, locale } = useFormatters()
   // Map bs/sr to de-DE consistent with useFormatters (Chromium stripped ICU data for these)
@@ -28,22 +28,27 @@ const ImportReview: React.FC = () => {
   const getAllAccountTransactions = (acc: ImportedAccount) => [
     ...(acc.transactions || []),
     ...(acc.duplicateTransactions || []),
+    ...(acc.modifiedTransactions || []),
   ]
 
   const hasDuplicateTransactions = React.useMemo(() => {
-    return (
-      importedAccounts.some(
-        (acc) =>
-          Boolean(acc.duplicateTransactions?.length) ||
-          acc.transactions.some(
-            (tx) => Boolean(tx.forceImport) || Boolean(tx.importedByRuleId),
-          ),
-      ) || countDuplicateTransactionsInAccounts(importedAccounts, duplicateOverrideRules || []) > 0
+    return importedAccounts.some(
+      (acc) =>
+        Boolean(acc.duplicateTransactions && acc.duplicateTransactions.length > 0) ||
+        Boolean(acc.modifiedTransactions && acc.modifiedTransactions.length > 0) ||
+        acc.transactions.some(
+          (tx) =>
+            Boolean(tx.forceImport) || Boolean(tx.isDuplicate) || Boolean(tx.importedByRuleId),
+        ),
     )
-  }, [importedAccounts, duplicateOverrideRules])
+  }, [importedAccounts])
 
   const totalTransactions = importedAccounts.reduce(
-    (sum, acc) => sum + acc.transactions.length + (acc.duplicateTransactions?.length || 0),
+    (sum, acc) =>
+      sum +
+      acc.transactions.length +
+      (acc.duplicateTransactions?.length || 0) +
+      (acc.modifiedTransactions?.length || 0),
     0,
   )
   const totalIncome = importedAccounts.reduce(

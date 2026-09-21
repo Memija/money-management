@@ -174,25 +174,72 @@ const TransactionImporter: React.FC = () => {
     return { inflows, outflows }
   }, [transactions, internalTransferStats, duplicateStats.duplicateIds])
 
-  const buildAccount = (ruleIdsByTxId?: Map<string, string>): ImportedAccount => {
-    const duplicateIdSet = new Set(duplicateStats.duplicateIds)
+  const isDuplicateFlow = rawDuplicateStats.duplicateCount > 0 || unlockedDuplicateIds.size > 0
+
+  const buildAccount = (
+    ruleIdsByTxId?: Map<string, string>,
+    forceImportAllDuplicates?: boolean,
+  ): ImportedAccount => {
+    const rawDuplicateIdSet = new Set(rawDuplicateStats.duplicateIds)
     const cleanTransactions: Transaction[] = []
     const duplicateTransactions: Transaction[] = []
+    const modifiedTransactions: Transaction[] = []
+
+    const isTxModified = (current: Transaction, original?: Transaction): boolean => {
+      if (current.isModified) return true
+      if (!original) return false
+      if (current.description !== original.description) return true
+      if (Math.abs(current.amount - original.amount) >= 0.005) return true
+      if (current.date !== original.date) return true
+      if (current.category !== original.category) return true
+      return false
+    }
 
     transactions.forEach((t) => {
-      if (duplicateIdSet.has(t.id)) {
-        return
-      }
-      if (unlockedDuplicateIds.has(t.id)) {
-        const ruleId = ruleIdsByTxId?.get(t.id)
-        duplicateTransactions.push({
+      const isRawDup = rawDuplicateIdSet.has(t.id)
+      const isUnlocked = unlockedDuplicateIds.has(t.id)
+      const isMarkedDup = Boolean(t.isDuplicate) || Boolean(t.forceImport)
+
+      const ruleId = ruleIdsByTxId?.get(t.id)
+
+      if (isUnlocked || (forceImportAllDuplicates && isRawDup) || isMarkedDup || Boolean(ruleId)) {
+        const orig = originalTransactionsRef.current.get(t.id)
+        const modified = isTxModified(t, orig)
+        const finalTx: Transaction = {
           ...t,
           forceImport: true,
           isDuplicate: true,
+          isModified: modified,
           ...(ruleId ? { importedByRuleId: ruleId } : {}),
-        })
+        }
+        if (modified) {
+          modifiedTransactions.push(finalTx)
+        } else {
+          duplicateTransactions.push(finalTx)
+        }
         return
       }
+
+      if (isRawDup) {
+        if (forceImportAllDuplicates || isAllDuplicates) {
+          const orig = originalTransactionsRef.current.get(t.id)
+          const modified = isTxModified(t, orig)
+          const finalTx: Transaction = {
+            ...t,
+            forceImport: true,
+            isDuplicate: true,
+            isModified: modified,
+          }
+          if (modified) {
+            modifiedTransactions.push(finalTx)
+          } else {
+            duplicateTransactions.push(finalTx)
+          }
+          return
+        }
+        return
+      }
+
       cleanTransactions.push(t)
     })
 
@@ -201,13 +248,14 @@ const TransactionImporter: React.FC = () => {
       institutionName,
       transactions: cleanTransactions,
       duplicateTransactions: duplicateTransactions.length > 0 ? duplicateTransactions : undefined,
+      modifiedTransactions: modifiedTransactions.length > 0 ? modifiedTransactions : undefined,
       importedAt: new Date().toISOString(),
       importedFingerprints: [importFingerprint],
       accountIbans: detectedAccountIbans,
     }
   }
 
-  const commitImport = () => {
+  const commitImport = (forceImportAllDuplicates?: boolean) => {
     setIsSubmitted(true)
     const currentTxMap = new Map((transactions || []).map((t) => [t.id, t]))
     const ruleIdsByTxId = new Map<string, string>()
@@ -254,22 +302,22 @@ const TransactionImporter: React.FC = () => {
         modifications: Object.keys(mods).length > 0 ? mods : undefined,
       })
     })
-    addImportedAccount(buildAccount(ruleIdsByTxId))
+    addImportedAccount(buildAccount(ruleIdsByTxId, forceImportAllDuplicates))
   }
 
   const handleConfirmImport = () => {
-    if (isAllDuplicates || isSubmitted) {
+    if (isSubmitted) {
       return
     }
     if (isPartialDuplicates) {
       setShowDuplicateWarning(true)
       return
     }
-    commitImport()
+    commitImport(isAllDuplicates)
   }
 
   const handleProceedDespiteDuplicate = () => {
-    commitImport()
+    commitImport(isAllDuplicates)
   }
 
   const onClearAll = useCallback(() => {
@@ -558,22 +606,31 @@ const TransactionImporter: React.FC = () => {
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: isAllDuplicates ? 1 : 1.02 }}
-              whileTap={{ scale: isAllDuplicates ? 1 : 0.98 }}
+              whileHover={{ scale: isAllDuplicates && unlockedDuplicateIds.size === 0 ? 1 : 1.02 }}
+              whileTap={{ scale: isAllDuplicates && unlockedDuplicateIds.size === 0 ? 1 : 0.98 }}
               className={`primary-button ${styles['no-margin-top']} ${
-                isAllDuplicates
-                  ? styles['button-disabled']
-                  : unlockedDuplicateIds.size > 0
+                isDuplicateFlow
                   ? styles['button-warning-orange']
                   : styles['button-clean-green']
               }`}
               onClick={handleConfirmImport}
               id="confirm-import"
-              disabled={loading || transactions.length === 0 || isAllDuplicates || isSubmitted}
-              title={isAllDuplicates ? t.allTransactionsAlreadyImported : t.confirmImport}
+              disabled={
+                loading ||
+                transactions.length === 0 ||
+                isSubmitted ||
+                (isAllDuplicates && unlockedDuplicateIds.size === 0)
+              }
+              title={
+                isAllDuplicates && unlockedDuplicateIds.size === 0
+                  ? t.allTransactionsAlreadyImported
+                  : isPartialDuplicates
+                  ? t.importNewTransactions.replace('{count}', String(duplicateStats.newCount))
+                  : t.confirmImport
+              }
             >
               <CheckCircle2 size={18} />
-              {isAllDuplicates
+              {isAllDuplicates && unlockedDuplicateIds.size === 0
                 ? t.allTransactionsAlreadyImported
                 : isPartialDuplicates
                 ? t.importNewTransactions.replace('{count}', String(duplicateStats.newCount))
@@ -587,6 +644,7 @@ const TransactionImporter: React.FC = () => {
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         transactions={transactions}
+        isImport={true}
         duplicateIds={new Set(rawDuplicateStats.duplicateIds)}
         unlockedDuplicateIds={unlockedDuplicateIds}
         internalTransferIds={internalTransferStats.transferTxIds}
@@ -642,11 +700,11 @@ const TransactionImporter: React.FC = () => {
         }
         proceedText={
           duplicateStats?.newCount === 0
-            ? t.duplicateImportOk
+            ? t.confirmImport
             : t.duplicateImportProceed.replace('{newCount}', String(duplicateStats?.newCount))
         }
         cancelText={t.duplicateImportCancel}
-        showProceedButton={duplicateStats?.newCount !== 0}
+        showProceedButton={true}
       />
     </motion.div>
   )

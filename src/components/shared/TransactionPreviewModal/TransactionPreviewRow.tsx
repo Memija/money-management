@@ -32,6 +32,7 @@ export interface TransactionPreviewRowProps {
   onToggleSpaceTransferInclude?: (tx: Transaction) => void
   onUnlockDuplicate?: (tx: Transaction) => void
   onRelockDuplicate?: (tx: Transaction) => void
+  hasActions?: boolean
 }
 
 export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
@@ -56,6 +57,13 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   onToggleSpaceTransferInclude,
   onUnlockDuplicate,
   onRelockDuplicate,
+  hasActions = Boolean(
+    onRemoveTransaction ||
+      onToggleSpaceTransferInclude ||
+      onUnlockDuplicate ||
+      onRelockDuplicate ||
+      onResetTransaction,
+  ),
 }) => {
   // When a transaction is marked as a duplicate, do not mark it as anything else
   // If it was explicitly unlocked by the user, it is no longer an effective duplicate
@@ -114,7 +122,15 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
               <span>{getCategoryLabel(tx.category, t, locale, customCategories)}</span>
             )}
             {effectiveIsDuplicate && !hideDuplicateBadge && (
-              <span className={styles['duplicate-pill']}>{t.duplicate || 'Duplicate'}</span>
+              isModified ? (
+                <span className={styles['modified-pill']} data-testid={`preview-modified-badge-${tx.id}`}>
+                  {t.modified || 'Modified'}
+                </span>
+              ) : (
+                <span className={styles['duplicate-pill']} data-testid={`preview-duplicate-badge-${tx.id}`}>
+                  {t.duplicate || 'Duplicate'}
+                </span>
+              )
             )}
             {effectiveIsInternalTransfer && (
               <span className={styles['internal-transfer-pill']}>
@@ -195,14 +211,8 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
         )}
       </div>
 
-      {Boolean(
-        onRemoveTransaction ||
-        onToggleSpaceTransferInclude ||
-        onUnlockDuplicate ||
-        onRelockDuplicate ||
-        onResetTransaction,
-      ) && (
-          <div className={styles['row-actions']}>
+      {hasActions && (
+        <div className={styles['row-actions']}>
             {effectiveIsDuplicate && onUnlockDuplicate && (
               <button
                 type="button"

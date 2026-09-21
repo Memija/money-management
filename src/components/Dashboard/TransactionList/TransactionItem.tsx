@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Ghost } from 'lucide-react'
+import { Copy, Ghost, Sliders } from 'lucide-react'
 
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { CustomCategory, Transaction } from '../../../types'
@@ -29,10 +29,14 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
   const locale = useLanguageStore((s) => s.locale)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
+  const isModifiedTx = Boolean(tx.isModified)
+  const isDuplicateTx = Boolean(tx.isDuplicate || tx.forceImport || tx.importedByRuleId)
 
   return (
     <div
       className={`${styles.transactionItem} ${tx.isGhost ? styles.ghostItem : ''} ${
+        isModifiedTx ? styles.modifiedItem : isDuplicateTx ? styles.duplicateItem : ''
+      } ${
         isDropdownOpen ? styles.itemWithOpenDropdown : ''
       }`}
       style={{ '--cat-color': categoryColor } as React.CSSProperties}
@@ -49,13 +53,34 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
             {tx.description}
           </p>
           <p className={styles.txMeta}>
-            {formatDate(tx.date)} • {tx.institution}
+            <span className={styles.txMetaText}>
+              {formatDate(tx.date)} • {tx.institution}
+            </span>
             {tx.isGhost && (
               <span className={styles.ghostBadge}>
                 <Ghost size={11} aria-hidden="true" />
                 {t.internalTransfer || 'Internal Transfer'}
               </span>
             )}
+            {isModifiedTx ? (
+              <span
+                className={styles.modifiedBadge}
+                data-testid={`tx-modified-badge-${tx.id}`}
+                title={t.modified || 'Modified'}
+                aria-label={t.modified || 'Modified'}
+              >
+                <Sliders size={11} aria-hidden="true" />
+              </span>
+            ) : isDuplicateTx ? (
+              <span
+                className={styles.duplicateBadge}
+                data-testid={`tx-duplicate-badge-${tx.id}`}
+                title={t.duplicate || 'Duplicate'}
+                aria-label={t.duplicate || 'Duplicate'}
+              >
+                <Copy size={11} aria-hidden="true" />
+              </span>
+            ) : null}
           </p>
         </div>
       </div>

@@ -54,6 +54,7 @@ export interface TransactionPreviewModalProps {
   title?: string
   variant?: 'income' | 'expense'
   showInstitution?: boolean
+  isImport?: boolean
 }
 
 export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = ({
@@ -76,7 +77,17 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   title,
   variant,
   showInstitution = false,
+  isImport,
 }) => {
+  const isImportMode =
+    isImport ??
+    Boolean(
+      onUnlockDuplicateTransaction ||
+        onRelockDuplicateTransaction ||
+        unlockedDuplicateIds !== undefined ||
+        onIncludeSpaceTransaction ||
+        onExcludeSpaceTransaction,
+    )
   const t = useLanguageStore((s) => s.t)
   const locale = useLanguageStore((s) => s.locale)
   const customCategories = useAppStore((s) => s.customCategories)
@@ -567,12 +578,57 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     return [...activeTransactions, ...activeExcluded]
   }, [activeTransactions, activeExcluded])
 
+  const duplicateCount = useMemo(() => {
+    return activeTransactions.filter((tx) => {
+      const isDup =
+        duplicateIds.has(tx.id) ||
+        effectiveUnlockedIds.has(tx.id) ||
+        Boolean(tx.isDuplicate) ||
+        Boolean(tx.forceImport)
+      const isMod = getIsModified(tx) || Boolean(tx.isModified)
+      return isDup && !isMod
+    }).length
+  }, [activeTransactions, duplicateIds, effectiveUnlockedIds, getIsModified])
+
+  const modifiedDuplicateCount = useMemo(() => {
+    return activeTransactions.filter((tx) => {
+      const isDup =
+        duplicateIds.has(tx.id) ||
+        effectiveUnlockedIds.has(tx.id) ||
+        Boolean(tx.isDuplicate) ||
+        Boolean(tx.forceImport)
+      const isMod = getIsModified(tx) || Boolean(tx.isModified)
+      return isDup && isMod
+    }).length
+  }, [activeTransactions, duplicateIds, effectiveUnlockedIds, getIsModified])
+
+  const hasDuplicates = duplicateCount > 0 || duplicateIds.size > 0
+
   const scopedTransactions = useMemo(() => {
     if (scopeFilter === 'unlocked') {
       return activeTransactions.filter((tx) => effectiveUnlockedIds.has(tx.id))
     }
     if (scopeFilter === 'duplicates') {
-      return activeTransactions.filter((tx) => duplicateIds.has(tx.id) || effectiveUnlockedIds.has(tx.id))
+      return activeTransactions.filter((tx) => {
+        const isDup =
+          duplicateIds.has(tx.id) ||
+          effectiveUnlockedIds.has(tx.id) ||
+          Boolean(tx.isDuplicate) ||
+          Boolean(tx.forceImport)
+        const isMod = getIsModified(tx) || Boolean(tx.isModified)
+        return isDup && !isMod
+      })
+    }
+    if (scopeFilter === 'modified') {
+      return activeTransactions.filter((tx) => {
+        const isDup =
+          duplicateIds.has(tx.id) ||
+          effectiveUnlockedIds.has(tx.id) ||
+          Boolean(tx.isDuplicate) ||
+          Boolean(tx.forceImport)
+        const isMod = getIsModified(tx) || Boolean(tx.isModified)
+        return isDup && isMod
+      })
     }
     if (scopeFilter === 'space-transfers') return activeExcluded
     if (scopeFilter === 'internal-transfers') {
@@ -599,6 +655,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     internalTransferIds,
     duplicateIds,
     effectiveUnlockedIds,
+    getIsModified,
   ])
 
   const hasMultipleTransactions = combinedTransactions.length > 1
@@ -630,12 +687,12 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     t,
   })
 
-  const effectiveIsFilterActive = isFilterActive || scopeFilter === 'unlocked'
+  const effectiveIsFilterActive = isFilterActive || scopeFilter !== initialFilter
 
   const handleClearAllFilters = () => {
     handleClearFilters()
-    if (scopeFilter === 'unlocked') {
-      setScopeFilter(initialFilter === 'unlocked' ? 'all' : initialFilter)
+    if (scopeFilter !== initialFilter) {
+      setScopeFilter(initialFilter)
     }
   }
 
@@ -658,8 +715,12 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const rowContent = (index: number, tx: Transaction) => {
     const isTxUnlockedDuplicate = effectiveUnlockedIds.has(tx.id)
-    const isTxDuplicate = duplicateIds.has(tx.id) || isTxUnlockedDuplicate
-    const isTxModified = getIsModified(tx)
+    const isTxDuplicate =
+      duplicateIds.has(tx.id) ||
+      isTxUnlockedDuplicate ||
+      Boolean(tx.isDuplicate) ||
+      Boolean(tx.forceImport)
+    const isTxModified = getIsModified(tx) || Boolean(tx.isModified)
     return (
       <TransactionPreviewRow
         key={tx.id}
@@ -668,7 +729,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         isDuplicate={isTxDuplicate}
         isUnlockedDuplicate={isTxUnlockedDuplicate}
         isModified={isTxModified}
-        hideDuplicateBadge={scopeFilter === 'duplicates'}
+        hideDuplicateBadge={false}
         isInternalTransfer={!isTxDuplicate && (tx.isGhost || internalTransferIds.has(tx.id))}
         isSpaceTransfer={!isTxDuplicate && spaceTransferIds.has(tx.id)}
         isManuallyIncludedSpaceTransfer={!isTxDuplicate && manuallyIncludedIds.has(tx.id)}
@@ -682,8 +743,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         onRemoveTransaction={onRemoveTransaction}
         onResetTransaction={handleResetTransaction}
         onToggleSpaceTransferInclude={handleToggleSpaceTransferInclude}
-        onUnlockDuplicate={handleRequestUnlockDuplicate}
-        onRelockDuplicate={handleRelockDuplicate}
+        onUnlockDuplicate={onUnlockDuplicateTransaction ? handleRequestUnlockDuplicate : undefined}
+        onRelockDuplicate={onRelockDuplicateTransaction ? handleRelockDuplicate : undefined}
+        hasActions={hasActions}
       />
     )
   }
@@ -845,7 +907,10 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         scopeFilter={scopeFilter}
         onScopeFilterChange={setScopeFilter}
         unlockedCount={effectiveUnlockedIds.size}
-        hasDuplicates={duplicateIds.size > 0}
+        hasDuplicates={hasDuplicates}
+        duplicateCount={duplicateCount}
+        modifiedCount={modifiedDuplicateCount}
+        isImport={isImportMode}
         t={t}
       />
 

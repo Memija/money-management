@@ -21,6 +21,8 @@ export interface Transaction {
   importedByRuleId?: string
   /** True if this transaction was imported as a duplicate override. */
   isDuplicate?: boolean
+  /** True if this transaction was modified compared to the original duplicate before/during import. */
+  isModified?: boolean
 }
 
 export interface RuleModifications {

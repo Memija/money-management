@@ -1,5 +1,5 @@
 import React from 'react'
-import { RotateCcw, Search, Unlock, X } from 'lucide-react'
+import { Copy, RotateCcw, Search, Sliders, Unlock, X } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/types'
 import { DatePicker } from '../DatePicker'
@@ -9,7 +9,7 @@ import styles from './TransactionPreviewModal.module.css'
 
 export type SortColumn = 'date' | 'description' | 'amount'
 export type SortDirection = 'asc' | 'desc'
-export type ScopeFilter = 'all' | 'included' | 'space-transfers' | 'internal-transfers' | 'duplicates' | 'unlocked'
+export type ScopeFilter = 'all' | 'included' | 'space-transfers' | 'internal-transfers' | 'duplicates' | 'unlocked' | 'modified'
 
 export interface TransactionPreviewToolbarProps {
   hasMultipleTransactions: boolean
@@ -28,6 +28,9 @@ export interface TransactionPreviewToolbarProps {
   onScopeFilterChange?: (filter: ScopeFilter) => void
   unlockedCount?: number
   hasDuplicates?: boolean
+  duplicateCount?: number
+  modifiedCount?: number
+  isImport?: boolean
   t: TranslationStrings
 }
 
@@ -48,6 +51,9 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
   onScopeFilterChange,
   unlockedCount = 0,
   hasDuplicates = false,
+  duplicateCount,
+  modifiedCount,
+  isImport = false,
   t,
 }) => {
   if (!hasMultipleTransactions) {
@@ -109,7 +115,63 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
         aria-label="Sort transactions"
       />
 
-      {(hasDuplicates || unlockedCount > 0) && (
+      {(hasDuplicates || (duplicateCount ?? 0) > 0 || scopeFilter === 'duplicates') && (
+        <button
+          type="button"
+          className={`${styles['duplicate-filter-btn']} ${
+            scopeFilter === 'duplicates' ? styles['duplicate-filter-btn-active'] : ''
+          } ${(duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates' ? styles['duplicate-filter-btn-disabled'] : ''}`}
+          onClick={() => {
+            if ((duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates') return
+            onScopeFilterChange?.(scopeFilter === 'duplicates' ? 'all' : 'duplicates')
+          }}
+          disabled={(duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates'}
+          title={
+            scopeFilter === 'duplicates'
+              ? t.filterAll || 'Show all'
+              : t.filterDuplicates || 'Duplicates'
+          }
+          aria-label={t.filterDuplicates || 'Duplicates'}
+          aria-pressed={scopeFilter === 'duplicates'}
+          data-testid="filter-duplicates-btn"
+        >
+          <Copy size={13} aria-hidden="true" />
+          <span>{t.filterDuplicates || 'Duplicates'}</span>
+          {duplicateCount !== undefined && (
+            <span className={styles['duplicate-filter-badge']}>{duplicateCount}</span>
+          )}
+        </button>
+      )}
+
+      {((modifiedCount ?? 0) > 0 || scopeFilter === 'modified') && (
+        <button
+          type="button"
+          className={`${styles['modified-filter-btn']} ${
+            scopeFilter === 'modified' ? styles['modified-filter-btn-active'] : ''
+          } ${(modifiedCount ?? 0) === 0 && scopeFilter !== 'modified' ? styles['modified-filter-btn-disabled'] : ''}`}
+          onClick={() => {
+            if ((modifiedCount ?? 0) === 0 && scopeFilter !== 'modified') return
+            onScopeFilterChange?.(scopeFilter === 'modified' ? 'all' : 'modified')
+          }}
+          disabled={(modifiedCount ?? 0) === 0 && scopeFilter !== 'modified'}
+          title={
+            scopeFilter === 'modified'
+              ? t.filterAll || 'Show all'
+              : t.filterModified || 'Modified'
+          }
+          aria-label={t.filterModified || 'Modified'}
+          aria-pressed={scopeFilter === 'modified'}
+          data-testid="filter-modified-btn"
+        >
+          <Sliders size={13} aria-hidden="true" />
+          <span>{t.filterModified || 'Modified'}</span>
+          {modifiedCount !== undefined && (
+            <span className={styles['modified-filter-badge']}>{modifiedCount}</span>
+          )}
+        </button>
+      )}
+
+      {isImport && (hasDuplicates || unlockedCount > 0 || scopeFilter === 'unlocked') && (
         <button
           type="button"
           className={`${styles['unlocked-filter-btn']} ${

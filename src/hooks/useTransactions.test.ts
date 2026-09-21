@@ -371,4 +371,49 @@ describe('useTransactions', () => {
 
     expect(result.current.filteredTx).toHaveLength(2)
   })
+
+  it('should include duplicateTransactions with isModified: false and modifiedTransactions with isModified: true', () => {
+    useAppStore.setState({
+      importedAccounts: [
+        makeAccount('bank-a', {
+          transactions: [makeTx({ id: 'clean-1', description: 'Clean Tx' })],
+          duplicateTransactions: [makeTx({ id: 'dup-1', description: 'Pure Dup Tx' })],
+          modifiedTransactions: [makeTx({ id: 'mod-1', description: 'Modified Dup Tx' })],
+        }),
+      ],
+    })
+
+    const { result } = renderHook(() => useTransactions())
+
+    expect(result.current.allTransactions).toHaveLength(3)
+    const pure = result.current.allTransactions.find((t) => t.id === 'dup-1')
+    expect(pure?.isDuplicate).toBe(true)
+    expect(pure?.isModified).toBe(false)
+
+    const mod = result.current.allTransactions.find((t) => t.id === 'mod-1')
+    expect(mod?.isDuplicate).toBe(true)
+    expect(mod?.isModified).toBe(true)
+  })
+
+  it('should normalize isDuplicate to true for transactions in account.transactions having forceImport or importedByRuleId', () => {
+    useAppStore.setState({
+      importedAccounts: [
+        makeAccount('bank-a', {
+          transactions: [
+            makeTx({ id: 'force-1', description: 'Force Tx', forceImport: true }),
+            makeTx({ id: 'rule-1', description: 'Rule Tx', importedByRuleId: 'rule-xyz' }),
+          ],
+        }),
+      ],
+    })
+
+    const { result } = renderHook(() => useTransactions())
+
+    expect(result.current.allTransactions).toHaveLength(2)
+    const forceTx = result.current.allTransactions.find((t) => t.id === 'force-1')
+    expect(forceTx?.isDuplicate).toBe(true)
+
+    const ruleTx = result.current.allTransactions.find((t) => t.id === 'rule-1')
+    expect(ruleTx?.isDuplicate).toBe(true)
+  })
 })

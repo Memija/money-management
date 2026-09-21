@@ -627,6 +627,105 @@ describe('useAppStore', () => {
       expect(importedTx?.importedByRuleId).toBe('rule-gym')
     })
 
+    it('imports duplicate transactions without changes and ensures collision-free unique IDs and isDuplicate flag', () => {
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            transactions: [
+              {
+                id: 'tx-1',
+                date: '2026-03-01',
+                description: 'Grocery Store',
+                amount: -50,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Chase',
+              },
+            ],
+            importedAt: '2026-03-01T00:00:00Z',
+            importedFingerprints: ['fp-1'],
+          },
+        ],
+        duplicateOverrideRules: [],
+      })
+
+      // Same transaction imported as duplicate without changes
+      const duplicateBatch = {
+        institutionId: 'chase',
+        institutionName: 'Chase',
+        transactions: [],
+        duplicateTransactions: [
+          {
+            id: 'tx-1',
+            date: '2026-03-01',
+            description: 'Grocery Store',
+            amount: -50,
+            currency: 'EUR',
+            type: 'expense' as const,
+            institution: 'Chase',
+            forceImport: true,
+          },
+        ],
+        importedAt: '2026-03-02T00:00:00Z',
+        importedFingerprints: ['fp-2'],
+      }
+
+      useAppStore.getState().addImportedAccount(duplicateBatch)
+
+      const account = useAppStore.getState().importedAccounts[0]
+      expect(account.transactions).toHaveLength(1)
+      expect(account.duplicateTransactions).toHaveLength(1)
+      const dup = account.duplicateTransactions![0]
+      expect(dup.isDuplicate).toBe(true)
+      // Guaranteed unique ID avoiding collision with tx-1
+      expect(dup.id).not.toBe('tx-1')
+      expect(dup.id).toContain('tx-1_dup_')
+    })
+
+    it('does not treat fresh imports for a new institution as duplicates even if description/amount matches existing rules', () => {
+      useAppStore.setState({
+        importedAccounts: [],
+        duplicateOverrideRules: [
+          {
+            id: 'rule-gym',
+            descriptionPattern: 'Monthly Gym',
+            amount: -45,
+            institutionId: 'new-bank',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 0,
+          },
+        ],
+      })
+
+      const freshBatch = {
+        institutionId: 'new-bank',
+        institutionName: 'New Bank',
+        transactions: [
+          {
+            id: 'tx-clean-1',
+            date: '2026-03-01',
+            description: 'Monthly Gym',
+            amount: -45,
+            currency: 'EUR',
+            type: 'expense' as const,
+            institution: 'New Bank',
+          },
+        ],
+        importedAt: '2026-03-01T00:00:00Z',
+        importedFingerprints: ['fp-fresh'],
+      }
+
+      useAppStore.getState().addImportedAccount(freshBatch)
+
+      const accounts = useAppStore.getState().importedAccounts
+      expect(accounts[0].transactions).toHaveLength(1)
+      expect(accounts[0].transactions[0].id).toBe('tx-clean-1')
+      expect(accounts[0].transactions[0].isDuplicate).toBeFalsy()
+      expect(accounts[0].duplicateTransactions).toBeUndefined()
+    })
+
     it('removes imported transactions when revoking a rule with deleteImportedTransactions = true', () => {
       useAppStore.setState({
         importedAccounts: [
@@ -1155,6 +1254,62 @@ describe('useAppStore', () => {
       const remaining = useAppStore.getState().importedAccounts[0].transactions
       expect(remaining).toHaveLength(1)
       expect(remaining[0].id).toBe('tx-original')
+    })
+
+    it('separates pure duplicate transactions and modified duplicate transactions into their own arrays', () => {
+      const pureDup: Transaction = {
+        id: 'dup-pure',
+        date: '2026-09-21',
+        description: 'Netflix',
+        amount: -15.99,
+        currency: 'EUR',
+        type: 'expense',
+        institution: 'Sparkasse',
+        isDuplicate: true,
+        isModified: false,
+      }
+      const modDup: Transaction = {
+        id: 'dup-mod',
+        date: '2026-09-21',
+        description: 'Netflix Family',
+        amount: -19.99,
+        currency: 'EUR',
+        type: 'expense',
+        institution: 'Sparkasse',
+        isDuplicate: true,
+        isModified: true,
+      }
+
+      useAppStore.getState().addImportedAccount({
+        institutionId: 'inst-test',
+        institutionName: 'Sparkasse',
+        transactions: [],
+        duplicateTransactions: [pureDup],
+        modifiedTransactions: [modDup],
+        importedAt: '2026-09-21T00:00:00Z',
+        importedFingerprints: ['fp-dup-mod'],
+      })
+
+      const state = useAppStore.getState()
+      const account = state.importedAccounts.find((a) => a.institutionId === 'inst-test')
+      expect(account).toBeDefined()
+      expect(account?.duplicateTransactions).toHaveLength(1)
+      expect(account?.duplicateTransactions?.[0].id).toBe('dup-pure')
+      expect(account?.duplicateTransactions?.[0].isModified).toBe(false)
+
+      expect(account?.modifiedTransactions).toHaveLength(1)
+      expect(account?.modifiedTransactions?.[0].id).toBe('dup-mod')
+      expect(account?.modifiedTransactions?.[0].isModified).toBe(true)
+
+      // countDuplicateTransactionsInAccounts includes both
+      expect(countDuplicateTransactionsInAccounts(state.importedAccounts)).toBe(2)
+
+      // Reset removes both
+      const resetRes = useAppStore.getState().resetDuplicateTransactions()
+      expect(resetRes.removedCount).toBe(2)
+      const afterReset = useAppStore.getState().importedAccounts.find((a) => a.institutionId === 'inst-test')
+      expect(afterReset?.duplicateTransactions).toHaveLength(0)
+      expect(afterReset?.modifiedTransactions).toHaveLength(0)
     })
   })
 })

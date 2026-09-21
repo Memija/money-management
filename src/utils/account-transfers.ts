@@ -514,6 +514,9 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
       duplicateTransactions: acc.duplicateTransactions?.map((tx) =>
         tx.isGhost ? { ...tx, isGhost: false, linkedTransactionId: undefined } : tx,
       ),
+      modifiedTransactions: acc.modifiedTransactions?.map((tx) =>
+        tx.isGhost ? { ...tx, isGhost: false, linkedTransactionId: undefined } : tx,
+      ),
     }))
   }
 
@@ -529,6 +532,9 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
       allIndexed.push({ accIdx, tx })
     })
     acc.duplicateTransactions?.forEach((tx) => {
+      allIndexed.push({ accIdx, tx })
+    })
+    acc.modifiedTransactions?.forEach((tx) => {
       allIndexed.push({ accIdx, tx })
     })
   })
@@ -694,5 +700,6 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
     ...acc,
     transactions: acc.transactions.map(reconcileTx),
     duplicateTransactions: acc.duplicateTransactions?.map(reconcileTx),
+    modifiedTransactions: acc.modifiedTransactions?.map(reconcileTx),
   }))
 }
