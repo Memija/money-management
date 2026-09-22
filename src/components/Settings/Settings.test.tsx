@@ -57,6 +57,8 @@ vi.mock('../../store/useLanguageStore', () => ({
 const mockSetCustomKeywords = vi.fn()
 const mockSetStep = vi.fn()
 
+let mockImportedAccounts: any[] = []
+
 vi.mock('../../store/useAppStore', () => ({
   countDuplicateTransactionsInAccounts: vi.fn(() => 0),
   matchesDuplicateOverrideRule: vi.fn(),
@@ -70,7 +72,7 @@ vi.mock('../../store/useAppStore', () => ({
       updateCustomCategory: vi.fn(),
       deleteCustomCategory: vi.fn(),
       duplicateOverrideRules: [],
-      importedAccounts: [],
+      importedAccounts: mockImportedAccounts,
       resetDuplicateTransactions: vi.fn(() => ({ removedCount: 0 })),
     }
     return typeof selector === 'function' ? selector(state) : state
@@ -144,7 +146,21 @@ describe('Settings Component', () => {
     expect(screen.queryByRole('button', { name: 'Delete All Data' })).not.toBeInTheDocument()
   })
 
-  it('switches to dedicated Duplicate Rules tab', () => {
+  it('does not render Duplicate Rules tab if there are no duplicates', () => {
+    mockImportedAccounts = []
+    render(<Settings />)
+
+    expect(screen.queryByRole('tab', { name: 'Duplicate Rules' })).not.toBeInTheDocument()
+  })
+
+  it('switches to dedicated Duplicate Rules tab when duplicates exist', () => {
+    mockImportedAccounts = [
+      {
+        institutionId: 'bank-1',
+        transactions: [],
+        duplicateTransactions: [{ id: 'dup-1' }],
+      },
+    ]
     render(<Settings />)
 
     const dupRulesTab = screen.getByRole('tab', { name: 'Duplicate Rules' })

@@ -98,19 +98,21 @@ export const Settings: React.FC = () => {
           <span>{t.categoriesAndRules || 'Categories & Rules'}</span>
         </button>
 
-        <button
-          type="button"
-          role="tab"
-          id="tab-duplicate-rules"
-          aria-selected={activeTab === 'duplicate-rules'}
-          aria-controls="tabpanel-duplicate-rules"
-          className={`${styles.tabButton} ${activeTab === 'duplicate-rules' ? styles.tabButtonActive : ''}`}
-          onClick={() => setActiveTab('duplicate-rules')}
-          data-testid="tab-duplicate-rules"
-        >
-          <CopyCheck size={16} aria-hidden="true" />
-          <span>{t.duplicateRulesTab || 'Duplicate Rules'}</span>
-        </button>
+        {importedAccounts.some((a) => (a.duplicateTransactions?.length ?? 0) > 0) && (
+          <button
+            type="button"
+            role="tab"
+            id="tab-duplicate-rules"
+            aria-selected={activeTab === 'duplicate-rules'}
+            aria-controls="tabpanel-duplicate-rules"
+            className={`${styles.tabButton} ${activeTab === 'duplicate-rules' ? styles.tabButtonActive : ''}`}
+            onClick={() => setActiveTab('duplicate-rules')}
+            data-testid="tab-duplicate-rules"
+          >
+            <CopyCheck size={16} aria-hidden="true" />
+            <span>{t.duplicateRulesTab || 'Duplicate Rules'}</span>
+          </button>
+        )}
 
         <button
           type="button"
