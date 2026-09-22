@@ -175,6 +175,7 @@ export const de: TranslationStrings = {
     'Wenn Sie beim Import eine doppelte Buchung entsperren und die Regel speichern, wird sie hier angezeigt.',
   ruleAllowDuplicate: "Duplikat zulassen: '{desc}'",
   ruleAllowDuplicateLabel: 'Duplikat zulassen',
+  ruleDuplicatedAndModifiedLabel: 'Dupliziert und modifiziert',
   ruleAppliedTimes: '{count}-mal angewendet',
   ruleAppliedOnce: '1-mal angewendet',
   ruleAppliedOnceOn: '1-mal angewendet • {date}',

@@ -35,6 +35,7 @@ vi.mock('../../store/useLanguageStore', () => ({
         noDuplicateRulesDesc: 'When you unlock a duplicate transaction, it will appear here.',
         ruleAllowDuplicate: "Allow duplicate: '{desc}'",
         ruleAllowDuplicateLabel: 'Allow duplicate',
+        ruleDuplicatedAndModifiedLabel: 'Duplicated and modified',
         ruleAppliedTimes: 'Applied {count} times',
         ruleAppliedOnce: 'Applied 1 time',
         ruleAppliedOnceOn: 'Applied 1 time • {date}',
@@ -138,6 +139,14 @@ describe('DuplicateRulesSettings', () => {
     expect(screen.getByTestId('delete-mode-both-radio')).toBeChecked()
     expect(screen.getByText('Revoke the rule and permanently delete 2 transaction(s) imported by it.')).toBeInTheDocument()
 
+    // Verify rule preview in modal is organized in the same manner as normal display:
+    expect(screen.getByTestId('modal-rule-preview-drule_1')).toBeInTheDocument()
+    expect(screen.getByTestId('modal-rule-inst-drule_1')).toHaveTextContent('Chase')
+    expect(screen.getByTestId('modal-rule-action-badge-drule_1')).toHaveTextContent('Allow duplicate')
+    expect(screen.getByTestId('modal-rule-pattern-drule_1')).toHaveTextContent('Gym Membership')
+    expect(screen.getByTestId('modal-rule-amount-drule_1')).toHaveTextContent('€45.00')
+    expect(screen.getByTestId('modal-rule-applied-drule_1')).toHaveTextContent('Applied 3 times • Last: 2026-09-18')
+
     // Confirm revoke
     const confirmBtn = screen.getByTestId('confirm-revoke-rule-btn')
     fireEvent.click(confirmBtn)
@@ -222,6 +231,13 @@ describe('DuplicateRulesSettings', () => {
 
     render(<DuplicateRulesSettings />)
 
+    // Pill should say "Duplicated and modified" instead of "Allow duplicate"
+    expect(screen.getByTestId('rule-action-badge-drule_mod_1')).toHaveTextContent('Duplicated and modified')
+    expect(screen.queryByText('Allow duplicate')).not.toBeInTheDocument()
+
+    // Bank logo and name first on its own row
+    expect(screen.getByTestId('rule-inst-drule_mod_1')).toHaveTextContent('Commerzbank')
+
     // Original transaction values shown
     expect(screen.getByTestId('rule-pattern-drule_mod_1')).toHaveTextContent('ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE')
     expect(screen.getByTestId('rule-amount-drule_mod_1')).toHaveTextContent('€502.58')
@@ -246,6 +262,18 @@ describe('DuplicateRulesSettings', () => {
     // Category and Date modification rows
     expect(screen.getByTestId('rule-mod-cat-drule_mod_1')).toHaveTextContent('Loans')
     expect(screen.getByTestId('rule-mod-date-drule_mod_1')).toHaveTextContent('2026-09-20')
+
+    // Open delete confirmation modal for modified rule
+    const revokeBtn = screen.getByTestId('revoke-duplicate-rule-btn-drule_mod_1')
+    fireEvent.click(revokeBtn)
+
+    // Modal organizes data in the same manner as normal display
+    expect(screen.getByTestId('modal-rule-preview-drule_mod_1')).toBeInTheDocument()
+    expect(screen.getByTestId('modal-rule-inst-drule_mod_1')).toHaveTextContent('Commerzbank')
+    expect(screen.getByTestId('modal-rule-action-badge-drule_mod_1')).toHaveTextContent('Duplicated and modified')
+    expect(screen.getByTestId('modal-rule-pattern-drule_mod_1')).toHaveTextContent('ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE')
+    expect(screen.getByTestId('modal-rule-amount-drule_mod_1')).toHaveTextContent('€502.58')
+    expect(screen.getByTestId('modal-rule-modifications-drule_mod_1')).toBeInTheDocument()
   })
 
   it('does not render duplicate-cleanup-banner and keeps settings page clean', () => {

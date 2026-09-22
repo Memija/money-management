@@ -1,9 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { AlertTriangle, Building2, CopyCheck, Pencil, Repeat, Sparkles, Trash2 } from 'lucide-react'
+import { CopyCheck, Sparkles, Trash2 } from 'lucide-react'
 
-import { findInstitution } from '../../data/institutions'
-import { useFormatters } from '../../hooks/useFormatters'
 import {
   matchesDuplicateOverrideRule,
   useAppStore,
@@ -11,12 +9,12 @@ import {
 import { useLanguageStore } from '../../store/useLanguageStore'
 import type { DuplicateDeleteMode, DuplicateOverrideRule } from '../../types'
 import { Modal } from '../shared/Modal'
+import { DuplicateRuleCard } from './DuplicateRuleCard'
 
 import styles from './DuplicateRulesSettings.module.css'
 
 export const DuplicateRulesSettings: React.FC = () => {
   const t = useLanguageStore((s) => s.t)
-  const { formatCurrency, formatDate } = useFormatters()
   const rawRules = useAppStore((s) => s.duplicateOverrideRules)
   const rawAccounts = useAppStore((s) => s.importedAccounts)
   const duplicateOverrideRules = useMemo(() => rawRules ?? [], [rawRules])
@@ -138,143 +136,16 @@ export const DuplicateRulesSettings: React.FC = () => {
           </div>
         ) : (
           <div className={styles.rulesList} data-testid="duplicate-rules-list">
-            {duplicateOverrideRules.map((rule) => {
-              const inst = findInstitution(rule.institutionId || rule.institutionName)
-              const amountText =
-                rule.amount !== undefined
-                  ? formatCurrency(rule.amount)
-                  : t.anyAmount || 'Any amount'
-
-              const instText =
-                rule.institutionName || inst?.name || t.allInstitutions || 'All institutions'
-
-              const executionDate = formatDate(
-                rule.lastAppliedAt || rule.createdAt || new Date().toISOString(),
-              )
-
-              const appliedWithDateText =
-                rule.applyCount === 1
-                  ? (t.ruleAppliedOnceOn || 'Applied 1 time • {date}').replace('{date}', executionDate)
-                  : (t.ruleAppliedTimesLast || 'Applied {count} times • Last: {date}')
-                    .replace('{count}', String(rule.applyCount || 1))
-                    .replace('{date}', executionDate)
-
-              const hasModifications = Boolean(
-                rule.modifications &&
-                  (rule.modifications.amount !== undefined ||
-                    (rule.modifications.description !== undefined &&
-                      rule.modifications.description !== rule.descriptionPattern) ||
-                    rule.modifications.category !== undefined ||
-                    rule.modifications.date !== undefined),
-              )
-
-              return (
-                <motion.div
-                  key={rule.id}
-                  className={styles.ruleItem}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  data-testid={`duplicate-rule-item-${rule.id}`}
-                >
-                  <div className={styles.ruleTopRow}>
-                    <span className={styles.ruleActionBadge}>
-                      {t.ruleAllowDuplicateLabel || 'Allow duplicate'}
-                    </span>
-                    <button
-                      type="button"
-                      className={styles.revokeBtn}
-                      onClick={() => handleRequestRevoke(rule)}
-                      title={t.revokeRule || 'Revoke rule'}
-                      aria-label={`${t.revokeRule || 'Revoke rule'}: ${rule.descriptionPattern}`}
-                      data-testid={`revoke-duplicate-rule-btn-${rule.id}`}
-                    >
-                      <Trash2 size={15} aria-hidden="true" />
-                    </button>
-                  </div>
-
-                  <div
-                    className={styles.rulePattern}
-                    title={rule.descriptionPattern}
-                    data-testid={`rule-pattern-${rule.id}`}
-                  >
-                    {rule.descriptionPattern}
-                  </div>
-
-                  <div className={styles.badgeRow}>
-                    <span
-                      className={`${styles.metaPill} ${rule.amount !== undefined ? styles.amountPill : ''}`}
-                      data-testid={`rule-amount-${rule.id}`}
-                    >
-                      {amountText}
-                    </span>
-
-                    <span className={styles.metaPill} data-testid={`rule-inst-${rule.id}`}>
-                      {inst?.logo ? (
-                        <img src={inst.logo} alt="" className={styles.pillBankLogo} />
-                      ) : (
-                        <Building2 size={11} aria-hidden="true" />
-                      )}
-                      <span>{instText}</span>
-                    </span>
-
-                    <span
-                      className={`${styles.metaPill} ${styles.appliedPill}`}
-                      data-testid={`rule-applied-${rule.id}`}
-                    >
-                      <Repeat size={11} aria-hidden="true" />
-                      <span>{appliedWithDateText}</span>
-                    </span>
-                  </div>
-
-                  {hasModifications && rule.modifications && (
-                    <div className={styles.modificationsCard} data-testid={`rule-modifications-${rule.id}`}>
-                      <div className={styles.modificationsHeader}>
-                        <Pencil size={12} className={styles.modIcon} aria-hidden="true" />
-                        <span className={styles.modificationsTitle}>
-                          {t.ruleModificationsTitle || 'Changes applied'}
-                        </span>
-                      </div>
-                      <div className={styles.modificationsList}>
-                        {rule.modifications.amount !== undefined && (
-                          <div className={styles.modRow} data-testid={`rule-mod-amount-${rule.id}`}>
-                            <span className={styles.modFieldLabel}>{t.amount || 'Amount'}:</span>
-                            <span className={styles.modOldVal}>
-                              {rule.amount !== undefined ? formatCurrency(rule.amount) : '—'}
-                            </span>
-                            <span className={styles.modArrow} aria-hidden="true">→</span>
-                            <span className={styles.modNewVal}>
-                              {formatCurrency(rule.modifications.amount)}
-                            </span>
-                          </div>
-                        )}
-                        {rule.modifications.description !== undefined &&
-                          rule.modifications.description !== rule.descriptionPattern && (
-                            <div className={styles.modRow} data-testid={`rule-mod-desc-${rule.id}`}>
-                              <span className={styles.modFieldLabel}>{t.description || 'Description'}:</span>
-                              <span className={styles.modOldVal}>{rule.descriptionPattern}</span>
-                              <span className={styles.modArrow} aria-hidden="true">→</span>
-                              <span className={styles.modNewVal}>{rule.modifications.description}</span>
-                            </div>
-                          )}
-                        {rule.modifications.category !== undefined && (
-                          <div className={styles.modRow} data-testid={`rule-mod-cat-${rule.id}`}>
-                            <span className={styles.modFieldLabel}>{t.category || 'Category'}:</span>
-                            <span className={styles.modNewVal}>{rule.modifications.category}</span>
-                          </div>
-                        )}
-                        {rule.modifications.date !== undefined && (
-                          <div className={styles.modRow} data-testid={`rule-mod-date-${rule.id}`}>
-                            <span className={styles.modFieldLabel}>{t.date || 'Date'}:</span>
-                            <span className={styles.modNewVal}>{formatDate(rule.modifications.date)}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              )
-            })}
+            {duplicateOverrideRules.map((rule) => (
+              <motion.div
+                key={rule.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+              >
+                <DuplicateRuleCard rule={rule} onRevoke={handleRequestRevoke} />
+              </motion.div>
+            ))}
           </div>
         )}
       </div>
@@ -312,44 +183,11 @@ export const DuplicateRulesSettings: React.FC = () => {
           </div>
         }
       >
-        {ruleToRevoke && (() => {
-          const revokeInst = findInstitution(
-            ruleToRevoke.rule.institutionId || ruleToRevoke.rule.institutionName,
-          )
-          const revokeAmountText =
-            ruleToRevoke.rule.amount !== undefined
-              ? formatCurrency(ruleToRevoke.rule.amount)
-              : t.anyAmount || 'Any amount'
-          const revokeInstText =
-            ruleToRevoke.rule.institutionName ||
-            revokeInst?.name ||
-            t.allInstitutions ||
-            'All institutions'
+        {ruleToRevoke && (
+          <div className={styles.modalBody}>
+            <DuplicateRuleCard rule={ruleToRevoke.rule} isModalPreview />
 
-          return (
-            <div className={styles.modalBody}>
-              <div className={styles.modalInfoBox}>
-                <AlertTriangle size={20} className={styles.modalWarningIcon} aria-hidden="true" />
-                <div className={styles.modalInfoText}>
-                  <p className={styles.modalRuleTitle}>
-                    {ruleToRevoke.rule.descriptionPattern}
-                  </p>
-                  <div className={styles.modalRuleMetaRow}>
-                    <span className={styles.modalAmount}>{revokeAmountText}</span>
-                    <span className={styles.modalDotSeparator}>•</span>
-                    <span className={styles.modalBankWithLogo}>
-                      {revokeInst?.logo ? (
-                        <img src={revokeInst.logo} alt="" className={styles.modalBankLogo} />
-                      ) : (
-                        <Building2 size={13} aria-hidden="true" />
-                      )}
-                      <span>{revokeInstText}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {ruleToRevoke.count > 0 ? (
+            {ruleToRevoke.count > 0 ? (
                 <div
                   className={styles.optionsList}
                   role="radiogroup"
@@ -440,8 +278,7 @@ export const DuplicateRulesSettings: React.FC = () => {
                 </p>
               )}
             </div>
-          )
-        })()}
+        )}
       </Modal>
 
       {/* Clear All Rules Modal */}

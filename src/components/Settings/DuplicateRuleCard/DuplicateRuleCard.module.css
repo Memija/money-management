@@ -1,0 +1,246 @@
+.ruleItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.95rem 1.15rem;
+  border-radius: var(--radius-md);
+  background: var(--dropdown-item-hover);
+  border: 1px solid var(--card-border);
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ruleItem:not(.modalPreview):hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.15);
+}
+
+.modalPreview {
+  cursor: default;
+}
+
+.ruleBankRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.bankInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.bankLogo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.bankIcon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.bankName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ruleActionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.ruleActionBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  letter-spacing: 0.01em;
+}
+
+:global([data-theme='light']) .ruleActionBadge {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.ruleModifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  letter-spacing: 0.01em;
+}
+
+:global([data-theme='light']) .ruleModifiedBadge {
+  background: rgba(249, 115, 22, 0.12);
+  color: #ea580c;
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.rulePattern {
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: var(--text-main);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+  width: 100%;
+}
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.metaPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.725rem;
+  font-weight: 500;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  max-width: 100%;
+}
+
+.amountPill {
+  color: var(--primary);
+  background: var(--glow-emerald);
+  border-color: rgba(16, 185, 129, 0.25);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.appliedPill {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.revokeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.revokeBtn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: var(--danger);
+  transform: translateY(-1px);
+}
+
+.modificationsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: rgba(249, 115, 22, 0.05);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  margin-top: 0.2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+:global([data-theme='light']) .modificationsCard {
+  background: rgba(249, 115, 22, 0.04);
+  border-color: rgba(249, 115, 22, 0.25);
+}
+
+.modificationsHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.modIcon {
+  color: #f97316;
+  flex-shrink: 0;
+}
+
+.modificationsTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #f97316;
+  letter-spacing: 0.01em;
+}
+
+.modificationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.modRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.775rem;
+  flex-wrap: wrap;
+  line-height: 1.35;
+}
+
+.modFieldLabel {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.modOldVal {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  opacity: 0.75;
+}
+
+.modArrow {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.modNewVal {
+  color: var(--text-main);
+  font-weight: 600;
+}

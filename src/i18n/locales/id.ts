@@ -174,6 +174,7 @@ export const id: TranslationStrings = {
     'Saat Anda membuka kunci transaksi duplikat saat impor dan memilih untuk mengingatnya, aturan akan muncul di sini.',
   ruleAllowDuplicate: "Izinkan duplikat: '{desc}'",
   ruleAllowDuplicateLabel: 'Izinkan duplikat',
+  ruleDuplicatedAndModifiedLabel: 'Diduplikasi dan dimodifikasi',
   ruleAppliedTimes: 'Diterapkan {count} kali',
   ruleAppliedOnce: 'Diterapkan 1 kali',
   ruleAppliedOnceOn: 'Diterapkan 1 kali • {date}',

@@ -177,6 +177,7 @@ export const sr: TranslationStrings = {
     'Када откључате дупликат током увоза и изаберете да га запамтите, правило ће се појавити овде.',
   ruleAllowDuplicate: "Дозволи дупликат: '{desc}'",
   ruleAllowDuplicateLabel: 'Дозволи дупликат',
+  ruleDuplicatedAndModifiedLabel: 'Дуплирано и модификовано',
   ruleAppliedTimes: 'Примењено {count} пута',
   ruleAppliedOnce: 'Примењено 1 пут',
   ruleAppliedOnceOn: 'Примењено 1 пут • {date}',

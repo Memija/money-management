@@ -175,6 +175,7 @@ export const pl: TranslationStrings = {
     'Gdy odblokujesz duplikat podczas importu i wybierzesz zapamiętanie reguły, pojawi się ona w tym miejscu.',
   ruleAllowDuplicate: "Zezwalaj na duplikat: '{desc}'",
   ruleAllowDuplicateLabel: 'Zezwalaj na duplikat',
+  ruleDuplicatedAndModifiedLabel: 'Zduplikowane i zmodyfikowane',
   ruleAppliedTimes: 'Zastosowano {count} razy',
   ruleAppliedOnce: 'Zastosowano 1 raz',
   ruleAppliedOnceOn: 'Zastosowano 1 raz • {date}',

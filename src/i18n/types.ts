@@ -197,6 +197,7 @@ export interface TranslationStrings {
   noDuplicateRulesDesc: string
   ruleAllowDuplicate: string
   ruleAllowDuplicateLabel: string
+  ruleDuplicatedAndModifiedLabel: string
   ruleAppliedTimes: string
   ruleAppliedOnce: string
   ruleAppliedOnceOn: string

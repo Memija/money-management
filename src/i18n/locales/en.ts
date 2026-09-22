@@ -175,6 +175,7 @@ export const en: TranslationStrings = {
     'When you unlock a duplicate transaction during import and choose to remember it, the rule will appear here.',
   ruleAllowDuplicate: "Allow duplicate: '{desc}'",
   ruleAllowDuplicateLabel: 'Allow duplicate',
+  ruleDuplicatedAndModifiedLabel: 'Duplicated and modified',
   ruleAppliedTimes: 'Applied {count} times',
   ruleAppliedOnce: 'Applied 1 time',
   ruleAppliedOnceOn: 'Applied 1 time • {date}',

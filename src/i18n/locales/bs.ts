@@ -175,6 +175,7 @@ export const bs: TranslationStrings = {
     'Kada otključate duplikat tokom uvoza i odaberete da ga zapamtite, pravilo će se pojaviti ovdje.',
   ruleAllowDuplicate: "Dozvoli duplikat: '{desc}'",
   ruleAllowDuplicateLabel: 'Dozvoli duplikat',
+  ruleDuplicatedAndModifiedLabel: 'Duplicirano i modifikovano',
   ruleAppliedTimes: 'Primijenjeno {count} puta',
   ruleAppliedOnce: 'Primijenjeno 1 put',
   ruleAppliedOnceOn: 'Primijenjeno 1 put • {date}',
