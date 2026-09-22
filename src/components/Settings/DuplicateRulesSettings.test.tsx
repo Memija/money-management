@@ -282,4 +282,73 @@ describe('DuplicateRulesSettings', () => {
     expect(screen.queryByTestId('duplicate-cleanup-banner')).not.toBeInTheDocument()
     expect(screen.queryByText('Duplicate transactions detected')).not.toBeInTheDocument()
   })
+
+  it('revoking one rule among multiple rules calls removeDuplicateOverrideRule with only that rule id', () => {
+    mockDuplicateRules = [
+      {
+        id: 'drule_alpha',
+        descriptionPattern: 'Netflix',
+        amount: -12.99,
+        institutionId: 'chase',
+        institutionName: 'Chase',
+        createdAt: '2026-09-18T10:00:00.000Z',
+        applyCount: 1,
+      },
+      {
+        id: 'drule_beta',
+        descriptionPattern: 'Spotify',
+        amount: -9.99,
+        institutionId: 'chase',
+        institutionName: 'Chase',
+        createdAt: '2026-09-18T10:00:00.000Z',
+        applyCount: 2,
+      },
+    ]
+
+    render(<DuplicateRulesSettings />)
+
+    expect(screen.getByTestId('duplicate-rule-item-drule_alpha')).toBeInTheDocument()
+    expect(screen.getByTestId('duplicate-rule-item-drule_beta')).toBeInTheDocument()
+
+    // Click revoke on drule_alpha
+    fireEvent.click(screen.getByTestId('revoke-duplicate-rule-btn-drule_alpha'))
+
+    // Confirm deletion in modal
+    fireEvent.click(screen.getByTestId('confirm-revoke-rule-btn'))
+
+    expect(mockRemoveDuplicateOverrideRule).toHaveBeenCalledTimes(1)
+    expect(mockRemoveDuplicateOverrideRule).toHaveBeenCalledWith('drule_alpha', expect.any(String))
+  })
+
+  it('defaults to rule_only delete mode and displays rule only action when rule has 0 associated transactions', () => {
+    mockDuplicateRules = [
+      {
+        id: 'drule_zero',
+        descriptionPattern: 'Gym Membership',
+        amount: -45.0,
+        institutionId: 'chase',
+        institutionName: 'Chase',
+        createdAt: '2026-09-18T10:00:00.000Z',
+        applyCount: 1,
+      },
+    ]
+    mockImportedAccounts = []
+
+    render(<DuplicateRulesSettings />)
+
+    fireEvent.click(screen.getByTestId('revoke-duplicate-rule-btn-drule_zero'))
+
+    // Modal should show 0 transactions note
+    expect(
+      screen.getByText('No transactions currently in your accounts were imported by this rule.'),
+    ).toBeInTheDocument()
+
+    // Confirm button text should be Delete Rule Only
+    const confirmBtn = screen.getByTestId('confirm-revoke-rule-btn')
+    expect(confirmBtn).toHaveTextContent('Delete Rule Only')
+
+    fireEvent.click(confirmBtn)
+
+    expect(mockRemoveDuplicateOverrideRule).toHaveBeenCalledWith('drule_zero', 'rule_only')
+  })
 })

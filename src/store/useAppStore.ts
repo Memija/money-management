@@ -136,7 +136,7 @@ export const isModifiedTransactionForRule = (
   if (mods.description !== undefined) {
     const modDesc = mods.description.trim().toLowerCase().replace(/\s+/g, ' ')
     const txDesc = (tx.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
-    if (!txDesc.includes(modDesc) && !modDesc.includes(txDesc)) {
+    if (!txDesc.includes(modDesc) && modDesc !== txDesc) {
       return false
     }
   }
@@ -175,7 +175,33 @@ export const isOriginalTransactionMatchForRule = (
   const origPattern = (rule.descriptionPattern || '').trim().toLowerCase().replace(/\s+/g, ' ')
   if (!origPattern) return false
   const txDesc = (tx.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
-  return txDesc.includes(origPattern) || origPattern.includes(txDesc)
+  return txDesc.includes(origPattern) || origPattern === txDesc
+}
+
+export const sanitizeDuplicateOverrideRules = (
+  rules?: DuplicateOverrideRule[],
+): DuplicateOverrideRule[] => {
+  if (!Array.isArray(rules)) return []
+  const seenIds = new Set<string>()
+  return rules
+    .filter((r): r is DuplicateOverrideRule => Boolean(r && typeof r === 'object'))
+    .map((rule, idx) => {
+      let id = typeof rule.id === 'string' && rule.id.trim().length > 0 ? rule.id.trim() : ''
+      if (!id || seenIds.has(id)) {
+        id = `drule_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 7)}`
+      }
+      seenIds.add(id)
+      return {
+        ...rule,
+        id,
+        descriptionPattern: (rule.descriptionPattern || '').trim(),
+        createdAt:
+          rule.createdAt && !isNaN(new Date(rule.createdAt).getTime())
+            ? rule.createdAt
+            : new Date().toISOString(),
+        applyCount: typeof rule.applyCount === 'number' && rule.applyCount > 0 ? rule.applyCount : 1,
+      }
+    })
 }
 
 export const countDuplicateTransactionsInAccounts = (
@@ -237,7 +263,7 @@ export const useAppStore = create<AppState>()(
 
       addDuplicateOverrideRule: (rule) =>
         set((state) => {
-          const currentRules = state.duplicateOverrideRules || []
+          const currentRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
           const pattern = (rule.descriptionPattern || '').trim()
           if (!pattern) return state
 
@@ -255,8 +281,13 @@ export const useAppStore = create<AppState>()(
             // Update existing rule
             const updated = [...currentRules]
             const existing = updated[existingIdx]
+            const existingId =
+              existing.id ||
+              (typeof rule.id === 'string' && rule.id.trim().length > 0 ? rule.id.trim() : '') ||
+              `drule_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
             updated[existingIdx] = {
               ...existing,
+              id: existingId,
               institutionName: rule.institutionName || existing.institutionName,
               amount: rule.amount !== undefined ? rule.amount : existing.amount,
               applyCount:
@@ -267,67 +298,96 @@ export const useAppStore = create<AppState>()(
                 rule.modifications !== undefined ? rule.modifications : existing.modifications,
               lastAppliedAt: rule.lastAppliedAt || new Date().toISOString(),
             }
-            return { duplicateOverrideRules: updated }
+            return { duplicateOverrideRules: sanitizeDuplicateOverrideRules(updated) }
           }
 
           const newRule: DuplicateOverrideRule = {
-            id: rule.id || `drule_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+            id:
+              typeof rule.id === 'string' && rule.id.trim().length > 0
+                ? rule.id.trim()
+                : `drule_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
             institutionId: rule.institutionId,
             institutionName: rule.institutionName,
             descriptionPattern: pattern,
             amount: rule.amount,
-            createdAt: rule.createdAt && !isNaN(new Date(rule.createdAt).getTime()) ? rule.createdAt : new Date().toISOString(),
-            lastAppliedAt: rule.lastAppliedAt && !isNaN(new Date(rule.lastAppliedAt).getTime()) ? rule.lastAppliedAt : new Date().toISOString(),
+            createdAt:
+              rule.createdAt && !isNaN(new Date(rule.createdAt).getTime())
+                ? rule.createdAt
+                : new Date().toISOString(),
+            lastAppliedAt:
+              rule.lastAppliedAt && !isNaN(new Date(rule.lastAppliedAt).getTime())
+                ? rule.lastAppliedAt
+                : new Date().toISOString(),
             applyCount: rule.applyCount ?? 1,
             modifications: rule.modifications,
           }
 
           return {
-            duplicateOverrideRules: [newRule, ...currentRules],
+            duplicateOverrideRules: sanitizeDuplicateOverrideRules([newRule, ...currentRules]),
           }
         }),
 
       removeDuplicateOverrideRule: (id, mode = 'both') =>
         set((state) => {
-          const ruleToDelete = (state.duplicateOverrideRules || []).find((r) => r.id === id)
+          if (!id || typeof id !== 'string' || !id.trim()) {
+            return state
+          }
+          const targetId = id.trim()
+          const currentRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
+          const ruleToDelete = currentRules.find((r) => r.id === targetId)
           if (!ruleToDelete) return state
 
           const shouldDeleteRule = mode === 'rule_only' || mode === 'both' || mode === false || mode === true
           const shouldDeleteTransactions = mode === 'data_only' || mode === 'both' || mode === true
 
           const newRules = shouldDeleteRule
-            ? (state.duplicateOverrideRules || []).filter((r) => r.id !== id)
-            : (state.duplicateOverrideRules || [])
+            ? currentRules.filter((r) => r.id !== targetId)
+            : currentRules
 
           if (!shouldDeleteTransactions) {
             return { duplicateOverrideRules: newRules }
           }
 
           const updatedAccounts = state.importedAccounts.map((account) => {
-            // Completely remove matching transactions from duplicateTransactions (no trash)
-            const filteredDuplicates = (account.duplicateTransactions || []).filter((tx) => {
-              if (tx.importedByRuleId === id) return false
-              if (isModifiedTransactionForRule(ruleToDelete, tx, account.institutionId)) return false
-              if (isOriginalTransactionMatchForRule(ruleToDelete, tx, account.institutionId)) return false
-              if (tx.importedByRuleId && !newRules.some((r) => r.id === tx.importedByRuleId)) return false
-              return true
-            })
+            const isTargetAccount =
+              !ruleToDelete.institutionId ||
+              ruleToDelete.institutionId === 'unknown' ||
+              account.institutionId === 'unknown' ||
+              account.institutionId === ruleToDelete.institutionId
 
-            const filteredModified = (account.modifiedTransactions || []).filter((tx) => {
-              if (tx.importedByRuleId === id) return false
-              if (isModifiedTransactionForRule(ruleToDelete, tx, account.institutionId)) return false
-              if (isOriginalTransactionMatchForRule(ruleToDelete, tx, account.institutionId)) return false
-              if (tx.importedByRuleId && !newRules.some((r) => r.id === tx.importedByRuleId)) return false
-              return true
-            })
+            if (!isTargetAccount) {
+              return account
+            }
+
+            const shouldDeleteTx = (tx: Transaction): boolean => {
+              if (tx.importedByRuleId === targetId) {
+                return true
+              }
+              if (tx.importedByRuleId && tx.importedByRuleId !== targetId) {
+                return false
+              }
+              if (tx.isDuplicate || tx.forceImport) {
+                if (isModifiedTransactionForRule(ruleToDelete, tx, account.institutionId)) {
+                  return true
+                }
+                if (isOriginalTransactionMatchForRule(ruleToDelete, tx, account.institutionId)) {
+                  return true
+                }
+              }
+              return false
+            }
+
+            // Completely remove matching transactions from duplicateTransactions (no trash)
+            const filteredDuplicates = (account.duplicateTransactions || []).filter(
+              (tx) => !shouldDeleteTx(tx),
+            )
+
+            const filteredModified = (account.modifiedTransactions || []).filter(
+              (tx) => !shouldDeleteTx(tx),
+            )
 
             // Clean any legacy duplicates in account.transactions if present
-            const filteredClean = account.transactions.filter((tx) => {
-              if (tx.importedByRuleId === id) return false
-              if (tx.isDuplicate && isModifiedTransactionForRule(ruleToDelete, tx, account.institutionId)) return false
-              if (tx.isDuplicate && isOriginalTransactionMatchForRule(ruleToDelete, tx, account.institutionId)) return false
-              return true
-            })
+            const filteredClean = account.transactions.filter((tx) => !shouldDeleteTx(tx))
 
             return {
               ...account,
@@ -349,36 +409,38 @@ export const useAppStore = create<AppState>()(
           const shouldDeleteRules = mode === 'rule_only' || mode === 'both' || mode === false || mode === true
           const shouldDeleteTransactions = mode === 'data_only' || mode === 'both' || mode === true
 
-          const newRules = shouldDeleteRules ? [] : (state.duplicateOverrideRules || [])
+          const newRules = shouldDeleteRules ? [] : sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
 
           if (!shouldDeleteTransactions) {
             return { duplicateOverrideRules: newRules }
           }
 
-          const rules = state.duplicateOverrideRules || []
+          const rules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
           const updatedAccounts = state.importedAccounts.map((account) => {
-            const filteredDuplicates = (account.duplicateTransactions || []).filter((tx) => {
-              if (tx.importedByRuleId && rules.some((r) => r.id === tx.importedByRuleId)) return false
-              if (rules.some((r) => isModifiedTransactionForRule(r, tx, account.institutionId))) return false
-              if (rules.some((r) => isOriginalTransactionMatchForRule(r, tx, account.institutionId))) return false
-              if (tx.importedByRuleId && !newRules.some((r) => r.id === tx.importedByRuleId)) return false
-              return true
-            })
+            const shouldDeleteTx = (tx: Transaction): boolean => {
+              if (tx.importedByRuleId && rules.some((r) => r.id === tx.importedByRuleId)) {
+                return true
+              }
+              if (tx.isDuplicate || tx.forceImport) {
+                if (rules.some((r) => isModifiedTransactionForRule(r, tx, account.institutionId))) {
+                  return true
+                }
+                if (rules.some((r) => isOriginalTransactionMatchForRule(r, tx, account.institutionId))) {
+                  return true
+                }
+              }
+              return false
+            }
 
-            const filteredModified = (account.modifiedTransactions || []).filter((tx) => {
-              if (tx.importedByRuleId && rules.some((r) => r.id === tx.importedByRuleId)) return false
-              if (rules.some((r) => isModifiedTransactionForRule(r, tx, account.institutionId))) return false
-              if (rules.some((r) => isOriginalTransactionMatchForRule(r, tx, account.institutionId))) return false
-              if (tx.importedByRuleId && !newRules.some((r) => r.id === tx.importedByRuleId)) return false
-              return true
-            })
+            const filteredDuplicates = (account.duplicateTransactions || []).filter(
+              (tx) => !shouldDeleteTx(tx),
+            )
 
-            const filteredClean = account.transactions.filter((tx) => {
-              if (tx.importedByRuleId && rules.some((r) => r.id === tx.importedByRuleId)) return false
-              if (tx.isDuplicate && rules.some((r) => isModifiedTransactionForRule(r, tx, account.institutionId))) return false
-              if (tx.isDuplicate && rules.some((r) => isOriginalTransactionMatchForRule(r, tx, account.institutionId))) return false
-              return true
-            })
+            const filteredModified = (account.modifiedTransactions || []).filter(
+              (tx) => !shouldDeleteTx(tx),
+            )
+
+            const filteredClean = account.transactions.filter((tx) => !shouldDeleteTx(tx))
 
             return {
               ...account,
@@ -778,6 +840,11 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'mm-app-storage',
+      onRehydrateStorage: () => (state) => {
+        if (state && Array.isArray(state.duplicateOverrideRules)) {
+          state.duplicateOverrideRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
+        }
+      },
     },
   ),
 )

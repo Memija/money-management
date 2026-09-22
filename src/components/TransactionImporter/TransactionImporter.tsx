@@ -259,8 +259,13 @@ const TransactionImporter: React.FC = () => {
     setIsSubmitted(true)
     const currentTxMap = new Map((transactions || []).map((t) => [t.id, t]))
     const ruleIdsByTxId = new Map<string, string>()
+    const processedTxIds = new Set<string>()
 
     pendingOverrideRules.forEach((origTx, txId) => {
+      if (processedTxIds.has(txId)) {
+        return
+      }
+
       const finalTx = currentTxMap.get(txId) || origTx
       const mods: RuleModifications = {}
       if (finalTx.description && origTx.description && finalTx.description !== origTx.description) {
@@ -287,8 +292,10 @@ const TransactionImporter: React.FC = () => {
 
       const ruleId = `drule_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
       sameGroup.forEach((t) => {
+        processedTxIds.add(t.id)
         ruleIdsByTxId.set(t.id, ruleId)
       })
+      processedTxIds.add(txId)
       ruleIdsByTxId.set(txId, ruleId)
 
       addDuplicateOverrideRule?.({

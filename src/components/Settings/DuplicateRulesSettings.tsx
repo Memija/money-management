@@ -36,9 +36,13 @@ export const DuplicateRulesSettings: React.FC = () => {
   const getRuleImportedTransactionCount = (rule: DuplicateOverrideRule): number => {
     let count = 0
     for (const acc of importedAccounts) {
-      const allTxs = [...(acc.transactions || []), ...(acc.duplicateTransactions || [])]
+      const allTxs = [
+        ...(acc.transactions || []),
+        ...(acc.duplicateTransactions || []),
+        ...(acc.modifiedTransactions || []),
+      ]
       for (const tx of allTxs) {
-        if (tx.importedByRuleId === rule.id) {
+        if (rule.id && tx.importedByRuleId === rule.id) {
           count++
         } else if (!tx.importedByRuleId && matchesDuplicateOverrideRule(rule, tx, acc.institutionId)) {
           count++
@@ -51,7 +55,11 @@ export const DuplicateRulesSettings: React.FC = () => {
   const getTotalRulesImportedCount = (): number => {
     let count = 0
     for (const acc of importedAccounts) {
-      const allTxs = [...(acc.transactions || []), ...(acc.duplicateTransactions || [])]
+      const allTxs = [
+        ...(acc.transactions || []),
+        ...(acc.duplicateTransactions || []),
+        ...(acc.modifiedTransactions || []),
+      ]
       for (const tx of allTxs) {
         if (tx.importedByRuleId) {
           count++
@@ -68,12 +76,15 @@ export const DuplicateRulesSettings: React.FC = () => {
   const handleRequestRevoke = (rule: DuplicateOverrideRule) => {
     const count = getRuleImportedTransactionCount(rule)
     setRuleToRevoke({ rule, count })
-    setSingleDeleteMode('both')
+    setSingleDeleteMode(count > 0 ? 'both' : 'rule_only')
   }
 
   const handleConfirmRevoke = () => {
     if (!ruleToRevoke) return
-    removeDuplicateOverrideRule(ruleToRevoke.rule.id, singleDeleteMode)
+    const ruleId = ruleToRevoke.rule.id
+    if (ruleId) {
+      removeDuplicateOverrideRule(ruleId, singleDeleteMode)
+    }
     setRuleToRevoke(null)
   }
 
@@ -136,9 +147,9 @@ export const DuplicateRulesSettings: React.FC = () => {
           </div>
         ) : (
           <div className={styles.rulesList} data-testid="duplicate-rules-list">
-            {duplicateOverrideRules.map((rule) => (
+            {duplicateOverrideRules.map((rule, idx) => (
               <motion.div
-                key={rule.id}
+                key={rule.id || `rule-${idx}-${rule.descriptionPattern}`}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}

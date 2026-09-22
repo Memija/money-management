@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import type { Country, FinancialInstitution, ImportedAccount, Transaction } from '../types'
-import { countDuplicateTransactionsInAccounts, useAppStore } from './useAppStore'
+import {
+  countDuplicateTransactionsInAccounts,
+  sanitizeDuplicateOverrideRules,
+  useAppStore,
+} from './useAppStore'
 
 describe('useAppStore', () => {
   beforeEach(() => {
@@ -1156,6 +1160,236 @@ describe('useAppStore', () => {
       const restoredBalance = restoredAllTxs.reduce((sum, t) => sum + t.amount, 0)
       expect(restoredBalance).toBe(initialBalance)
       expect(restoredBalance).toBe(2000)
+    })
+
+    it('deleting one rule among multiple rules preserves all other rules in the store', () => {
+      useAppStore.setState({
+        duplicateOverrideRules: [
+          {
+            id: 'rule-1',
+            descriptionPattern: 'Netflix',
+            amount: -12.99,
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 2,
+          },
+          {
+            id: 'rule-2',
+            descriptionPattern: 'Spotify',
+            amount: -9.99,
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+          {
+            id: 'rule-3',
+            descriptionPattern: 'Gym Membership',
+            amount: -45,
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 5,
+          },
+        ],
+      })
+
+      expect(useAppStore.getState().duplicateOverrideRules).toHaveLength(3)
+
+      // Delete only rule-2
+      useAppStore.getState().removeDuplicateOverrideRule('rule-2')
+
+      const state = useAppStore.getState()
+      expect(state.duplicateOverrideRules).toHaveLength(2)
+      expect(state.duplicateOverrideRules.map((r) => r.id)).toEqual(['rule-1', 'rule-3'])
+      expect(state.duplicateOverrideRules.map((r) => r.descriptionPattern)).toEqual(['Netflix', 'Gym Membership'])
+    })
+
+    it('handles legacy rules with missing or duplicate IDs without deleting all rules', () => {
+      // 1. Verify sanitizeDuplicateOverrideRules assigns unique IDs to legacy rules
+      const legacyRules = [
+        {
+          descriptionPattern: 'Rewe Supermarkt',
+          amount: -25.5,
+          createdAt: '2026-03-01T00:00:00Z',
+          applyCount: 1,
+        } as any,
+        {
+          descriptionPattern: 'Aldi Sud',
+          amount: -18.2,
+          createdAt: '2026-03-01T00:00:00Z',
+          applyCount: 2,
+        } as any,
+      ]
+      const sanitized = sanitizeDuplicateOverrideRules(legacyRules)
+      expect(sanitized).toHaveLength(2)
+      expect(sanitized[0].id).toBeTruthy()
+      expect(sanitized[1].id).toBeTruthy()
+      expect(sanitized[0].id).not.toBe(sanitized[1].id)
+
+      // 2. Verify state with duplicate IDs disambiguates on deletion
+      useAppStore.setState({
+        duplicateOverrideRules: [
+          {
+            id: 'rule-dup',
+            descriptionPattern: 'Rewe Supermarkt',
+            amount: -25.5,
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+          {
+            id: 'rule-dup',
+            descriptionPattern: 'Aldi Sud',
+            amount: -18.2,
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 2,
+          },
+        ],
+      })
+
+      // When deleting 'rule-dup', only the first matching rule is deleted,
+      // and the second rule with colliding ID gets a fresh unique ID so it is preserved!
+      useAppStore.getState().removeDuplicateOverrideRule('rule-dup')
+
+      const afterState = useAppStore.getState()
+      expect(afterState.duplicateOverrideRules).toHaveLength(1)
+      expect(afterState.duplicateOverrideRules[0].descriptionPattern).toBe('Aldi Sud')
+      expect(afterState.duplicateOverrideRules[0].id).not.toBe('rule-dup')
+    })
+
+    it('deleting one rule with mode "both" preserves transactions belonging to other rules', () => {
+      useAppStore.setState({
+        duplicateOverrideRules: [
+          {
+            id: 'rule-netflix',
+            descriptionPattern: 'Netflix',
+            amount: -12.99,
+            institutionId: 'bank-1',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+          {
+            id: 'rule-spotify',
+            descriptionPattern: 'Spotify',
+            amount: -9.99,
+            institutionId: 'bank-1',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+        ],
+        importedAccounts: [
+          {
+            institutionId: 'bank-1',
+            institutionName: 'Bank One',
+            importedAt: '2026-03-01T00:00:00Z',
+            importedFingerprints: ['fp-1'],
+            transactions: [
+              {
+                id: 'tx-clean',
+                date: '2026-03-01',
+                description: 'Clean Salary',
+                amount: 3000,
+                currency: 'EUR',
+                type: 'income',
+                institution: 'Bank One',
+              },
+            ],
+            duplicateTransactions: [
+              {
+                id: 'tx-netflix-dup',
+                date: '2026-03-01',
+                description: 'Netflix',
+                amount: -12.99,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Bank One',
+                importedByRuleId: 'rule-netflix',
+                isDuplicate: true,
+              },
+              {
+                id: 'tx-spotify-dup',
+                date: '2026-03-01',
+                description: 'Spotify',
+                amount: -9.99,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Bank One',
+                importedByRuleId: 'rule-spotify',
+                isDuplicate: true,
+              },
+            ],
+            modifiedTransactions: [
+              {
+                id: 'tx-netflix-mod',
+                date: '2026-03-01',
+                description: 'Netflix Adjusted',
+                amount: -12.99,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Bank One',
+                importedByRuleId: 'rule-netflix',
+                isDuplicate: true,
+                isModified: true,
+              },
+              {
+                id: 'tx-spotify-mod',
+                date: '2026-03-01',
+                description: 'Spotify Adjusted',
+                amount: -9.99,
+                currency: 'EUR',
+                type: 'expense',
+                institution: 'Bank One',
+                importedByRuleId: 'rule-spotify',
+                isDuplicate: true,
+                isModified: true,
+              },
+            ],
+          },
+        ],
+      })
+
+      // Delete only rule-netflix in mode 'both'
+      useAppStore.getState().removeDuplicateOverrideRule('rule-netflix', 'both')
+
+      const state = useAppStore.getState()
+      // Rule list: only spotify remains
+      expect(state.duplicateOverrideRules).toHaveLength(1)
+      expect(state.duplicateOverrideRules[0].id).toBe('rule-spotify')
+
+      const account = state.importedAccounts[0]
+      // Clean transactions untouched
+      expect(account.transactions).toHaveLength(1)
+      expect(account.transactions[0].id).toBe('tx-clean')
+
+      // Duplicate transactions: netflix removed, spotify preserved
+      expect(account.duplicateTransactions).toHaveLength(1)
+      expect(account.duplicateTransactions?.[0].id).toBe('tx-spotify-dup')
+
+      // Modified transactions: netflix removed, spotify preserved
+      expect(account.modifiedTransactions).toHaveLength(1)
+      expect(account.modifiedTransactions?.[0].id).toBe('tx-spotify-mod')
+    })
+
+    it('calling removeDuplicateOverrideRule with falsy or non-existent ID does not delete any rules or transactions', () => {
+      useAppStore.setState({
+        duplicateOverrideRules: [
+          {
+            id: 'rule-a',
+            descriptionPattern: 'Rule A',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+          {
+            id: 'rule-b',
+            descriptionPattern: 'Rule B',
+            createdAt: '2026-03-01T00:00:00Z',
+            applyCount: 1,
+          },
+        ],
+      })
+
+      useAppStore.getState().removeDuplicateOverrideRule('' as any)
+      useAppStore.getState().removeDuplicateOverrideRule('   ' as any)
+      useAppStore.getState().removeDuplicateOverrideRule(undefined as any)
+      useAppStore.getState().removeDuplicateOverrideRule('non-existent-id')
+
+      expect(useAppStore.getState().duplicateOverrideRules).toHaveLength(2)
+      expect(useAppStore.getState().duplicateOverrideRules.map((r) => r.id)).toEqual(['rule-a', 'rule-b'])
     })
   })
 
