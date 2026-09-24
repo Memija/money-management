@@ -118,7 +118,7 @@ export function usePreviewTransactionsFilter({
         if (aUnlocked !== bUnlocked) {
           return aUnlocked ? -1 : 1
         }
-        if (key === 'date') return a.date.localeCompare(b.date) * factor
+        if (key === 'date') return (a.date < b.date ? -1 : a.date > b.date ? 1 : 0) * factor
         if (key === 'description') return a.description.localeCompare(b.description) * factor
         if (key === 'amount') return (a.amount - b.amount) * factor
         return 0

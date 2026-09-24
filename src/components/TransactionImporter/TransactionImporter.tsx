@@ -21,15 +21,13 @@ import styles from './TransactionImporter.module.css'
 
 /* ─── component ─── */
 const TransactionImporter: React.FC = () => {
-  const {
-    selectedInstitution,
-    addImportedAccount,
-    addDuplicateOverrideRule,
-    setStep,
-    getDuplicateTransactionStats,
-    importedAccounts,
-    cancelImport,
-  } = useAppStore()
+  const selectedInstitution = useAppStore((s) => s.selectedInstitution)
+  const addImportedAccount = useAppStore((s) => s.addImportedAccount)
+  const addDuplicateOverrideRule = useAppStore((s) => s.addDuplicateOverrideRule)
+  const setStep = useAppStore((s) => s.setStep)
+  const getDuplicateTransactionStats = useAppStore((s) => s.getDuplicateTransactionStats)
+  const importedAccounts = useAppStore((s) => s.importedAccounts)
+  const cancelImport = useAppStore((s) => s.cancelImport)
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency } = useFormatters()
   const institutionName = selectedInstitution?.name ?? 'Unknown'

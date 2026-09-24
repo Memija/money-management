@@ -16,12 +16,12 @@ export function normalizeTransferText(text: string): string {
  * Calculates absolute difference between two ISO date strings (YYYY-MM-DD) in calendar days.
  */
 export function dateDiffInDays(dateA: string, dateB: string): number {
-  const d1 = new Date(dateA).getTime()
-  const d2 = new Date(dateB).getTime()
+  const d1 = Date.parse(dateA)
+  const d2 = Date.parse(dateB)
   if (Number.isNaN(d1) || Number.isNaN(d2)) {
     return Infinity
   }
-  return Math.abs(d1 - d2) / (1000 * 60 * 60 * 24)
+  return Math.abs(d1 - d2) / 86400000
 }
 
 /**
@@ -245,76 +245,104 @@ export function filterInternalSpaceTransfers(
 
   // Sort chronologically so earlier transfers bind to earlier matching counterparties
   const indexed = transactions.map((tx, originalIndex) => ({ tx, originalIndex }))
-  indexed.sort((a, b) => a.tx.date.localeCompare(b.tx.date))
+  indexed.sort((a, b) => (a.tx.date < b.tx.date ? -1 : a.tx.date > b.tx.date ? 1 : 0))
+
+  // Index items by rounded cents for O(1) candidate lookup
+  const itemsByCents = new Map<number, typeof indexed>()
+  for (const item of indexed) {
+    const cents = Math.round(item.tx.amount * 100)
+    let list = itemsByCents.get(cents)
+    if (!list) {
+      list = []
+      itemsByCents.set(cents, list)
+    }
+    list.push(item)
+  }
+
+  // Pre-normalize transfer descriptions and extract flags to avoid repeating regexes
+  const normDescMap = new Map<string, string>()
+  const extCounterpartyMap = new Map<string, boolean>()
+  const spaceKeywordMap = new Map<string, boolean>()
+  const reversalMap = new Map<string, boolean>()
+  const depotMap = new Map<string, boolean>()
+  const meaningfulWordsMap = new Map<string, string[]>()
+
+  for (const item of indexed) {
+    const desc = item.tx.description || ''
+    const norm = normalizeTransferText(desc)
+    normDescMap.set(item.tx.id, norm)
+    extCounterpartyMap.set(item.tx.id, hasExternalCounterparty(item.tx))
+    spaceKeywordMap.set(item.tx.id, hasSpaceTransferKeyword(norm))
+    reversalMap.set(item.tx.id, REVERSAL_KEYWORDS.some((kw) => norm.includes(kw)))
+    depotMap.set(item.tx.id, norm.includes('depot'))
+    meaningfulWordsMap.set(
+      item.tx.id,
+      norm.split(' ').filter((w) => w.length >= 3 && !BANKING_STOP_WORDS.has(w)),
+    )
+  }
 
   for (let i = 0; i < indexed.length; i++) {
     const itemA = indexed[i]
     if (usedTxIds.has(itemA.tx.id)) continue
+    if (itemA.tx.amount === 0) continue
+
+    const targetCents = -Math.round(itemA.tx.amount * 100)
+    const candidates = itemsByCents.get(targetCents)
+    if (!candidates || candidates.length === 0) continue
 
     let bestMatch: (typeof indexed)[0] | null = null
     let minDays = Infinity
 
-    for (let j = 0; j < indexed.length; j++) {
-      if (i === j) continue
-      const itemB = indexed[j]
+    for (let j = 0; j < candidates.length; j++) {
+      const itemB = candidates[j]
+      if (itemA.tx.id === itemB.tx.id) continue
       if (usedTxIds.has(itemB.tx.id)) continue
 
       // 1. Amounts must be equal and opposite
       if (Math.abs(itemA.tx.amount + itemB.tx.amount) > 0.001) continue
-      if (Math.sign(itemA.tx.amount) === Math.sign(itemB.tx.amount) || itemA.tx.amount === 0) continue
+      if (Math.sign(itemA.tx.amount) === Math.sign(itemB.tx.amount)) continue
 
-      // 2. Dates must be within 1 calendar day (space transfers are immediate/same day)
+      // 2. Dates must be within 1 calendar day
       const diffDays = dateDiffInDays(itemA.tx.date, itemB.tx.date)
       if (diffDays > 1) continue
 
       // 3. External transfers with counterparty IBANs cannot be intra-statement space transfers
-      if (hasExternalCounterparty(itemA.tx) || hasExternalCounterparty(itemB.tx)) {
+      if (extCounterpartyMap.get(itemA.tx.id) || extCounterpartyMap.get(itemB.tx.id)) {
         continue
       }
 
-      const normDescA = normalizeTransferText(itemA.tx.description)
-      const normDescB = normalizeTransferText(itemB.tx.description)
-
       // Ignore reversals / chargebacks / refunds from being misclassified as space transfers
-      const hasReversalA = REVERSAL_KEYWORDS.some((kw) => normDescA.includes(kw))
-      const hasReversalB = REVERSAL_KEYWORDS.some((kw) => normDescB.includes(kw))
-      if (hasReversalA || hasReversalB) {
+      if (reversalMap.get(itemA.tx.id) || reversalMap.get(itemB.tx.id)) {
         continue
       }
 
       // Custody/brokerage depot transfers are not internal space movements
-      if (normDescA.includes('depot') || normDescB.includes('depot')) {
+      if (depotMap.get(itemA.tx.id) || depotMap.get(itemB.tx.id)) {
         continue
       }
 
       // 4. Clues: At least one side MUST have a space/transfer keyword
-      const hasSpaceKeywordA = hasSpaceTransferKeyword(normDescA)
-      const hasSpaceKeywordB = hasSpaceTransferKeyword(normDescB)
-
+      const hasSpaceKeywordA = spaceKeywordMap.get(itemA.tx.id) ?? false
+      const hasSpaceKeywordB = spaceKeywordMap.get(itemB.tx.id) ?? false
       if (!hasSpaceKeywordA && !hasSpaceKeywordB) {
         continue
       }
 
-      const meaningfulWordsA = normDescA
-        .split(' ')
-        .filter((w) => w.length >= 3 && !BANKING_STOP_WORDS.has(w))
-      const meaningfulWordsB = normDescB
-        .split(' ')
-        .filter((w) => w.length >= 3 && !BANKING_STOP_WORDS.has(w))
+      const normDescA = normDescMap.get(itemA.tx.id) ?? ''
+      const normDescB = normDescMap.get(itemB.tx.id) ?? ''
+
+      const meaningfulWordsA = meaningfulWordsMap.get(itemA.tx.id) ?? []
+      const meaningfulWordsB = meaningfulWordsMap.get(itemB.tx.id) ?? []
       const sharedMeaningfulWords = meaningfulWordsA.filter((w) => meaningfulWordsB.includes(w))
 
       const isDescCrossReference =
         (normDescA.length >= 4 && !BANKING_STOP_WORDS.has(normDescA) && normDescB.includes(normDescA)) ||
         (normDescB.length >= 4 && !BANKING_STOP_WORDS.has(normDescB) && normDescA.includes(normDescB))
 
-      // Valid space pair:
-      // - Both have explicit space keywords, OR
-      // - Direct cross-reference of the description/space name, OR
-      // - At least 2 meaningful shared non-stopword tokens (e.g. multi-word space target)
       const isSpacePair =
         (hasSpaceKeywordA && hasSpaceKeywordB) ||
         isDescCrossReference ||
-        (sharedMeaningfulWords.length >= 2)
+        sharedMeaningfulWords.length >= 2
 
       if (isSpacePair) {
         if (diffDays < minDays) {
@@ -553,31 +581,51 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
 
   const candidatePairs: CandidatePair[] = []
 
-  for (let i = 0; i < allIndexed.length; i++) {
-    const itemA = allIndexed[i]
-    for (let j = i + 1; j < allIndexed.length; j++) {
-      const itemB = allIndexed[j]
-      if (itemA.accIdx === itemB.accIdx) continue
-      if (
-        accounts[itemA.accIdx].institutionId &&
-        accounts[itemA.accIdx].institutionId === accounts[itemB.accIdx].institutionId
-      ) {
-        continue
+  // Group candidate negative transactions by absolute rounded cents for O(1) matching
+  const negativeByCents = new Map<number, IndexedTx[]>()
+  for (const item of allIndexed) {
+    if (item.tx.amount < 0) {
+      const cents = Math.abs(Math.round(item.tx.amount * 100))
+      let list = negativeByCents.get(cents)
+      if (!list) {
+        list = []
+        negativeByCents.set(cents, list)
       }
+      list.push(item)
+    }
+  }
 
-      const score = calculateTransferCandidateScore(
-        itemA.tx,
-        accounts[itemA.accIdx],
-        itemB.tx,
-        accounts[itemB.accIdx],
-      )
-      if (score > 0) {
-        candidatePairs.push({
-          itemA,
-          itemB,
-          score,
-          diffDays: dateDiffInDays(itemA.tx.date, itemB.tx.date),
-        })
+  for (const itemA of allIndexed) {
+    if (itemA.tx.amount <= 0) continue
+    const posCents = Math.round(itemA.tx.amount * 100)
+
+    for (let c = posCents - 1; c <= posCents + 1; c++) {
+      const candidates = negativeByCents.get(c)
+      if (!candidates || candidates.length === 0) continue
+
+      for (const itemB of candidates) {
+        if (itemA.accIdx === itemB.accIdx) continue
+        if (
+          accounts[itemA.accIdx].institutionId &&
+          accounts[itemA.accIdx].institutionId === accounts[itemB.accIdx].institutionId
+        ) {
+          continue
+        }
+
+        const score = calculateTransferCandidateScore(
+          itemA.tx,
+          accounts[itemA.accIdx],
+          itemB.tx,
+          accounts[itemB.accIdx],
+        )
+        if (score > 0) {
+          candidatePairs.push({
+            itemA,
+            itemB,
+            score,
+            diffDays: dateDiffInDays(itemA.tx.date, itemB.tx.date),
+          })
+        }
       }
     }
   }
@@ -613,10 +661,16 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
     knownAccountIbans.set(accIdx, ibanSet)
   })
 
+  // Fast O(1) map of tx.id to IndexedTx
+  const txById = new Map<string, IndexedTx>()
+  for (const it of allIndexed) {
+    txById.set(it.tx.id, it)
+  }
+
   // Learn IBANs from matched pairs in Phase 1
   for (const [txAId, txBId] of matchedPairsMap.entries()) {
-    const itemA = allIndexed.find((it) => it.tx.id === txAId)
-    const itemB = allIndexed.find((it) => it.tx.id === txBId)
+    const itemA = txById.get(txAId)
+    const itemB = txById.get(txBId)
     if (!itemA || !itemB || itemA.accIdx === itemB.accIdx) continue
 
     const ibansOfB = knownAccountIbans.get(itemB.accIdx)
@@ -644,28 +698,40 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
   // has a non-overlapping date range or does not cover older dates)
   const singleLeggedGhostTxIds = new Set<string>()
 
+  // Pre-combine other account IBANs for each account index to avoid inner loop set iteration
+  const otherIbansByAccIdx = new Map<number, Set<string>>()
+  accounts.forEach((_, accIdx) => {
+    const combined = new Set<string>()
+    for (const [otherIdx, ibans] of knownAccountIbans.entries()) {
+      if (otherIdx !== accIdx) {
+        for (const ib of ibans) {
+          combined.add(ib)
+        }
+      }
+    }
+    otherIbansByAccIdx.set(accIdx, combined)
+  })
+
   for (let i = 0; i < allIndexed.length; i++) {
     const itemA = allIndexed[i]
     if (matchedPairsMap.has(itemA.tx.id)) continue
 
-    const txIbans = [
-      ...(itemA.tx.counterpartyIban ? [itemA.tx.counterpartyIban.toUpperCase().replace(/\s+/g, '')] : []),
-      ...extractIbans(itemA.tx.description).map((ib) => ib.toUpperCase().replace(/\s+/g, '')),
-    ]
+    const otherIbans = otherIbansByAccIdx.get(itemA.accIdx)
+    if (!otherIbans || otherIbans.size === 0) continue
 
-    if (txIbans.length === 0) continue
-
-    let matchesOtherAccount = false
-    for (const [otherAccIdx, otherIbans] of knownAccountIbans.entries()) {
-      if (otherAccIdx === itemA.accIdx) continue
-      if (txIbans.some((iban) => otherIbans.has(iban))) {
-        matchesOtherAccount = true
-        break
-      }
+    const counterIban = itemA.tx.counterpartyIban
+      ? itemA.tx.counterpartyIban.toUpperCase().replace(/\s+/g, '')
+      : ''
+    if (counterIban && otherIbans.has(counterIban)) {
+      singleLeggedGhostTxIds.add(itemA.tx.id)
+      continue
     }
 
-    if (matchesOtherAccount) {
-      singleLeggedGhostTxIds.add(itemA.tx.id)
+    const descIbans = extractIbans(itemA.tx.description)
+    if (descIbans.length > 0) {
+      if (descIbans.some((ib) => otherIbans.has(ib.toUpperCase().replace(/\s+/g, '')))) {
+        singleLeggedGhostTxIds.add(itemA.tx.id)
+      }
     }
   }
 

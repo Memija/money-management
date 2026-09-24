@@ -25,7 +25,7 @@ import { TransactionList } from './TransactionList'
 import styles from './Dashboard.module.css'
 
 const Dashboard: React.FC = () => {
-  const { importedAccounts } = useAppStore()
+  const importedAccounts = useAppStore((s) => s.importedAccounts)
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatMonthYear } = useFormatters()
 

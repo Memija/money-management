@@ -209,6 +209,7 @@ export const countDuplicateTransactionsInAccounts = (
   duplicateOverrideRules: DuplicateOverrideRule[] = [],
 ): number => {
   let count = 0
+  const ruleIdSet = new Set(duplicateOverrideRules.map((r) => r.id))
   for (const account of importedAccounts) {
     if (account.duplicateTransactions?.length) {
       count += account.duplicateTransactions.length
@@ -221,12 +222,9 @@ export const countDuplicateTransactionsInAccounts = (
         count++
         continue
       }
-      if (tx.importedByRuleId) {
-        const ruleExists = duplicateOverrideRules.some((r) => r.id === tx.importedByRuleId)
-        if (!ruleExists) {
-          count++
-          continue
-        }
+      if (tx.importedByRuleId && !ruleIdSet.has(tx.importedByRuleId)) {
+        count++
+        continue
       }
     }
   }
@@ -460,30 +458,27 @@ export const useAppStore = create<AppState>()(
         let removedCount = 0
         set((state) => {
           const rules = state.duplicateOverrideRules || []
+          const ruleIdSet = new Set(rules.map((r) => r.id))
           const updatedAccounts = state.importedAccounts.map((account) => {
             const dups = account.duplicateTransactions || []
             const modified = account.modifiedTransactions || []
             removedCount += dups.length + modified.length
-            const seenKeys = new Map<string, number>()
+            const seenKeys = new Set<string>()
             const filteredTxs = account.transactions.filter((tx) => {
               if (tx.forceImport || tx.isDuplicate) {
                 removedCount++
                 return false
               }
-              if (tx.importedByRuleId) {
-                const ruleExists = rules.some((r) => r.id === tx.importedByRuleId)
-                if (!ruleExists) {
-                  removedCount++
-                  return false
-                }
-              }
-              const key = toCanonicalTransactionKey(tx)
-              const count = seenKeys.get(key) || 0
-              seenKeys.set(key, count + 1)
-              if (count > 0) {
+              if (tx.importedByRuleId && !ruleIdSet.has(tx.importedByRuleId)) {
                 removedCount++
                 return false
               }
+              const key = toCanonicalTransactionKey(tx)
+              if (seenKeys.has(key)) {
+                removedCount++
+                return false
+              }
+              seenKeys.add(key)
               return true
             })
             return {
@@ -808,6 +803,7 @@ export const useAppStore = create<AppState>()(
           }
         }
 
+        const cleanMatchCache = new Map<string, Transaction | null>()
         const getOriginalKeyForTx = (tx: Transaction, account: ImportedAccount): string => {
           if (
             tx.originalDescription !== undefined ||
@@ -823,9 +819,15 @@ export const useAppStore = create<AppState>()(
           if (tx.importedByRuleId) {
             const rule = duplicateOverrideRules?.find((r) => r.id === tx.importedByRuleId)
             if (rule) {
-              const matchedClean = account.transactions.find((ct) =>
-                isOriginalTransactionMatchForRule(rule, ct, account.institutionId),
-              )
+              const cacheKey = `${account.institutionId || ''}|${rule.id}`
+              let matchedClean = cleanMatchCache.get(cacheKey)
+              if (matchedClean === undefined) {
+                matchedClean =
+                  account.transactions.find((ct) =>
+                    isOriginalTransactionMatchForRule(rule, ct, account.institutionId),
+                  ) ?? null
+                cleanMatchCache.set(cacheKey, matchedClean)
+              }
               if (matchedClean) {
                 return toCanonicalTransactionKey(matchedClean)
               }
@@ -865,6 +867,14 @@ export const useAppStore = create<AppState>()(
         }
 
         const rules = duplicateOverrideRules || []
+        const applicableRules = rules.filter(
+          (r) =>
+            !r.institutionId ||
+            !institutionId ||
+            r.institutionId === 'unknown' ||
+            institutionId === 'unknown' ||
+            r.institutionId === institutionId,
+        )
         const duplicateIds: string[] = []
         const alreadyDuplicatedIds: string[] = []
 
@@ -887,7 +897,9 @@ export const useAppStore = create<AppState>()(
             duplicateIds.push(t.id)
             alreadyDuplicatedIds.push(t.id)
           } else if (cleanAvail) {
-            const isOverridden = rules.some((r) => matchesDuplicateOverrideRule(r, t, institutionId))
+            const isOverridden =
+              applicableRules.length > 0 &&
+              applicableRules.some((r) => matchesDuplicateOverrideRule(r, t, institutionId))
             if (!isOverridden) {
               duplicateIds.push(t.id)
             }

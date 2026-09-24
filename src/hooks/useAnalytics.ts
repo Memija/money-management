@@ -148,7 +148,9 @@ export const useAnalytics = (
   formatMonthYear: (dateString: string) => string,
   catColorClassPrefix: string = 'cat-color-',
 ): AnalyticsData => {
-  const { customKeywords, manualCategories, customCategories } = useAppStore()
+  const customKeywords = useAppStore((s) => s.customKeywords)
+  const manualCategories = useAppStore((s) => s.manualCategories)
+  const customCategories = useAppStore((s) => s.customCategories)
 
   // Exclude ghost transactions (internal transfers between own accounts) from financial analytics
   const activeRawTransactions = useMemo(
@@ -184,9 +186,9 @@ export const useAnalytics = (
     })
 
     return {
-      availableYears: [...years].sort().reverse(),
-      availableQuarters: [...quarters].sort().reverse(),
-      availableMonths: [...months].sort().reverse(),
+      availableYears: [...years].sort((a, b) => (b < a ? -1 : b > a ? 1 : 0)),
+      availableQuarters: [...quarters].sort((a, b) => (b < a ? -1 : b > a ? 1 : 0)),
+      availableMonths: [...months].sort((a, b) => (b < a ? -1 : b > a ? 1 : 0)),
     }
   }, [allTransactions])
 
@@ -340,7 +342,7 @@ export const useAnalytics = (
     })
 
     return Object.entries(map)
-      .sort((a, b) => a[0].localeCompare(b[0]))
+      .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
       .map(([month, data]) => ({
         name: formatMonthYear(month),
         rawMonth: month,
@@ -351,39 +353,29 @@ export const useAnalytics = (
 
   // Top merchants
   const topMerchants = useMemo(() => {
-    const map: Record<string, { amount: number; count: number; categoryCounts: Record<string, number> }> = {}
+    const map: Record<
+      string,
+      { displayName: string; amount: number; count: number; categoryCounts: Record<string, number> }
+    > = {}
+
     periodTransactions
       .filter((t) => t.type === 'expense')
       .forEach((t) => {
-        // Normalize: trim, collapse whitespace, title-case
         const name = t.description.trim().replace(/\s+/g, ' ')
         const key = name.toLowerCase()
         if (!map[key]) {
-          map[key] = { amount: 0, count: 0, categoryCounts: {} }
+          map[key] = { displayName: name, amount: 0, count: 0, categoryCounts: {} }
         }
         map[key].amount += Math.abs(t.amount)
         map[key].count++
         const cat = t.category || 'Other'
         map[key].categoryCounts[cat] = (map[key].categoryCounts[cat] || 0) + 1
-        // Keep original-cased name from first occurrence
       })
 
-    // Build final list with display names
-    const nameMap: Record<string, string> = {}
-    periodTransactions
-      .filter((t) => t.type === 'expense')
-      .forEach((t) => {
-        const name = t.description.trim().replace(/\s+/g, ' ')
-        const key = name.toLowerCase()
-        if (!nameMap[key]) {
-          nameMap[key] = name
-        }
-      })
-
-    return Object.entries(map)
-      .sort((a, b) => b[1].amount - a[1].amount)
+    return Object.values(map)
+      .sort((a, b) => b.amount - a.amount)
       .slice(0, 10)
-      .map(([key, data]) => {
+      .map((data) => {
         let topCategory = 'Other'
         let maxCount = -1
         Object.entries(data.categoryCounts).forEach(([cat, count]) => {
@@ -394,7 +386,7 @@ export const useAnalytics = (
         })
 
         return {
-          name: nameMap[key] || key,
+          name: data.displayName,
           amount: Math.round(data.amount * 100) / 100,
           count: data.count,
           category: topCategory,
@@ -417,7 +409,7 @@ export const useAnalytics = (
       })
 
     return Object.entries(map)
-      .sort((a, b) => a[0].localeCompare(b[0]))
+      .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
       .map(([month, cats]) => {
         const entry: MonthlyCategoryEntry = { month: formatMonthYear(month) }
         for (const [cat, val] of Object.entries(cats)) {

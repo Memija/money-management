@@ -37,6 +37,8 @@ for (const locale of Object.values(translations)) {
   }
 }
 
+const defaultCategoryCache = new Map<string, string>()
+
 /**
  * Infers a category from a transaction description using keyword matching.
  * Returns one of the standardized category keys (e.g. 'Salary', 'Groceries').
@@ -54,6 +56,11 @@ export function categorize(desc: string, customKeywords?: Record<string, string[
         return cat
       }
     }
+  }
+
+  const cached = defaultCategoryCache.get(d)
+  if (cached !== undefined) {
+    return cached
   }
 
   // Evaluate in the original priority order
@@ -75,11 +82,13 @@ export function categorize(desc: string, customKeywords?: Record<string, string[
   for (const cat of order) {
     if (categoryRegexes[cat]?.test(d)) {
       // Map 'DiningOut' back to 'Dining Out' for the internal key
-      if (cat === 'DiningOut') return 'Dining Out'
-      return cat
+      const result = cat === 'DiningOut' ? 'Dining Out' : cat
+      defaultCategoryCache.set(d, result)
+      return result
     }
   }
 
+  defaultCategoryCache.set(d, 'Other')
   return 'Other'
 }
 

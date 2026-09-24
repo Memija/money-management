@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ChevronLeft,
@@ -136,16 +136,19 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     return effectiveTx.slice(start, start + pageSize)
   }, [effectiveTx, safeCurrentPage, pageSize])
 
-  const handleCategoryChange = (tx: Transaction, newCategory: string) => {
-    setManualCategory(tx.id, newCategory)
-    const norm = normalizeDescription(tx.description)
-    if (norm.length >= 3) {
-      const existingKeywords = customKeywords[newCategory] || []
-      if (!existingKeywords.some((kw) => kw.toLowerCase() === norm.toLowerCase())) {
-        setCustomKeywords(newCategory, [...existingKeywords, norm])
+  const handleCategoryChange = useCallback(
+    (tx: Transaction, newCategory: string) => {
+      setManualCategory(tx.id, newCategory)
+      const norm = normalizeDescription(tx.description)
+      if (norm.length >= 3) {
+        const existingKeywords = customKeywords[newCategory] || []
+        if (!existingKeywords.some((kw) => kw.toLowerCase() === norm.toLowerCase())) {
+          setCustomKeywords(newCategory, [...existingKeywords, norm])
+        }
       }
-    }
-  }
+    },
+    [setManualCategory, customKeywords, setCustomKeywords],
+  )
 
   const handleResetFilters = () => {
     setSearchTerm('')

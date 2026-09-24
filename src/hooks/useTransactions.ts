@@ -6,7 +6,9 @@ import { getTransactionCategory } from '../utils/category-utils'
 import { filterByPeriod, type PeriodFilter } from './useAnalytics'
 
 export function useTransactions(period?: PeriodFilter) {
-  const { importedAccounts, customKeywords, manualCategories } = useAppStore()
+  const importedAccounts = useAppStore((s) => s.importedAccounts)
+  const customKeywords = useAppStore((s) => s.customKeywords)
+  const manualCategories = useAppStore((s) => s.manualCategories)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedInstitution, setSelectedInstitution] = useState<string>('all')
@@ -52,19 +54,20 @@ export function useTransactions(period?: PeriodFilter) {
     if (selectedInstitution !== 'all') {
       txs = txs.filter((t) => t.institution === selectedInstitution)
     }
-    if (searchTerm) {
+    const term = searchTerm.trim().toLowerCase()
+    if (term) {
       txs = txs.filter(
         (t) =>
-          t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          t.category?.toLowerCase().includes(searchTerm.toLowerCase()),
+          t.description.toLowerCase().includes(term) ||
+          (t.category && t.category.toLowerCase().includes(term)),
       )
     }
     switch (sortOrder) {
       case 'newest':
-        txs = [...txs].sort((a, b) => b.date.localeCompare(a.date))
+        txs = [...txs].sort((a, b) => (b.date < a.date ? -1 : b.date > a.date ? 1 : 0))
         break
       case 'oldest':
-        txs = [...txs].sort((a, b) => a.date.localeCompare(b.date))
+        txs = [...txs].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
         break
       case 'highest':
         txs = [...txs].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))

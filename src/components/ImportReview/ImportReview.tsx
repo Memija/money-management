@@ -19,7 +19,9 @@ import type { ImportedAccount } from '../../types'
 import styles from './ImportReview.module.css'
 
 const ImportReview: React.FC = () => {
-  const { importedAccounts, startNewInstitution, setStep } = useAppStore()
+  const importedAccounts = useAppStore((s) => s.importedAccounts)
+  const startNewInstitution = useAppStore((s) => s.startNewInstitution)
+  const setStep = useAppStore((s) => s.setStep)
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatTransactionCount, locale } = useFormatters()
   // Map bs/sr to de-DE consistent with useFormatters (Chromium stripped ICU data for these)
@@ -43,30 +45,36 @@ const ImportReview: React.FC = () => {
     )
   }, [importedAccounts])
 
-  const totalTransactions = importedAccounts.reduce(
-    (sum, acc) =>
-      sum +
-      acc.transactions.length +
-      (acc.duplicateTransactions?.length || 0) +
-      (acc.modifiedTransactions?.length || 0),
-    0,
+  const totalTransactions = React.useMemo(
+    () =>
+      importedAccounts.reduce(
+        (sum, acc) =>
+          sum +
+          acc.transactions.length +
+          (acc.duplicateTransactions?.length || 0) +
+          (acc.modifiedTransactions?.length || 0),
+        0,
+      ),
+    [importedAccounts],
   )
-  const totalIncome = importedAccounts.reduce(
-    (sum, acc) =>
-      sum +
-      getAllAccountTransactions(acc)
-        .filter((t) => t.type === 'income' && !t.isGhost)
-        .reduce((s, t) => s + t.amount, 0),
-    0,
-  )
-  const totalExpenses = importedAccounts.reduce(
-    (sum, acc) =>
-      sum +
-      getAllAccountTransactions(acc)
-        .filter((t) => t.type === 'expense' && !t.isGhost)
-        .reduce((s, t) => s + Math.abs(t.amount), 0),
-    0,
-  )
+
+  const { totalIncome, totalExpenses } = React.useMemo(() => {
+    let inc = 0
+    let exp = 0
+    for (const acc of importedAccounts) {
+      const all = [
+        ...(acc.transactions || []),
+        ...(acc.duplicateTransactions || []),
+        ...(acc.modifiedTransactions || []),
+      ]
+      for (const t of all) {
+        if (t.isGhost) continue
+        if (t.type === 'income') inc += t.amount
+        else if (t.type === 'expense') exp += Math.abs(t.amount)
+      }
+    }
+    return { totalIncome: inc, totalExpenses: exp }
+  }, [importedAccounts])
 
   return (
     <div className="onboarding-container">

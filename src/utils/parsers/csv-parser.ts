@@ -361,6 +361,20 @@ export function findSpaceTransferRowIndices(
 
   // Step 2: Historical / renamed space transfers
   const pairedDirectSide = new Set<number>()
+  const directByDateAndCents = new Map<string, number[]>()
+
+  for (const directIdx of directSpaceIndices) {
+    const row = dataRows[directIdx]
+    const date = row[dateIdx]?.toString().trim() ?? ''
+    const amt = getRowAmount(row)
+    const key = `${date}|${Math.round(amt * 100)}`
+    let list = directByDateAndCents.get(key)
+    if (!list) {
+      list = []
+      directByDateAndCents.set(key, list)
+    }
+    list.push(directIdx)
+  }
 
   for (let i = 1; i < dataRows.length; i++) {
     if (discarded.has(i)) continue
@@ -373,18 +387,17 @@ export function findSpaceTransferRowIndices(
     if (partnerIban) continue
 
     const account = row[accountIdx]?.toString().trim().toLowerCase()
-    const date = row[dateIdx]?.toString().trim()
+    const date = row[dateIdx]?.toString().trim() ?? ''
     const amount = getRowAmount(row)
+    const oppKey = `${date}|${Math.round(-amount * 100)}`
 
-    for (const otherIdx of directSpaceIndices) {
+    const candidates = directByDateAndCents.get(oppKey)
+    if (!candidates) continue
+
+    for (const otherIdx of candidates) {
       if (pairedDirectSide.has(otherIdx)) continue
 
       const other = dataRows[otherIdx]
-      if (other[dateIdx]?.toString().trim() !== date) continue
-
-      const otherAmount = getRowAmount(other)
-      if (Math.abs(amount + otherAmount) > 0.001) continue
-
       const otherPartner = other[pIdx]?.toString().trim().toLowerCase()
       const otherAccount = other[accountIdx]?.toString().trim().toLowerCase()
 

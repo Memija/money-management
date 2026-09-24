@@ -18,7 +18,7 @@ interface TransactionItemProps {
   onCategoryChange: (tx: Transaction, newCategory: string) => void
 }
 
-export const TransactionItem: React.FC<TransactionItemProps> = ({
+export const TransactionItem = React.memo<TransactionItemProps>(({
   tx,
   customCategories,
   formatDate,
@@ -117,4 +117,6 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
       </div>
     </div>
   )
-}
+})
+
+TransactionItem.displayName = 'TransactionItem'
