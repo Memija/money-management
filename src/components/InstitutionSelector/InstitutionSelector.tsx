@@ -112,13 +112,7 @@ const InstitutionSelector: React.FC = () => {
   }, [filtered])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -30 }}
-      transition={{ duration: 0.5 }}
-      className="onboarding-container"
-    >
+    <div className="onboarding-container">
       <div className={styles['nav-actions-wrapper']}>
         <button className={`back-button ${styles['back-button-clean']}`} onClick={() => setStep('country')} id="back-to-country">
           <ArrowLeft size={18} />
@@ -262,7 +256,7 @@ const InstitutionSelector: React.FC = () => {
           ))
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }
 

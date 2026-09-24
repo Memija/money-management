@@ -46,13 +46,7 @@ const CountrySelector: React.FC = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -30 }}
-      transition={{ duration: 0.5 }}
-      className="onboarding-container"
-    >
+    <div className="onboarding-container">
       {(importedAccounts || []).length > 0 && (
         <button
           className="back-button"
@@ -156,17 +150,15 @@ const CountrySelector: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
-      <motion.button
-        whileHover={{ scale: selected ? 1.02 : 1 }}
-        whileTap={{ scale: selected ? 0.98 : 1 }}
+      <button
         className={`primary-button ${!selected ? 'disabled' : ''}`}
         onClick={handleContinue}
         disabled={!selected}
         id="continue-button"
       >
         {t.continue}
-      </motion.button>
-    </motion.div>
+      </button>
+    </div>
   )
 }
 

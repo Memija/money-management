@@ -69,13 +69,7 @@ const ImportReview: React.FC = () => {
   )
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -30 }}
-      transition={{ duration: 0.5 }}
-      className="onboarding-container"
-    >
+    <div className="onboarding-container">
       <div className="onboarding-header">
         <motion.div
           initial={{ scale: 0 }}
@@ -189,20 +183,16 @@ const ImportReview: React.FC = () => {
 
       {/* Action Buttons */}
       <div className={styles['review-actions']}>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           className="secondary-button"
           onClick={startNewInstitution}
           id="add-another-institution"
         >
           <Plus size={18} />
           {t.addAnotherInstitution}
-        </motion.button>
+        </button>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           className={`primary-button ${hasDuplicateTransactions ? styles['button-warning-orange'] : styles['button-clean-green']}`}
           onClick={() => setStep('dashboard')}
           id="proceed-to-dashboard"
@@ -210,9 +200,9 @@ const ImportReview: React.FC = () => {
         >
           {t.proceedToAnalysis}
           <ArrowRight size={18} />
-        </motion.button>
+        </button>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

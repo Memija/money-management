@@ -1,15 +1,32 @@
 import React, { Suspense } from 'react'
-import { AnimatePresence } from 'framer-motion'
 
 import AppHeader from './components/layout/AppHeader'
 import { ErrorBoundary } from './components/shared/ErrorBoundary'
 
-const Dashboard = React.lazy(() => import('./components/Dashboard'))
-const ImportReview = React.lazy(() => import('./components/ImportReview'))
-const CountrySelector = React.lazy(() => import('./components/CountrySelector'))
-const InstitutionSelector = React.lazy(() => import('./components/InstitutionSelector'))
-const TransactionImporter = React.lazy(() => import('./components/TransactionImporter'))
+import CountrySelector from './components/CountrySelector'
+import InstitutionSelector from './components/InstitutionSelector'
+import TransactionImporter from './components/TransactionImporter'
+import ImportReview from './components/ImportReview'
+
+const LazyDashboard = React.lazy(() => import('./components/Dashboard'))
 const Settings = React.lazy(() => import('./components/Settings'))
+
+let preloadedDashboardComponent: React.ComponentType | null = null
+
+const preloadDashboard = (): Promise<void> => {
+  if (preloadedDashboardComponent) {
+    return Promise.resolve()
+  }
+  return import('./components/Dashboard')
+    .then((mod) => {
+      preloadedDashboardComponent = mod.default
+    })
+    .catch(() => {})
+}
+
+// Preload dashboard immediately in the background
+preloadDashboard()
+
 import { useAppStore } from './store/useAppStore'
 import { useLanguageStore } from './store/useLanguageStore'
 
@@ -25,13 +42,28 @@ const App: React.FC = () => {
     </div>
   )
 
+  // Ensure scroll is reset to top cleanly on each step transition
+  React.useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    } catch {
+      // Ignore in non-browser or test environments
+    }
+  }, [currentStep])
+
+  // Preload dashboard as soon as app is active
+  React.useEffect(() => {
+    preloadDashboard()
+  }, [])
+
   // Dashboard has its own full layout
   if (currentStep === 'dashboard') {
+    const ActiveDashboard = preloadedDashboardComponent || LazyDashboard
     return (
       <ErrorBoundary>
         <Suspense fallback={loadingFallback}>
           <AppHeader />
-          <Dashboard />
+          <ActiveDashboard />
         </Suspense>
       </ErrorBoundary>
     )
@@ -86,14 +118,10 @@ const App: React.FC = () => {
         </div>
 
         <ErrorBoundary>
-          <Suspense fallback={loadingFallback}>
-            <AnimatePresence mode="wait">
-              {currentStep === 'country' && <CountrySelector key="country" />}
-              {currentStep === 'institution' && <InstitutionSelector key="institution" />}
-              {currentStep === 'import' && <TransactionImporter key="import" />}
-              {currentStep === 'review' && <ImportReview key="review" />}
-            </AnimatePresence>
-          </Suspense>
+          {currentStep === 'country' && <CountrySelector key="country" />}
+          {currentStep === 'institution' && <InstitutionSelector key="institution" />}
+          {currentStep === 'import' && <TransactionImporter key="import" />}
+          {currentStep === 'review' && <ImportReview key="review" />}
         </ErrorBoundary>
       </div>
     </>

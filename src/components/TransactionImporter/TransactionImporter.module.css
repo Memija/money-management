@@ -535,6 +535,7 @@
 .button-warning-orange:active:not(:disabled) {
   background: #b45309 !important;
   transform: translateY(1px);
+  transition: none !important;
 }
 
 .button-clean-green {
@@ -554,6 +555,7 @@
 .button-clean-green:active:not(:disabled) {
   background: #047857 !important;
   transform: translateY(1px);
+  transition: none !important;
 }
 
 :global([data-theme='light']) .duplicate-banner-action-btn {

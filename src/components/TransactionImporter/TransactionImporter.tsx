@@ -350,13 +350,7 @@ const TransactionImporter: React.FC = () => {
 
   /* ─── render ─── */
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -30 }}
-      transition={{ duration: 0.5 }}
-      className="onboarding-container"
-    >
+    <div className="onboarding-container">
       <div className={styles['nav-actions-wrapper']}>
         <button
           className={`back-button ${styles['back-button-clean']}`}
@@ -600,9 +594,7 @@ const TransactionImporter: React.FC = () => {
           )}
 
           <div className={styles['action-buttons-container']}>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               className={`secondary-button ${styles['no-margin-top']}`}
               onClick={() => {
                 setPreviewFilter('all')
@@ -610,11 +602,9 @@ const TransactionImporter: React.FC = () => {
               }}
             >
               {t.reviewTransactions}
-            </motion.button>
+            </button>
 
-            <motion.button
-              whileHover={{ scale: isAllDuplicates && unlockedDuplicateIds.size === 0 ? 1 : 1.02 }}
-              whileTap={{ scale: isAllDuplicates && unlockedDuplicateIds.size === 0 ? 1 : 0.98 }}
+            <button
               className={`primary-button ${styles['no-margin-top']} ${
                 isDuplicateFlow
                   ? styles['button-warning-orange']
@@ -625,7 +615,6 @@ const TransactionImporter: React.FC = () => {
               disabled={
                 loading ||
                 transactions.length === 0 ||
-                isSubmitted ||
                 (isAllDuplicates && unlockedDuplicateIds.size === 0)
               }
               title={
@@ -642,7 +631,7 @@ const TransactionImporter: React.FC = () => {
                 : isPartialDuplicates
                 ? t.importNewTransactions.replace('{count}', String(duplicateStats.newCount))
                 : t.confirmImport}
-            </motion.button>
+            </button>
           </div>
         </motion.div>
       )}
@@ -713,7 +702,7 @@ const TransactionImporter: React.FC = () => {
         cancelText={t.duplicateImportCancel}
         showProceedButton={true}
       />
-    </motion.div>
+    </div>
   )
 }
 
