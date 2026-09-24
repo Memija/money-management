@@ -11,7 +11,7 @@ import { useLanguageStore } from '../../store/useLanguageStore'
 import type { ImportedAccount, ImportMethod, RuleModifications, Transaction } from '../../types'
 import { reconcileCrossAccountTransfers } from '../../utils/account-transfers'
 import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal'
-import { TransactionPreviewModal } from '../shared/TransactionPreviewModal'
+import { type ScopeFilter, TransactionPreviewModal } from '../shared/TransactionPreviewModal'
 import { DuplicateImportWarningModal } from './DuplicateImportWarningModal'
 import { ImportMethodSelector } from './ImportMethodSelector'
 import { ImportUploadArea } from './ImportUploadArea'
@@ -36,7 +36,7 @@ const TransactionImporter: React.FC = () => {
 
   const [method, setMethod] = useState<ImportMethod | null>(null)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
-  const [previewFilter, setPreviewFilter] = useState<'all' | 'included' | 'space-transfers' | 'internal-transfers' | 'duplicates'>('all')
+  const [previewFilter, setPreviewFilter] = useState<ScopeFilter>('all')
   const [showClearConfirmation, setShowClearConfirmation] = useState(false)
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -103,6 +103,7 @@ const TransactionImporter: React.FC = () => {
       duplicateCount,
       newCount,
       duplicateIds: activeDuplicateIds,
+      alreadyDuplicatedIds: rawDuplicateStats.alreadyDuplicatedIds || [],
     }
   }, [rawDuplicateStats, unlockedDuplicateIds, transactions])
 
@@ -145,6 +146,9 @@ const TransactionImporter: React.FC = () => {
   const previewModalTitle = React.useMemo(() => {
     if (previewFilter === 'duplicates') {
       return t.filterDuplicates || 'Duplicates'
+    }
+    if (previewFilter === 'already-duplicated') {
+      return t.filterAlreadyDuplicated || t.alreadyDuplicated || 'Already Duplicated'
     }
     if (previewFilter === 'space-transfers') {
       return t.filterSpaceTransfers || 'Space Transfers'
@@ -210,6 +214,9 @@ const TransactionImporter: React.FC = () => {
           forceImport: true,
           isDuplicate: true,
           isModified: modified,
+          originalDescription: orig?.description ?? t.description,
+          originalAmount: orig?.amount !== undefined ? orig.amount : t.amount,
+          originalDate: orig?.date ?? t.date,
           ...(ruleId ? { importedByRuleId: ruleId } : {}),
         }
         if (modified) {
@@ -229,6 +236,9 @@ const TransactionImporter: React.FC = () => {
             forceImport: true,
             isDuplicate: true,
             isModified: modified,
+            originalDescription: orig?.description ?? t.description,
+            originalAmount: orig?.amount !== undefined ? orig.amount : t.amount,
+            originalDate: orig?.date ?? t.date,
           }
           if (modified) {
             modifiedTransactions.push(finalTx)
@@ -642,6 +652,7 @@ const TransactionImporter: React.FC = () => {
         transactions={transactions}
         isImport={true}
         duplicateIds={new Set(rawDuplicateStats.duplicateIds)}
+        alreadyDuplicatedIds={new Set(rawDuplicateStats.alreadyDuplicatedIds || [])}
         unlockedDuplicateIds={unlockedDuplicateIds}
         internalTransferIds={internalTransferStats.transferTxIds}
         discardedSpaceCount={discardedSpaceCount}
@@ -653,6 +664,9 @@ const TransactionImporter: React.FC = () => {
         onExcludeSpaceTransaction={handleExcludeSpaceTransaction}
         onIncludeAllSpaceTransactions={handleIncludeAllSpaceTransactions}
         onUnlockDuplicateTransaction={(tx, rememberRule) => {
+          if (rawDuplicateStats.alreadyDuplicatedIds?.includes(tx.id)) {
+            return
+          }
           setUnlockedDuplicateIds((prev) => new Set(prev).add(tx.id))
           if (rememberRule) {
             const orig = originalTransactionsRef.current.get(tx.id) || tx

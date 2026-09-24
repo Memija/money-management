@@ -103,6 +103,8 @@ export const pl: TranslationStrings = {
   searchTransactionsPlaceholder: 'Szukaj opisu, sprzedawcy, kwoty…',
   clearFilters: 'Wyczyść filtry',
   duplicate: 'Duplikat',
+  alreadyDuplicated: 'Już zduplikowane',
+  alreadyDuplicatedNotice: 'Ten duplikat został już zaimportowany i nie można go ponownie odblokować.',
   modified: 'Zmodyfikowane',
   allDates: 'Wszystkie daty',
   fromDate: 'Od daty',
@@ -138,6 +140,9 @@ export const pl: TranslationStrings = {
   relockDuplicate: 'Zablokuj ponownie jako duplikat',
   unlockedDuplicateBadge: 'Odblokowana',
   filterUnlocked: 'Odblokowane',
+  filterAlreadyDuplicated: 'Już zduplikowane',
+  alreadyDuplicatedFilterNotice:
+    'Te zduplikowane transakcje zostały już wcześniej zaimportowane i nie można ich modyfikować ani odblokowywać.',
   cannotRelockModified: 'Nie można zablokować zmodyfikowanej transakcji. Przywróć wartości początkowe, aby zablokować.',
   resetToOriginal: 'Przywróć wartości początkowe',
   resetTransactionModalTitle: 'Przywróć transakcje',

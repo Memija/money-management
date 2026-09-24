@@ -182,4 +182,46 @@ describe('TransactionPreviewRow', () => {
 
     expect(screen.queryByTestId('row-bulk-adjust-btn-tx-1')).not.toBeInTheDocument()
   })
+
+  it('renders disabled lock button, Already Duplicated badge, and disables all actions when isAlreadyDuplicated is true', () => {
+    const onUnlock = vi.fn()
+    const onUpdate = vi.fn()
+    const onReset = vi.fn()
+    const onRelock = vi.fn()
+
+    render(
+      <TransactionPreviewRow
+        {...defaultProps}
+        isDuplicate={true}
+        isAlreadyDuplicated={true}
+        onUnlockDuplicate={onUnlock}
+        onUpdateTransaction={onUpdate}
+        onResetTransaction={onReset}
+        onRelockDuplicate={onRelock}
+        t={{
+          ...defaultProps.t,
+          alreadyDuplicated: 'Already Duplicated',
+          alreadyDuplicatedNotice: 'This duplicate was already imported and cannot be unlocked again.',
+        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+      />,
+    )
+
+    // Displays Already Duplicated pill
+    expect(screen.getByTestId('preview-duplicate-badge-tx-1')).toHaveTextContent('Already Duplicated')
+
+    // Lock button is disabled with notice tooltip and cannot be clicked
+    const lockBtn = screen.getByTestId('already-duplicated-lock-tx-1')
+    expect(lockBtn).toBeInTheDocument()
+    expect(lockBtn).toBeDisabled()
+    expect(lockBtn).toHaveAttribute('title', 'This duplicate was already imported and cannot be unlocked again.')
+
+    // Does not render unlock button, reset button, or relock button
+    expect(screen.queryByTestId('unlock-duplicate-btn-tx-1')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('reset-tx-btn-tx-1')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('relock-duplicate-btn-tx-1')).not.toBeInTheDocument()
+
+    // Row is not editable (inputs not rendered, plain text rendered)
+    expect(screen.queryByDisplayValue('Bakery Purchase')).not.toBeInTheDocument()
+    expect(screen.getByText('Bakery Purchase')).toBeInTheDocument()
+  })
 })

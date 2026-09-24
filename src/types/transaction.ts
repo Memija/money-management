@@ -23,6 +23,12 @@ export interface Transaction {
   isDuplicate?: boolean
   /** True if this transaction was modified compared to the original duplicate before/during import. */
   isModified?: boolean
+  /** Original description before modification if this was an edited duplicate. */
+  originalDescription?: string
+  /** Original amount before modification if this was an edited duplicate. */
+  originalAmount?: number
+  /** Original date before modification if this was an edited duplicate. */
+  originalDate?: string
 }
 
 export interface RuleModifications {

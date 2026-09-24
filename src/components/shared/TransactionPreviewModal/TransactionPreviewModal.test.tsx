@@ -25,6 +25,10 @@ vi.mock('../../../store/useLanguageStore', () => ({
         clearFilters: 'Clear filters',
         duplicate: 'Duplicate',
         filterDuplicates: 'Duplicates',
+        filterAlreadyDuplicated: 'Already Duplicated',
+        alreadyDuplicated: 'Already Duplicated',
+        alreadyDuplicatedFilterNotice:
+          'These duplicate transactions were already imported previously and cannot be modified or unlocked again.',
         duplicatesSkippedNotice: 'Duplicates notice',
         allDates: 'All dates',
         showingOf: 'Showing {shown} of {total} transactions',
@@ -1221,6 +1225,76 @@ describe('TransactionPreviewModal (Shared)', () => {
     const modBadge = screen.getByTestId('preview-modified-badge-tx-3')
     expect(modBadge).toBeInTheDocument()
     expect(modBadge).toHaveTextContent('Modified')
+  })
+
+  it('renders Already Duplicated filter button, filters list, and displays notice banner', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Normal Dup', isDuplicate: true }
+    const tx3 = { ...mockTransactions[1], id: 'tx-3', description: 'Groceries Already Dup', isDuplicate: true }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2, tx3]}
+        duplicateIds={new Set(['tx-2', 'tx-3'])}
+        alreadyDuplicatedIds={new Set(['tx-3'])}
+        isImport={true}
+      />,
+    )
+
+    // Filter button for Already Duplicated should be visible with badge count 1
+    const alreadyDupBtn = screen.getByTestId('filter-already-duplicated-btn')
+    expect(alreadyDupBtn).toBeInTheDocument()
+    expect(alreadyDupBtn).toHaveTextContent('1')
+
+    // Click to filter by already duplicated
+    fireEvent.click(alreadyDupBtn)
+
+    // Only tx-3 should be displayed
+    expect(screen.getByText('Groceries Already Dup')).toBeInTheDocument()
+    expect(screen.queryByText('Salary')).not.toBeInTheDocument()
+    expect(screen.queryByText('Groceries Normal Dup')).not.toBeInTheDocument()
+
+    // Notice banner must be shown
+    const notice = screen.getByTestId('already-duplicated-notice')
+    expect(notice).toBeInTheDocument()
+    expect(notice).toHaveTextContent(/already imported previously/i)
+
+    // Button should be active (aria-pressed=true)
+    expect(alreadyDupBtn).toHaveAttribute('aria-pressed', 'true')
+
+    // Click to toggle back to all
+    fireEvent.click(alreadyDupBtn)
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+    expect(screen.getByText('Groceries Normal Dup')).toBeInTheDocument()
+    expect(screen.getByText('Groceries Already Dup')).toBeInTheDocument()
+    expect(screen.queryByTestId('already-duplicated-notice')).not.toBeInTheDocument()
+  })
+
+  it('displays alreadyDuplicated badge on transaction row when flagged in alreadyDuplicatedIds', () => {
+    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
+    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Already Dup', isDuplicate: true }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[tx1, tx2]}
+        duplicateIds={new Set(['tx-2'])}
+        alreadyDuplicatedIds={new Set(['tx-2'])}
+        initialFilter="already-duplicated"
+        isImport={true}
+      />,
+    )
+
+    // Notice banner should be visible initially due to initialFilter
+    expect(screen.getByTestId('already-duplicated-notice')).toBeInTheDocument()
+
+    // Row-level badge for already duplicated transaction
+    const dupBadge = screen.getByTestId('preview-duplicate-badge-tx-2')
+    expect(dupBadge).toBeInTheDocument()
+    expect(dupBadge).toHaveTextContent(/Already Duplicated/i)
   })
 })
 

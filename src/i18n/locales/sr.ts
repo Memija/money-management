@@ -103,6 +103,8 @@ export const sr: TranslationStrings = {
   searchTransactionsPlaceholder: 'Претражи опис, трговца, износ…',
   clearFilters: 'Поништи филтере',
   duplicate: 'Дупликат',
+  alreadyDuplicated: 'Већ дуплирано',
+  alreadyDuplicatedNotice: 'Овај дупликат је већ увезен и не може се поново откључати.',
   modified: 'Модификовано',
   allDates: 'Сви датуми',
   fromDate: 'Од датума',
@@ -140,6 +142,9 @@ export const sr: TranslationStrings = {
   relockDuplicate: 'Поново закључај као дупликат',
   unlockedDuplicateBadge: 'Откључано',
   filterUnlocked: 'Откључано',
+  filterAlreadyDuplicated: 'Већ дуплирано',
+  alreadyDuplicatedFilterNotice:
+    'Ове дуплиране трансакције су већ раније увезене и не могу се више мењати нити откључавати.',
   cannotRelockModified: 'Није могуће поново закључати измењену трансакцију. Вратите на оригиналне вредности за закључавање.',
   resetToOriginal: 'Врати на оригиналне вредности',
   resetTransactionModalTitle: 'Врати трансакције на изворно',

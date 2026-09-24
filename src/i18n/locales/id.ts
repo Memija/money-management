@@ -103,6 +103,8 @@ export const id: TranslationStrings = {
   searchTransactionsPlaceholder: 'Cari deskripsi, pedagang, jumlah…',
   clearFilters: 'Hapus filter',
   duplicate: 'Duplikat',
+  alreadyDuplicated: 'Sudah Diduplikasi',
+  alreadyDuplicatedNotice: 'Duplikat ini sudah pernah diimpor dan tidak dapat dibuka kuncinya lagi.',
   modified: 'Dimodifikasi',
   allDates: 'Semua tanggal',
   fromDate: 'Dari tanggal',
@@ -137,6 +139,9 @@ export const id: TranslationStrings = {
   relockDuplicate: 'Kunci kembali sebagai duplikat',
   unlockedDuplicateBadge: 'Terbuka',
   filterUnlocked: 'Terbuka',
+  filterAlreadyDuplicated: 'Sudah Diduplikasi',
+  alreadyDuplicatedFilterNotice:
+    'Transaksi duplikat ini sudah diimpor sebelumnya dan tidak dapat diubah atau dibuka kuncinya lagi.',
   cannotRelockModified: 'Tidak dapat mengunci kembali transaksi yang dimodifikasi. Kembalikan ke nilai asli untuk mengunci.',
   resetToOriginal: 'Kembalikan ke nilai asli',
   resetTransactionModalTitle: 'Atur Ulang Transaksi',

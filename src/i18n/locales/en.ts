@@ -103,6 +103,8 @@ export const en: TranslationStrings = {
   searchTransactionsPlaceholder: 'Search description, merchant, amount…',
   clearFilters: 'Clear filters',
   duplicate: 'Duplicate',
+  alreadyDuplicated: 'Already Duplicated',
+  alreadyDuplicatedNotice: 'This duplicate was already imported and cannot be unlocked again.',
   modified: 'Modified',
   allDates: 'All dates',
   fromDate: 'From date',
@@ -138,6 +140,9 @@ export const en: TranslationStrings = {
   relockDuplicate: 'Re-lock as duplicate',
   unlockedDuplicateBadge: 'Unlocked',
   filterUnlocked: 'Unlocked',
+  filterAlreadyDuplicated: 'Already Duplicated',
+  alreadyDuplicatedFilterNotice:
+    'These duplicate transactions were already imported previously and cannot be modified or unlocked again.',
   cannotRelockModified: 'Cannot relock modified transaction. Reset to original values to relock.',
   resetToOriginal: 'Reset to original values',
   resetTransactionModalTitle: 'Reset Transactions',

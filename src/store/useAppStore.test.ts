@@ -262,18 +262,18 @@ describe('useAppStore', () => {
 
     // Check against 'chase'
     const statsChase = useAppStore.getState().getDuplicateTransactionStats('chase', incomingTransactions)
-    expect(statsChase).toEqual({ duplicateCount: 1, newCount: 1, duplicateIds: ['1a'] })
+    expect(statsChase).toEqual({ duplicateCount: 1, newCount: 1, duplicateIds: ['1a'], alreadyDuplicatedIds: [] })
 
     // Check whitespace normalization and amount decimal equivalence
     const whitespaceTransactions = [
       { id: '1b', date: '2023-01-01', amount: 100.00, description: 'Test   1', category: '', currency: 'USD', type: 'expense' as const, institution: 'chase' },
     ]
     const statsWhitespace = useAppStore.getState().getDuplicateTransactionStats('chase', whitespaceTransactions)
-    expect(statsWhitespace).toEqual({ duplicateCount: 1, newCount: 0, duplicateIds: ['1b'] })
+    expect(statsWhitespace).toEqual({ duplicateCount: 1, newCount: 0, duplicateIds: ['1b'], alreadyDuplicatedIds: [] })
 
     // Check against unknown institution (all should be new)
     const statsIng = useAppStore.getState().getDuplicateTransactionStats('ing', incomingTransactions)
-    expect(statsIng).toEqual({ duplicateCount: 0, newCount: 2, duplicateIds: [] })
+    expect(statsIng).toEqual({ duplicateCount: 0, newCount: 2, duplicateIds: [], alreadyDuplicatedIds: [] })
   })
 
   it('should reset import state', () => {
@@ -570,6 +570,112 @@ describe('useAppStore', () => {
       expect(stats.duplicateCount).toBe(0)
       expect(stats.newCount).toBe(1)
       expect(stats.duplicateIds).toEqual([])
+    })
+
+    it('marks transactions as already duplicated on subsequent imports when duplicates or modifies were already imported, preventing rules from bypassing them', () => {
+      // Step 1: Account with initial clean transactions
+      const baseCoffee = {
+        id: 'tx-clean-coffee',
+        date: '2026-03-01',
+        description: 'Coffee Shop',
+        amount: -5,
+        currency: 'EUR',
+        type: 'expense' as const,
+        institution: 'Chase',
+      }
+      const baseBakery = {
+        id: 'tx-clean-bakery',
+        date: '2026-03-02',
+        description: 'Bakery Pastry',
+        amount: -10,
+        currency: 'EUR',
+        type: 'expense' as const,
+        institution: 'Chase',
+      }
+
+      // Step 2: Account has duplicate Coffee imported (with rule) and modified Bakery imported
+      const allowedDuplicateCoffee = {
+        id: 'tx-dup-coffee',
+        date: '2026-03-01',
+        description: 'Coffee Shop',
+        amount: -5,
+        currency: 'EUR',
+        type: 'expense' as const,
+        institution: 'Chase',
+        originalDescription: 'Coffee Shop',
+        originalAmount: -5,
+        originalDate: '2026-03-01',
+      }
+      const modifiedBakery = {
+        id: 'tx-mod-bakery',
+        date: '2026-03-02',
+        description: 'Bakery Pastry (Birthday treat)',
+        amount: -12.5,
+        currency: 'EUR',
+        type: 'expense' as const,
+        institution: 'Chase',
+        originalDescription: 'Bakery Pastry',
+        originalAmount: -10,
+        originalDate: '2026-03-02',
+      }
+
+      useAppStore.setState({
+        importedAccounts: [
+          {
+            institutionId: 'chase',
+            institutionName: 'Chase',
+            transactions: [baseCoffee, baseBakery],
+            duplicateTransactions: [allowedDuplicateCoffee],
+            modifiedTransactions: [modifiedBakery],
+            importedAt: '2026-03-02T00:00:00Z',
+            importedFingerprints: ['fp-1', 'fp-2'],
+          },
+        ],
+        duplicateOverrideRules: [
+          {
+            id: 'rule-coffee',
+            descriptionPattern: 'Coffee Shop',
+            amount: -5,
+            institutionId: 'chase',
+            createdAt: '2026-03-02T00:00:00Z',
+            applyCount: 1,
+          },
+        ],
+      })
+
+      // Step 3: Re-importing original CSV containing original Coffee and Bakery rows
+      const incomingRows = [
+        {
+          id: 'incoming-coffee-3',
+          date: '2026-03-01',
+          description: 'Coffee Shop',
+          amount: -5,
+          currency: 'EUR',
+          type: 'expense' as const,
+          institution: 'Chase',
+        },
+        {
+          id: 'incoming-bakery-3',
+          date: '2026-03-02',
+          description: 'Bakery Pastry',
+          amount: -10,
+          currency: 'EUR',
+          type: 'expense' as const,
+          institution: 'Chase',
+        },
+      ]
+
+      const stats = useAppStore.getState().getDuplicateTransactionStats('chase', incomingRows)
+
+      // Both must be identified as duplicates
+      expect(stats.duplicateCount).toBe(2)
+      expect(stats.newCount).toBe(0)
+      expect(stats.duplicateIds).toContain('incoming-coffee-3')
+      expect(stats.duplicateIds).toContain('incoming-bakery-3')
+
+      // Both must be flagged in alreadyDuplicatedIds
+      expect(stats.alreadyDuplicatedIds).toContain('incoming-coffee-3')
+      expect(stats.alreadyDuplicatedIds).toContain('incoming-bakery-3')
     })
 
     it('stamps importedByRuleId on transactions allowed by duplicate override rules when imported', () => {

@@ -10,7 +10,7 @@ import TransactionImporter from './TransactionImporter'
 const { mockAddImportedAccount, mockSetStep, mockGetDuplicateTransactionStats, mockReplaceImportedAccount, mockImportedAccounts, mockAddDuplicateOverrideRule } = vi.hoisted(() => ({
   mockAddImportedAccount: vi.fn(),
   mockSetStep: vi.fn(),
-  mockGetDuplicateTransactionStats: vi.fn().mockReturnValue({ duplicateCount: 0, newCount: 0 }),
+  mockGetDuplicateTransactionStats: vi.fn().mockReturnValue({ duplicateCount: 0, newCount: 0, duplicateIds: [], alreadyDuplicatedIds: [] }),
   mockReplaceImportedAccount: vi.fn(),
   mockImportedAccounts: { current: [] as unknown[] },
   mockAddDuplicateOverrideRule: vi.fn(),
@@ -115,6 +115,11 @@ vi.mock('../../store/useLanguageStore', () => ({
         unlockDuplicateConfirm: 'Unlock & Edit',
         relockDuplicate: 'Relock duplicate',
         unlockedDuplicateBadge: 'Unlocked',
+        filterAlreadyDuplicated: 'Already Duplicated',
+        alreadyDuplicated: 'Already Duplicated',
+        alreadyDuplicatedNotice: 'This duplicate was already imported and cannot be unlocked again.',
+        alreadyDuplicatedFilterNotice:
+          'These duplicate transactions were already imported previously and cannot be modified or unlocked again.',
       } as unknown as TranslationStrings,
     }
     return typeof selector === 'function' ? selector(state as LanguageState) : state
@@ -233,12 +238,18 @@ describe('TransactionImporter', () => {
     unlockDuplicateConfirm: 'Unlock & Edit',
     relockDuplicate: 'Lock',
     unlockedDuplicateBadge: 'Unlocked',
+    duplicate: 'Duplicate',
+    filterAlreadyDuplicated: 'Already Duplicated',
+    alreadyDuplicated: 'Already Duplicated',
+    alreadyDuplicatedNotice: 'This duplicate was already imported and cannot be unlocked again.',
+    alreadyDuplicatedFilterNotice:
+      'These duplicate transactions were already imported previously and cannot be modified or unlocked again.',
   }
 
   beforeEach(() => {
     vi.clearAllMocks()
     mockImportedAccounts.current = []
-    mockGetDuplicateTransactionStats.mockReturnValue({ duplicateCount: 0, newCount: 0, duplicateIds: [] })
+    mockGetDuplicateTransactionStats.mockReturnValue({ duplicateCount: 0, newCount: 0, duplicateIds: [], alreadyDuplicatedIds: [] })
     vi.mocked(useLanguageStore).mockImplementation((selector) => {
       const state = {
         t: mockT as unknown as TranslationStrings,
@@ -1107,6 +1118,59 @@ Transfer from Bank B DE12345678901234567890
     // Unmount should also clean up without saving
     unmount()
     expect(mockAddDuplicateOverrideRule).not.toHaveBeenCalled()
+  })
+
+  it('renders already duplicated transactions as non-interactable with disabled lock button and alreadyDuplicated badge', async () => {
+    mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: { id: string }[]) => {
+      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [], alreadyDuplicatedIds: [] }
+      return {
+        duplicateCount: txs.length,
+        newCount: 0,
+        duplicateIds: txs.map((tx) => tx.id),
+        alreadyDuplicatedIds: txs.map((tx) => tx.id),
+      }
+    })
+
+    render(<TransactionImporter />)
+
+    // Select copy paste method
+    const pasteButton = screen.getByText('Paste')
+    fireEvent.click(pasteButton)
+
+    // Paste data containing duplicates
+    const pasteInput = screen.getByPlaceholderText('Paste here')
+    const samplePaste = `Date\tDescription\tAmount
+2026-04-01\tCoffee Shop\t-4.50
+2026-04-02\tBakery Store\t-3.20`
+    fireEvent.change(pasteInput, { target: { value: samplePaste } })
+
+    const parseBtn = screen.getByRole('button', { name: 'Parse' })
+    fireEvent.click(parseBtn)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('view-duplicates-button')).toBeInTheDocument()
+    })
+
+    // Open duplicate preview
+    fireEvent.click(screen.getByTestId('view-duplicates-button'))
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Duplicates' })).toBeInTheDocument()
+    })
+
+    // Notice that unlock buttons are NOT available, instead disabled lock buttons with alreadyDuplicated notice are present
+    expect(screen.queryByTitle('Unlock')).not.toBeInTheDocument()
+    const disabledLocks = screen.getAllByTitle('This duplicate was already imported and cannot be unlocked again.')
+    expect(disabledLocks.length).toBeGreaterThan(0)
+    expect(disabledLocks[0]).toBeDisabled()
+
+    // Already duplicated badge is shown
+    expect(screen.getAllByText('Already Duplicated').length).toBeGreaterThan(0)
+
+    // Filter button for Already Duplicated is present in the toolbar
+    const alreadyDupFilterBtn = screen.getByTestId('filter-already-duplicated-btn')
+    expect(alreadyDupFilterBtn).toBeInTheDocument()
+    fireEvent.click(alreadyDupFilterBtn)
+    expect(screen.getByTestId('already-duplicated-notice')).toBeInTheDocument()
   })
 })
 

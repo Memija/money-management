@@ -1,5 +1,5 @@
 import React from 'react'
-import { Copy, RotateCcw, Search, Sliders, Unlock, X } from 'lucide-react'
+import { Copy, Lock, RotateCcw, Search, Sliders, Unlock, X } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/types'
 import { DatePicker } from '../DatePicker'
@@ -9,7 +9,15 @@ import styles from './TransactionPreviewModal.module.css'
 
 export type SortColumn = 'date' | 'description' | 'amount'
 export type SortDirection = 'asc' | 'desc'
-export type ScopeFilter = 'all' | 'included' | 'space-transfers' | 'internal-transfers' | 'duplicates' | 'unlocked' | 'modified'
+export type ScopeFilter =
+  | 'all'
+  | 'included'
+  | 'space-transfers'
+  | 'internal-transfers'
+  | 'duplicates'
+  | 'already-duplicated'
+  | 'unlocked'
+  | 'modified'
 
 export interface TransactionPreviewToolbarProps {
   hasMultipleTransactions: boolean
@@ -29,6 +37,7 @@ export interface TransactionPreviewToolbarProps {
   unlockedCount?: number
   hasDuplicates?: boolean
   duplicateCount?: number
+  alreadyDuplicatedCount?: number
   modifiedCount?: number
   isImport?: boolean
   t: TranslationStrings
@@ -52,6 +61,7 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
   unlockedCount = 0,
   hasDuplicates = false,
   duplicateCount,
+  alreadyDuplicatedCount,
   modifiedCount,
   isImport = false,
   t,
@@ -139,6 +149,42 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
           <span>{t.filterDuplicates || 'Duplicates'}</span>
           {duplicateCount !== undefined && (
             <span className={styles['duplicate-filter-badge']}>{duplicateCount}</span>
+          )}
+        </button>
+      )}
+
+      {((alreadyDuplicatedCount ?? 0) > 0 || scopeFilter === 'already-duplicated') && (
+        <button
+          type="button"
+          className={`${styles['already-duplicated-filter-btn']} ${
+            scopeFilter === 'already-duplicated'
+              ? styles['already-duplicated-filter-btn-active']
+              : ''
+          } ${(alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated' ? styles['already-duplicated-filter-btn-disabled'] : ''}`}
+          onClick={() => {
+            if ((alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated') return
+            onScopeFilterChange?.(
+              scopeFilter === 'already-duplicated' ? 'all' : 'already-duplicated',
+            )
+          }}
+          disabled={
+            (alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated'
+          }
+          title={
+            scopeFilter === 'already-duplicated'
+              ? t.filterAll || 'Show all'
+              : t.filterAlreadyDuplicated || 'Already Duplicated'
+          }
+          aria-label={t.filterAlreadyDuplicated || 'Already Duplicated'}
+          aria-pressed={scopeFilter === 'already-duplicated'}
+          data-testid="filter-already-duplicated-btn"
+        >
+          <Lock size={13} aria-hidden="true" />
+          <span>{t.filterAlreadyDuplicated || 'Already Duplicated'}</span>
+          {alreadyDuplicatedCount !== undefined && (
+            <span className={styles['already-duplicated-filter-badge']}>
+              {alreadyDuplicatedCount}
+            </span>
           )}
         </button>
       )}

@@ -130,6 +130,8 @@ export interface TranslationStrings {
   searchTransactionsPlaceholder: string
   clearFilters: string
   duplicate: string
+  alreadyDuplicated: string
+  alreadyDuplicatedNotice: string
   modified: string
   allDates: string
   fromDate: string
@@ -163,6 +165,8 @@ export interface TranslationStrings {
   relockDuplicate: string
   unlockedDuplicateBadge: string
   filterUnlocked: string
+  filterAlreadyDuplicated: string
+  alreadyDuplicatedFilterNotice: string
   cannotRelockModified: string
   resetToOriginal: string
   resetTransactionModalTitle: string

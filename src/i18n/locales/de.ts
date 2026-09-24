@@ -103,6 +103,8 @@ export const de: TranslationStrings = {
   searchTransactionsPlaceholder: 'Beschreibung, Händler, Betrag suchen…',
   clearFilters: 'Filter zurücksetzen',
   duplicate: 'Duplikat',
+  alreadyDuplicated: 'Bereits dupliziert',
+  alreadyDuplicatedNotice: 'Dieses Duplikat wurde bereits importiert und kann nicht erneut entsperrt werden.',
   modified: 'Modifiziert',
   allDates: 'Alle Daten',
   fromDate: 'Von Datum',
@@ -138,6 +140,9 @@ export const de: TranslationStrings = {
   relockDuplicate: 'Wieder als Duplikat sperren',
   unlockedDuplicateBadge: 'Entsperrt',
   filterUnlocked: 'Entsperrt',
+  filterAlreadyDuplicated: 'Bereits dupliziert',
+  alreadyDuplicatedFilterNotice:
+    'Diese doppelten Transaktionen wurden bereits zuvor importiert und können nicht mehr geändert oder entsperrt werden.',
   cannotRelockModified: 'Geänderte Buchung kann nicht gesperrt werden. Auf Originalwerte zurücksetzen, um zu sperren.',
   resetToOriginal: 'Auf Originalwerte zurücksetzen',
   resetTransactionModalTitle: 'Transaktionen zurücksetzen',

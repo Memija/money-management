@@ -47,7 +47,7 @@ export interface AppState {
   /**
    * Returns the count of duplicate and new transactions for the given institution.
    */
-  getDuplicateTransactionStats: (institutionId: string, transactions: Transaction[]) => { duplicateCount: number; newCount: number; duplicateIds: string[] }
+  getDuplicateTransactionStats: (institutionId: string, transactions: Transaction[]) => { duplicateCount: number; newCount: number; duplicateIds: string[]; alreadyDuplicatedIds: string[] }
   /**
    * Cleans up duplicate transactions in imported accounts and recalculates balances.
    */
@@ -800,34 +800,98 @@ export const useAppStore = create<AppState>()(
             : importedAccounts
 
         if (targetAccounts.length === 0) {
-          return { duplicateCount: 0, newCount: transactions.length, duplicateIds: [] }
+          return {
+            duplicateCount: 0,
+            newCount: transactions.length,
+            duplicateIds: [],
+            alreadyDuplicatedIds: [],
+          }
         }
 
-        const existingKeys = new Set<string>()
+        const getOriginalKeyForTx = (tx: Transaction, account: ImportedAccount): string => {
+          if (
+            tx.originalDescription !== undefined ||
+            tx.originalAmount !== undefined ||
+            tx.originalDate !== undefined
+          ) {
+            return toCanonicalTransactionKey({
+              date: tx.originalDate ?? tx.date,
+              amount: tx.originalAmount !== undefined ? tx.originalAmount : tx.amount,
+              description: tx.originalDescription ?? tx.description,
+            })
+          }
+          if (tx.importedByRuleId) {
+            const rule = duplicateOverrideRules?.find((r) => r.id === tx.importedByRuleId)
+            if (rule) {
+              const matchedClean = account.transactions.find((ct) =>
+                isOriginalTransactionMatchForRule(rule, ct, account.institutionId),
+              )
+              if (matchedClean) {
+                return toCanonicalTransactionKey(matchedClean)
+              }
+              if (rule.descriptionPattern && rule.amount !== undefined) {
+                return toCanonicalTransactionKey({
+                  date: tx.date,
+                  amount: rule.amount,
+                  description: rule.descriptionPattern,
+                })
+              }
+            }
+          }
+          return toCanonicalTransactionKey(tx)
+        }
+
+        const cleanCounts = new Map<string, number>()
+        const duplicateCounts = new Map<string, number>()
+        const modifiedCounts = new Map<string, number>()
+
         for (const account of targetAccounts) {
           for (const tx of account.transactions) {
-            existingKeys.add(toCanonicalTransactionKey(tx))
+            const key = toCanonicalTransactionKey(tx)
+            cleanCounts.set(key, (cleanCounts.get(key) || 0) + 1)
           }
           if (account.duplicateTransactions) {
             for (const tx of account.duplicateTransactions) {
-              existingKeys.add(toCanonicalTransactionKey(tx))
+              const key = getOriginalKeyForTx(tx, account)
+              duplicateCounts.set(key, (duplicateCounts.get(key) || 0) + 1)
             }
           }
           if (account.modifiedTransactions) {
             for (const tx of account.modifiedTransactions) {
-              existingKeys.add(toCanonicalTransactionKey(tx))
+              const key = getOriginalKeyForTx(tx, account)
+              modifiedCounts.set(key, (modifiedCounts.get(key) || 0) + 1)
             }
           }
         }
 
         const rules = duplicateOverrideRules || []
         const duplicateIds: string[] = []
+        const alreadyDuplicatedIds: string[] = []
+
+        const remainingCleanCounts = new Map(cleanCounts)
+        const remainingDupCounts = new Map(duplicateCounts)
+        const remainingModCounts = new Map(modifiedCounts)
+
         for (const t of transactions) {
-          if (existingKeys.has(toCanonicalTransactionKey(t))) {
+          const key = toCanonicalTransactionKey(t)
+          const dupAvail = (remainingDupCounts.get(key) || 0) > 0
+          const modAvail = (remainingModCounts.get(key) || 0) > 0
+          const cleanAvail = (remainingCleanCounts.get(key) || 0) > 0
+
+          if (dupAvail) {
+            remainingDupCounts.set(key, remainingDupCounts.get(key)! - 1)
+            duplicateIds.push(t.id)
+            alreadyDuplicatedIds.push(t.id)
+          } else if (modAvail) {
+            remainingModCounts.set(key, remainingModCounts.get(key)! - 1)
+            duplicateIds.push(t.id)
+            alreadyDuplicatedIds.push(t.id)
+          } else if (cleanAvail) {
             const isOverridden = rules.some((r) => matchesDuplicateOverrideRule(r, t, institutionId))
             if (!isOverridden) {
               duplicateIds.push(t.id)
             }
+            remainingCleanCounts.set(key, remainingCleanCounts.get(key)! - 1)
           }
         }
 
@@ -835,6 +899,7 @@ export const useAppStore = create<AppState>()(
           duplicateCount: duplicateIds.length,
           newCount: transactions.length - duplicateIds.length,
           duplicateIds,
+          alreadyDuplicatedIds,
         }
       },
     }),

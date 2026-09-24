@@ -14,6 +14,7 @@ export interface TransactionPreviewRowProps {
   index: number
   tx: Transaction
   isDuplicate: boolean
+  isAlreadyDuplicated?: boolean
   isUnlockedDuplicate?: boolean
   isModified?: boolean
   hideDuplicateBadge?: boolean
@@ -39,6 +40,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   index,
   tx,
   isDuplicate,
+  isAlreadyDuplicated = false,
   isUnlockedDuplicate = false,
   isModified = false,
   hideDuplicateBadge = false,
@@ -122,7 +124,14 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
               <span>{getCategoryLabel(tx.category, t, locale, customCategories)}</span>
             )}
             {effectiveIsDuplicate && !hideDuplicateBadge && (
-              isModified ? (
+              isAlreadyDuplicated ? (
+                <span
+                  className={`${styles['duplicate-pill']} ${styles['already-duplicated-pill']}`}
+                  data-testid={`preview-duplicate-badge-${tx.id}`}
+                >
+                  {t.alreadyDuplicated || t.duplicate || 'Duplicate'}
+                </span>
+              ) : isModified ? (
                 <span className={styles['modified-pill']} data-testid={`preview-modified-badge-${tx.id}`}>
                   {t.modified || 'Modified'}
                 </span>
@@ -213,20 +222,34 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
 
       {hasActions && (
         <div className={styles['row-actions']}>
-            {effectiveIsDuplicate && onUnlockDuplicate && (
-              <button
-                type="button"
-                className={styles['unlock-duplicate-btn']}
-                onClick={() => onUnlockDuplicate(tx)}
-                aria-label={t.unlockDuplicate || 'Unlock'}
-                title={t.unlockDuplicate || 'Unlock'}
-                data-testid={`unlock-duplicate-btn-${tx.id}`}
-              >
-                <Lock size={15} aria-hidden="true" />
-              </button>
+            {effectiveIsDuplicate && (onUnlockDuplicate || isAlreadyDuplicated) && (
+              isAlreadyDuplicated ? (
+                <button
+                  type="button"
+                  className={`${styles['unlock-duplicate-btn']} ${styles['unlock-duplicate-btn-disabled']}`}
+                  disabled={true}
+                  aria-disabled="true"
+                  aria-label={t.alreadyDuplicatedNotice || 'This duplicate was already imported and cannot be unlocked again.'}
+                  title={t.alreadyDuplicatedNotice || 'This duplicate was already imported and cannot be unlocked again.'}
+                  data-testid={`already-duplicated-lock-${tx.id}`}
+                >
+                  <Lock size={15} aria-hidden="true" />
+                </button>
+              ) : onUnlockDuplicate ? (
+                <button
+                  type="button"
+                  className={styles['unlock-duplicate-btn']}
+                  onClick={() => onUnlockDuplicate(tx)}
+                  aria-label={t.unlockDuplicate || 'Unlock'}
+                  title={t.unlockDuplicate || 'Unlock'}
+                  data-testid={`unlock-duplicate-btn-${tx.id}`}
+                >
+                  <Lock size={15} aria-hidden="true" />
+                </button>
+              ) : null
             )}
 
-            {isModified && onResetTransaction ? (
+            {!isAlreadyDuplicated && isModified && onResetTransaction ? (
               <button
                 type="button"
                 className={styles['reset-tx-btn']}
@@ -237,7 +260,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
               >
                 <RotateCcw size={14} aria-hidden="true" />
               </button>
-            ) : isUnlockedDuplicate && onRelockDuplicate ? (
+            ) : !isAlreadyDuplicated && isUnlockedDuplicate && onRelockDuplicate ? (
               <button
                 type="button"
                 className={`${styles['relock-duplicate-btn']} ${
