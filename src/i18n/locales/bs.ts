@@ -220,20 +220,20 @@ export const bs: TranslationStrings = {
     'Proračuni uspješno resetovani. Uklonjeno {count} duplih transakcija.',
 
   spaceTransfersExcluded:
-    '{count} internih prijenosa između prostora (Spaces) je automatski isključeno radi izbjegavanja dvostrukog računanja.',
+    '{count} internih prijenosa na podračune je automatski isključeno radi izbjegavanja dvostrukog računanja.',
   spaceTransfersExcludedSingular:
-    '1 interni prijenos između prostora (Spaces) je automatski isključen radi izbjegavanja dvostrukog računanja.',
+    '1 interni prijenos na podračun je automatski isključen radi izbjegavanja dvostrukog računanja.',
   filterAll: 'Sve',
   filterIncluded: 'Za uvoz',
-  filterSpaceTransfers: 'Prijenosi između prostora',
+  filterSpaceTransfers: 'Prijenosi na podračun',
   filterInternalTransfers: 'Interni transferi',
   viewExcludedSpaceTransfers: 'Prikaži isključene',
   viewInternalTransfers: 'Prikaži transfere',
   viewTheseTransactions: 'Prikaži ove transakcije',
-  spaceTransfer: 'Prijenos između prostora',
+  spaceTransfer: 'Podračun',
   spaceTransferExcludedBadge: 'Isključeno',
   spaceTransfersExcludedNotice:
-    'Ove transakcije su automatski isključene kako bi se spriječilo dvostruko računanje i neće biti uvezene.',
+    'Prijenosi na podračun su automatski isključeni radi sprječavanja dvostrukog računanja.',
   internalTransfersNotice:
     'Ove transakcije su interni transferi između Vaših računa. Isključene su iz prihoda i rashoda te skrivene iz standardnih pregleda.',
   includeInImport: 'Uključi u uvoz',
@@ -261,15 +261,15 @@ export const bs: TranslationStrings = {
 
   transferWarningModalTitle: 'Otkriveni interni prijenosi',
   transferWarningModalSpaceMessage:
-    'Otkriveno je {count} prijenosa između vaših podračuna ili prostora. Biće isključeni iz troškova kako bi se spriječilo dvostruko računanje. Možete ih pregledati prije uvoza.',
+    'Otkriveno je {count} prijenosa između vaših podračuna ili prostora (space). Isključeni su iz troškova kako bi se spriječilo dvostruko računanje.',
   transferWarningModalSpaceMessageSingular:
-    'Otkriven je 1 prijenos između vaših podračuna ili prostora. Biće isključen iz troškova kako bi se spriječilo dvostruko računanje. Možete ga pregledati prije uvoza.',
+    'Otkriven je 1 prijenos između vaših podračuna ili prostora (space). Isključen je iz troškova kako bi se spriječilo dvostruko računanje.',
   transferWarningModalInternalMessage:
     'Otkriveno je {count} prijenosa između vaših računa. Biće isključeni iz prihoda i rashoda kako bi se spriječilo dvostruko računanje. Možete ih pregledati prije uvoza.',
   transferWarningModalInternalMessageSingular:
     'Otkriven je 1 prijenos između vaših računa. Biće isključen iz prihoda i rashoda kako bi se spriječilo dvostruko računanje. Možete ga pregledati prije uvoza.',
   transferWarningModalBothMessage:
-    'Otkriveno je {count} internih prijenosa (uključujući prijenose između prostora i međuračunske prijenose). Biće isključeni iz prihoda i rashoda radi tačnog obračuna.',
+    'Otkriveno je {count} internih prijenosa (uključujući kretanja između podračuna i međuračunske prijenose). Isključeni su iz prihoda i rashoda radi tačnog obračuna.',
   transferWarningModalReview: 'Pregledaj detalje',
   transferWarningModalProceed: 'Nastavi s uvozom',
 

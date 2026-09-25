@@ -48,6 +48,12 @@
   .import-methods-grid {
     grid-template-columns: 1fr;
   }
+
+  .transfer-info-banner {
+    padding: 0.65rem 0.75rem;
+    gap: 0.5rem;
+    font-size: 0.775rem;
+  }
 }
 
 /* ─── Drop Zone ─── */
@@ -431,6 +437,67 @@
 .transfer-info-icon {
   color: #818cf8;
   flex-shrink: 0;
+}
+
+:global([data-theme='light']) .transfer-info-banner {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: #3730a3;
+}
+
+:global([data-theme='light']) .transfer-info-icon {
+  color: #4f46e5;
+}
+
+:global([data-theme='light']) .banner-action-btn {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #3730a3;
+}
+
+/* Sub-account Transfers Excluded Banner (Muted Slate / Neutral) */
+.space-transfers-banner {
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: var(--text-main);
+}
+
+.space-transfers-banner-icon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.space-banner-action-btn {
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: var(--text-main);
+}
+
+.space-banner-action-btn:hover {
+  background: rgba(148, 163, 184, 0.2);
+  border-color: rgba(148, 163, 184, 0.45);
+}
+
+:global([data-theme='light']) .space-transfers-banner {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+:global([data-theme='light']) .space-transfers-banner-icon {
+  color: #64748b;
+}
+
+:global([data-theme='light']) .space-banner-action-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #334155;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme='light']) .space-banner-action-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
 }
 
 .duplicate-all-banner {

@@ -219,20 +219,20 @@ export const id: TranslationStrings = {
     'Perhitungan berhasil diatur ulang. {count} transaksi duplikat dihapus.',
 
   spaceTransfersExcluded:
-    '{count} transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',
+    '{count} transfer sub-akun otomatis dikecualikan untuk mencegah perhitungan ganda.',
   spaceTransfersExcludedSingular:
-    '1 transfer antar-space internal dikecualikan secara otomatis untuk mencegah penghitungan ganda.',
+    '1 transfer sub-akun otomatis dikecualikan untuk mencegah perhitungan ganda.',
   filterAll: 'Semua',
   filterIncluded: 'Untuk Diimpor',
-  filterSpaceTransfers: 'Transfer Ruang',
+  filterSpaceTransfers: 'Transfer Sub-Akun',
   filterInternalTransfers: 'Transfer Internal',
   viewExcludedSpaceTransfers: 'Lihat yang dikecualikan',
   viewInternalTransfers: 'Lihat transfer',
   viewTheseTransactions: 'Lihat transaksi ini',
-  spaceTransfer: 'Transfer Ruang',
+  spaceTransfer: 'Sub-Akun',
   spaceTransferExcludedBadge: 'Dikecualikan',
   spaceTransfersExcludedNotice:
-    'Transaksi ini secara otomatis dikecualikan untuk mencegah perhitungan ganda dan tidak akan diimpor.',
+    'Transfer sub-akun otomatis dikecualikan untuk mencegah perhitungan ganda.',
   internalTransfersNotice:
     'Transaksi ini adalah transfer internal antar rekening Anda sendiri. Transaksi ini dikecualikan dari pemasukan/pengeluaran dan disembunyikan dari tampilan standar.',
   includeInImport: 'Sertakan dalam impor',
@@ -260,15 +260,15 @@ export const id: TranslationStrings = {
 
   transferWarningModalTitle: 'Transfer Internal Terdeteksi',
   transferWarningModalSpaceMessage:
-    '{count} transfer antara sub-akun atau space Anda terdeteksi. Transaksi ini akan dikecualikan dari pengeluaran untuk mencegah penghitungan ganda. Anda dapat meninjaunya sebelum mengimpor.',
+    '{count} transfer antara sub-akun atau space Anda terdeteksi. Transaksi ini dikecualikan untuk mencegah perhitungan ganda.',
   transferWarningModalSpaceMessageSingular:
-    '1 transfer antara sub-akun atau space Anda terdeteksi. Transaksi ini akan dikecualikan dari pengeluaran untuk mencegah penghitungan ganda. Anda dapat meninjaunya sebelum mengimpor.',
+    '1 transfer antara sub-akun atau space Anda terdeteksi. Transaksi ini dikecualikan untuk mencegah perhitungan ganda.',
   transferWarningModalInternalMessage:
     '{count} transfer antar-akun Anda terdeteksi. Transaksi ini akan dikecualikan dari pemasukan dan pengeluaran untuk mencegah penghitungan ganda. Anda dapat meninjaunya sebelum mengimpor.',
   transferWarningModalInternalMessageSingular:
     '1 transfer antar-akun Anda terdeteksi. Transaksi ini akan dikecualikan dari pemasukan dan pengeluaran untuk mencegah penghitungan ganda. Anda dapat meninjaunya sebelum mengimpor.',
   transferWarningModalBothMessage:
-    '{count} transfer internal (termasuk transfer antar-space dan transfer antar-akun) terdeteksi. Transaksi ini akan dikecualikan dari pemasukan dan pengeluaran.',
+    '{count} transfer internal (termasuk mutasi sub-akun dan transfer antar-akun) terdeteksi. Transaksi ini dikecualikan dari pemasukan dan pengeluaran.',
   transferWarningModalReview: 'Tinjau Rincian',
   transferWarningModalProceed: 'Lanjutkan Impor',
 

@@ -224,4 +224,36 @@ describe('TransactionPreviewRow', () => {
     expect(screen.queryByDisplayValue('Bakery Purchase')).not.toBeInTheDocument()
     expect(screen.getByText('Bakery Purchase')).toBeInTheDocument()
   })
+
+  it('renders space transfer badge as view-only with Sub-account label, and no include/exclude action buttons', () => {
+    const onUpdate = vi.fn()
+    const onRemove = vi.fn()
+
+    render(
+      <TransactionPreviewRow
+        {...defaultProps}
+        isSpaceTransfer={true}
+        onUpdateTransaction={onUpdate}
+        onRemoveTransaction={onRemove}
+        t={{
+          ...defaultProps.t,
+          spaceTransfer: 'Sub-account',
+        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+      />,
+    )
+
+    // Displays Sub-account pill
+    const spaceBadge = screen.getByTestId('space-transfer-badge-tx-1')
+    expect(spaceBadge).toBeInTheDocument()
+    expect(spaceBadge).toHaveTextContent('Sub-account')
+
+    // Row is read-only (not editable inline even if onUpdateTransaction is passed)
+    expect(screen.queryByDisplayValue('Bakery Purchase')).not.toBeInTheDocument()
+    expect(screen.getByText('Bakery Purchase')).toBeInTheDocument()
+
+    // No remove/trash button, and no include or exclude buttons
+    expect(screen.queryByRole('button', { name: 'Remove transaction' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /include/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /exclude/i })).not.toBeInTheDocument()
+  })
 })

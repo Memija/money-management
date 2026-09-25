@@ -59,9 +59,6 @@ const TransactionImporter: React.FC = () => {
     handlePaste,
     handleRemoveTransaction,
     handleUpdateTransaction,
-    handleIncludeSpaceTransaction,
-    handleExcludeSpaceTransaction,
-    handleIncludeAllSpaceTransactions,
     handleClearAll,
   } = useTransactionImport(institutionName, method, t)
 
@@ -149,7 +146,7 @@ const TransactionImporter: React.FC = () => {
       return t.filterAlreadyDuplicated || t.alreadyDuplicated || 'Already Duplicated'
     }
     if (previewFilter === 'space-transfers') {
-      return t.filterSpaceTransfers || 'Space Transfers'
+      return t.filterSpaceTransfers || 'Sub-account Transfers'
     }
     if (previewFilter === 'internal-transfers') {
       return t.filterInternalTransfers || 'Internal Transfers'
@@ -550,9 +547,12 @@ const TransactionImporter: React.FC = () => {
           )}
 
           {!isSubmitted && !isAllDuplicates && discardedSpaceCount > 0 && (
-            <div className={styles['transfer-info-banner']} data-testid="space-transfers-banner">
+            <div
+              className={`${styles['transfer-info-banner']} ${styles['space-transfers-banner']}`}
+              data-testid="space-transfers-banner"
+            >
               <div className={styles['transfer-info-content']}>
-                <Info size={16} className={styles['transfer-info-icon']} />
+                <Layers size={16} className={styles['space-transfers-banner-icon']} aria-hidden="true" />
                 <span>
                   {discardedSpaceCount === 1
                     ? t.spaceTransfersExcludedSingular
@@ -561,7 +561,7 @@ const TransactionImporter: React.FC = () => {
               </div>
               <button
                 type="button"
-                className={styles['banner-action-btn']}
+                className={`${styles['banner-action-btn']} ${styles['space-banner-action-btn']}`}
                 onClick={() => {
                   setPreviewFilter('space-transfers')
                   setIsPreviewOpen(true)
@@ -658,9 +658,6 @@ const TransactionImporter: React.FC = () => {
         initialFilter={previewFilter}
         onRemoveTransaction={handleRemoveTransaction}
         onUpdateTransaction={onUpdateTransaction}
-        onIncludeSpaceTransaction={handleIncludeSpaceTransaction}
-        onExcludeSpaceTransaction={handleExcludeSpaceTransaction}
-        onIncludeAllSpaceTransactions={handleIncludeAllSpaceTransactions}
         onUnlockDuplicateTransaction={(tx, rememberRule) => {
           if (rawDuplicateStats.alreadyDuplicatedIds?.includes(tx.id)) {
             return

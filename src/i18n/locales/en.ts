@@ -219,20 +219,20 @@ export const en: TranslationStrings = {
   duplicatesResetSuccess: 'Calculations reset successfully. {count} duplicate transaction(s) removed.',
 
   spaceTransfersExcluded:
-    '{count} internal space transfers were automatically excluded to prevent double counting.',
+    '{count} sub-account transfers were automatically excluded to prevent double counting.',
   spaceTransfersExcludedSingular:
-    '1 internal space transfer was automatically excluded to prevent double counting.',
+    '1 sub-account transfer was automatically excluded to prevent double counting.',
   filterAll: 'All',
   filterIncluded: 'To Import',
-  filterSpaceTransfers: 'Space Transfers',
+  filterSpaceTransfers: 'Sub-account Transfers',
   filterInternalTransfers: 'Internal Transfers',
   viewExcludedSpaceTransfers: 'View excluded',
   viewInternalTransfers: 'View transfers',
   viewTheseTransactions: 'View these transactions',
-  spaceTransfer: 'Space Transfer',
+  spaceTransfer: 'Sub-account',
   spaceTransferExcludedBadge: 'Excluded',
   spaceTransfersExcludedNotice:
-    'These transactions were automatically excluded to prevent double counting and will not be imported.',
+    'Sub-account transfers are automatically excluded to prevent double counting.',
   internalTransfersNotice:
     'These transactions are internal transfers between your own accounts. They are excluded from income and expenses and hidden from standard views.',
   includeInImport: 'Include in import',
@@ -260,15 +260,15 @@ export const en: TranslationStrings = {
 
   transferWarningModalTitle: 'Internal Transfers Detected',
   transferWarningModalSpaceMessage:
-    '{count} transfers between your sub-accounts or spaces were detected. They will be excluded from spending to prevent double counting. You can review them before importing.',
+    '{count} transfers between your sub-accounts or spaces were detected. They are excluded from spending to prevent double counting.',
   transferWarningModalSpaceMessageSingular:
-    '1 transfer between your sub-accounts or spaces was detected. It will be excluded from spending to prevent double counting. You can review it before importing.',
+    '1 transfer between your sub-accounts or spaces was detected. It is excluded to prevent double counting.',
   transferWarningModalInternalMessage:
     '{count} transfers between your accounts were detected. They will be excluded from income and expenses to prevent double counting. You can review them before importing.',
   transferWarningModalInternalMessageSingular:
     '1 transfer between your accounts was detected. It will be excluded from income and expenses to prevent double counting. You can review it before importing.',
   transferWarningModalBothMessage:
-    '{count} internal transfers (including sub-account space movements and cross-account transfers) were detected. They will be excluded from income and expenses to prevent double counting.',
+    '{count} internal transfers (including sub-account movements and cross-account transfers) were detected. They are excluded to prevent double counting.',
   transferWarningModalReview: 'Review Details',
   transferWarningModalProceed: 'Proceed with Import',
 

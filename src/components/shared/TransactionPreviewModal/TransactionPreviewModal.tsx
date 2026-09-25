@@ -49,9 +49,6 @@ export interface TransactionPreviewModalProps {
   initialFilter?: ScopeFilter
   onRemoveTransaction?: (id: string) => void
   onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void
-  onIncludeSpaceTransaction?: (tx: Transaction) => void
-  onExcludeSpaceTransaction?: (tx: Transaction) => void
-  onIncludeAllSpaceTransactions?: () => void
   onUnlockDuplicateTransaction?: (tx: Transaction, rememberRule?: boolean) => void
   onRelockDuplicateTransaction?: (tx: Transaction) => void
   title?: string
@@ -73,9 +70,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   initialFilter = 'all',
   onRemoveTransaction,
   onUpdateTransaction,
-  onIncludeSpaceTransaction,
-  onExcludeSpaceTransaction,
-  onIncludeAllSpaceTransactions,
   onUnlockDuplicateTransaction,
   onRelockDuplicateTransaction,
   title,
@@ -88,9 +82,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     Boolean(
       onUnlockDuplicateTransaction ||
         onRelockDuplicateTransaction ||
-        unlockedDuplicateIds !== undefined ||
-        onIncludeSpaceTransaction ||
-        onExcludeSpaceTransaction,
+        unlockedDuplicateIds !== undefined,
     )
   const t = useLanguageStore((s) => s.t)
   const locale = useLanguageStore((s) => s.locale)
@@ -101,10 +93,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>(initialFilter)
   const [localTransactions, setLocalTransactions] = useState<Transaction[]>(transactions)
-  const [localExcludedSpaceTransactions, setLocalExcludedSpaceTransactions] = useState<
-    Transaction[]
-  >(excludedSpaceTransactions || [])
-  const [manuallyIncludedIds, setManuallyIncludedIds] = useState<Set<string>>(new Set())
   const [localUnlockedDuplicateIds, setLocalUnlockedDuplicateIds] = useState<Set<string>>(new Set())
   const [unlockedTxToWarn, setUnlockedTxToWarn] = useState<Transaction | null>(null)
   const [bulkApplyOffer, setBulkApplyOffer] = useState<{
@@ -154,10 +142,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     setLocalTransactions(transactions)
   }, [transactions])
 
-  useEffect(() => {
-    setLocalExcludedSpaceTransactions(excludedSpaceTransactions || [])
-  }, [excludedSpaceTransactions])
-
   const effectiveUnlockedIds = useMemo(() => {
     const raw = unlockedDuplicateIds
       ? new Set([...unlockedDuplicateIds, ...localUnlockedDuplicateIds])
@@ -170,15 +154,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     return raw
   }, [unlockedDuplicateIds, localUnlockedDuplicateIds, alreadyDuplicatedIds])
 
-  const activeTransactions = useMemo(
-    () => (onIncludeSpaceTransaction ? transactions : localTransactions),
-    [onIncludeSpaceTransaction, transactions, localTransactions],
-  )
-
-  const activeExcluded = useMemo(
-    () => (onIncludeSpaceTransaction ? excludedSpaceTransactions : localExcludedSpaceTransactions) ?? [],
-    [onIncludeSpaceTransaction, excludedSpaceTransactions, localExcludedSpaceTransactions],
-  )
+  const activeTransactions = localTransactions
+  const activeExcluded = excludedSpaceTransactions ?? []
 
   const modifiedTransactions = useMemo(() => {
     return activeTransactions.filter((tx) => getIsModified(tx))
@@ -360,7 +337,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   useEffect(() => {
     if (isOpen) {
       setScopeFilter(initialFilter)
-      setManuallyIncludedIds(new Set())
       setLocalUnlockedDuplicateIds(new Set())
       setUnlockedTxToWarn(null)
       setIsAdjustModalOpen(false)
@@ -551,48 +527,12 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     onRelockDuplicateTransaction?.(tx)
   }
 
-  const handleToggleSpaceTransferInclude = (tx: Transaction) => {
-    if (manuallyIncludedIds.has(tx.id)) {
-      if (onExcludeSpaceTransaction) {
-        onExcludeSpaceTransaction(tx)
-      } else {
-        setLocalTransactions((prev) => prev.filter((t) => t.id !== tx.id))
-        setLocalExcludedSpaceTransactions((prev) => [...prev, tx])
-      }
-      setManuallyIncludedIds((prev) => {
-        const next = new Set(prev)
-        next.delete(tx.id)
-        return next
-      })
-    } else {
-      if (onIncludeSpaceTransaction) {
-        onIncludeSpaceTransaction(tx)
-      } else {
-        setLocalExcludedSpaceTransactions((prev) => prev.filter((t) => t.id !== tx.id))
-        setLocalTransactions((prev) => [...prev, tx])
-      }
-      setManuallyIncludedIds((prev) => new Set(prev).add(tx.id))
-    }
-  }
-
-  const handleIncludeAllSpaceTransfers = () => {
-    if (onIncludeAllSpaceTransactions) {
-      onIncludeAllSpaceTransactions()
-    } else {
-      setLocalTransactions((prev) => [...prev, ...localExcludedSpaceTransactions])
-      setLocalExcludedSpaceTransactions([])
-    }
-    const newlyIncluded = new Set(manuallyIncludedIds)
-    activeExcluded.forEach((tx) => newlyIncluded.add(tx.id))
-    setManuallyIncludedIds(newlyIncluded)
-  }
-
   const spaceTransferIds = useMemo(() => {
     return new Set(activeExcluded.map((tx) => tx.id))
   }, [activeExcluded])
 
   const hasSpaceTransfers = Boolean(
-    activeExcluded.length > 0 || manuallyIncludedIds.size > 0 || discardedSpaceCount > 0,
+    activeExcluded.length > 0 || discardedSpaceCount > 0,
   )
 
   const combinedTransactions = useMemo(() => {
@@ -737,7 +677,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const hasActions = Boolean(
     onRemoveTransaction ||
-      hasSpaceTransfers ||
       onUnlockDuplicateTransaction ||
       onRelockDuplicateTransaction ||
       effectiveUnlockedIds.size > 0 ||
@@ -765,7 +704,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         hideDuplicateBadge={false}
         isInternalTransfer={!isTxDuplicate && (tx.isGhost || internalTransferIds.has(tx.id))}
         isSpaceTransfer={!isTxDuplicate && spaceTransferIds.has(tx.id)}
-        isManuallyIncludedSpaceTransfer={!isTxDuplicate && manuallyIncludedIds.has(tx.id)}
         showInstitution={showInstitution}
         customCategories={customCategories}
         t={t}
@@ -775,7 +713,6 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         onUpdateTransaction={handleUpdateTransaction}
         onRemoveTransaction={onRemoveTransaction}
         onResetTransaction={handleResetTransaction}
-        onToggleSpaceTransferInclude={handleToggleSpaceTransferInclude}
         onUnlockDuplicate={
           onUnlockDuplicateTransaction && !isTxAlreadyDuplicated
             ? handleRequestUnlockDuplicate
@@ -973,19 +910,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             <Layers size={15} aria-hidden="true" />
             <span>
               {t.spaceTransfersExcludedNotice ||
-                'These transactions were automatically excluded to prevent double counting and will not be imported.'}
+                'Sub-account transfers are automatically excluded to prevent double counting.'}
             </span>
-            {activeExcluded.length > 0 && (
-              <button
-                type="button"
-                className={styles['include-all-btn']}
-                onClick={handleIncludeAllSpaceTransfers}
-                data-testid="include-all-space-transfers-btn"
-              >
-                <Plus size={13} aria-hidden="true" />
-                <span>{t.includeAllInImport || 'Include all in import'}</span>
-              </button>
-            )}
           </div>
         )}
 

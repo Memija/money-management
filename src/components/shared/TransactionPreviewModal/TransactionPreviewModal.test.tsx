@@ -36,8 +36,8 @@ vi.mock('../../../store/useLanguageStore', () => ({
         toDate: 'To date',
         transactionCountSingular: '{count} transaction',
         transactionCountPlural: '{count} transactions',
-        spaceTransfersExcluded: '{count} transactions between spaces were automatically excluded.',
-        spaceTransfersExcludedSingular: '1 transaction between spaces was automatically excluded.',
+        spaceTransfersExcluded: '{count} sub-account transfers were automatically excluded.',
+        spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded.',
         inflows: 'Inflows',
         outflows: 'Outflows',
       },
@@ -208,6 +208,7 @@ describe('TransactionPreviewModal (Shared)', () => {
     )
     expect(screen.queryByTestId('preview-space-transfers-banner')).not.toBeInTheDocument()
     expect(screen.getByTestId('space-transfers-notice')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /include/i })).not.toBeInTheDocument()
   })
 
   it('renders inline editable inputs when onUpdateTransaction is provided', () => {
@@ -419,6 +420,7 @@ describe('TransactionPreviewModal (Shared)', () => {
     // Must NOT have internal transfer pill or space transfer pill or include button
     expect(screen.queryByText('Internal Transfer')).not.toBeInTheDocument()
     expect(screen.queryByText('Space Transfer')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Sub-account Transfer/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /include/i })).not.toBeInTheDocument()
   })
 

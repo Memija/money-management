@@ -82,15 +82,15 @@ vi.mock('../../store/useLanguageStore', () => ({
         filterDuplicates: 'Duplicates',
         duplicatesSkippedNotice: 'These transactions already exist in your records and will be skipped to prevent double counting.',
         viewDuplicates: 'View duplicates',
-        spaceTransfersExcluded: '{count} internal space transfers were automatically excluded to prevent double counting.',
-        spaceTransfersExcludedSingular: '1 internal space transfer was automatically excluded to prevent double counting.',
+        spaceTransfersExcluded: '{count} sub-account transfers were automatically excluded to prevent double counting.',
+        spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded to prevent double counting.',
         internalTransfersDetectedSingular: '1 internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
         internalTransfersDetected: '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
         internalTransfersDetectedBannerSingular: '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
         internalTransfersDetectedBanner: '{count} internal transfers between your accounts detected (marked with an internal transfer badge).',
         filterAll: 'All',
         filterIncluded: 'To Import',
-        filterSpaceTransfers: 'Space Transfers',
+        filterSpaceTransfers: 'Sub-account Transfers',
         filterInternalTransfers: 'Internal Transfers',
         viewExcludedSpaceTransfers: 'View excluded',
         viewInternalTransfers: 'View transfers',
@@ -212,8 +212,8 @@ describe('TransactionImporter', () => {
     filterDuplicates: 'Duplicates',
     duplicatesSkippedNotice: 'These transactions already exist in your records and will be skipped to prevent double counting.',
     viewDuplicates: 'View duplicates',
-    spaceTransfersExcluded: '{count} internal space transfers were automatically excluded to prevent double counting.',
-    spaceTransfersExcludedSingular: '1 internal space transfer was automatically excluded to prevent double counting.',
+    spaceTransfersExcluded: '{count} sub-account transfers were automatically excluded to prevent double counting.',
+    spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded to prevent double counting.',
     viewExcludedSpaceTransfers: 'View excluded',
     internalTransfersDetectedSingular: '{count} internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
     internalTransfersDetected: '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
@@ -375,7 +375,7 @@ describe('TransactionImporter', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/internal space transfers were automatically excluded/i)).toBeInTheDocument()
+      expect(screen.getByText(/sub-account transfers were automatically excluded/i)).toBeInTheDocument()
     })
   })
 
@@ -481,7 +481,7 @@ describe('TransactionImporter', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/internal space transfers were automatically excluded/i)).toBeInTheDocument()
+      expect(screen.getByText(/sub-account transfers were automatically excluded/i)).toBeInTheDocument()
       expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
       expect(screen.getByText(/internal transfer with your other accounts detected/i)).toBeInTheDocument()
     })
@@ -529,7 +529,7 @@ Transfer from Bank B DE12345678901234567890
 
     await waitFor(() => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/internal space transfers were automatically excluded/i)).toBeInTheDocument()
+      expect(screen.getByText(/sub-account transfers were automatically excluded/i)).toBeInTheDocument()
       expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
       expect(screen.getByText(/internal transfer with your other accounts detected/i)).toBeInTheDocument()
     })
@@ -608,7 +608,9 @@ Transfer from Bank B DE12345678901234567890
     expect(screen.queryByTestId('preview-space-transfers-banner')).not.toBeInTheDocument()
     expect(screen.queryByTestId('filter-tab-space-transfers')).not.toBeInTheDocument()
     expect(screen.getByTestId('space-transfers-notice')).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: /include/i }).length).toBeGreaterThan(0)
+    // Users should NOT be able to include this type of transaction at all
+    expect(screen.queryByRole('button', { name: /include/i })).not.toBeInTheDocument()
+    expect(screen.getByText('Umbuchung auf Space Notgroschen')).toBeInTheDocument()
   })
 
   it('allows clicking view transfers button on internal transfers banner to open review modal filtered to internal transfers', async () => {
@@ -824,7 +826,7 @@ Transfer from Bank B DE12345678901234567890
 
     await waitFor(() => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/2 internal space transfers were automatically excluded/i)).toBeInTheDocument()
+      expect(screen.getByText(/2 sub-account transfers were automatically excluded/i)).toBeInTheDocument()
     })
 
     // Click "View excluded" on the banner

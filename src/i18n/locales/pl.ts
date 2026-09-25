@@ -220,20 +220,20 @@ export const pl: TranslationStrings = {
     'Obliczenia zostały pomyślnie zresetowane. Usunięto {count} zduplikowanych transakcji.',
 
   spaceTransfersExcluded:
-    '{count} wewnętrznych transferów między przestrzeniami (Spaces) zostało automatycznie wykluczonych, aby uniknąć podwójnego liczenia.',
+    '{count} przelewów na subkonta zostało automatycznie wykluczonych, aby uniknąć podwójnego liczenia.',
   spaceTransfersExcludedSingular:
-    '1 wewnętrzny transfer między przestrzeniami (Spaces) został automatycznie wykluczony, aby uniknąć podwójnego liczenia.',
+    '1 przelew na subkonto został automatycznie wykluczony, aby uniknąć podwójnego liczenia.',
   filterAll: 'Wszystkie',
   filterIncluded: 'Do zaimportowania',
-  filterSpaceTransfers: 'Transfery Spaces',
+  filterSpaceTransfers: 'Przelewy na subkonta',
   filterInternalTransfers: 'Przelewy własne',
   viewExcludedSpaceTransfers: 'Pokaż wykluczone',
   viewInternalTransfers: 'Pokaż przelewy',
   viewTheseTransactions: 'Pokaż te transakcje',
-  spaceTransfer: 'Transfer Spaces',
+  spaceTransfer: 'Subkonto',
   spaceTransferExcludedBadge: 'Wykluczono',
   spaceTransfersExcludedNotice:
-    'Te transakcje zostały automatycznie wykluczone, aby zapobiec podwójnemu liczeniu i nie zostaną zaimportowane.',
+    'Przelewy na subkonta są automatycznie wykluczane, aby zapobiec podwójnemu liczeniu.',
   internalTransfersNotice:
     'Te transakcje to przelewy wewnętrzne między Twoimi kontami. Są one wykluczone z przychodów i wydatków oraz ukryte w widokach standardowych.',
   includeInImport: 'Uwzględnij w imporcie',
@@ -261,15 +261,15 @@ export const pl: TranslationStrings = {
 
   transferWarningModalTitle: 'Wykryto przelewy własne',
   transferWarningModalSpaceMessage:
-    'Wykryto {count} przelewów między Twoimi podkontami lub przestrzeniami (Spaces). Zostaną one wykluczone z wydatków, aby zapobiec podwójnemu liczeniu. Możesz je sprawdzić przed importem.',
+    'Wykryto {count} przelewów między Twoimi subkontami lub przestrzeniami (Spaces). Zostały wykluczone, aby zapobiec podwójnemu liczeniu.',
   transferWarningModalSpaceMessageSingular:
-    'Wykryto 1 przelew między Twoimi podkontami lub przestrzeniami (Spaces). Zostanie on wykluczony z wydatków, aby zapobiec podwójnemu liczeniu. Możesz go sprawdzić przed importem.',
+    'Wykryto 1 przelew między Twoimi subkontami lub przestrzeniami (Spaces). Został wykluczony, aby zapobiec podwójnemu liczeniu.',
   transferWarningModalInternalMessage:
     'Wykryto {count} przelewów między Twoimi kontami. Zostaną one wykluczone z przychodów i wydatków, aby zapobiec podwójnemu liczeniu. Możesz je sprawdzić przed importem.',
   transferWarningModalInternalMessageSingular:
     'Wykryto 1 przelew między Twoimi kontami. Zostanie on wykluczony z przychodów i wydatków, aby zapobiec podwójnemu liczeniu. Możesz go sprawdzić przed importem.',
   transferWarningModalBothMessage:
-    'Wykryto {count} przelewów własnych (w tym ruchy między przestrzeniami oraz przelewy międzykontowe). Zostaną wykluczone z przychodów i wydatków.',
+    'Wykryto {count} przelewów wewnętrznych (w tym ruchy na subkontach i transfery między rachunkami). Zostały wykluczone, aby zapobiec podwójnemu liczeniu.',
   transferWarningModalReview: 'Sprawdź szczegóły',
   transferWarningModalProceed: 'Kontynuuj import',
 

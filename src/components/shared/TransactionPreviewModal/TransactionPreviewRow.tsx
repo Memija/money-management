@@ -1,5 +1,5 @@
 import React from 'react'
-import { Ghost, Layers, Lock, Minus, Plus, RotateCcw, Trash2, Unlock } from 'lucide-react'
+import { Ghost, Layers, Lock, RotateCcw, Trash2, Unlock } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/types'
 import type { CustomCategory, Transaction } from '../../../types'
@@ -20,7 +20,6 @@ export interface TransactionPreviewRowProps {
   hideDuplicateBadge?: boolean
   isInternalTransfer: boolean
   isSpaceTransfer: boolean
-  isManuallyIncludedSpaceTransfer?: boolean
   showInstitution?: boolean
   customCategories: CustomCategory[]
   t: TranslationStrings
@@ -30,7 +29,6 @@ export interface TransactionPreviewRowProps {
   onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void
   onRemoveTransaction?: (id: string) => void
   onResetTransaction?: (id: string) => void
-  onToggleSpaceTransferInclude?: (tx: Transaction) => void
   onUnlockDuplicate?: (tx: Transaction) => void
   onRelockDuplicate?: (tx: Transaction) => void
   hasActions?: boolean
@@ -46,7 +44,6 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   hideDuplicateBadge = false,
   isInternalTransfer,
   isSpaceTransfer,
-  isManuallyIncludedSpaceTransfer,
   showInstitution = false,
   customCategories,
   t,
@@ -56,12 +53,10 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   onUpdateTransaction,
   onRemoveTransaction,
   onResetTransaction,
-  onToggleSpaceTransferInclude,
   onUnlockDuplicate,
   onRelockDuplicate,
   hasActions = Boolean(
     onRemoveTransaction ||
-      onToggleSpaceTransferInclude ||
       onUnlockDuplicate ||
       onRelockDuplicate ||
       onResetTransaction,
@@ -72,14 +67,12 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   const effectiveIsDuplicate = isDuplicate && !isUnlockedDuplicate
   const effectiveIsInternalTransfer = !effectiveIsDuplicate && isInternalTransfer
   const effectiveIsSpaceTransfer = !effectiveIsDuplicate && isSpaceTransfer
-  const effectiveIsManuallyIncludedSpaceTransfer =
-    !effectiveIsDuplicate && isManuallyIncludedSpaceTransfer
 
   const isEditable = Boolean(
     onUpdateTransaction &&
     !effectiveIsDuplicate &&
     !effectiveIsInternalTransfer &&
-    (!effectiveIsSpaceTransfer || effectiveIsManuallyIncludedSpaceTransfer),
+    !effectiveIsSpaceTransfer,
   )
   const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
   const isTxIncome = tx.type === 'income'
@@ -153,22 +146,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
                 data-testid={`space-transfer-badge-${tx.id}`}
               >
                 <Layers size={11} aria-hidden="true" />
-                <span>{t.spaceTransfer || 'Space Transfer'}</span>
-                <span className={styles['excluded-sub-pill']}>
-                  • {t.spaceTransferExcludedBadge || 'Excluded'}
-                </span>
-              </span>
-            )}
-            {effectiveIsManuallyIncludedSpaceTransfer && (
-              <span
-                className={`${styles['space-transfer-pill']} ${styles['space-transfer-pill-included']}`}
-                data-testid={`space-transfer-included-badge-${tx.id}`}
-              >
-                <Layers size={11} aria-hidden="true" />
-                <span>{t.spaceTransfer || 'Space Transfer'}</span>
-                <span className={styles['included-sub-pill']}>
-                  • {t.includeInImport || 'Included'}
-                </span>
+                <span>{t.spaceTransfer || 'Sub-account'}</span>
               </span>
             )}
           </div>
@@ -287,33 +265,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
               </button>
             ) : null}
 
-            {effectiveIsSpaceTransfer && onToggleSpaceTransferInclude && (
-              <button
-                type="button"
-                className={styles['include-space-btn']}
-                onClick={() => onToggleSpaceTransferInclude(tx)}
-                aria-label={t.includeInImport || 'Include in import'}
-                title={t.includeInImport || 'Include in import'}
-                data-testid={`include-space-btn-${tx.id}`}
-              >
-                <Plus size={13} aria-hidden="true" />
-                <span>{t.include || 'Include'}</span>
-              </button>
-            )}
 
-            {effectiveIsManuallyIncludedSpaceTransfer && onToggleSpaceTransferInclude && (
-              <button
-                type="button"
-                className={styles['exclude-space-btn']}
-                onClick={() => onToggleSpaceTransferInclude(tx)}
-                aria-label={t.excludeFromImport || 'Exclude from import'}
-                title={t.excludeFromImport || 'Exclude from import'}
-                data-testid={`exclude-space-btn-${tx.id}`}
-              >
-                <Minus size={13} aria-hidden="true" />
-                <span>{t.exclude || 'Exclude'}</span>
-              </button>
-            )}
 
             {onRemoveTransaction &&
               !isDuplicate &&

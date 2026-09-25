@@ -220,20 +220,20 @@ export const de: TranslationStrings = {
     'Berechnungen erfolgreich zurückgesetzt. {count} duplizierte Transaktion(en) entfernt.',
 
   spaceTransfersExcluded:
-    '{count} interne Space-Umbuchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
+    '{count} Unterkonto-Umbuchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
   spaceTransfersExcludedSingular:
-    '1 interne Space-Umbuchung wurde automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
+    '1 Unterkonto-Umbuchung wurde automatisch ausgeschlossen, um Doppelzählungen zu vermeiden.',
   filterAll: 'Alle',
   filterIncluded: 'Zu importieren',
-  filterSpaceTransfers: 'Space-Umbuchungen',
+  filterSpaceTransfers: 'Unterkonto-Umbuchungen',
   filterInternalTransfers: 'Interne Überweisungen',
   viewExcludedSpaceTransfers: 'Ausgeschlossene anzeigen',
   viewInternalTransfers: 'Umbuchungen anzeigen',
   viewTheseTransactions: 'Diese Umsätze anzeigen',
-  spaceTransfer: 'Space-Umbuchung',
+  spaceTransfer: 'Unterkonto',
   spaceTransferExcludedBadge: 'Ausgeschlossen',
   spaceTransfersExcludedNotice:
-    'Diese Buchungen wurden automatisch ausgeschlossen, um Doppelzählungen zu verhindern, und werden nicht importiert.',
+    'Unterkonto-Umbuchungen werden automatisch ausgeschlossen, um Doppelzählungen zu verhindern.',
   internalTransfersNotice:
     'Diese Buchungen sind interne Umbuchungen zwischen Ihren eigenen Konten. Sie werden von Einnahmen/Ausgaben ausgeschlossen und in Standardansichten ausgeblendet.',
   includeInImport: 'In Import aufnehmen',
@@ -261,15 +261,15 @@ export const de: TranslationStrings = {
 
   transferWarningModalTitle: 'Interne Überweisungen erkannt',
   transferWarningModalSpaceMessage:
-    '{count} Überweisungen zwischen deinen Unterkonten oder Spaces wurden erkannt. Sie werden von den Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden. Du kannst sie vor dem Import überprüfen.',
+    '{count} Umbuchungen zwischen Ihren Unterkonten oder Spaces wurden erkannt. Sie werden ausgeschlossen, um Doppelzählungen zu vermeiden.',
   transferWarningModalSpaceMessageSingular:
-    '1 Überweisung zwischen deinen Unterkonten oder Spaces wurde erkannt. Sie wird von den Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden. Du kannst sie vor dem Import überprüfen.',
+    '1 Umbuchung zwischen Ihren Unterkonten oder Spaces wurde erkannt. Sie wird ausgeschlossen, um Doppelzählungen zu vermeiden.',
   transferWarningModalInternalMessage:
     '{count} Überweisungen zwischen deinen Konten wurden erkannt. Sie werden aus Einnahmen und Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden. Du kannst sie vor dem Import überprüfen.',
   transferWarningModalInternalMessageSingular:
     '1 Überweisung zwischen deinen Konten wurde erkannt. Sie wird aus Einnahmen und Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden. Du kannst sie vor dem Import überprüfen.',
   transferWarningModalBothMessage:
-    '{count} interne Überweisungen (einschließlich Unterkonto-/Space-Umbuchungen und kontoübergreifenden Überweisungen) wurden erkannt. Sie werden aus Einnahmen und Ausgaben ausgeschlossen, um Doppelzählungen zu vermeiden.',
+    '{count} interne Überweisungen (einschließlich Unterkonto-Umbuchungen und kontoübergreifenden Überweisungen) wurden erkannt. Sie werden ausgeschlossen, um Doppelzählungen zu vermeiden.',
   transferWarningModalReview: 'Details überprüfen',
   transferWarningModalProceed: 'Mit Import fortfahren',
 

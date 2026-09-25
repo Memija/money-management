@@ -213,26 +213,6 @@ export const useTransactionImport = (
     setTransactions((prev) => prev.map((tx) => (tx.id === id ? { ...tx, ...updates } : tx)))
   }, [])
 
-  const handleIncludeSpaceTransaction = useCallback((tx: Transaction) => {
-    setExcludedSpaceTransactions((prev) => prev.filter((t) => t.id !== tx.id))
-    setTransactions((prev) => [...prev, tx])
-    setDiscardedSpaceCount((prev) => Math.max(0, prev - 1))
-  }, [])
-
-  const handleExcludeSpaceTransaction = useCallback((tx: Transaction) => {
-    setTransactions((prev) => prev.filter((t) => t.id !== tx.id))
-    setExcludedSpaceTransactions((prev) => [...prev, tx])
-    setDiscardedSpaceCount((prev) => prev + 1)
-  }, [])
-
-  const handleIncludeAllSpaceTransactions = useCallback(() => {
-    setExcludedSpaceTransactions((prev) => {
-      setTransactions((current) => [...current, ...prev])
-      return []
-    })
-    setDiscardedSpaceCount(0)
-  }, [])
-
   const handleClearAll = useCallback(() => {
     setTransactions([])
     setDiscardedSpaceCount(0)
@@ -264,9 +244,6 @@ export const useTransactionImport = (
     handlePaste,
     handleRemoveTransaction,
     handleUpdateTransaction,
-    handleIncludeSpaceTransaction,
-    handleExcludeSpaceTransaction,
-    handleIncludeAllSpaceTransactions,
     handleClearAll,
   }
 }
