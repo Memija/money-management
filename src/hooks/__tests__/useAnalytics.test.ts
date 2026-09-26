@@ -74,4 +74,49 @@ describe('useAnalytics hook', () => {
     const merchantNames = result.current.topMerchants.map((m) => m.name)
     expect(merchantNames).not.toContain('ANEL MEMIC N26 Transfer')
   })
+
+  it('includes ghost transactions when includeGhosts is true for single account view', () => {
+    const commerzbankTxs: Transaction[] = [
+      {
+        id: 'tx-1',
+        date: '2026-08-01',
+        description: 'Monthly Salary',
+        amount: 3000,
+        currency: 'EUR',
+        type: 'income',
+        category: 'Salary',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-2',
+        date: '2026-08-05',
+        description: 'Groceries Supermarket',
+        amount: -150,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Groceries',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-ghost-out',
+        date: '2026-08-10',
+        description: 'Transfer to N26',
+        amount: -500,
+        currency: 'EUR',
+        type: 'expense',
+        institution: 'Commerzbank',
+        isGhost: true,
+      },
+    ]
+
+    const { result } = renderHook(() =>
+      useAnalytics(commerzbankTxs, period, formatMonthYear, 'cat-color-', true),
+    )
+
+    // With includeGhosts: true, the -500 transfer out is counted for this account's cashflow & balance
+    expect(result.current.totalIncome).toBe(3000)
+    expect(result.current.totalExpenses).toBe(650) // 150 + 500
+    expect(result.current.balance).toBe(2350) // 3000 - 650 = 2350
+    expect(result.current.periodTransactions).toHaveLength(3)
+  })
 })

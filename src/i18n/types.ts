@@ -301,6 +301,9 @@ export interface TranslationStrings {
   // Dashboard
   newImport: string
   totalBalance: string
+  accountBalance: string
+  subAccounts: string
+  bankAccounts: string
   income: string
   expenses: string
   incomeVsExpenses: string
@@ -467,6 +470,11 @@ export interface TranslationStrings {
   deleteDataTransactionsCount: string
   deleteDataCategoriesCount: string
   deleteDataRulesCount: string
+  connectedBanksTitle: string
+  noConnectedBanks: string
+  deleteBankTransactions: string
+  deleteBankTransactionsTitle: string
+  deleteBankTransactionsConfirm: string
 
   // Expense category labels
   catSalary: string

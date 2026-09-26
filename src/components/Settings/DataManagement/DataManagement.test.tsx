@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DataManagement } from './DataManagement'
 
 const mockClearAllData = vi.fn()
+const mockRemoveImportedAccount = vi.fn()
 
 // Mock useAppStore
 vi.mock('../../../store/useAppStore', () => ({
@@ -11,8 +12,8 @@ vi.mock('../../../store/useAppStore', () => ({
     const state = {
       importedAccounts: [
         {
-          institutionId: 'bank-1',
-          institutionName: 'Bank 1',
+          institutionId: 'de_commerzbank',
+          institutionName: 'Commerzbank',
           transactions: [
             { id: 'tx-1', amount: -10, date: '2026-01-01', description: 'Coffee' },
             { id: 'tx-2', amount: 50, date: '2026-01-02', description: 'Salary' },
@@ -22,6 +23,7 @@ vi.mock('../../../store/useAppStore', () => ({
       customCategories: [{ id: 'cat-1', translations: { en: 'Pets' } }],
       customKeywords: { Groceries: ['lidl', 'aldi'] },
       clearAllData: mockClearAllData,
+      removeImportedAccount: mockRemoveImportedAccount,
     }
     return typeof selector === 'function' ? selector(state) : state
   }),
@@ -46,6 +48,11 @@ vi.mock('../../../store/useLanguageStore', () => ({
         deleteDataTransactionsCount: '{count} transactions',
         deleteDataCategoriesCount: '{count} custom categories',
         deleteDataRulesCount: '{count} custom rules',
+        connectedBanksTitle: 'Connected Accounts & Banks',
+        noConnectedBanks: 'No accounts imported yet',
+        deleteBankTransactions: 'Delete Transactions',
+        deleteBankTransactionsTitle: 'Delete {bank} Transactions',
+        deleteBankTransactionsConfirm: 'Are you sure you want to delete all transactions and data for {bank}?',
         cancel: 'Cancel',
       },
     }
@@ -67,7 +74,7 @@ describe('DataManagement Component', () => {
 
     // 1 account, 2 transactions, 1 custom category, 2 custom rules
     expect(screen.getByText('1 accounts')).toBeInTheDocument()
-    expect(screen.getByText('2 transactions')).toBeInTheDocument()
+    expect(screen.getAllByText('2 transactions').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('1 custom categories')).toBeInTheDocument()
     expect(screen.getByText('2 custom rules')).toBeInTheDocument()
 
@@ -128,5 +135,77 @@ describe('DataManagement Component', () => {
 
     expect(mockClearAllData).toHaveBeenCalledTimes(1)
     expect(mockClearAllData).toHaveBeenCalledWith(true)
+  })
+
+  it('renders connected bank with its name, logo, and transaction count', () => {
+    render(<DataManagement />)
+
+    expect(screen.getByText('Connected Accounts & Banks')).toBeInTheDocument()
+    expect(screen.getByText('Commerzbank')).toBeInTheDocument()
+
+    // 2 transactions for Commerzbank
+    const txCountElements = screen.getAllByText('2 transactions')
+    expect(txCountElements.length).toBeGreaterThanOrEqual(1)
+
+    // Check bank logo is rendered with clean borderless class and correct src
+    const bankCard = screen.getByTestId('bank-card-de_commerzbank')
+    expect(bankCard).toBeInTheDocument()
+    const logoImg = bankCard.querySelector('img')
+    expect(logoImg).toBeInTheDocument()
+    expect(logoImg).toHaveAttribute('src', '/banks/commerzbank.png')
+
+    // Delete button for this specific bank
+    const deleteBankBtn = screen.getByRole('button', {
+      name: 'Delete Transactions - Commerzbank',
+    })
+    expect(deleteBankBtn).toBeInTheDocument()
+  })
+
+  it('opens confirmation modal when clicking Delete Transactions on a bank', () => {
+    render(<DataManagement />)
+
+    const deleteBankBtn = screen.getByRole('button', {
+      name: 'Delete Transactions - Commerzbank',
+    })
+    fireEvent.click(deleteBankBtn)
+
+    expect(screen.getByText('Delete Commerzbank Transactions')).toBeInTheDocument()
+    expect(
+      screen.getByText('Are you sure you want to delete all transactions and data for Commerzbank?'),
+    ).toBeInTheDocument()
+  })
+
+  it('calls removeImportedAccount when confirming bank deletion', () => {
+    render(<DataManagement />)
+
+    const deleteBankBtn = screen.getByRole('button', {
+      name: 'Delete Transactions - Commerzbank',
+    })
+    fireEvent.click(deleteBankBtn)
+
+    // The modal confirm button has text 'Delete Transactions'
+    const modalDeleteButtons = screen.getAllByRole('button', { name: 'Delete Transactions' })
+    fireEvent.click(modalDeleteButtons[modalDeleteButtons.length - 1])
+
+    expect(mockRemoveImportedAccount).toHaveBeenCalledTimes(1)
+    expect(mockRemoveImportedAccount).toHaveBeenCalledWith('de_commerzbank')
+  })
+
+  it('closes bank confirmation modal without deleting when Cancel is clicked', async () => {
+    render(<DataManagement />)
+
+    const deleteBankBtn = screen.getByRole('button', {
+      name: 'Delete Transactions - Commerzbank',
+    })
+    fireEvent.click(deleteBankBtn)
+
+    expect(screen.getByText('Delete Commerzbank Transactions')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => {
+      expect(screen.queryByText('Delete Commerzbank Transactions')).not.toBeInTheDocument()
+    })
+    expect(mockRemoveImportedAccount).not.toHaveBeenCalled()
   })
 })

@@ -12,19 +12,36 @@ export function useTransactions(period?: PeriodFilter) {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedInstitution, setSelectedInstitution] = useState<string>('all')
+  const [selectedSubAccount, setSelectedSubAccount] = useState<string>('all')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest')
   const [showGhost, setShowGhost] = useState(false)
+
+  const handleSetSelectedInstitution = (inst: string) => {
+    setSelectedInstitution(inst)
+    setSelectedSubAccount('all')
+  }
 
   const allTransactions: Transaction[] = useMemo(() => {
     return importedAccounts.flatMap((a) =>
       [
         ...(a.transactions || []).map((t) => ({
           ...t,
+          institution: t.institution || a.institutionName,
           isDuplicate: Boolean(t.isDuplicate || t.forceImport || t.importedByRuleId),
           isModified: Boolean(t.isModified),
         })),
-        ...(a.duplicateTransactions || []).map((t) => ({ ...t, isDuplicate: true, isModified: false })),
-        ...(a.modifiedTransactions || []).map((t) => ({ ...t, isDuplicate: true, isModified: true })),
+        ...(a.duplicateTransactions || []).map((t) => ({
+          ...t,
+          institution: t.institution || a.institutionName,
+          isDuplicate: true,
+          isModified: false,
+        })),
+        ...(a.modifiedTransactions || []).map((t) => ({
+          ...t,
+          institution: t.institution || a.institutionName,
+          isDuplicate: true,
+          isModified: true,
+        })),
       ].map((t) => ({
         ...t,
         category: getTransactionCategory(t, customKeywords, manualCategories),
@@ -40,8 +57,11 @@ export function useTransactions(period?: PeriodFilter) {
     if (selectedInstitution !== 'all') {
       txs = txs.filter((t) => t.institution === selectedInstitution)
     }
+    if (selectedSubAccount !== 'all') {
+      txs = txs.filter((t) => t.subAccount === selectedSubAccount)
+    }
     return txs.filter((t) => t.isGhost).length
-  }, [allTransactions, period, selectedInstitution])
+  }, [allTransactions, period, selectedInstitution, selectedSubAccount])
 
   const filteredTx = useMemo(() => {
     let txs = allTransactions
@@ -53,6 +73,9 @@ export function useTransactions(period?: PeriodFilter) {
     }
     if (selectedInstitution !== 'all') {
       txs = txs.filter((t) => t.institution === selectedInstitution)
+    }
+    if (selectedSubAccount !== 'all') {
+      txs = txs.filter((t) => t.subAccount === selectedSubAccount)
     }
     const term = searchTerm.trim().toLowerCase()
     if (term) {
@@ -77,7 +100,7 @@ export function useTransactions(period?: PeriodFilter) {
         break
     }
     return txs
-  }, [allTransactions, showGhost, selectedInstitution, searchTerm, sortOrder, period])
+  }, [allTransactions, showGhost, selectedInstitution, selectedSubAccount, searchTerm, sortOrder, period])
 
   return {
     allTransactions,
@@ -85,7 +108,9 @@ export function useTransactions(period?: PeriodFilter) {
     searchTerm,
     setSearchTerm,
     selectedInstitution,
-    setSelectedInstitution,
+    setSelectedInstitution: handleSetSelectedInstitution,
+    selectedSubAccount,
+    setSelectedSubAccount,
     sortOrder,
     setSortOrder,
     showGhost,

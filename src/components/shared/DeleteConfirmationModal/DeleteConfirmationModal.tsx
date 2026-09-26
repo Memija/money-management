@@ -40,14 +40,22 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
       title={title}
       maxWidth={maxWidth}
       footer={
-        <>
-          <button className={`secondary-button ${styles.cancelButton}`} onClick={onClose}>
+        <div className={styles.footerActions}>
+          <button
+            type="button"
+            className={`secondary-button ${styles.cancelButton}`}
+            onClick={onClose}
+          >
             {cancelText}
           </button>
-          <button className={`primary-button ${styles.deleteButton}`} onClick={handleConfirm}>
+          <button
+            type="button"
+            className={`primary-button ${styles.deleteButton}`}
+            onClick={handleConfirm}
+          >
             {confirmText}
           </button>
-        </>
+        </div>
       }
     >
       <div className={styles.contentContainer}>

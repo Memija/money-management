@@ -307,6 +307,9 @@ export const id: TranslationStrings = {
 
   newImport: 'Impor Baru',
   totalBalance: 'Total Saldo',
+  accountBalance: 'Saldo Akun',
+  subAccounts: 'Sub-akun',
+  bankAccounts: 'Akun Bank',
   income: 'Pemasukan',
   expenses: 'Pengeluaran',
   incomeVsExpenses: 'Pemasukan & Pengeluaran',
@@ -474,6 +477,11 @@ export const id: TranslationStrings = {
   deleteDataTransactionsCount: '{count} transaksi',
   deleteDataCategoriesCount: '{count} kategori kustom',
   deleteDataRulesCount: '{count} aturan kustom',
+  connectedBanksTitle: 'Bank & Akun Terhubung',
+  noConnectedBanks: 'Belum ada akun yang diimpor',
+  deleteBankTransactions: 'Hapus Transaksi',
+  deleteBankTransactionsTitle: 'Hapus Transaksi {bank}',
+  deleteBankTransactionsConfirm: 'Apakah Anda yakin ingin menghapus semua transaksi dan data untuk {bank}? Tindakan ini tidak dapat dibatalkan.',
 
   catSalary: 'Gaji',
   catRent: 'Sewa',

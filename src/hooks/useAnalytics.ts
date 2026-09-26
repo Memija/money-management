@@ -147,15 +147,16 @@ export const useAnalytics = (
   period: PeriodFilter,
   formatMonthYear: (dateString: string) => string,
   catColorClassPrefix: string = 'cat-color-',
+  includeGhosts: boolean = false,
 ): AnalyticsData => {
   const customKeywords = useAppStore((s) => s.customKeywords)
   const manualCategories = useAppStore((s) => s.manualCategories)
   const customCategories = useAppStore((s) => s.customCategories)
 
-  // Exclude ghost transactions (internal transfers between own accounts) from financial analytics
+  // Exclude ghost transactions (internal transfers between own accounts) from financial analytics unless explicitly requested
   const activeRawTransactions = useMemo(
-    () => allRawTransactions.filter((t) => !t.isGhost),
-    [allRawTransactions],
+    () => (includeGhosts ? allRawTransactions : allRawTransactions.filter((t) => !t.isGhost)),
+    [allRawTransactions, includeGhosts],
   )
 
   // Categorize all active transactions once if not already categorized

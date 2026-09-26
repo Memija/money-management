@@ -82,12 +82,28 @@
 .imported-account-icon {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+:global([data-theme='light']) .imported-account-icon {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.imported-account-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  border: none;
+  box-shadow: none;
 }
 
 .imported-account-name {
@@ -111,13 +127,22 @@
   gap: 0.75rem;
 }
 
+.account-meta-dot {
+  color: var(--text-dim);
+  margin: 0 0.15rem;
+}
+
 .account-internal-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  margin-left: 0.35rem;
-  color: #818cf8;
+  gap: 0.3rem;
+  margin-left: 0.25rem;
+  color: #10b981;
   font-weight: 500;
+}
+
+:global([data-theme='light']) .account-internal-badge {
+  color: #059669;
 }
 
 .account-internal-badge svg {

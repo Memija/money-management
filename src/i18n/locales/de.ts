@@ -308,6 +308,9 @@ export const de: TranslationStrings = {
 
   newImport: 'Neuer Import',
   totalBalance: 'Gesamtsaldo',
+  accountBalance: 'Kontosaldo',
+  subAccounts: 'Unterkonten',
+  bankAccounts: 'Bankkonten',
   income: 'Einnahmen',
   expenses: 'Ausgaben',
   incomeVsExpenses: 'Einnahmen & Ausgaben',
@@ -477,6 +480,11 @@ export const de: TranslationStrings = {
   deleteDataTransactionsCount: '{count} Transaktionen',
   deleteDataCategoriesCount: '{count} benutzerdefinierte Kategorien',
   deleteDataRulesCount: '{count} benutzerdefinierte Regeln',
+  connectedBanksTitle: 'Verbundene Banken & Konten',
+  noConnectedBanks: 'Noch keine Konten importiert',
+  deleteBankTransactions: 'Transaktionen löschen',
+  deleteBankTransactionsTitle: '{bank}-Transaktionen löschen',
+  deleteBankTransactionsConfirm: 'Möchten Sie wirklich alle Transaktionen und Daten für {bank} löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
 
   catSalary: 'Gehalt',
   catRent: 'Miete',

@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from 'react'
-import { Check, ShieldAlert, Trash2 } from 'lucide-react'
+import { Building2, Check, ShieldAlert, Trash2 } from 'lucide-react'
 
+import { findInstitution } from '../../../data/institutions'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import type { ImportedAccount } from '../../../types'
 import { DeleteConfirmationModal } from '../../shared/DeleteConfirmationModal'
 
 import styles from './DataManagement.module.css'
@@ -13,17 +15,23 @@ export interface DataManagementProps {
 
 export const DataManagement: React.FC<DataManagementProps> = ({ className }) => {
   const t = useLanguageStore((s) => s.t)
-  const { importedAccounts, customCategories, customKeywords, clearAllData } = useAppStore()
+  const { importedAccounts, customCategories, customKeywords, clearAllData, removeImportedAccount } =
+    useAppStore()
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [resetPreferences, setResetPreferences] = useState(false)
+  const [bankToDelete, setBankToDelete] = useState<ImportedAccount | null>(null)
+  const [failedLogos, setFailedLogos] = useState<Record<string, boolean>>({})
 
   const accountsCount = (importedAccounts || []).length
   const transactionsCount = useMemo(
     () =>
       (importedAccounts || []).reduce(
         (sum, acc) =>
-          sum + (acc.transactions?.length || 0) + (acc.duplicateTransactions?.length || 0),
+          sum +
+          (acc.transactions?.length || 0) +
+          (acc.duplicateTransactions?.length || 0) +
+          (acc.modifiedTransactions?.length || 0),
         0,
       ),
     [importedAccounts],
@@ -100,6 +108,81 @@ export const DataManagement: React.FC<DataManagementProps> = ({ className }) => 
         </div>
       </div>
 
+      <div className={styles.banksSection}>
+        <div className={styles.summaryTitle}>
+          {t.connectedBanksTitle || 'Connected Accounts & Banks'}
+        </div>
+
+        {importedAccounts.length === 0 ? (
+          <div className={styles.emptyAccounts}>
+            <p>{t.noConnectedBanks || 'No accounts imported yet'}</p>
+          </div>
+        ) : (
+          <div className={styles.bankList}>
+            {importedAccounts.map((account) => {
+              const institution = findInstitution(account.institutionName || account.institutionId)
+              const hasLogo = Boolean(
+                institution?.logo && !failedLogos[account.institutionId || account.institutionName],
+              )
+              const txCount =
+                (account.transactions?.length || 0) +
+                (account.duplicateTransactions?.length || 0) +
+                (account.modifiedTransactions?.length || 0)
+
+              return (
+                <div
+                  key={account.institutionId}
+                  className={styles.bankCard}
+                  data-testid={`bank-card-${account.institutionId}`}
+                >
+                  <div className={styles.bankInfo}>
+                    <div className={styles.bankLogoWrapper}>
+                      {hasLogo ? (
+                        <img
+                          src={institution!.logo}
+                          alt=""
+                          className={styles.bankLogo}
+                          aria-hidden="true"
+                          onError={() => {
+                            setFailedLogos((prev) => ({
+                              ...prev,
+                              [account.institutionId || account.institutionName]: true,
+                            }))
+                          }}
+                        />
+                      ) : (
+                        <Building2 size={20} className={styles.fallbackIcon} aria-hidden="true" />
+                      )}
+                    </div>
+                    <div className={styles.bankDetails}>
+                      <span className={styles.bankName}>
+                        {account.institutionName || institution?.name || 'Bank'}
+                      </span>
+                      <span className={styles.bankMeta}>
+                        {(t.deleteDataTransactionsCount || '{count} transactions').replace(
+                          '{count}',
+                          String(txCount),
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className={styles.deleteBankButton}
+                    onClick={() => setBankToDelete(account)}
+                    aria-label={`${t.deleteBankTransactions || 'Delete Transactions'} - ${account.institutionName}`}
+                  >
+                    <Trash2 size={14} aria-hidden="true" />
+                    <span>{t.deleteBankTransactions || 'Delete Transactions'}</span>
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
       <div className={styles.actions}>
         <button
           type="button"
@@ -152,6 +235,29 @@ export const DataManagement: React.FC<DataManagementProps> = ({ className }) => 
           </div>
         </label>
       </DeleteConfirmationModal>
+
+      {bankToDelete && (
+        <DeleteConfirmationModal
+          isOpen={Boolean(bankToDelete)}
+          onClose={() => setBankToDelete(null)}
+          onConfirm={() => {
+            if (bankToDelete) {
+              removeImportedAccount?.(bankToDelete.institutionId || bankToDelete.institutionName)
+              setBankToDelete(null)
+            }
+          }}
+          title={(t.deleteBankTransactionsTitle || 'Delete {bank} Transactions').replace(
+            '{bank}',
+            bankToDelete.institutionName || 'Bank',
+          )}
+          message={(
+            t.deleteBankTransactionsConfirm ||
+            'Are you sure you want to delete all transactions and data for {bank}? This action cannot be undone.'
+          ).replace('{bank}', bankToDelete.institutionName || 'Bank')}
+          confirmText={t.deleteBankTransactions || 'Delete Transactions'}
+          cancelText={t.cancel || 'Cancel'}
+        />
+      )}
     </section>
   )
 }

@@ -41,6 +41,11 @@ export interface AppState {
   cancelImport: () => void
   startNewInstitution: () => void
   /**
+   * Deletes an imported account and its transactions by institution ID or name,
+   * reconciling cross-account internal transfers for remaining accounts.
+   */
+  removeImportedAccount: (institutionIdOrName: string) => void
+  /**
    * Permanently clears all stored user data and returns the app to the initial state.
    */
   clearAllData: (resetPreferences?: boolean) => void
@@ -759,6 +764,30 @@ export const useAppStore = create<AppState>()(
         set({
           selectedInstitution: null,
           currentStep: 'institution',
+        }),
+
+      removeImportedAccount: (institutionIdOrName: string) =>
+        set((state) => {
+          const updated = state.importedAccounts.filter(
+            (a) => a.institutionId !== institutionIdOrName && a.institutionName !== institutionIdOrName,
+          )
+          const reconciled = reconcileCrossAccountTransfers(updated)
+          const hasRemainingAccounts = reconciled.length > 0
+          const shouldResetStep =
+            !hasRemainingAccounts && (state.currentStep === 'dashboard' || state.currentStep === 'review')
+
+          return {
+            importedAccounts: reconciled,
+            currentStep: shouldResetStep ? 'country' : state.currentStep,
+            selectedCountry: shouldResetStep ? null : state.selectedCountry,
+            selectedInstitution:
+              shouldResetStep ||
+              (state.selectedInstitution &&
+                (state.selectedInstitution.id === institutionIdOrName ||
+                  state.selectedInstitution.name === institutionIdOrName))
+                ? null
+                : state.selectedInstitution,
+          }
         }),
 
       clearAllData: (resetPreferences = false) => {

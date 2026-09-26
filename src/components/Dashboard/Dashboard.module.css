@@ -271,6 +271,38 @@
   );
 }
 
+.balance-label-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-bank-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: none;
+  box-shadow: none;
+}
+
+:global([data-theme='light']) .hero-bank-logo {
+  border: none;
+  box-shadow: none;
+}
+
+.sticky-bank-logo {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
 .balance-label {
   color: var(--text-muted);
   font-size: 0.82rem;

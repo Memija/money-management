@@ -3,6 +3,7 @@ import { AnimatePresence,motion, useInView } from 'framer-motion'
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 
 import type { PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
+import { useAccountBalances } from '../../hooks/useAccountBalances'
 import { useAnalytics } from '../../hooks/useAnalytics'
 import { useFormatters } from '../../hooks/useFormatters'
 import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
@@ -11,6 +12,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import { getCategoryLabel, hasExtensiveCategoryData } from '../../utils/category-utils'
 import { TransactionPreviewModal } from '../shared/TransactionPreviewModal'
+import { AccountSelector } from './AccountSelector'
 import { AvgDetailModal } from './AvgDetailModal/AvgDetailModal'
 import { CategoryTrend } from './CategoryTrend'
 import { ExpenseCategories } from './ExpenseCategories'
@@ -47,6 +49,12 @@ const Dashboard: React.FC = () => {
   // Savings trend modal
   const [isSavingsTrendOpen, setIsSavingsTrendOpen] = useState(false)
 
+  const {
+    accounts: bankAccounts,
+    totalBalance: allAccountsBalance,
+    totalTransactionCount: allAccountsTxCount,
+  } = useAccountBalances()
+
   // Transactions with active period filter applied
   const {
     allTransactions,
@@ -55,6 +63,8 @@ const Dashboard: React.FC = () => {
     setSearchTerm,
     selectedInstitution,
     setSelectedInstitution,
+    selectedSubAccount,
+    setSelectedSubAccount,
     sortOrder,
     setSortOrder,
     showGhost,
@@ -62,8 +72,28 @@ const Dashboard: React.FC = () => {
     ghostCount,
   } = useTransactions(period)
 
+  const isSingleAccountView = selectedInstitution !== 'all'
+
+  // Transactions filtered by institution and sub-account for accurate per-bank analytics
+  const dashboardTransactions = useMemo(() => {
+    let txs = allTransactions
+    if (selectedInstitution !== 'all') {
+      txs = txs.filter((t) => t.institution === selectedInstitution)
+    }
+    if (selectedSubAccount !== 'all') {
+      txs = txs.filter((t) => t.subAccount === selectedSubAccount)
+    }
+    return txs
+  }, [allTransactions, selectedInstitution, selectedSubAccount])
+
   // Analytics — all derived data from one centralized hook
-  const analytics = useAnalytics(allTransactions, period, formatMonthYear)
+  const analytics = useAnalytics(
+    dashboardTransactions,
+    period,
+    formatMonthYear,
+    'cat-color-',
+    isSingleAccountView,
+  )
 
   // Allow Spending by Category (and Top Merchants) to occupy full row on desktop when lots of data are present
   const isCategoryTrendFullWidth = useMemo(() => {
@@ -76,7 +106,14 @@ const Dashboard: React.FC = () => {
     return hasExtensiveCategoryData(analytics.monthlyCategoryData)
   }, [analytics.monthlyCategoryData, analytics.topMerchants.length])
 
-  const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(allTransactions)
+  const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(dashboardTransactions)
+
+  const selectedAccountInfo = useMemo(() => {
+    if (selectedInstitution === 'all') return null
+    return bankAccounts.find(
+      (a) => a.id === selectedInstitution || a.name === selectedInstitution,
+    )
+  }, [bankAccounts, selectedInstitution])
 
   // Consolidated modal configuration
   const detailModalConfig = useMemo(() => {
@@ -155,8 +192,23 @@ const Dashboard: React.FC = () => {
                 className={styles['sticky-stats']}
               >
                 <div className={styles['sticky-stat-item']}>
-                  <Wallet size={14} className={styles['text-muted']} />
-                  <span className={styles['sticky-stat-label']}>{t.totalBalance}:</span>
+                  {selectedAccountInfo?.logo ? (
+                    <img
+                      src={selectedAccountInfo.logo}
+                      alt=""
+                      className={styles['sticky-bank-logo']}
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <Wallet size={14} className={styles['text-muted']} />
+                  )}
+                  <span className={styles['sticky-stat-label']}>
+                    {selectedInstitution === 'all'
+                      ? `${t.totalBalance}:`
+                      : selectedSubAccount !== 'all'
+                        ? `${selectedSubAccount}:`
+                        : `${selectedAccountInfo?.name || selectedInstitution}:`}
+                  </span>
                   <span
                     className={`${styles['sticky-stat-value']} ${
                       analytics.balance >= 0 ? styles['text-primary'] : styles['text-danger']
@@ -192,6 +244,17 @@ const Dashboard: React.FC = () => {
           <div className={styles['orb-3']} />
         </div>
         <main className="container">
+          {/* Bank & Account Selector */}
+          <AccountSelector
+            accounts={bankAccounts}
+            totalBalance={allAccountsBalance}
+            totalTransactionCount={allAccountsTxCount}
+            selectedInstitution={selectedInstitution}
+            onSelectInstitution={setSelectedInstitution}
+            selectedSubAccount={selectedSubAccount}
+            onSelectSubAccount={setSelectedSubAccount}
+          />
+
           <motion.section
             ref={heroRef}
             initial={{ opacity: 0, y: 24 }}
@@ -199,7 +262,26 @@ const Dashboard: React.FC = () => {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className={`${styles['balance-hero']} ${analytics.balance < 0 ? styles.negative : ''}`}
           >
-          <p className={styles['balance-label']}>{t.totalBalance}</p>
+            <div className={styles['balance-label-wrapper']}>
+              {selectedAccountInfo?.logo && (
+                <img
+                  src={selectedAccountInfo.logo}
+                  alt=""
+                  className={styles['hero-bank-logo']}
+                  aria-hidden="true"
+                  onError={(e) => {
+                    ;(e.currentTarget as HTMLElement).style.display = 'none'
+                  }}
+                />
+              )}
+              <p className={styles['balance-label']}>
+                {selectedInstitution === 'all'
+                  ? t.totalBalance
+                  : selectedSubAccount !== 'all'
+                    ? `${selectedAccountInfo?.name || selectedInstitution} • ${selectedSubAccount}`
+                    : `${selectedAccountInfo?.name || selectedInstitution} ${t.totalBalance || 'Balance'}`}
+              </p>
+            </div>
           <h1 className={styles['balance-amount']}>{formatCurrency(analytics.balance)}</h1>
           <div className={styles['balance-stats']}>
             <div className={styles['stat-item']}>

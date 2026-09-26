@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Copy, Ghost, Sliders } from 'lucide-react'
 
+import { findInstitution } from '../../../data/institutions'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
@@ -31,6 +32,7 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
   const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
   const isModifiedTx = Boolean(tx.isModified)
   const isDuplicateTx = Boolean(tx.isDuplicate || tx.forceImport || tx.importedByRuleId)
+  const institutionLogo = tx.institution ? findInstitution(tx.institution)?.logo : undefined
 
   return (
     <div
@@ -54,7 +56,20 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
           </p>
           <p className={styles.txMeta}>
             <span className={styles.txMetaText}>
-              {formatDate(tx.date)} • {tx.institution}
+              {formatDate(tx.date)} •{' '}
+              {institutionLogo && (
+                <img
+                  src={institutionLogo}
+                  alt=""
+                  className={styles.institutionLogo}
+                  aria-hidden="true"
+                  onError={(e) => {
+                    ;(e.currentTarget as HTMLElement).style.display = 'none'
+                  }}
+                />
+              )}
+              {tx.institution}
+              {tx.subAccount && ` • ${tx.subAccount}`}
             </span>
             {tx.isGhost && (
               <span className={styles.ghostBadge}>

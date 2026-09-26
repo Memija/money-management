@@ -1652,4 +1652,62 @@ describe('useAppStore', () => {
       expect(afterReset?.modifiedTransactions).toHaveLength(0)
     })
   })
+
+  describe('removeImportedAccount', () => {
+    it('removes the specified account and retains other accounts', () => {
+      const acc1: ImportedAccount = {
+        institutionId: 'de_commerzbank',
+        institutionName: 'Commerzbank',
+        transactions: [
+          { id: 'tx-1', amount: -50, date: '2026-09-01', description: 'Groceries' },
+        ],
+        importedAt: '2026-09-01T10:00:00Z',
+        importedFingerprints: ['fp-1'],
+      }
+      const acc2: ImportedAccount = {
+        institutionId: 'de_n26',
+        institutionName: 'N26',
+        transactions: [
+          { id: 'tx-2', amount: 100, date: '2026-09-02', description: 'Income' },
+        ],
+        importedAt: '2026-09-02T10:00:00Z',
+        importedFingerprints: ['fp-2'],
+      }
+
+      useAppStore.setState({
+        importedAccounts: [acc1, acc2],
+        currentStep: 'dashboard',
+      })
+
+      useAppStore.getState().removeImportedAccount('de_commerzbank')
+
+      const state = useAppStore.getState()
+      expect(state.importedAccounts).toHaveLength(1)
+      expect(state.importedAccounts[0].institutionId).toBe('de_n26')
+      expect(state.currentStep).toBe('dashboard')
+    })
+
+    it('resets step to country when the last account is removed from dashboard', () => {
+      const acc1: ImportedAccount = {
+        institutionId: 'de_commerzbank',
+        institutionName: 'Commerzbank',
+        transactions: [
+          { id: 'tx-1', amount: -50, date: '2026-09-01', description: 'Groceries' },
+        ],
+        importedAt: '2026-09-01T10:00:00Z',
+        importedFingerprints: ['fp-1'],
+      }
+
+      useAppStore.setState({
+        importedAccounts: [acc1],
+        currentStep: 'dashboard',
+      })
+
+      useAppStore.getState().removeImportedAccount('Commerzbank')
+
+      const state = useAppStore.getState()
+      expect(state.importedAccounts).toHaveLength(0)
+      expect(state.currentStep).toBe('country')
+    })
+  })
 })

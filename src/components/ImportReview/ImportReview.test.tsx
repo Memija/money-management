@@ -455,6 +455,51 @@ describe('ImportReview', () => {
     expect(proceedBtn.className).toContain('button-warning-orange')
     expect(proceedBtn.className).not.toContain('button-clean-green')
   })
+
+  it('renders bank logos for recognized institutions', () => {
+    mockState.importedAccounts = [
+      {
+        institutionId: 'commerzbank',
+        institutionName: 'Commerzbank',
+        importedAt: new Date('2024-01-01T10:07:00').toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 'cb1',
+            amount: 1500,
+            type: 'income',
+            date: '2024-01-01',
+            description: 'Salary',
+            currency: 'EUR',
+            institution: 'Commerzbank',
+          },
+        ],
+      },
+      {
+        institutionId: 'n26',
+        institutionName: 'N26',
+        importedAt: new Date('2024-01-01T15:00:00').toISOString(),
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 'n1',
+            amount: -50,
+            type: 'expense',
+            date: '2024-01-01',
+            description: 'Coffee',
+            currency: 'EUR',
+            institution: 'N26',
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(<ImportReview />)
+
+    const logos = Array.from(container.querySelectorAll('img'))
+    expect(logos.some((img) => img.getAttribute('src')?.includes('commerzbank'))).toBe(true)
+    expect(logos.some((img) => img.getAttribute('src')?.includes('n26'))).toBe(true)
+  })
 })
 
 

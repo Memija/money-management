@@ -308,6 +308,9 @@ export const bs: TranslationStrings = {
 
   newImport: 'Novi uvoz',
   totalBalance: 'Ukupni saldo',
+  accountBalance: 'Saldo računa',
+  subAccounts: 'Podračuni',
+  bankAccounts: 'Bankovni računi',
   income: 'Prihodi',
   expenses: 'Rashodi',
   incomeVsExpenses: 'Prihodi i Rashodi',
@@ -476,6 +479,11 @@ export const bs: TranslationStrings = {
   deleteDataTransactionsCount: '{count} transakcija',
   deleteDataCategoriesCount: '{count} prilagođenih kategorija',
   deleteDataRulesCount: '{count} prilagođenih pravila',
+  connectedBanksTitle: 'Povezane banke i računi',
+  noConnectedBanks: 'Nema uvezenih računa',
+  deleteBankTransactions: 'Obriši transakcije',
+  deleteBankTransactionsTitle: 'Brisanje transakcija za {bank}',
+  deleteBankTransactionsConfirm: 'Jeste li sigurni da želite obrisati sve transakcije i podatke za {bank}? Ova radnja se ne može poništiti.',
 
   catSalary: 'Plata',
   catRent: 'Stanarina',

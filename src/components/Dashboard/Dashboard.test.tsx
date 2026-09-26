@@ -121,6 +121,11 @@ vi.mock('../../store/useLanguageStore', () => ({
         insightMedian: 'Median Transaction',
         showingOf: 'Showing {shown} of {total}',
         perPage: 'Per page:',
+        allAccounts: 'All Accounts',
+        allSubAccounts: 'All Sub-accounts',
+        subAccounts: 'Sub-accounts',
+        bankAccounts: 'Bank Accounts',
+        institutions: 'Accounts',
       } as unknown as TranslationStrings,
     }
     return typeof selector === 'function' ? selector(state as LanguageState) : state
@@ -189,5 +194,79 @@ describe('Dashboard', () => {
 
     render(<Dashboard />)
     expect(screen.getAllByText('No transactions').length).toBeGreaterThan(0)
+  })
+
+  it('allows switching accounts and filtering transactions per bank and sub-account', () => {
+    vi.mocked(useAppStore).mockImplementation((selector) => {
+      const state = {
+        importedAccounts: [
+          {
+            institutionId: '1',
+            institutionName: 'Bank A',
+            importedAt: '2024-01-01T12:00:00Z',
+            transactions: [
+              {
+                id: 't1',
+                amount: 3000,
+                type: 'income',
+                date: '2024-01-01',
+                description: 'Salary',
+                institution: 'Bank A',
+              },
+            ],
+          },
+          {
+            institutionId: '2',
+            institutionName: 'Bank B',
+            importedAt: '2024-01-01T12:00:00Z',
+            transactions: [
+              {
+                id: 't2',
+                amount: -1000,
+                type: 'expense',
+                date: '2024-01-02',
+                description: 'Rent',
+                institution: 'Bank B',
+                subAccount: 'Savings Space',
+              },
+              {
+                id: 't3',
+                amount: -200,
+                type: 'expense',
+                date: '2024-01-03',
+                description: 'Utilities',
+                institution: 'Bank B',
+                subAccount: 'Bills Space',
+              },
+            ],
+          },
+        ],
+        resetImport: mockResetImport,
+      }
+      return typeof selector === 'function' ? selector(state as unknown as AppState) : state
+    })
+
+    render(<Dashboard />)
+
+    // Verify account cards are rendered
+    expect(screen.getByTestId('account-card-all')).toBeInTheDocument()
+    expect(screen.getByTestId('account-card-1')).toBeInTheDocument()
+    expect(screen.getByTestId('account-card-2')).toBeInTheDocument()
+
+    // Switch to Bank B
+    fireEvent.click(screen.getByTestId('account-card-2'))
+
+    // Sub-accounts for Bank B should now be visible
+    expect(screen.getByTestId('subaccount-pill-Savings Space')).toBeInTheDocument()
+    expect(screen.getByTestId('subaccount-pill-Bills Space')).toBeInTheDocument()
+
+    // Filter to Savings Space
+    fireEvent.click(screen.getByTestId('subaccount-pill-Savings Space'))
+
+    // Transaction list should only have Rent, not Utilities
+    const txList = screen.getByTestId('transaction-list')
+    expect(within(txList).getAllByText('Rent').length).toBeGreaterThan(0)
+    expect(within(txList).queryByText('Utilities')).not.toBeInTheDocument()
+    expect(within(txList).queryByText('Salary')).not.toBeInTheDocument()
   })
 })

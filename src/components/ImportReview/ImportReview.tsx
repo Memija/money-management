@@ -11,6 +11,7 @@ import {
   TrendingUp,
 } from 'lucide-react'
 
+import { findInstitution } from '../../data/institutions'
 import { useFormatters } from '../../hooks/useFormatters'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
@@ -24,6 +25,7 @@ const ImportReview: React.FC = () => {
   const setStep = useAppStore((s) => s.setStep)
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatTransactionCount, locale } = useFormatters()
+  const [failedLogos, setFailedLogos] = React.useState<Record<string, boolean>>({})
   // Map bs/sr to de-DE consistent with useFormatters (Chromium stripped ICU data for these)
   const intlLocale = locale === 'bs' || locale === 'sr' ? 'de-DE' : locale
 
@@ -151,6 +153,10 @@ const ImportReview: React.FC = () => {
         {importedAccounts.map((acc, idx) => {
           const allTxs = getAllAccountTransactions(acc)
           const internalCount = allTxs.filter((tx) => tx.isGhost).length
+          const institution = findInstitution(acc.institutionName || acc.institutionId)
+          const hasLogo = Boolean(
+            institution?.logo && !failedLogos[acc.institutionId || acc.institutionName],
+          )
 
           return (
             <motion.div
@@ -162,7 +168,22 @@ const ImportReview: React.FC = () => {
             >
               <div className={styles['imported-account-left']}>
                 <div className={styles['imported-account-icon']}>
-                  <Building2 size={18} />
+                  {hasLogo ? (
+                    <img
+                      src={institution!.logo}
+                      alt=""
+                      className={styles['imported-account-logo']}
+                      aria-hidden="true"
+                      onError={() => {
+                        setFailedLogos((prev) => ({
+                          ...prev,
+                          [acc.institutionId || acc.institutionName]: true,
+                        }))
+                      }}
+                    />
+                  ) : (
+                    <Building2 size={18} />
+                  )}
                 </div>
                 <div>
                   <p className={styles['imported-account-name']}>{acc.institutionName}</p>
@@ -174,7 +195,8 @@ const ImportReview: React.FC = () => {
                     })}
                     {internalCount > 0 && (
                       <span className={styles['account-internal-badge']}>
-                        • <Ghost size={11} aria-hidden="true" />
+                        <span className={styles['account-meta-dot']}>•</span>
+                        <Ghost size={11} aria-hidden="true" />
                         {internalCount === 1
                           ? t.accountInternalTransfersSingular
                           : t.accountInternalTransfers.replace('{count}', String(internalCount))}
