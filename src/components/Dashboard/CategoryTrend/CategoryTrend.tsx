@@ -21,13 +21,18 @@ import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { CustomCategory } from '../../../types'
 import { adjustColor, getCategoryColor } from '../../../utils/category-colors'
-import { formatCategoryPercent, getCategoryLabel } from '../../../utils/category-utils'
+import {
+  formatCategoryPercent,
+  getCategoryLabel,
+  hasExtensiveCategoryData,
+} from '../../../utils/category-utils'
 
 import styles from './CategoryTrend.module.css'
 
 interface CategoryTrendProps {
   data: MonthlyCategoryEntry[]
   onCategoryClick?: (categoryName: string) => void
+  fullWidth?: boolean
 }
 
 interface CustomTooltipProps {
@@ -129,6 +134,7 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
 export const CategoryTrend: React.FC<CategoryTrendProps> = ({
   data,
   onCategoryClick,
+  fullWidth,
 }) => {
   const t = useLanguageStore((s) => s.t)
   const locale = useLanguageStore((s) => s.locale)
@@ -181,6 +187,12 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = ({
       peakMonth: peak,
     }
   }, [data])
+
+  const isLotsOfData = useMemo(() => {
+    return hasExtensiveCategoryData(data, categories.length)
+  }, [data, categories.length])
+
+  const isFullWidth = fullWidth !== undefined ? fullWidth : isLotsOfData
 
   const formatYAxis = (v: number) => {
     if (v === 0) return '€0'
@@ -280,7 +292,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
-      className={`glass-card ${styles.container}`}
+      className={`glass-card ${styles.container} ${isFullWidth ? styles.fullWidth : ''}`}
     >
       {/* Header with Icon, Title, Metrics and View Toggle */}
       <div className={styles.header}>
@@ -345,7 +357,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = ({
             <BarChart
               data={data}
               margin={{ top: 16, right: 12, left: -10, bottom: 4 }}
-              barSize={40}
+              maxBarSize={44}
               onMouseMove={(state) => {
                 if (state?.activeLabel) {
                   const label = String(state.activeLabel)

@@ -345,3 +345,41 @@ export function formatCategoryPercent(
   }
   return `${Math.round(pct)}%`
 }
+
+/**
+ * Evaluates whether monthly category data is extensive enough to occupy
+ * a full row on desktop screens rather than sharing half a row.
+ * Returns true if:
+ * - 6 or more months are present, or
+ * - 6 or more distinct categories are present, or
+ * - At least 4 months and at least 4 categories (16+ data points), or
+ * - Total data matrix points (months * categories) >= 20.
+ */
+export function hasExtensiveCategoryData(
+  data?: Array<Record<string, unknown>> | null,
+  categoriesCount?: number,
+): boolean {
+  if (!data || data.length === 0) return false
+  const monthsCount = data.length
+
+  let numCategories = categoriesCount
+  if (numCategories === undefined) {
+    const catSet = new Set<string>()
+    data.forEach((entry) => {
+      Object.keys(entry).forEach((k) => {
+        if (k !== 'month') {
+          catSet.add(k)
+        }
+      })
+    })
+    numCategories = catSet.size
+  }
+
+  return (
+    monthsCount >= 6 ||
+    numCategories >= 6 ||
+    (monthsCount >= 4 && numCategories >= 4) ||
+    monthsCount * numCategories >= 20
+  )
+}
+

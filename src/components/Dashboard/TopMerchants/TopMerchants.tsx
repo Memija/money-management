@@ -19,6 +19,7 @@ interface TopMerchantsProps {
   merchants: MerchantEntry[]
   totalExpenses?: number
   onMerchantClick?: (merchantName: string) => void
+  fullWidth?: boolean
 }
 
 interface CustomTooltipProps {
@@ -164,6 +165,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
   merchants,
   totalExpenses = 0,
   onMerchantClick,
+  fullWidth,
 }) => {
   const t = useLanguageStore((s) => s.t)
   const customCategories = useAppStore((s) => s.customCategories)
@@ -197,7 +199,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className={`glass-card ${styles.container}`}
+      className={`glass-card ${styles.container} ${fullWidth ? styles.fullWidth : ''}`}
     >
       {/* Header */}
       <div className={styles.header}>

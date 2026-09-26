@@ -81,6 +81,63 @@ describe('CategoryTrend', () => {
     expect(screen.getByText('Spitzenmonat')).toBeInTheDocument()
   })
 
+  it('does not occupy full row when data is small', () => {
+    const { container } = render(<CategoryTrend data={sampleMonthlyData} />)
+    const card = container.firstChild as HTMLElement
+    expect(card.className).not.toContain('fullWidth')
+  })
+
+  it('occupies full row automatically on desktop when lots of months are present', () => {
+    const lotsOfMonthsData = [
+      { month: 'Jan 25', Rent: 1000 },
+      { month: 'Feb 25', Rent: 1000 },
+      { month: 'Mar 25', Rent: 1000 },
+      { month: 'Apr 25', Rent: 1000 },
+      { month: 'May 25', Rent: 1000 },
+      { month: 'Jun 25', Rent: 1000 },
+    ]
+    const { container } = render(<CategoryTrend data={lotsOfMonthsData} />)
+    const card = container.firstChild as HTMLElement
+    expect(card.className).toContain('fullWidth')
+  })
+
+  it('occupies full row automatically on desktop when lots of categories are present', () => {
+    const lotsOfCategoriesData = [
+      {
+        month: 'Jan 25',
+        Rent: 1000,
+        Groceries: 400,
+        Utilities: 100,
+        Transport: 50,
+        Entertainment: 80,
+        Shopping: 120,
+      },
+    ]
+    const { container } = render(<CategoryTrend data={lotsOfCategoriesData} />)
+    const card = container.firstChild as HTMLElement
+    expect(card.className).toContain('fullWidth')
+  })
+
+  it('respects explicit fullWidth prop', () => {
+    const { container: container1 } = render(
+      <CategoryTrend data={sampleMonthlyData} fullWidth={true} />,
+    )
+    expect((container1.firstChild as HTMLElement).className).toContain('fullWidth')
+
+    const lotsOfMonthsData = [
+      { month: 'Jan 25', Rent: 1000 },
+      { month: 'Feb 25', Rent: 1000 },
+      { month: 'Mar 25', Rent: 1000 },
+      { month: 'Apr 25', Rent: 1000 },
+      { month: 'May 25', Rent: 1000 },
+      { month: 'Jun 25', Rent: 1000 },
+    ]
+    const { container: container2 } = render(
+      <CategoryTrend data={lotsOfMonthsData} fullWidth={false} />,
+    )
+    expect((container2.firstChild as HTMLElement).className).not.toContain('fullWidth')
+  })
+
   describe('CustomTrendTooltip interactivity and shading', () => {
     const mockPayload = [
       { name: 'Rent', value: 1000, color: '#6366f1', dataKey: 'Rent' },

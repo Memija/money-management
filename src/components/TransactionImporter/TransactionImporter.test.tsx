@@ -86,10 +86,18 @@ vi.mock('../../store/useLanguageStore', () => ({
         spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded to prevent double counting.',
         internalTransfersDetectedSingular: '1 internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
         internalTransfersDetected: '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
+        internalTransfersWithExistingDetected:
+          '{count} internal transfer(s) detected • {existingCount} already imported transaction(s) will also be excluded.',
+        internalTransfersWithExistingNotice:
+          'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses.',
+        alreadyImported: 'Already Imported',
         internalTransfersDetectedBannerSingular: '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
         internalTransfersDetectedBanner: '{count} internal transfers between your accounts detected (marked with an internal transfer badge).',
         filterAll: 'All',
         filterIncluded: 'To Import',
+        filterExcluded: 'Excluded',
+        excludedItemsNotice:
+          'These items are excluded from import or calculations (sub-account transfers, internal transfers, and duplicates).',
         filterSpaceTransfers: 'Sub-account Transfers',
         filterInternalTransfers: 'Internal Transfers',
         viewExcludedSpaceTransfers: 'View excluded',
@@ -214,6 +222,9 @@ describe('TransactionImporter', () => {
     viewDuplicates: 'View duplicates',
     spaceTransfersExcluded: '{count} sub-account transfers were automatically excluded to prevent double counting.',
     spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded to prevent double counting.',
+    filterExcluded: 'Excluded',
+    excludedItemsNotice:
+      'These items are excluded from import or calculations (sub-account transfers, internal transfers, and duplicates).',
     viewExcludedSpaceTransfers: 'View excluded',
     internalTransfersDetectedSingular: '{count} internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
     internalTransfersDetected: '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
@@ -408,7 +419,7 @@ describe('TransactionImporter', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/internal transfer with your other accounts detected/i)).toBeInTheDocument()
+      expect(screen.getByText(/already imported transaction\(s\) will also be excluded/i)).toBeInTheDocument()
     })
   })
 
@@ -483,7 +494,7 @@ describe('TransactionImporter', () => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
       expect(screen.getByText(/sub-account transfers were automatically excluded/i)).toBeInTheDocument()
       expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/internal transfer with your other accounts detected/i)).toBeInTheDocument()
+      expect(screen.getByText(/already imported transaction\(s\) will also be excluded/i)).toBeInTheDocument()
     })
   })
 
@@ -531,7 +542,7 @@ Transfer from Bank B DE12345678901234567890
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
       expect(screen.getByText(/sub-account transfers were automatically excluded/i)).toBeInTheDocument()
       expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/internal transfer with your other accounts detected/i)).toBeInTheDocument()
+      expect(screen.getByText(/already imported transaction\(s\) will also be excluded/i)).toBeInTheDocument()
     })
   })
 
@@ -608,8 +619,38 @@ Transfer from Bank B DE12345678901234567890
     expect(screen.queryByTestId('preview-space-transfers-banner')).not.toBeInTheDocument()
     expect(screen.queryByTestId('filter-tab-space-transfers')).not.toBeInTheDocument()
     expect(screen.getByTestId('space-transfers-notice')).toBeInTheDocument()
+    // Scope filter buttons must not be present
+    expect(screen.queryByTestId('filter-space-transfers-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-excluded-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-duplicates-btn')).not.toBeInTheDocument()
     // Users should NOT be able to include this type of transaction at all
     expect(screen.queryByRole('button', { name: /include/i })).not.toBeInTheDocument()
+    expect(screen.getByText('Umbuchung auf Space Notgroschen')).toBeInTheDocument()
+  })
+
+  it('allows clicking space transfers banner directly to open review modal', async () => {
+    const tsvData = `Date\tDescription\tAmount
+2026-03-01\tUmbuchung auf Space Notgroschen\t-500
+2026-03-01\tUmbuchung von Hauptkonto\t500
+2026-03-01\tSupermarkt Einkauf\t-50`
+
+    render(<TransactionImporter />)
+    fireEvent.click(screen.getByText('Paste'))
+    fireEvent.change(screen.getByPlaceholderText('Paste here'), {
+      target: { value: tsvData },
+    })
+    fireEvent.click(screen.getByText('Parse'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
+    })
+
+    const banner = screen.getByTestId('space-transfers-banner')
+    fireEvent.click(banner)
+
+    expect(screen.getByTestId('space-transfers-notice')).toBeInTheDocument()
+    expect(screen.queryByTestId('filter-space-transfers-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-excluded-btn')).not.toBeInTheDocument()
     expect(screen.getByText('Umbuchung auf Space Notgroschen')).toBeInTheDocument()
   })
 
@@ -655,9 +696,57 @@ Transfer from Bank B DE12345678901234567890
     // Modal opens filtered to internal transfers without warning banner and without tabs
     expect(screen.queryByTestId('preview-internal-transfers-banner')).not.toBeInTheDocument()
     expect(screen.queryByTestId('filter-tab-internal-transfers')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-internal-transfers-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-excluded-btn')).not.toBeInTheDocument()
     expect(screen.getByTestId('internal-transfers-notice')).toBeInTheDocument()
     expect(screen.getByText('Transfer from Bank B DE12345678901234567890')).toBeInTheDocument()
+    expect(screen.getByText('Transfer to Bank A DE12345678901234567890')).toBeInTheDocument()
+    expect(screen.getByTestId('already-imported-badge-tx-bank-b')).toBeInTheDocument()
     expect(screen.queryByText('Supermarkt Einkauf')).not.toBeInTheDocument()
+  })
+
+  it('allows clicking internal transfers banner directly to open review modal', async () => {
+    mockImportedAccounts.current = [
+      {
+        institutionId: '2',
+        institutionName: 'Bank B',
+        importedAt: '2026-03-01T00:00:00.000Z',
+        importedFingerprints: [],
+        transactions: [
+          {
+            id: 'tx-bank-b',
+            date: '2026-03-01',
+            description: 'Transfer to Bank A DE12345678901234567890',
+            amount: -100,
+            type: 'expense',
+            institution: 'Bank B',
+          },
+        ],
+      },
+    ]
+
+    const tsvData = `Date\tDescription\tAmount
+2026-03-01\tTransfer from Bank B DE12345678901234567890\t100
+2026-03-01\tSupermarkt Einkauf\t-50`
+
+    render(<TransactionImporter />)
+    fireEvent.click(screen.getByText('Paste'))
+    fireEvent.change(screen.getByPlaceholderText('Paste here'), {
+      target: { value: tsvData },
+    })
+    fireEvent.click(screen.getByText('Parse'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
+    })
+
+    const banner = screen.getByTestId('internal-transfers-banner')
+    fireEvent.click(banner)
+
+    expect(screen.getByTestId('internal-transfers-notice')).toBeInTheDocument()
+    expect(screen.queryByTestId('filter-internal-transfers-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-excluded-btn')).not.toBeInTheDocument()
+    expect(screen.getByText('Transfer from Bank B DE12345678901234567890')).toBeInTheDocument()
   })
 
   it('shows duplicate-all-banner and disables import button when all transactions are duplicates', async () => {

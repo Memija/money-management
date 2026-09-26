@@ -403,6 +403,18 @@
   color: var(--text-main);
   font-size: 0.825rem;
   line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.transfer-info-banner:hover {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+.transfer-info-banner:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .transfer-info-content {
@@ -462,6 +474,16 @@
   color: var(--text-main);
 }
 
+.space-transfers-banner:hover {
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.space-transfers-banner:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+}
+
 .space-transfers-banner-icon {
   color: #94a3b8;
   flex-shrink: 0;
@@ -482,6 +504,14 @@
   background: #f8fafc;
   border-color: #cbd5e1;
   color: #334155;
+}
+
+:global([data-theme='light']) .transfer-info-banner:hover {
+  background: rgba(99, 102, 241, 0.12);
+}
+
+:global([data-theme='light']) .space-transfers-banner:hover {
+  background: #f1f5f9;
 }
 
 :global([data-theme='light']) .space-transfers-banner-icon {

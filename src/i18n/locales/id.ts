@@ -224,8 +224,21 @@ export const id: TranslationStrings = {
     '1 transfer sub-akun otomatis dikecualikan untuk mencegah perhitungan ganda.',
   filterAll: 'Semua',
   filterIncluded: 'Untuk Diimpor',
+  filterExcluded: 'Dikecualikan',
   filterSpaceTransfers: 'Transfer Sub-Akun',
   filterInternalTransfers: 'Transfer Internal',
+  excludedItemsNotice:
+    'Item-item ini dikecualikan dari impor atau perhitungan (transfer sub-akun, transfer internal, dan duplikat).',
+  filterByAccount: 'Akun:',
+  allAccounts: 'Semua Akun',
+  currentImport: 'Impor Saat Ini',
+  internalTransfersCurrentAccountNotice:
+    'Transfer internal dari {account} ini dikecualikan dari pemasukan dan pengeluaran.',
+  internalTransfersExistingAccountNotice:
+    'Transfer internal dari {account} ini sudah diimpor sebelumnya dan sekarang juga akan dikecualikan.',
+  excludedItemsCurrentNotice: 'Item dari {account} ini dikecualikan dari impor.',
+  excludedItemsExistingNotice:
+    'Item yang sudah diimpor dari {account} ini sekarang akan dikecualikan dari perhitungan.',
   viewExcludedSpaceTransfers: 'Lihat yang dikecualikan',
   viewInternalTransfers: 'Lihat transfer',
   viewTheseTransactions: 'Lihat transaksi ini',
@@ -244,6 +257,11 @@ export const id: TranslationStrings = {
     '1 transfer internal dengan akun Anda lainnya terdeteksi (dikecualikan dari pemasukan/pengeluaran dan disembunyikan dari tampilan standar).',
   internalTransfersDetected:
     '{count} transfer internal dengan akun Anda lainnya terdeteksi (dikecualikan dari pemasukan/pengeluaran dan disembunyikan dari tampilan standar).',
+  internalTransfersWithExistingDetected:
+    '{count} transfer internal terdeteksi • {existingCount} transaksi yang sudah diimpor juga akan dikecualikan.',
+  internalTransfersWithExistingNotice:
+    'Transaksi ini adalah transfer internal antar rekening Anda. {existingCount} transaksi yang sudah diimpor dari rekening lain juga akan dikecualikan.',
+  alreadyImported: 'Sudah Diimpor',
   internalTransfersDetectedBannerSingular:
     '1 transfer internal antar-akun Anda terdeteksi (ditandai dengan lencana transfer internal).',
   internalTransfersDetectedBanner:

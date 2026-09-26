@@ -225,8 +225,21 @@ export const bs: TranslationStrings = {
     '1 interni prijenos na podračun je automatski isključen radi izbjegavanja dvostrukog računanja.',
   filterAll: 'Sve',
   filterIncluded: 'Za uvoz',
+  filterExcluded: 'Isključeno',
   filterSpaceTransfers: 'Prijenosi na podračun',
   filterInternalTransfers: 'Interni transferi',
+  excludedItemsNotice:
+    'Ove stavke su isključene iz uvoza ili obračuna (prijenosi na podračune, interni transferi i duplikati).',
+  filterByAccount: 'Račun:',
+  allAccounts: 'Svi računi',
+  currentImport: 'Trenutni uvoz',
+  internalTransfersCurrentAccountNotice:
+    'Ovi interni transferi sa računa {account} su isključeni iz prihoda i rashoda.',
+  internalTransfersExistingAccountNotice:
+    'Ovi interni transferi sa računa {account} su već uvezeni i sada će također biti isključeni.',
+  excludedItemsCurrentNotice: 'Ove stavke sa računa {account} su isključene iz uvoza.',
+  excludedItemsExistingNotice:
+    'Ove već uvezene stavke sa računa {account} će sada biti isključene iz izračuna.',
   viewExcludedSpaceTransfers: 'Prikaži isključene',
   viewInternalTransfers: 'Prikaži transfere',
   viewTheseTransactions: 'Prikaži ove transakcije',
@@ -245,6 +258,11 @@ export const bs: TranslationStrings = {
     'Otkriven je 1 interni prijenos s vašim drugim računima (isključen iz prihoda/rashoda i sakriven iz standardnih pregleda).',
   internalTransfersDetected:
     'Otkriveno je {count} internih prijenosa s vašim drugim računima (isključeni iz prihoda/rashoda i sakriveni iz standardnih pregleda).',
+  internalTransfersWithExistingDetected:
+    'Prepoznato {count} internih transfera • {existingCount} već uvezenih transakcija će također biti isključeno.',
+  internalTransfersWithExistingNotice:
+    'Ove transakcije su interni transferi između Vaših računa. {existingCount} već uvezenih transakcija iz Vaših drugih računa će također biti isključeno.',
+  alreadyImported: 'Već uvezeno',
   internalTransfersDetectedBannerSingular:
     'Otkriven je 1 interni prijenos između vaših računa (označen značkom internog prijenosa).',
   internalTransfersDetectedBanner:

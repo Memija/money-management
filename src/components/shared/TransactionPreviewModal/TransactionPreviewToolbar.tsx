@@ -1,5 +1,5 @@
 import React from 'react'
-import { Copy, Lock, RotateCcw, Search, Sliders, Unlock, X } from 'lucide-react'
+import { Ban, Copy, Ghost, Layers, Lock, RotateCcw, Search, Sliders, Unlock, X } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/types'
 import { DatePicker } from '../DatePicker'
@@ -12,6 +12,7 @@ export type SortDirection = 'asc' | 'desc'
 export type ScopeFilter =
   | 'all'
   | 'included'
+  | 'excluded'
   | 'space-transfers'
   | 'internal-transfers'
   | 'duplicates'
@@ -32,6 +33,7 @@ export interface TransactionPreviewToolbarProps {
   sortOptions: SelectOption[]
   isFilterActive: boolean
   handleClearFilters: () => void
+  initialFilter?: ScopeFilter
   scopeFilter?: ScopeFilter
   onScopeFilterChange?: (filter: ScopeFilter) => void
   unlockedCount?: number
@@ -39,6 +41,9 @@ export interface TransactionPreviewToolbarProps {
   duplicateCount?: number
   alreadyDuplicatedCount?: number
   modifiedCount?: number
+  excludedCount?: number
+  spaceTransferCount?: number
+  internalTransferCount?: number
   isImport?: boolean
   t: TranslationStrings
 }
@@ -56,6 +61,7 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
   sortOptions,
   isFilterActive,
   handleClearFilters,
+  initialFilter,
   scopeFilter = 'all',
   onScopeFilterChange,
   unlockedCount = 0,
@@ -63,9 +69,15 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
   duplicateCount,
   alreadyDuplicatedCount,
   modifiedCount,
+  excludedCount,
+  spaceTransferCount,
+  internalTransferCount,
   isImport = false,
   t,
 }) => {
+  const isSpecializedScope =
+    initialFilter === 'space-transfers' || initialFilter === 'internal-transfers'
+  const showScopeFilters = !isSpecializedScope
   if (!hasMultipleTransactions) {
     return null
   }
@@ -125,7 +137,35 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
         aria-label="Sort transactions"
       />
 
-      {(hasDuplicates || (duplicateCount ?? 0) > 0 || scopeFilter === 'duplicates') && (
+      {showScopeFilters && isImport && ((excludedCount ?? 0) > 0 || scopeFilter === 'excluded') && (
+        <button
+          type="button"
+          className={`${styles['excluded-filter-btn']} ${
+            scopeFilter === 'excluded' ? styles['excluded-filter-btn-active'] : ''
+          } ${(excludedCount ?? 0) === 0 && scopeFilter !== 'excluded' ? styles['excluded-filter-btn-disabled'] : ''}`}
+          onClick={() => {
+            if ((excludedCount ?? 0) === 0 && scopeFilter !== 'excluded') return
+            onScopeFilterChange?.(scopeFilter === 'excluded' ? 'all' : 'excluded')
+          }}
+          disabled={(excludedCount ?? 0) === 0 && scopeFilter !== 'excluded'}
+          title={
+            scopeFilter === 'excluded'
+              ? t.filterAll || 'Show all'
+              : t.filterExcluded || 'Excluded'
+          }
+          aria-label={t.filterExcluded || 'Excluded'}
+          aria-pressed={scopeFilter === 'excluded'}
+          data-testid="filter-excluded-btn"
+        >
+          <Ban size={13} aria-hidden="true" />
+          <span>{t.filterExcluded || 'Excluded'}</span>
+          {excludedCount !== undefined && (
+            <span className={styles['excluded-filter-badge']}>{excludedCount}</span>
+          )}
+        </button>
+      )}
+
+      {showScopeFilters && (hasDuplicates || (duplicateCount ?? 0) > 0 || scopeFilter === 'duplicates') && (
         <button
           type="button"
           className={`${styles['duplicate-filter-btn']} ${
@@ -153,7 +193,7 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
         </button>
       )}
 
-      {((alreadyDuplicatedCount ?? 0) > 0 || scopeFilter === 'already-duplicated') && (
+      {showScopeFilters && ((alreadyDuplicatedCount ?? 0) > 0 || scopeFilter === 'already-duplicated') && (
         <button
           type="button"
           className={`${styles['already-duplicated-filter-btn']} ${
@@ -189,7 +229,67 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
         </button>
       )}
 
-      {((modifiedCount ?? 0) > 0 || scopeFilter === 'modified') && (
+      {showScopeFilters && isImport && ((spaceTransferCount ?? 0) > 0 || scopeFilter === 'space-transfers') && (
+        <button
+          type="button"
+          className={`${styles['space-transfers-filter-btn']} ${
+            scopeFilter === 'space-transfers' ? styles['space-transfers-filter-btn-active'] : ''
+          } ${(spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers' ? styles['space-transfers-filter-btn-disabled'] : ''}`}
+          onClick={() => {
+            if ((spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers') return
+            onScopeFilterChange?.(scopeFilter === 'space-transfers' ? 'all' : 'space-transfers')
+          }}
+          disabled={(spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers'}
+          title={
+            scopeFilter === 'space-transfers'
+              ? t.filterAll || 'Show all'
+              : t.filterSpaceTransfers || 'Sub-account'
+          }
+          aria-label={t.filterSpaceTransfers || 'Sub-account Transfers'}
+          aria-pressed={scopeFilter === 'space-transfers'}
+          data-testid="filter-space-transfers-btn"
+        >
+          <Layers size={13} aria-hidden="true" />
+          <span>{t.filterSpaceTransfers || 'Sub-account'}</span>
+          {spaceTransferCount !== undefined && (
+            <span className={styles['space-transfers-filter-badge']}>
+              {spaceTransferCount}
+            </span>
+          )}
+        </button>
+      )}
+
+      {showScopeFilters && isImport && ((internalTransferCount ?? 0) > 0 || scopeFilter === 'internal-transfers') && (
+        <button
+          type="button"
+          className={`${styles['internal-transfers-filter-btn']} ${
+            scopeFilter === 'internal-transfers' ? styles['internal-transfers-filter-btn-active'] : ''
+          } ${(internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers' ? styles['internal-transfers-filter-btn-disabled'] : ''}`}
+          onClick={() => {
+            if ((internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers') return
+            onScopeFilterChange?.(scopeFilter === 'internal-transfers' ? 'all' : 'internal-transfers')
+          }}
+          disabled={(internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers'}
+          title={
+            scopeFilter === 'internal-transfers'
+              ? t.filterAll || 'Show all'
+              : t.filterInternalTransfers || 'Internal Transfers'
+          }
+          aria-label={t.filterInternalTransfers || 'Internal Transfers'}
+          aria-pressed={scopeFilter === 'internal-transfers'}
+          data-testid="filter-internal-transfers-btn"
+        >
+          <Ghost size={13} aria-hidden="true" />
+          <span>{t.filterInternalTransfers || 'Internal Transfers'}</span>
+          {internalTransferCount !== undefined && (
+            <span className={styles['internal-transfers-filter-badge']}>
+              {internalTransferCount}
+            </span>
+          )}
+        </button>
+      )}
+
+      {showScopeFilters && ((modifiedCount ?? 0) > 0 || scopeFilter === 'modified') && (
         <button
           type="button"
           className={`${styles['modified-filter-btn']} ${
@@ -217,7 +317,7 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
         </button>
       )}
 
-      {isImport && (hasDuplicates || unlockedCount > 0 || scopeFilter === 'unlocked') && (
+      {showScopeFilters && isImport && (hasDuplicates || unlockedCount > 0 || scopeFilter === 'unlocked') && (
         <button
           type="button"
           className={`${styles['unlocked-filter-btn']} ${

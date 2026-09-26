@@ -13,9 +13,23 @@
   z-index: 50;
 }
 
+.fullWidth {
+  grid-column: span 12;
+}
+
 @media (max-width: 1024px) {
   .container {
     grid-column: span 12;
+  }
+}
+
+@media (min-width: 1025px) {
+  .fullWidth .listContainer {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem 1rem;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 

@@ -20,6 +20,7 @@ export interface TransactionPreviewRowProps {
   hideDuplicateBadge?: boolean
   isInternalTransfer: boolean
   isSpaceTransfer: boolean
+  isExistingAccountTransfer?: boolean
   showInstitution?: boolean
   customCategories: CustomCategory[]
   t: TranslationStrings
@@ -44,6 +45,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   hideDuplicateBadge = false,
   isInternalTransfer,
   isSpaceTransfer,
+  isExistingAccountTransfer = false,
   showInstitution = false,
   customCategories,
   t,
@@ -72,7 +74,8 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
     onUpdateTransaction &&
     !effectiveIsDuplicate &&
     !effectiveIsInternalTransfer &&
-    !effectiveIsSpaceTransfer,
+    !effectiveIsSpaceTransfer &&
+    !isExistingAccountTransfer,
   )
   const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
   const isTxIncome = tx.type === 'income'
@@ -111,8 +114,12 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
           )}
 
           <div className={styles['row-meta']}>
-            {showInstitution && tx.institution && <span>{tx.institution}</span>}
-            {showInstitution && tx.institution && tx.category && <span>•</span>}
+            {(showInstitution || isExistingAccountTransfer) && tx.institution && (
+              <span>{tx.institution}</span>
+            )}
+            {(showInstitution || isExistingAccountTransfer) && tx.institution && tx.category && (
+              <span>•</span>
+            )}
             {tx.category && (
               <span>{getCategoryLabel(tx.category, t, locale, customCategories)}</span>
             )}
@@ -137,7 +144,15 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             {effectiveIsInternalTransfer && (
               <span className={styles['internal-transfer-pill']}>
                 <Ghost size={11} aria-hidden="true" />
-                {t.internalTransfer || 'Internal Transfer'}
+                <span>{t.internalTransfer || 'Internal Transfer'}</span>
+                {isExistingAccountTransfer && (
+                  <span
+                    className={styles['already-imported-sub-pill']}
+                    data-testid={`already-imported-badge-${tx.id}`}
+                  >
+                    • {t.alreadyImported || 'Already Imported'}
+                  </span>
+                )}
               </span>
             )}
             {effectiveIsSpaceTransfer && (
@@ -270,7 +285,8 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             {onRemoveTransaction &&
               !isDuplicate &&
               !effectiveIsInternalTransfer &&
-              !effectiveIsSpaceTransfer && (
+              !effectiveIsSpaceTransfer &&
+              !isExistingAccountTransfer && (
                 <button
                   className={styles['remove-button']}
                   onClick={() => onRemoveTransaction(tx.id)}

@@ -227,8 +227,21 @@ export const sr: TranslationStrings = {
     '1 интерни пренос на подрачун је аутоматски искључен ради избегавања двоструког рачунања.',
   filterAll: 'Све',
   filterIncluded: 'За увоз',
+  filterExcluded: 'Искључено',
   filterSpaceTransfers: 'Преноси на подрачун',
   filterInternalTransfers: 'Интерни трансфери',
+  excludedItemsNotice:
+    'Ове ставке су искључене из увоза или обрачуна (преноси на подрачуне, интерни преноси и дупликати).',
+  filterByAccount: 'Рачун:',
+  allAccounts: 'Сви рачуни',
+  currentImport: 'Тренутни увоз',
+  internalTransfersCurrentAccountNotice:
+    'Ови интерни трансфери са рачуна {account} су искључени из прихода и расхода.',
+  internalTransfersExistingAccountNotice:
+    'Ови интерни трансфери са рачуна {account} су већ увезени и сада ће такође бити искључени.',
+  excludedItemsCurrentNotice: 'Ове ставке са рачуна {account} су искључене из увоза.',
+  excludedItemsExistingNotice:
+    'Ове већ увезене ставке са рачуна {account} ће сада бити искључене из обрачуна.',
   viewExcludedSpaceTransfers: 'Прикажи искључене',
   viewInternalTransfers: 'Прикажи трансфере',
   viewTheseTransactions: 'Прикажи ове трансакције',
@@ -247,6 +260,11 @@ export const sr: TranslationStrings = {
     'Откривен је 1 интерни пренос са вашим другим рачунима (искључен из прихода/расхода и сакривен из стандардних прегледа).',
   internalTransfersDetected:
     'Откривено је {count} интерних преноса са вашим другим рачунима (искључени из прихода/расхода и сакривени из стандардних прегледа).',
+  internalTransfersWithExistingDetected:
+    'Препознато {count} интерних преноса • {existingCount} већ увезених трансакција ће такође бити искључено.',
+  internalTransfersWithExistingNotice:
+    'Ове трансакције су интерни преноси између Ваших рачуна. {existingCount} већ увезених трансакција из Ваших других рачуна ће такође бити искључено.',
+  alreadyImported: 'Већ увезено',
   internalTransfersDetectedBannerSingular:
     'Откривен је 1 интерни пренос између ваших рачуна (означен ознаком интерног преноса).',
   internalTransfersDetectedBanner:

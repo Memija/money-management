@@ -224,8 +224,21 @@ export const en: TranslationStrings = {
     '1 sub-account transfer was automatically excluded to prevent double counting.',
   filterAll: 'All',
   filterIncluded: 'To Import',
+  filterExcluded: 'Excluded',
   filterSpaceTransfers: 'Sub-account Transfers',
   filterInternalTransfers: 'Internal Transfers',
+  excludedItemsNotice:
+    'These items are excluded from import or calculations (sub-account transfers, internal transfers, and duplicates).',
+  filterByAccount: 'Account:',
+  allAccounts: 'All Accounts',
+  currentImport: 'Current Import',
+  internalTransfersCurrentAccountNotice:
+    'These internal transfers from {account} are excluded from income and expenses.',
+  internalTransfersExistingAccountNotice:
+    'These internal transfers from {account} were already imported and will now also be excluded from income and expenses.',
+  excludedItemsCurrentNotice: 'These items from {account} are excluded from import.',
+  excludedItemsExistingNotice:
+    'These already imported items from {account} will now be excluded from calculations.',
   viewExcludedSpaceTransfers: 'View excluded',
   viewInternalTransfers: 'View transfers',
   viewTheseTransactions: 'View these transactions',
@@ -244,6 +257,11 @@ export const en: TranslationStrings = {
     '1 internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
   internalTransfersDetected:
     '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
+  internalTransfersWithExistingDetected:
+    '{count} internal transfer(s) detected • {existingCount} already imported transaction(s) will also be excluded.',
+  internalTransfersWithExistingNotice:
+    'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses.',
+  alreadyImported: 'Already Imported',
   internalTransfersDetectedBannerSingular:
     '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
   internalTransfersDetectedBanner:

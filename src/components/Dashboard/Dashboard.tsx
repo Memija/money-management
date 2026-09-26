@@ -9,7 +9,7 @@ import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
 import { useTransactions } from '../../hooks/useTransactions'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
-import { getCategoryLabel } from '../../utils/category-utils'
+import { getCategoryLabel, hasExtensiveCategoryData } from '../../utils/category-utils'
 import { TransactionPreviewModal } from '../shared/TransactionPreviewModal'
 import { AvgDetailModal } from './AvgDetailModal/AvgDetailModal'
 import { CategoryTrend } from './CategoryTrend'
@@ -64,6 +64,17 @@ const Dashboard: React.FC = () => {
 
   // Analytics — all derived data from one centralized hook
   const analytics = useAnalytics(allTransactions, period, formatMonthYear)
+
+  // Allow Spending by Category (and Top Merchants) to occupy full row on desktop when lots of data are present
+  const isCategoryTrendFullWidth = useMemo(() => {
+    if (!analytics.monthlyCategoryData || analytics.monthlyCategoryData.length === 0) {
+      return false
+    }
+    if (analytics.topMerchants.length === 0) {
+      return true
+    }
+    return hasExtensiveCategoryData(analytics.monthlyCategoryData)
+  }, [analytics.monthlyCategoryData, analytics.topMerchants.length])
 
   const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(allTransactions)
 
@@ -256,14 +267,16 @@ const Dashboard: React.FC = () => {
             totalMonthly={recurringMonthlyTotal}
           />
 
-          {/* Top Merchants + Category Trend side by side */}
+          {/* Top Merchants + Category Trend (side-by-side or full row when lots of data are present) */}
           <TopMerchants
             merchants={analytics.topMerchants}
             totalExpenses={analytics.totalExpenses}
             onMerchantClick={(merchant) => setActiveDetailModal({ type: 'merchant', merchant })}
+            fullWidth={isCategoryTrendFullWidth}
           />
           <CategoryTrend
             data={analytics.monthlyCategoryData}
+            fullWidth={isCategoryTrendFullWidth}
           />
 
 

@@ -256,4 +256,40 @@ describe('TransactionPreviewRow', () => {
     expect(screen.queryByRole('button', { name: /include/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /exclude/i })).not.toBeInTheDocument()
   })
+
+  it('renders already imported badge and institution, and is non-editable without remove button when isExistingAccountTransfer is true', () => {
+    const onUpdate = vi.fn()
+    const onRemove = vi.fn()
+
+    render(
+      <TransactionPreviewRow
+        {...defaultProps}
+        isInternalTransfer={true}
+        isExistingAccountTransfer={true}
+        showInstitution={false}
+        onUpdateTransaction={onUpdate}
+        onRemoveTransaction={onRemove}
+        t={{
+          ...defaultProps.t,
+          internalTransfer: 'Internal Transfer',
+          alreadyImported: 'Already Imported',
+        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+      />,
+    )
+
+    // Displays Internal Transfer pill with Already Imported sub-pill
+    const badge = screen.getByTestId('already-imported-badge-tx-1')
+    expect(badge).toBeInTheDocument()
+    expect(badge).toHaveTextContent('Already Imported')
+
+    // Displays institution even when showInstitution is false
+    expect(screen.getByText('Sparkasse')).toBeInTheDocument()
+
+    // Row is read-only
+    expect(screen.queryByDisplayValue('Bakery Purchase')).not.toBeInTheDocument()
+    expect(screen.getByText('Bakery Purchase')).toBeInTheDocument()
+
+    // No remove button
+    expect(screen.queryByRole('button', { name: 'Remove transaction' })).not.toBeInTheDocument()
+  })
 })

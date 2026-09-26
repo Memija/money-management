@@ -118,7 +118,11 @@ const TransactionImporter: React.FC = () => {
 
   const internalTransferStats = React.useMemo(() => {
     if (!nonDuplicateTransactions?.length || !otherImportedAccounts?.length) {
-      return { count: 0, transferTxIds: new Set<string>() }
+      return {
+        count: 0,
+        transferTxIds: new Set<string>(),
+        existingAccountTransfers: [] as Transaction[],
+      }
     }
 
     const draftAccount: ImportedAccount = {
@@ -130,15 +134,41 @@ const TransactionImporter: React.FC = () => {
       accountIbans: detectedAccountIbans,
     }
 
+    const existingOriginalGhostIds = new Set<string>()
+    for (const acc of otherImportedAccounts) {
+      for (const tx of acc.transactions) {
+        if (tx.isGhost) {
+          existingOriginalGhostIds.add(tx.id)
+        }
+      }
+    }
+
     const reconciled = reconcileCrossAccountTransfers([...otherImportedAccounts, draftAccount])
     const reconciledDraft = reconciled[reconciled.length - 1]
     const ghostTxs = reconciledDraft.transactions.filter((tx) => tx.isGhost)
     const transferTxIds = new Set(ghostTxs.map((tx) => tx.id))
 
-    return { count: transferTxIds.size, transferTxIds }
+    const existingAccountTransfers: Transaction[] = []
+    for (let i = 0; i < otherImportedAccounts.length; i++) {
+      const origAcc = otherImportedAccounts[i]
+      const reconciledAcc = reconciled[i]
+      for (const tx of reconciledAcc.transactions) {
+        if (tx.isGhost && !existingOriginalGhostIds.has(tx.id)) {
+          existingAccountTransfers.push({
+            ...tx,
+            institution: tx.institution || origAcc.institutionName || origAcc.institutionId,
+          })
+        }
+      }
+    }
+
+    return { count: transferTxIds.size, transferTxIds, existingAccountTransfers }
   }, [nonDuplicateTransactions, otherImportedAccounts, selectedInstitution?.id, institutionName, detectedAccountIbans])
 
   const previewModalTitle = React.useMemo(() => {
+    if (previewFilter === 'excluded') {
+      return t.filterExcluded || 'Excluded'
+    }
     if (previewFilter === 'duplicates') {
       return t.filterDuplicates || 'Duplicates'
     }
@@ -550,6 +580,20 @@ const TransactionImporter: React.FC = () => {
             <div
               className={`${styles['transfer-info-banner']} ${styles['space-transfers-banner']}`}
               data-testid="space-transfers-banner"
+              role="button"
+              tabIndex={0}
+              onClick={() => {
+                setPreviewFilter('space-transfers')
+                setIsPreviewOpen(true)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setPreviewFilter('space-transfers')
+                  setIsPreviewOpen(true)
+                }
+              }}
+              title={t.viewExcludedSpaceTransfers || 'View excluded'}
             >
               <div className={styles['transfer-info-content']}>
                 <Layers size={16} className={styles['space-transfers-banner-icon']} aria-hidden="true" />
@@ -562,7 +606,8 @@ const TransactionImporter: React.FC = () => {
               <button
                 type="button"
                 className={`${styles['banner-action-btn']} ${styles['space-banner-action-btn']}`}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation()
                   setPreviewFilter('space-transfers')
                   setIsPreviewOpen(true)
                 }}
@@ -575,31 +620,66 @@ const TransactionImporter: React.FC = () => {
             </div>
           )}
 
-          {!isSubmitted && !isAllDuplicates && internalTransferStats.count > 0 && (
-            <div className={styles['transfer-info-banner']} data-testid="internal-transfers-banner">
-              <div className={styles['transfer-info-content']}>
-                <Ghost size={16} className={styles['transfer-info-icon']} />
-                <span>
-                  {internalTransferStats.count === 1
-                    ? t.internalTransfersDetectedSingular
-                    : t.internalTransfersDetected.replace('{count}', String(internalTransferStats.count))}
-                </span>
-              </div>
-              <button
-                type="button"
-                className={styles['banner-action-btn']}
+          {!isSubmitted &&
+            !isAllDuplicates &&
+            (internalTransferStats.count > 0 ||
+              internalTransferStats.existingAccountTransfers.length > 0) && (
+              <div
+                className={styles['transfer-info-banner']}
+                data-testid="internal-transfers-banner"
+                role="button"
+                tabIndex={0}
                 onClick={() => {
                   setPreviewFilter('internal-transfers')
                   setIsPreviewOpen(true)
                 }}
-                data-testid="view-internal-transfers-button"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setPreviewFilter('internal-transfers')
+                    setIsPreviewOpen(true)
+                  }
+                }}
                 title={t.viewInternalTransfers || 'View transfers'}
               >
-                <Ghost size={13} aria-hidden="true" />
-                <span>{t.viewInternalTransfers || 'View transfers'}</span>
-              </button>
-            </div>
-          )}
+                <div className={styles['transfer-info-content']}>
+                  <Ghost size={16} className={styles['transfer-info-icon']} />
+                  <span>
+                    {internalTransferStats.existingAccountTransfers.length > 0
+                      ? (
+                          t.internalTransfersWithExistingDetected ||
+                          '{count} internal transfer(s) detected • {existingCount} already imported transaction(s) will also be excluded.'
+                        )
+                          .replace('{count}', String(internalTransferStats.count))
+                          .replace(
+                            '{existingCount}',
+                            String(internalTransferStats.existingAccountTransfers.length),
+                          )
+                      : internalTransferStats.count === 1
+                        ? (t.internalTransfersDetectedSingular ||
+                          '1 internal transfer with your other accounts detected.')
+                        : (
+                            t.internalTransfersDetected ||
+                            '{count} internal transfers with your other accounts detected.'
+                          ).replace('{count}', String(internalTransferStats.count))}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className={styles['banner-action-btn']}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setPreviewFilter('internal-transfers')
+                    setIsPreviewOpen(true)
+                  }}
+                  data-testid="view-internal-transfers-button"
+                  title={t.viewInternalTransfers || 'View transfers'}
+                >
+                  <Ghost size={13} aria-hidden="true" />
+                  <span>{t.viewInternalTransfers || 'View transfers'}</span>
+                </button>
+              </div>
+            )}
 
           <div className={styles['action-buttons-container']}>
             <button
@@ -648,11 +728,13 @@ const TransactionImporter: React.FC = () => {
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         transactions={transactions}
+        currentInstitutionName={institutionName}
         isImport={true}
         duplicateIds={new Set(rawDuplicateStats.duplicateIds)}
         alreadyDuplicatedIds={new Set(rawDuplicateStats.alreadyDuplicatedIds || [])}
         unlockedDuplicateIds={unlockedDuplicateIds}
         internalTransferIds={internalTransferStats.transferTxIds}
+        existingAccountTransfers={internalTransferStats.existingAccountTransfers}
         discardedSpaceCount={discardedSpaceCount}
         excludedSpaceTransactions={excludedSpaceTransactions}
         initialFilter={previewFilter}

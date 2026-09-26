@@ -180,4 +180,16 @@ describe('TopMerchants', () => {
     expect(netflixRow?.textContent).not.toMatch(/~.*17\.99/)
     expect(netflixRow?.textContent).toMatch(/17\.99 \/ tx/)
   })
+
+  it('applies fullWidth class when fullWidth prop is true', () => {
+    const { container: container1 } = render(
+      <TopMerchants merchants={mockMerchants} fullWidth={true} />,
+    )
+    expect((container1.firstChild as HTMLElement).className).toContain('fullWidth')
+
+    const { container: container2 } = render(
+      <TopMerchants merchants={mockMerchants} fullWidth={false} />,
+    )
+    expect((container2.firstChild as HTMLElement).className).not.toContain('fullWidth')
+  })
 })

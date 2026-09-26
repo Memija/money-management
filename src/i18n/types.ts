@@ -236,8 +236,17 @@ export interface TranslationStrings {
   spaceTransfersExcludedSingular: string
   filterAll: string
   filterIncluded: string
+  filterExcluded: string
   filterSpaceTransfers: string
   filterInternalTransfers: string
+  excludedItemsNotice: string
+  filterByAccount: string
+  allAccounts: string
+  currentImport: string
+  internalTransfersCurrentAccountNotice: string
+  internalTransfersExistingAccountNotice: string
+  excludedItemsCurrentNotice: string
+  excludedItemsExistingNotice: string
   viewExcludedSpaceTransfers: string
   viewInternalTransfers: string
   viewTheseTransactions: string
@@ -252,6 +261,9 @@ export interface TranslationStrings {
   exclude: string
   internalTransfersDetectedSingular: string
   internalTransfersDetected: string
+  internalTransfersWithExistingDetected: string
+  internalTransfersWithExistingNotice: string
+  alreadyImported: string
   internalTransfersDetectedBannerSingular: string
   internalTransfersDetectedBanner: string
   internalTransfersReconciledTitle: string

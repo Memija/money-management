@@ -9,6 +9,7 @@ import {
   formatPopularMerchantsCount,
   formatTransactionCount,
   getCategoryLabel,
+  hasExtensiveCategoryData,
   resolveCanonicalCategory,
   resolvePluralTemplate,
 } from './category-utils'
@@ -521,4 +522,79 @@ describe('category-utils', () => {
       },
     )
   })
+
+  describe('hasExtensiveCategoryData', () => {
+    it('returns false for null, undefined, or empty data', () => {
+      expect(hasExtensiveCategoryData(null)).toBe(false)
+      expect(hasExtensiveCategoryData(undefined)).toBe(false)
+      expect(hasExtensiveCategoryData([])).toBe(false)
+    })
+
+    it('returns false for small data sets (e.g. 1-3 months with few categories)', () => {
+      const data = [
+        { month: 'Jan 25', Rent: 1000, Groceries: 400, Utilities: 150 },
+        { month: 'Feb 25', Rent: 1000, Groceries: 450, Utilities: 120 },
+        { month: 'Mar 25', Rent: 1000, Groceries: 500, Utilities: 200 },
+      ]
+      expect(hasExtensiveCategoryData(data)).toBe(false)
+    })
+
+    it('returns true when there are 6 or more months', () => {
+      const data = [
+        { month: 'Jan 25', Rent: 1000 },
+        { month: 'Feb 25', Rent: 1000 },
+        { month: 'Mar 25', Rent: 1000 },
+        { month: 'Apr 25', Rent: 1000 },
+        { month: 'May 25', Rent: 1000 },
+        { month: 'Jun 25', Rent: 1000 },
+      ]
+      expect(hasExtensiveCategoryData(data)).toBe(true)
+    })
+
+    it('returns true when there are 6 or more categories across months', () => {
+      const data = [
+        {
+          month: 'Jan 25',
+          Rent: 1000,
+          Groceries: 400,
+          Utilities: 100,
+          Transport: 50,
+          Entertainment: 80,
+          Shopping: 120,
+        },
+      ]
+      expect(hasExtensiveCategoryData(data)).toBe(true)
+    })
+
+    it('returns true when both months count and categories count are at least 4', () => {
+      const data = [
+        { month: 'Jan 25', C1: 10, C2: 20, C3: 30, C4: 40 },
+        { month: 'Feb 25', C1: 10, C2: 20, C3: 30, C4: 40 },
+        { month: 'Mar 25', C1: 10, C2: 20, C3: 30, C4: 40 },
+        { month: 'Apr 25', C1: 10, C2: 20, C3: 30, C4: 40 },
+      ]
+      expect(hasExtensiveCategoryData(data)).toBe(true)
+    })
+
+    it('returns true when total data matrix points (months * categories) >= 20', () => {
+      // 5 months * 4 categories = 20 points
+      const data = [
+        { month: 'Jan 25', A: 1, B: 2, C: 3, D: 4 },
+        { month: 'Feb 25', A: 1, B: 2, C: 3, D: 4 },
+        { month: 'Mar 25', A: 1, B: 2, C: 3, D: 4 },
+        { month: 'Apr 25', A: 1, B: 2, C: 3, D: 4 },
+        { month: 'May 25', A: 1, B: 2, C: 3, D: 4 },
+      ]
+      expect(hasExtensiveCategoryData(data)).toBe(true)
+    })
+
+    it('uses explicit categoriesCount parameter when provided', () => {
+      const data = [{ month: 'Jan 25', A: 1 }]
+      // 1 month, but categoriesCount passed as 7
+      expect(hasExtensiveCategoryData(data, 7)).toBe(true)
+      // 1 month, categoriesCount passed as 2
+      expect(hasExtensiveCategoryData(data, 2)).toBe(false)
+    })
+  })
 })
+

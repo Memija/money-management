@@ -27,6 +27,23 @@ vi.mock('../../../store/useLanguageStore', () => ({
         filterDuplicates: 'Duplicates',
         filterAlreadyDuplicated: 'Already Duplicated',
         alreadyDuplicated: 'Already Duplicated',
+        filterSpaceTransfers: 'Sub-account',
+        filterInternalTransfers: 'Internal Transfers',
+        filterExcluded: 'Excluded',
+        excludedItemsNotice:
+          'These items are excluded from import or calculations (sub-account transfers, internal transfers, and duplicates).',
+        spaceTransfersExcludedNotice:
+          'Sub-account transfers are automatically excluded to prevent double counting.',
+        filterByAccount: 'Account:',
+        allAccounts: 'All Accounts',
+        currentImport: 'Current Import',
+        internalTransfersCurrentAccountNotice:
+          'These internal transfers from {account} are excluded from income and expenses.',
+        internalTransfersExistingAccountNotice:
+          'These internal transfers from {account} were already imported and will now also be excluded from income and expenses.',
+        excludedItemsCurrentNotice: 'These items from {account} are excluded from import.',
+        excludedItemsExistingNotice:
+          'These already imported items from {account} will now be excluded from calculations.',
         alreadyDuplicatedFilterNotice:
           'These duplicate transactions were already imported previously and cannot be modified or unlocked again.',
         duplicatesSkippedNotice: 'Duplicates notice',
@@ -38,6 +55,13 @@ vi.mock('../../../store/useLanguageStore', () => ({
         transactionCountPlural: '{count} transactions',
         spaceTransfersExcluded: '{count} sub-account transfers were automatically excluded.',
         spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded.',
+        internalTransfer: 'Internal Transfer',
+        internalTransfersNotice: 'These transactions are internal transfers between your own accounts.',
+        internalTransfersWithExistingDetected:
+          '{count} internal transfer(s) detected • {existingCount} already imported transaction(s) will also be excluded.',
+        internalTransfersWithExistingNotice:
+          'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses.',
+        alreadyImported: 'Already Imported',
         inflows: 'Inflows',
         outflows: 'Outflows',
       },
@@ -195,6 +219,43 @@ describe('TransactionPreviewModal (Shared)', () => {
     )
     expect(screen.queryByTestId('preview-internal-transfers-banner')).not.toBeInTheDocument()
     expect(screen.getByText('Internal Transfer')).toBeInTheDocument()
+  })
+
+  it('renders internal transfers notice with already imported count and displays already imported transactions with badge', () => {
+    const existingTx: Transaction = {
+      id: 'tx-existing-1',
+      date: '2026-03-01',
+      description: 'Transfer to Main Account',
+      amount: 500,
+      currency: 'EUR',
+      type: 'income',
+      institution: 'N26 Bank',
+      isGhost: true,
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        initialFilter="internal-transfers"
+        internalTransferIds={new Set(['tx-2'])}
+        existingAccountTransfers={[existingTx]}
+      />,
+    )
+
+    // Notice displays message mentioning 1 already imported transaction
+    const notice = screen.getByTestId('internal-transfers-notice')
+    expect(notice).toBeInTheDocument()
+    expect(notice.textContent).toMatch(/1/)
+
+    // Both the draft transfer and existing account transfer are displayed
+    expect(screen.getByText('Supermarket Groceries')).toBeInTheDocument()
+    expect(screen.getByText('Transfer to Main Account')).toBeInTheDocument()
+
+    // Already Imported badge and institution are displayed for the existing transfer
+    const alreadyImportedBadge = screen.getByTestId('already-imported-badge-tx-existing-1')
+    expect(alreadyImportedBadge).toBeInTheDocument()
+    expect(alreadyImportedBadge).toHaveTextContent('Already Imported')
+    expect(screen.getAllByText('N26 Bank').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders space transfers notice when filtered to space transfers', () => {
@@ -1297,6 +1358,378 @@ describe('TransactionPreviewModal (Shared)', () => {
     const dupBadge = screen.getByTestId('preview-duplicate-badge-tx-2')
     expect(dupBadge).toBeInTheDocument()
     expect(dupBadge).toHaveTextContent(/Already Duplicated/i)
+  })
+
+  it('renders Excluded filter button with correct total count and filters all excluded transactions', () => {
+    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
+    const duplicateTx = { ...mockTransactions[1], id: 'tx-dup', description: 'Locked Duplicate', amount: -50 }
+    const internalTransferTx = { ...mockTransactions[2], id: 'tx-internal', description: 'Draft Transfer to Savings', amount: -100 }
+    const spaceTx: Transaction = {
+      id: 'tx-space',
+      date: '2026-03-01',
+      description: 'Transfer to Holiday Space',
+      amount: -200,
+      type: 'expense',
+      category: 'Transfer',
+    }
+    const existingTransferTx: Transaction = {
+      id: 'tx-existing',
+      date: '2026-03-01',
+      description: 'Transfer from Main Account',
+      amount: 100,
+      type: 'income',
+      category: 'Transfer',
+      isGhost: true,
+      institution: 'Sparkasse',
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[normalTx, duplicateTx, internalTransferTx]}
+        duplicateIds={new Set(['tx-dup'])}
+        internalTransferIds={new Set(['tx-internal'])}
+        excludedSpaceTransactions={[spaceTx]}
+        existingAccountTransfers={[existingTransferTx]}
+        isImport={true}
+      />,
+    )
+
+    // Excluded button should be present with total count 4 (1 dup + 1 draft internal + 1 space + 1 existing)
+    const excludedBtn = screen.getByTestId('filter-excluded-btn')
+    expect(excludedBtn).toBeInTheDocument()
+    expect(excludedBtn).toHaveTextContent('4')
+
+    // Space transfers button should have count 1
+    const spaceBtn = screen.getByTestId('filter-space-transfers-btn')
+    expect(spaceBtn).toBeInTheDocument()
+    expect(spaceBtn).toHaveTextContent('1')
+
+    // Internal transfers button should have count 2 (1 draft + 1 existing)
+    const internalBtn = screen.getByTestId('filter-internal-transfers-btn')
+    expect(internalBtn).toBeInTheDocument()
+    expect(internalBtn).toHaveTextContent('2')
+
+    // Initially, notice banner is not visible
+    expect(screen.queryByTestId('excluded-items-notice')).not.toBeInTheDocument()
+
+    // Click "Excluded" filter button
+    fireEvent.click(excludedBtn)
+
+    // Banner must be displayed
+    const notice = screen.getByTestId('excluded-items-notice')
+    expect(notice).toBeInTheDocument()
+    expect(notice).toHaveTextContent(/These items are excluded from import or calculations/i)
+
+    // Excluded button is active
+    expect(excludedBtn).toHaveAttribute('aria-pressed', 'true')
+
+    // Normal non-duplicate transaction should be hidden
+    expect(screen.queryByText('Normal Income')).not.toBeInTheDocument()
+
+    // All 4 excluded transactions should be visible
+    expect(screen.getByText('Locked Duplicate')).toBeInTheDocument()
+    expect(screen.getByText('Draft Transfer to Savings')).toBeInTheDocument()
+    expect(screen.getByText('Transfer to Holiday Space')).toBeInTheDocument()
+    expect(screen.getByText('Transfer from Main Account')).toBeInTheDocument()
+
+    // Click "Excluded" button again to toggle back to all
+    fireEvent.click(excludedBtn)
+    expect(screen.getByText('Normal Income')).toBeInTheDocument()
+    expect(screen.queryByTestId('excluded-items-notice')).not.toBeInTheDocument()
+  })
+
+  it('filters specifically by Sub-account Transfers when clicked', () => {
+    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
+    const duplicateTx = { ...mockTransactions[1], id: 'tx-dup', description: 'Locked Duplicate', amount: -50 }
+    const spaceTx: Transaction = {
+      id: 'tx-space',
+      date: '2026-03-01',
+      description: 'Transfer to Sub-Space',
+      amount: -200,
+      type: 'expense',
+      category: 'Transfer',
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[normalTx, duplicateTx]}
+        duplicateIds={new Set(['tx-dup'])}
+        excludedSpaceTransactions={[spaceTx]}
+        isImport={true}
+      />,
+    )
+
+    const spaceBtn = screen.getByTestId('filter-space-transfers-btn')
+    fireEvent.click(spaceBtn)
+
+    expect(screen.getByTestId('space-transfers-notice')).toBeInTheDocument()
+    expect(screen.getByText('Transfer to Sub-Space')).toBeInTheDocument()
+    expect(screen.queryByText('Normal Income')).not.toBeInTheDocument()
+    expect(screen.queryByText('Locked Duplicate')).not.toBeInTheDocument()
+  })
+
+  it('filters specifically by Internal Transfers when clicked', () => {
+    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
+    const internalTransferTx = { ...mockTransactions[2], id: 'tx-internal', description: 'Inter-Account Transfer', amount: -100 }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[normalTx, internalTransferTx]}
+        internalTransferIds={new Set(['tx-internal'])}
+        isImport={true}
+      />,
+    )
+
+    const internalBtn = screen.getByTestId('filter-internal-transfers-btn')
+    fireEvent.click(internalBtn)
+
+    expect(screen.getByTestId('internal-transfers-notice')).toBeInTheDocument()
+    expect(screen.getByText('Inter-Account Transfer')).toBeInTheDocument()
+    expect(screen.queryByText('Normal Income')).not.toBeInTheDocument()
+  })
+
+  it('allows filtering excluded transfers by account (N26 vs Commerzbank)', () => {
+    const n26Normal = {
+      ...mockTransactions[0],
+      id: 'tx-n26-normal',
+      description: 'N26 Supermarket',
+      amount: -45,
+    }
+    const n26Internal = {
+      ...mockTransactions[1],
+      id: 'tx-n26-transfer',
+      description: 'Transfer to Commerzbank',
+      amount: -300,
+      isGhost: true,
+    }
+    const commerzbankExisting: Transaction = {
+      id: 'tx-cb-transfer',
+      date: '2026-03-02',
+      description: 'Transfer from N26',
+      amount: 300,
+      type: 'income',
+      category: 'Transfer',
+      isGhost: true,
+      institution: 'Commerzbank',
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[n26Normal, n26Internal]}
+        currentInstitutionName="N26"
+        internalTransferIds={new Set(['tx-n26-transfer'])}
+        existingAccountTransfers={[commerzbankExisting]}
+        initialFilter="excluded"
+        isImport={true}
+      />,
+    )
+
+    // Account filter bar should be present with 3 pills: All, N26, Commerzbank
+    const accountBar = screen.getByTestId('account-filter-bar')
+    expect(accountBar).toBeInTheDocument()
+
+    const allPill = screen.getByTestId('account-filter-pill-all')
+    const n26Pill = screen.getByTestId('account-filter-pill-current')
+    const commerzbankPill = screen.getByTestId('account-filter-pill-commerzbank')
+
+    expect(allPill).toHaveTextContent('2') // 1 from N26 + 1 from Commerzbank
+    expect(n26Pill).toHaveTextContent('1')
+    expect(commerzbankPill).toHaveTextContent('1')
+
+    // Initially all excluded are visible
+    expect(screen.getByText('Transfer to Commerzbank')).toBeInTheDocument()
+    expect(screen.getByText('Transfer from N26')).toBeInTheDocument()
+    expect(screen.queryByText('N26 Supermarket')).not.toBeInTheDocument()
+
+    // 1. Filter specifically by N26 transfers
+    fireEvent.click(n26Pill)
+    expect(n26Pill).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('Transfer to Commerzbank')).toBeInTheDocument()
+    expect(screen.queryByText('Transfer from N26')).not.toBeInTheDocument()
+
+    // Notice banner updates for N26
+    const noticeN26 = screen.getByTestId('excluded-items-notice')
+    expect(noticeN26).toHaveTextContent(/These items from N26 are excluded from import/i)
+
+    // 2. Filter specifically by Commerzbank transfers
+    fireEvent.click(commerzbankPill)
+    expect(commerzbankPill).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('Transfer from N26')).toBeInTheDocument()
+    expect(screen.queryByText('Transfer to Commerzbank')).not.toBeInTheDocument()
+
+    // Notice banner updates for Commerzbank
+    const noticeCb = screen.getByTestId('excluded-items-notice')
+    expect(noticeCb).toHaveTextContent(/These already imported items from Commerzbank will now be excluded from calculations/i)
+
+    // 3. Switch back to All Accounts
+    fireEvent.click(allPill)
+    expect(allPill).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('Transfer to Commerzbank')).toBeInTheDocument()
+    expect(screen.getByText('Transfer from N26')).toBeInTheDocument()
+  })
+
+  it('allows filtering internal transfers by account (N26 vs Commerzbank)', () => {
+    const n26Normal = {
+      ...mockTransactions[0],
+      id: 'tx-n26-salary',
+      description: 'N26 Salary',
+      amount: 2500,
+    }
+    const n26Transfer = {
+      ...mockTransactions[1],
+      id: 'tx-n26-out',
+      description: 'Out to Commerzbank',
+      amount: -500,
+      isGhost: true,
+    }
+    const cbTransfer: Transaction = {
+      id: 'tx-cb-in',
+      date: '2026-03-03',
+      description: 'In from N26',
+      amount: 500,
+      type: 'income',
+      category: 'Transfer',
+      isGhost: true,
+      institution: 'Commerzbank',
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[n26Normal, n26Transfer]}
+        currentInstitutionName="N26"
+        internalTransferIds={new Set(['tx-n26-out'])}
+        existingAccountTransfers={[cbTransfer]}
+        initialFilter="internal-transfers"
+        isImport={true}
+      />,
+    )
+
+    const n26Pill = screen.getByTestId('account-filter-pill-current')
+    const cbPill = screen.getByTestId('account-filter-pill-commerzbank')
+
+    // Click N26
+    fireEvent.click(n26Pill)
+    expect(screen.getByText('Out to Commerzbank')).toBeInTheDocument()
+    expect(screen.queryByText('In from N26')).not.toBeInTheDocument()
+
+    const noticeN26 = screen.getByTestId('internal-transfers-notice')
+    expect(noticeN26).toHaveTextContent(/These internal transfers from N26 are excluded/i)
+
+    // Click Commerzbank
+    fireEvent.click(cbPill)
+    expect(screen.getByText('In from N26')).toBeInTheDocument()
+    expect(screen.queryByText('Out to Commerzbank')).not.toBeInTheDocument()
+
+    const noticeCb = screen.getByTestId('internal-transfers-notice')
+    expect(noticeCb).toHaveTextContent(/These internal transfers from Commerzbank were already imported/i)
+  })
+
+  it('hides all scope filter buttons and shows only sub-account transfers when opened with initialFilter="space-transfers"', () => {
+    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Salary Income', amount: 3000 }
+    const dupTx = { ...mockTransactions[1], id: 'tx-dup', description: 'Duplicated Expense', amount: -50 }
+    const spaceTx: Transaction = {
+      id: 'tx-space-1',
+      date: '2026-03-01',
+      description: 'Transfer to Sub-account Space',
+      amount: -400,
+      type: 'expense',
+      category: 'Transfer',
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[normalTx, dupTx]}
+        duplicateIds={new Set(['tx-dup'])}
+        excludedSpaceTransactions={[spaceTx]}
+        initialFilter="space-transfers"
+        isImport={true}
+      />,
+    )
+
+    // Notice should be displayed
+    expect(screen.getByTestId('space-transfers-notice')).toBeInTheDocument()
+
+    // Only sub-account transfer is displayed
+    expect(screen.getByText('Transfer to Sub-account Space')).toBeInTheDocument()
+    expect(screen.queryByText('Salary Income')).not.toBeInTheDocument()
+    expect(screen.queryByText('Duplicated Expense')).not.toBeInTheDocument()
+
+    // No scope filter buttons should be present
+    expect(screen.queryByTestId('filter-space-transfers-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-excluded-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-duplicates-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-internal-transfers-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('account-filter-bar')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('duplicate-banner')).not.toBeInTheDocument()
+  })
+
+  it('hides scope filter buttons but keeps account filter bar when opened with initialFilter="internal-transfers"', () => {
+    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
+    const internalTx: Transaction = {
+      id: 'tx-internal-1',
+      date: '2026-03-01',
+      description: 'Internal Transfer Out',
+      amount: -150,
+      type: 'expense',
+      category: 'Transfer',
+      isGhost: true,
+      institution: 'N26',
+    }
+    const existingTx: Transaction = {
+      id: 'tx-existing-cb',
+      date: '2026-03-01',
+      description: 'Internal Transfer In',
+      amount: 150,
+      type: 'income',
+      category: 'Transfer',
+      isGhost: true,
+      institution: 'Commerzbank',
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[normalTx, internalTx]}
+        currentInstitutionName="N26"
+        internalTransferIds={new Set(['tx-internal-1'])}
+        existingAccountTransfers={[existingTx]}
+        initialFilter="internal-transfers"
+        isImport={true}
+      />,
+    )
+
+    // Notice should be displayed
+    expect(screen.getByTestId('internal-transfers-notice')).toBeInTheDocument()
+
+    // Only internal transfers are displayed
+    expect(screen.getByText('Internal Transfer Out')).toBeInTheDocument()
+    expect(screen.getByText('Internal Transfer In')).toBeInTheDocument()
+    expect(screen.queryByText('Normal Income')).not.toBeInTheDocument()
+
+    // Scope filter buttons should NOT be present
+    expect(screen.queryByTestId('filter-internal-transfers-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-excluded-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-space-transfers-btn')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('filter-duplicates-btn')).not.toBeInTheDocument()
+
+    // Account filter bar MUST be present
+    expect(screen.getByTestId('account-filter-bar')).toBeInTheDocument()
+    expect(screen.getByTestId('account-filter-pill-all')).toBeInTheDocument()
+    expect(screen.getByTestId('account-filter-pill-current')).toBeInTheDocument()
+    expect(screen.getByTestId('account-filter-pill-commerzbank')).toBeInTheDocument()
   })
 })
 

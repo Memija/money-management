@@ -225,8 +225,21 @@ export const pl: TranslationStrings = {
     '1 przelew na subkonto został automatycznie wykluczony, aby uniknąć podwójnego liczenia.',
   filterAll: 'Wszystkie',
   filterIncluded: 'Do zaimportowania',
+  filterExcluded: 'Wykluczone',
   filterSpaceTransfers: 'Przelewy na subkonta',
   filterInternalTransfers: 'Przelewy własne',
+  excludedItemsNotice:
+    'Te pozycje są wykluczone z importu lub obliczeń (przelewy na subkonta, przelewy własne i duplikaty).',
+  filterByAccount: 'Konto:',
+  allAccounts: 'Wszystkie konta',
+  currentImport: 'Bieżący import',
+  internalTransfersCurrentAccountNotice:
+    'Te przelewy wewnętrzne z konta {account} są wyłączone z przychodów i wydatków.',
+  internalTransfersExistingAccountNotice:
+    'Te przelewy wewnętrzne z konta {account} zostały już zaimportowane i teraz również zostaną wykluczone.',
+  excludedItemsCurrentNotice: 'Te pozycje z konta {account} są wykluczone z importu.',
+  excludedItemsExistingNotice:
+    'Te już zaimportowane pozycje z konta {account} zostaną teraz wykluczone z obliczeń.',
   viewExcludedSpaceTransfers: 'Pokaż wykluczone',
   viewInternalTransfers: 'Pokaż przelewy',
   viewTheseTransactions: 'Pokaż te transakcje',
@@ -245,6 +258,11 @@ export const pl: TranslationStrings = {
     'Wykryto 1 przelew własny między Twoimi kontami (wykluczony z przychodów/wydatków i ukryty w widokach standardowych).',
   internalTransfersDetected:
     'Wykryto {count} przelewów własnych między Twoimi kontami (wykluczonych z przychodów/wydatków i ukrytych w widokach standardowych).',
+  internalTransfersWithExistingDetected:
+    'Wykryto {count} przelewów własnych • {existingCount} już zaimportowanych transakcji również zostanie wykluczonych.',
+  internalTransfersWithExistingNotice:
+    'Te transakcje to przelewy wewnętrzne między Twoimi kontami. {existingCount} już zaimportowanych transakcji z innych kont również zostanie wykluczonych.',
+  alreadyImported: 'Już zaimportowano',
   internalTransfersDetectedBannerSingular:
     'Wykryto 1 przelew własny między Twoimi kontami (oznaczony etykietą przelewu własnego).',
   internalTransfersDetectedBanner:
