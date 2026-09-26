@@ -242,6 +242,9 @@ export interface TranslationStrings {
   excludedItemsNotice: string
   filterByAccount: string
   allAccounts: string
+  filterBySubAccount: string
+  allSubAccounts: string
+  spaceTransfersExcludedForSubAccountNotice: string
   currentImport: string
   internalTransfersCurrentAccountNotice: string
   internalTransfersExistingAccountNotice: string

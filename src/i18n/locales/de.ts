@@ -232,11 +232,15 @@ export const de: TranslationStrings = {
     'Diese Buchungen sind vom Import oder von Berechnungen ausgeschlossen (Umbuchungen zwischen Unterkonten, interne Umbuchungen und Duplikate).',
   filterByAccount: 'Konto:',
   allAccounts: 'Alle Konten',
+  filterBySubAccount: 'Unterkonto:',
+  allSubAccounts: 'Alle Unterkonten',
+  spaceTransfersExcludedForSubAccountNotice:
+    'Unterkonto-Umbuchungen für {subAccount} werden automatisch ausgeschlossen, um Doppelzählungen zu verhindern.',
   currentImport: 'Aktueller Import',
   internalTransfersCurrentAccountNotice:
-    'Diese internen Überweisungen von {account} sind von Einnahmen und Ausgaben ausgeschlossen.',
+    'Diese internen Überweisungen von {account} sind von Einnahmen und Ausgaben ausgeschlossen und werden in der Umsatzliste ausgeblendet.',
   internalTransfersExistingAccountNotice:
-    'Diese internen Überweisungen von {account} wurden bereits importiert und werden nun ebenfalls ausgeschlossen.',
+    'Diese internen Überweisungen von {account} wurden bereits importiert und werden nun ebenfalls von Einnahmen/Ausgaben ausgeschlossen und in der Umsatzliste ausgeblendet.',
   excludedItemsCurrentNotice: 'Diese Einträge von {account} sind vom Import ausgeschlossen.',
   excludedItemsExistingNotice:
     'Diese bereits importierten Einträge von {account} werden nun von Berechnungen ausgeschlossen.',
@@ -261,7 +265,7 @@ export const de: TranslationStrings = {
   internalTransfersWithExistingDetected:
     '{count} Umbuchung(en) erkannt • {existingCount} bereits importierte Buchung(en) werden ebenfalls ausgeschlossen.',
   internalTransfersWithExistingNotice:
-    'Diese Buchungen sind Umbuchungen zwischen Ihren eigenen Konten. {existingCount} bereits importierte Buchung(en) aus Ihren anderen Konten werden ebenfalls ausgeschlossen.',
+    'Diese Buchungen sind Umbuchungen zwischen Ihren eigenen Konten. {existingCount} bereits importierte Buchung(en) aus Ihren anderen Konten werden ebenfalls von Einnahmen/Ausgaben ausgeschlossen und in der Umsatzliste ausgeblendet.',
   alreadyImported: 'Bereits importiert',
   internalTransfersDetectedBannerSingular:
     '1 interne Umbuchung zwischen deinen Konten erkannt (mit Umbuchungs-Badge gekennzeichnet).',

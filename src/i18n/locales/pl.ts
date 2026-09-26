@@ -232,11 +232,15 @@ export const pl: TranslationStrings = {
     'Te pozycje są wykluczone z importu lub obliczeń (przelewy na subkonta, przelewy własne i duplikaty).',
   filterByAccount: 'Konto:',
   allAccounts: 'Wszystkie konta',
+  filterBySubAccount: 'Subkonto:',
+  allSubAccounts: 'Wszystkie subkonta',
+  spaceTransfersExcludedForSubAccountNotice:
+    'Przelewy na subkonto dla {subAccount} są automatycznie wykluczane, aby zapobiec podwójnemu liczeniu.',
   currentImport: 'Bieżący import',
   internalTransfersCurrentAccountNotice:
-    'Te przelewy wewnętrzne z konta {account} są wyłączone z przychodów i wydatków.',
+    'Te przelewy wewnętrzne z konta {account} są wyłączone z przychodów i wydatków oraz ukryte na liście transakcji.',
   internalTransfersExistingAccountNotice:
-    'Te przelewy wewnętrzne z konta {account} zostały już zaimportowane i teraz również zostaną wykluczone.',
+    'Te przelewy wewnętrzne z konta {account} zostały już zaimportowane i teraz również zostaną wyłączone z przychodów i wydatków oraz ukryte na liście transakcji.',
   excludedItemsCurrentNotice: 'Te pozycje z konta {account} są wykluczone z importu.',
   excludedItemsExistingNotice:
     'Te już zaimportowane pozycje z konta {account} zostaną teraz wykluczone z obliczeń.',
@@ -261,7 +265,7 @@ export const pl: TranslationStrings = {
   internalTransfersWithExistingDetected:
     'Wykryto {count} przelewów własnych • {existingCount} już zaimportowanych transakcji również zostanie wykluczonych.',
   internalTransfersWithExistingNotice:
-    'Te transakcje to przelewy wewnętrzne między Twoimi kontami. {existingCount} już zaimportowanych transakcji z innych kont również zostanie wykluczonych.',
+    'Te transakcje to przelewy wewnętrzne między Twoimi kontami. {existingCount} już zaimportowanych transakcji z innych kont również zostanie wyłączonych z przychodów/wydatków oraz ukrytych na liście transakcji.',
   alreadyImported: 'Już zaimportowano',
   internalTransfersDetectedBannerSingular:
     'Wykryto 1 przelew własny między Twoimi kontami (oznaczony etykietą przelewu własnego).',

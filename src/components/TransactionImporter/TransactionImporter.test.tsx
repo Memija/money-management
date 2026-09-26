@@ -89,7 +89,7 @@ vi.mock('../../store/useLanguageStore', () => ({
         internalTransfersWithExistingDetected:
           '{count} internal transfer(s) detected • {existingCount} already imported transaction(s) will also be excluded.',
         internalTransfersWithExistingNotice:
-          'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses.',
+          'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses and hidden from the transaction list.',
         alreadyImported: 'Already Imported',
         internalTransfersDetectedBannerSingular: '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
         internalTransfersDetectedBanner: '{count} internal transfers between your accounts detected (marked with an internal transfer badge).',

@@ -231,11 +231,15 @@ export const id: TranslationStrings = {
     'Item-item ini dikecualikan dari impor atau perhitungan (transfer sub-akun, transfer internal, dan duplikat).',
   filterByAccount: 'Akun:',
   allAccounts: 'Semua Akun',
+  filterBySubAccount: 'Sub-akun:',
+  allSubAccounts: 'Semua Sub-akun',
+  spaceTransfersExcludedForSubAccountNotice:
+    'Transfer sub-akun untuk {subAccount} otomatis dikecualikan untuk mencegah perhitungan ganda.',
   currentImport: 'Impor Saat Ini',
   internalTransfersCurrentAccountNotice:
-    'Transfer internal dari {account} ini dikecualikan dari pemasukan dan pengeluaran.',
+    'Transfer internal dari {account} ini dikecualikan dari pemasukan dan pengeluaran serta disembunyikan dari daftar transaksi.',
   internalTransfersExistingAccountNotice:
-    'Transfer internal dari {account} ini sudah diimpor sebelumnya dan sekarang juga akan dikecualikan.',
+    'Transfer internal dari {account} ini sudah diimpor sebelumnya dan sekarang juga akan dikecualikan dari pemasukan/pengeluaran serta disembunyikan dari daftar transaksi.',
   excludedItemsCurrentNotice: 'Item dari {account} ini dikecualikan dari impor.',
   excludedItemsExistingNotice:
     'Item yang sudah diimpor dari {account} ini sekarang akan dikecualikan dari perhitungan.',
@@ -260,7 +264,7 @@ export const id: TranslationStrings = {
   internalTransfersWithExistingDetected:
     '{count} transfer internal terdeteksi • {existingCount} transaksi yang sudah diimpor juga akan dikecualikan.',
   internalTransfersWithExistingNotice:
-    'Transaksi ini adalah transfer internal antar rekening Anda. {existingCount} transaksi yang sudah diimpor dari rekening lain juga akan dikecualikan.',
+    'Transaksi ini adalah transfer internal antar rekening Anda. {existingCount} transaksi yang sudah diimpor dari rekening lain juga akan dikecualikan dari pemasukan/pengeluaran serta disembunyikan dari daftar transaksi.',
   alreadyImported: 'Sudah Diimpor',
   internalTransfersDetectedBannerSingular:
     '1 transfer internal antar-akun Anda terdeteksi (ditandai dengan lencana transfer internal).',

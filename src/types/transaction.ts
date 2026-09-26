@@ -15,6 +15,8 @@ export interface Transaction {
   counterpartyIban?: string
   /** Own account IBAN if present in the statement/row (e.g. IBAN Kontoinhaber). */
   ownIban?: string
+  /** Sub-account or space name if this transaction is associated with a sub-account (e.g. 'Investment fund', 'Notgroschen'). */
+  subAccount?: string
   /** True if the user manually unlocked this duplicate to force its import. */
   forceImport?: boolean
   /** ID of the duplicate override rule that permitted importing this transaction. */

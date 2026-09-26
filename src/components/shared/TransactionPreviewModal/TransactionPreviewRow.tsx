@@ -1,6 +1,7 @@
 import React from 'react'
 import { Ghost, Layers, Lock, RotateCcw, Trash2, Unlock } from 'lucide-react'
 
+import { findInstitution } from '../../../data/institutions'
 import type { TranslationStrings } from '../../../i18n/types'
 import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
@@ -115,7 +116,20 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
 
           <div className={styles['row-meta']}>
             {(showInstitution || isExistingAccountTransfer) && tx.institution && (
-              <span>{tx.institution}</span>
+              <span className={styles['row-institution']}>
+                {findInstitution(tx.institution)?.logo && (
+                  <img
+                    src={findInstitution(tx.institution)!.logo}
+                    alt=""
+                    className={styles['row-institution-logo']}
+                    aria-hidden="true"
+                    onError={(e) => {
+                      ;(e.currentTarget as HTMLElement).style.display = 'none'
+                    }}
+                  />
+                )}
+                <span>{tx.institution}</span>
+              </span>
             )}
             {(showInstitution || isExistingAccountTransfer) && tx.institution && tx.category && (
               <span>•</span>
@@ -161,7 +175,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
                 data-testid={`space-transfer-badge-${tx.id}`}
               >
                 <Layers size={11} aria-hidden="true" />
-                <span>{t.spaceTransfer || 'Sub-account'}</span>
+                <span>{tx.subAccount || t.spaceTransfer || 'Sub-account'}</span>
               </span>
             )}
           </div>

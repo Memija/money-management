@@ -234,11 +234,15 @@ export const sr: TranslationStrings = {
     'Ове ставке су искључене из увоза или обрачуна (преноси на подрачуне, интерни преноси и дупликати).',
   filterByAccount: 'Рачун:',
   allAccounts: 'Сви рачуни',
+  filterBySubAccount: 'Подрачун:',
+  allSubAccounts: 'Сви подрачуни',
+  spaceTransfersExcludedForSubAccountNotice:
+    'Преноси на подрачун за {subAccount} су аутоматски искључени ради спречавања двоструког рачунања.',
   currentImport: 'Тренутни увоз',
   internalTransfersCurrentAccountNotice:
-    'Ови интерни трансфери са рачуна {account} су искључени из прихода и расхода.',
+    'Ови интерни трансфери са рачуна {account} су искључени из прихода и расхода и сакривени са листе трансакција.',
   internalTransfersExistingAccountNotice:
-    'Ови интерни трансфери са рачуна {account} су већ увезени и сада ће такође бити искључени.',
+    'Ови интерни трансфери са рачуна {account} су већ увезени и сада ће такође бити искључени из прихода и расхода и сакривени са листе трансакција.',
   excludedItemsCurrentNotice: 'Ове ставке са рачуна {account} су искључене из увоза.',
   excludedItemsExistingNotice:
     'Ове већ увезене ставке са рачуна {account} ће сада бити искључене из обрачуна.',
@@ -263,7 +267,7 @@ export const sr: TranslationStrings = {
   internalTransfersWithExistingDetected:
     'Препознато {count} интерних преноса • {existingCount} већ увезених трансакција ће такође бити искључено.',
   internalTransfersWithExistingNotice:
-    'Ове трансакције су интерни преноси између Ваших рачуна. {existingCount} већ увезених трансакција из Ваших других рачуна ће такође бити искључено.',
+    'Ове трансакције су интерни преноси између Ваших рачуна. {existingCount} већ увезених трансакција из Ваших других рачуна ће такође бити искључено из прихода и расхода и сакривено са листе трансакција.',
   alreadyImported: 'Већ увезено',
   internalTransfersDetectedBannerSingular:
     'Откривен је 1 интерни пренос између ваших рачуна (означен ознаком интерног преноса).',

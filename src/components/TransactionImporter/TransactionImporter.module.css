@@ -398,8 +398,8 @@
   padding: 0.75rem 1rem;
   margin-top: 0.75rem;
   border-radius: var(--radius-md);
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
   color: var(--text-main);
   font-size: 0.825rem;
   line-height: 1.4;
@@ -408,8 +408,8 @@
 }
 
 .transfer-info-banner:hover {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(16, 185, 129, 0.13);
+  border-color: rgba(16, 185, 129, 0.38);
 }
 
 .transfer-info-banner:focus-visible {
@@ -430,8 +430,8 @@
   gap: 0.35rem;
   padding: 0.3rem 0.65rem;
   border-radius: var(--radius-sm);
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
   color: var(--text-main);
   font-size: 0.75rem;
   font-weight: 600;
@@ -442,29 +442,34 @@
 }
 
 .banner-action-btn:hover {
-  background: rgba(99, 102, 241, 0.25);
-  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.5);
 }
 
 .transfer-info-icon {
-  color: #818cf8;
+  color: #10b981;
   flex-shrink: 0;
 }
 
 :global([data-theme='light']) .transfer-info-banner {
-  background: rgba(99, 102, 241, 0.08);
-  border-color: rgba(99, 102, 241, 0.25);
-  color: #3730a3;
+  background: rgba(5, 150, 105, 0.08);
+  border-color: rgba(5, 150, 105, 0.25);
+  color: #065f46;
 }
 
 :global([data-theme='light']) .transfer-info-icon {
-  color: #4f46e5;
+  color: #059669;
 }
 
 :global([data-theme='light']) .banner-action-btn {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #3730a3;
+  background: rgba(5, 150, 105, 0.12);
+  border-color: rgba(5, 150, 105, 0.3);
+  color: #065f46;
+}
+
+:global([data-theme='light']) .banner-action-btn:hover {
+  background: rgba(5, 150, 105, 0.2);
+  border-color: rgba(5, 150, 105, 0.45);
 }
 
 /* Sub-account Transfers Excluded Banner (Muted Slate / Neutral) */
@@ -507,7 +512,8 @@
 }
 
 :global([data-theme='light']) .transfer-info-banner:hover {
-  background: rgba(99, 102, 241, 0.12);
+  background: rgba(5, 150, 105, 0.12);
+  border-color: rgba(5, 150, 105, 0.35);
 }
 
 :global([data-theme='light']) .space-transfers-banner:hover {

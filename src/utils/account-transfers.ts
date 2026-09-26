@@ -353,6 +353,36 @@ export function filterInternalSpaceTransfers(
     }
 
     if (bestMatch) {
+      const isMain = (s?: string) =>
+        !s ||
+        s.toLowerCase() === 'main account' ||
+        s.toLowerCase() === 'hauptkonto' ||
+        s.toLowerCase() === 'glavni račun' ||
+        s.toLowerCase() === 'glavni racun'
+
+      const subAccount =
+        itemA.tx.subAccount ||
+        bestMatch.tx.subAccount ||
+        (() => {
+          const extractFromText = (text: string): string | undefined => {
+            if (!text) return undefined
+            const prefixMatch = text.match(
+              /(?:space|spaces|unterkonto|pocket|tresor|vault|subaccount|podracun|podračun)[:\s-]+([^,\n;]+)/i,
+            )
+            if (prefixMatch && prefixMatch[1]) {
+              const clean = prefixMatch[1].trim()
+              if (clean.length > 1 && clean.length < 50 && !isMain(clean)) return clean
+            }
+            return undefined
+          }
+          return extractFromText(itemA.tx.description) || extractFromText(bestMatch.tx.description)
+        })()
+
+      if (subAccount) {
+        if (!itemA.tx.subAccount) itemA.tx.subAccount = subAccount
+        if (!bestMatch.tx.subAccount) bestMatch.tx.subAccount = subAccount
+      }
+
       usedTxIds.add(itemA.tx.id)
       usedTxIds.add(bestMatch.tx.id)
       discardedTxIds.add(itemA.tx.id)

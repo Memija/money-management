@@ -231,7 +231,7 @@ function detectColumnIndices(header: string[]): ColumnIndices {
 function parseRow(row: string[], indices: ColumnIndices, institution: string): Transaction | null {
   if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) return null
 
-  const { dateIdx, descIdx, amountIdx, sollIdx, habenIdx, refIdx, ownIbanIdx, counterpartyIbanIdx } = indices
+  const { dateIdx, descIdx, amountIdx, sollIdx, habenIdx, refIdx, ownIbanIdx, counterpartyIbanIdx, accountIdx } = indices
 
   const rawAmount = row[amountIdx]
   const rawAmountStr = rawAmount?.toString().trim() ?? ''
@@ -279,6 +279,20 @@ function parseRow(row: string[], indices: ColumnIndices, institution: string): T
     }
   }
 
+  let subAccount: string | undefined
+  if (accountIdx !== -1) {
+    const rawAcc = row[accountIdx]?.toString().trim() ?? ''
+    const isMain = (s?: string) =>
+      !s ||
+      s.toLowerCase() === 'main account' ||
+      s.toLowerCase() === 'hauptkonto' ||
+      s.toLowerCase() === 'glavni račun' ||
+      s.toLowerCase() === 'glavni racun'
+    if (rawAcc && !isMain(rawAcc)) {
+      subAccount = rawAcc
+    }
+  }
+
   return {
     id: generateId(),
     date: parseDate(rawDate),
@@ -289,6 +303,7 @@ function parseRow(row: string[], indices: ColumnIndices, institution: string): T
     institution,
     counterpartyIban,
     ownIban,
+    subAccount,
   }
 }
 
@@ -449,6 +464,19 @@ export function rowsToTransactionsWithMeta(
     if (spaceTransferIndices.has(i)) {
       const transaction = parseRow(row, indices, institution)
       if (transaction) {
+        if (!transaction.subAccount && indices.accountIdx !== -1) {
+          const pIdx = indices.partnerIdx !== -1 ? indices.partnerIdx : indices.descIdx
+          const rawPartner = pIdx !== -1 ? row[pIdx]?.toString().trim() ?? '' : ''
+          const isMain = (s?: string) =>
+            !s ||
+            s.toLowerCase() === 'main account' ||
+            s.toLowerCase() === 'hauptkonto' ||
+            s.toLowerCase() === 'glavni račun' ||
+            s.toLowerCase() === 'glavni racun'
+          if (rawPartner && !isMain(rawPartner)) {
+            transaction.subAccount = rawPartner
+          }
+        }
         excludedSpaceTransactions.push(transaction)
       }
       continue

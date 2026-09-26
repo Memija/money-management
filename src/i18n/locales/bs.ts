@@ -232,11 +232,15 @@ export const bs: TranslationStrings = {
     'Ove stavke su isključene iz uvoza ili obračuna (prijenosi na podračune, interni transferi i duplikati).',
   filterByAccount: 'Račun:',
   allAccounts: 'Svi računi',
+  filterBySubAccount: 'Podračun:',
+  allSubAccounts: 'Svi podračuni',
+  spaceTransfersExcludedForSubAccountNotice:
+    'Prijenosi na podračun za {subAccount} su automatski isključeni radi sprječavanja dvostrukog računanja.',
   currentImport: 'Trenutni uvoz',
   internalTransfersCurrentAccountNotice:
-    'Ovi interni transferi sa računa {account} su isključeni iz prihoda i rashoda.',
+    'Ovi interni transferi sa računa {account} su isključeni iz prihoda i rashoda te skriveni sa liste transakcija.',
   internalTransfersExistingAccountNotice:
-    'Ovi interni transferi sa računa {account} su već uvezeni i sada će također biti isključeni.',
+    'Ovi interni transferi sa računa {account} su već uvezeni i sada će također biti isključeni iz prihoda i rashoda te skriveni sa liste transakcija.',
   excludedItemsCurrentNotice: 'Ove stavke sa računa {account} su isključene iz uvoza.',
   excludedItemsExistingNotice:
     'Ove već uvezene stavke sa računa {account} će sada biti isključene iz izračuna.',
@@ -261,7 +265,7 @@ export const bs: TranslationStrings = {
   internalTransfersWithExistingDetected:
     'Prepoznato {count} internih transfera • {existingCount} već uvezenih transakcija će također biti isključeno.',
   internalTransfersWithExistingNotice:
-    'Ove transakcije su interni transferi između Vaših računa. {existingCount} već uvezenih transakcija iz Vaših drugih računa će također biti isključeno.',
+    'Ove transakcije su interni transferi između Vaših računa. {existingCount} već uvezenih transakcija iz Vaših drugih računa će također biti isključeno iz prihoda i rashoda te skriveno sa liste transakcija.',
   alreadyImported: 'Već uvezeno',
   internalTransfersDetectedBannerSingular:
     'Otkriven je 1 interni prijenos između vaših računa (označen značkom internog prijenosa).',

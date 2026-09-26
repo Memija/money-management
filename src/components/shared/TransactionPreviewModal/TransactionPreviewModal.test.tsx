@@ -34,13 +34,17 @@ vi.mock('../../../store/useLanguageStore', () => ({
           'These items are excluded from import or calculations (sub-account transfers, internal transfers, and duplicates).',
         spaceTransfersExcludedNotice:
           'Sub-account transfers are automatically excluded to prevent double counting.',
+        filterBySubAccount: 'Sub-account:',
+        allSubAccounts: 'All Sub-accounts',
+        spaceTransfersExcludedForSubAccountNotice:
+          'Sub-account transfers for {subAccount} are automatically excluded to prevent double counting.',
         filterByAccount: 'Account:',
         allAccounts: 'All Accounts',
         currentImport: 'Current Import',
         internalTransfersCurrentAccountNotice:
-          'These internal transfers from {account} are excluded from income and expenses.',
+          'These internal transfers from {account} are excluded from income and expenses and hidden from the transaction list.',
         internalTransfersExistingAccountNotice:
-          'These internal transfers from {account} were already imported and will now also be excluded from income and expenses.',
+          'These internal transfers from {account} were already imported and will now also be excluded from income and expenses and hidden from the transaction list.',
         excludedItemsCurrentNotice: 'These items from {account} are excluded from import.',
         excludedItemsExistingNotice:
           'These already imported items from {account} will now be excluded from calculations.',
@@ -60,7 +64,7 @@ vi.mock('../../../store/useLanguageStore', () => ({
         internalTransfersWithExistingDetected:
           '{count} internal transfer(s) detected • {existingCount} already imported transaction(s) will also be excluded.',
         internalTransfersWithExistingNotice:
-          'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses.',
+          'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses and hidden from the transaction list.',
         alreadyImported: 'Already Imported',
         inflows: 'Inflows',
         outflows: 'Outflows',
@@ -1730,6 +1734,195 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.getByTestId('account-filter-pill-all')).toBeInTheDocument()
     expect(screen.getByTestId('account-filter-pill-current')).toBeInTheDocument()
     expect(screen.getByTestId('account-filter-pill-commerzbank')).toBeInTheDocument()
+  })
+
+  it('renders sub-account filter bar and filters by sub-account when multiple sub-accounts exist', () => {
+    const spaceTx1: Transaction = {
+      id: 'tx-space-1',
+      date: '2026-03-01',
+      description: 'Transfer to Investment fund',
+      amount: -200,
+      type: 'expense',
+      category: 'Transfer',
+      subAccount: 'Investment fund',
+    }
+    const spaceTx2: Transaction = {
+      id: 'tx-space-2',
+      date: '2026-03-01',
+      description: 'Investment fund leg',
+      amount: 200,
+      type: 'income',
+      category: 'Transfer',
+      subAccount: 'Investment fund',
+    }
+    const spaceTx3: Transaction = {
+      id: 'tx-space-3',
+      date: '2026-03-02',
+      description: 'Transfer to Wohnung und Auto',
+      amount: -500,
+      type: 'expense',
+      category: 'Transfer',
+      subAccount: 'Wohnung und Auto',
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[]}
+        excludedSpaceTransactions={[spaceTx1, spaceTx2, spaceTx3]}
+        discardedSpaceCount={3}
+        initialFilter="space-transfers"
+        isImport={true}
+      />,
+    )
+
+    // Sub-account filter bar should be rendered
+    const subAccountBar = screen.getByTestId('subaccount-filter-bar')
+    expect(subAccountBar).toBeInTheDocument()
+    expect(screen.getByTestId('subaccount-filter-pill-all')).toBeInTheDocument()
+    expect(screen.getByTestId('subaccount-filter-pill-investment-fund')).toBeInTheDocument()
+    expect(screen.getByTestId('subaccount-filter-pill-wohnung-und-auto')).toBeInTheDocument()
+
+    // Default view shows all 3 transactions
+    expect(screen.getByText('Transfer to Investment fund')).toBeInTheDocument()
+    expect(screen.getByText('Investment fund leg')).toBeInTheDocument()
+    expect(screen.getByText('Transfer to Wohnung und Auto')).toBeInTheDocument()
+
+    // Default notice
+    expect(
+      screen.getByText('Sub-account transfers are automatically excluded to prevent double counting.'),
+    ).toBeInTheDocument()
+
+    // Click on 'Investment fund' pill
+    fireEvent.click(screen.getByTestId('subaccount-filter-pill-investment-fund'))
+
+    // Should only show Investment fund transactions
+    expect(screen.getByText('Transfer to Investment fund')).toBeInTheDocument()
+    expect(screen.getByText('Investment fund leg')).toBeInTheDocument()
+    expect(screen.queryByText('Transfer to Wohnung und Auto')).not.toBeInTheDocument()
+
+    // Notice should update with sub-account name
+    expect(
+      screen.getByText(
+        'Sub-account transfers for Investment fund are automatically excluded to prevent double counting.',
+      ),
+    ).toBeInTheDocument()
+
+    // Click on 'Wohnung und Auto' pill
+    fireEvent.click(screen.getByTestId('subaccount-filter-pill-wohnung-und-auto'))
+
+    // Should only show Wohnung und Auto transaction
+    expect(screen.queryByText('Transfer to Investment fund')).not.toBeInTheDocument()
+    expect(screen.queryByText('Investment fund leg')).not.toBeInTheDocument()
+    expect(screen.getByText('Transfer to Wohnung und Auto')).toBeInTheDocument()
+
+    // Notice should update with Wohnung und Auto
+    expect(
+      screen.getByText(
+        'Sub-account transfers for Wohnung und Auto are automatically excluded to prevent double counting.',
+      ),
+    ).toBeInTheDocument()
+
+    // Click 'All Sub-accounts'
+    fireEvent.click(screen.getByTestId('subaccount-filter-pill-all'))
+
+    // All should be visible again
+    expect(screen.getByText('Transfer to Investment fund')).toBeInTheDocument()
+    expect(screen.getByText('Investment fund leg')).toBeInTheDocument()
+    expect(screen.getByText('Transfer to Wohnung und Auto')).toBeInTheDocument()
+  })
+
+  it('does NOT render sub-account filter bar when only 1 sub-account exists or not in space-transfers view', () => {
+    const spaceTx1: Transaction = {
+      id: 'tx-space-1',
+      date: '2026-03-01',
+      description: 'Transfer to Investment fund',
+      amount: -200,
+      type: 'expense',
+      category: 'Transfer',
+      subAccount: 'Investment fund',
+    }
+
+    const { rerender } = render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[]}
+        excludedSpaceTransactions={[spaceTx1]}
+        discardedSpaceCount={1}
+        initialFilter="space-transfers"
+        isImport={true}
+      />,
+    )
+
+    // With only 1 sub-account, no filter bar
+    expect(screen.queryByTestId('subaccount-filter-bar')).not.toBeInTheDocument()
+
+    // In 'all' or standard view, subaccount filter bar should NOT appear
+    const normalTx: Transaction = {
+      id: 'tx-normal-1',
+      date: '2026-03-01',
+      description: 'Normal grocery purchase',
+      amount: -50,
+      type: 'expense',
+      category: 'Food',
+    }
+    rerender(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[normalTx]}
+        excludedSpaceTransactions={[spaceTx1]}
+        initialFilter="all"
+        isImport={true}
+      />,
+    )
+
+    expect(screen.queryByTestId('subaccount-filter-bar')).not.toBeInTheDocument()
+  })
+
+  it('renders bank logos for account filter pills when institutions are detected', () => {
+    const n26Tx: Transaction = {
+      id: 'tx-n26',
+      date: '2026-03-01',
+      description: 'Transfer to Commerzbank',
+      amount: -100,
+      type: 'expense',
+      category: 'Transfers',
+      institution: 'N26',
+    }
+    const cbTx: Transaction = {
+      id: 'tx-cb',
+      date: '2026-03-01',
+      description: 'Transfer from N26',
+      amount: 100,
+      type: 'income',
+      category: 'Transfers',
+      institution: 'Commerzbank',
+    }
+
+    render(
+      <TransactionPreviewModal
+        {...defaultProps}
+        isOpen={true}
+        transactions={[n26Tx]}
+        currentInstitutionName="N26"
+        internalTransferIds={new Set(['tx-n26'])}
+        existingAccountTransfers={[cbTx]}
+        initialFilter="internal-transfers"
+        isImport={true}
+      />,
+    )
+
+    // Verify account filter pills render bank logos
+    const n26Logo = screen.getByTestId('account-pill-logo-current')
+    expect(n26Logo).toBeInTheDocument()
+    expect(n26Logo).toHaveAttribute('src', '/banks/n26.png')
+
+    const cbLogo = screen.getByTestId('account-pill-logo-commerzbank')
+    expect(cbLogo).toBeInTheDocument()
+    expect(cbLogo).toHaveAttribute('src', '/banks/commerzbank.png')
   })
 })
 

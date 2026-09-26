@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react'
 
+import { findInstitution } from '../../../data/institutions'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
@@ -101,11 +102,15 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>(initialFilter)
   const [accountFilter, setAccountFilter] = useState<string>(initialAccountFilter)
+  const [subAccountFilter, setSubAccountFilter] = useState<string>('all')
   const [localTransactions, setLocalTransactions] = useState<Transaction[]>(transactions)
   const [localUnlockedDuplicateIds, setLocalUnlockedDuplicateIds] = useState<Set<string>>(new Set())
   const [unlockedTxToWarn, setUnlockedTxToWarn] = useState<Transaction | null>(null)
 
   const currentAccountName = currentInstitutionName || t.currentImport || 'Current Import'
+  const currentInstLogo = useMemo(() => {
+    return findInstitution(currentInstitutionName || currentAccountName)?.logo
+  }, [currentInstitutionName, currentAccountName])
 
   const existingInstitutions = useMemo(() => {
     if (!existingAccountTransfers || existingAccountTransfers.length === 0) return []
@@ -370,6 +375,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     if (isOpen) {
       setScopeFilter(initialFilter)
       setAccountFilter(initialAccountFilter ?? 'all')
+      setSubAccountFilter('all')
       setLocalUnlockedDuplicateIds(new Set())
       setUnlockedTxToWarn(null)
       setIsAdjustModalOpen(false)
@@ -568,6 +574,26 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     activeExcluded.length > 0 || discardedSpaceCount > 0,
   )
 
+  const subAccounts = useMemo(() => {
+    const names = new Set<string>()
+    for (const tx of activeExcluded) {
+      if (tx.subAccount) {
+        names.add(tx.subAccount)
+      }
+    }
+    return Array.from(names).sort((a, b) => a.localeCompare(b))
+  }, [activeExcluded])
+
+  const subAccountCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      all: activeExcluded.length,
+    }
+    for (const sa of subAccounts) {
+      counts[sa] = activeExcluded.filter((tx) => tx.subAccount === sa).length
+    }
+    return counts
+  }, [activeExcluded, subAccounts])
+
   const combinedTransactions = useMemo(() => {
     if (activeExcluded.length === 0) {
       return activeTransactions
@@ -677,7 +703,10 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       })
       return [...draftExcluded, ...activeExcluded, ...(existingAccountTransfers || [])]
     }
-    if (scopeFilter === 'space-transfers') return activeExcluded
+    if (scopeFilter === 'space-transfers') {
+      if (subAccountFilter === 'all') return activeExcluded
+      return activeExcluded.filter((tx) => tx.subAccount === subAccountFilter)
+    }
     if (scopeFilter === 'internal-transfers') {
       const draftTransfers = activeTransactions.filter(
         (tx) =>
@@ -699,6 +728,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     activeExcluded,
     hasSpaceTransfers,
     scopeFilter,
+    subAccountFilter,
     combinedTransactions,
     internalTransferIds,
     existingAccountTransfers,
@@ -764,7 +794,10 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   })
 
   const effectiveIsFilterActive =
-    isFilterActive || scopeFilter !== initialFilter || accountFilter !== 'all'
+    isFilterActive ||
+    scopeFilter !== initialFilter ||
+    accountFilter !== 'all' ||
+    (scopeFilter === 'space-transfers' && subAccountFilter !== 'all')
 
   const handleClearAllFilters = () => {
     handleClearFilters()
@@ -773,6 +806,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     }
     if (accountFilter !== 'all') {
       setAccountFilter('all')
+    }
+    if (subAccountFilter !== 'all') {
+      setSubAccountFilter('all')
     }
   }
 
@@ -783,6 +819,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     setScopeFilter(newScope)
     if (newScope !== 'excluded' && newScope !== 'internal-transfers' && newScope !== 'all') {
       setAccountFilter('all')
+    }
+    if (newScope !== 'space-transfers') {
+      setSubAccountFilter('all')
     }
   }
 
@@ -795,8 +834,13 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   const effectiveTitle = useMemo(() => {
     let base = ''
     if (scopeFilter === 'excluded') base = t.filterExcluded || 'Excluded'
-    else if (scopeFilter === 'space-transfers') base = t.filterSpaceTransfers || 'Sub-account Transfers'
-    else if (scopeFilter === 'internal-transfers') base = t.filterInternalTransfers || 'Internal Transfers'
+    else if (scopeFilter === 'space-transfers') {
+      base = t.filterSpaceTransfers || 'Sub-account Transfers'
+      if (subAccountFilter !== 'all') {
+        return `${base} • ${subAccountFilter}`
+      }
+      return base
+    } else if (scopeFilter === 'internal-transfers') base = t.filterInternalTransfers || 'Internal Transfers'
     else if (scopeFilter === 'duplicates') base = t.filterDuplicates || 'Duplicates'
     else if (scopeFilter === 'already-duplicated')
       base = t.filterAlreadyDuplicated || t.alreadyDuplicated || 'Already Duplicated'
@@ -813,7 +857,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       return `${base} • ${accName}`
     }
     return base
-  }, [scopeFilter, initialFilter, accountFilter, currentAccountName, title, t])
+  }, [scopeFilter, initialFilter, accountFilter, subAccountFilter, currentAccountName, title, t])
 
   const hasActions = Boolean(
     onRemoveTransaction ||
@@ -1078,33 +1122,109 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 data-testid="account-filter-pill-current"
                 title={currentAccountName}
               >
+                {currentInstLogo ? (
+                  <img
+                    src={currentInstLogo}
+                    alt=""
+                    className={styles['account-pill-logo']}
+                    aria-hidden="true"
+                    data-testid="account-pill-logo-current"
+                    onError={(e) => {
+                      ;(e.currentTarget as HTMLElement).style.display = 'none'
+                    }}
+                  />
+                ) : (
+                  <Landmark size={13} className={styles['account-pill-icon']} aria-hidden="true" />
+                )}
                 <span className={styles['account-pill-name']}>{currentAccountName}</span>
                 <span className={styles['account-pill-badge']}>
                   {accountCounts.current ?? 0}
                 </span>
               </button>
 
-              {existingInstitutions.map((inst) => (
-                <button
-                  key={inst}
-                  type="button"
-                  className={`${styles['account-pill']} ${
-                    accountFilter === inst ? styles['account-pill-active'] : ''
-                  }`}
-                  onClick={() => setAccountFilter(inst)}
-                  aria-pressed={accountFilter === inst}
-                  data-testid={`account-filter-pill-${inst.toLowerCase().replace(/\s+/g, '-')}`}
-                  title={inst}
-                >
-                  <span className={styles['account-pill-name']}>{inst}</span>
-                  <span className={styles['account-pill-badge']}>
-                    {accountCounts[inst] ?? 0}
-                  </span>
-                </button>
-              ))}
+              {existingInstitutions.map((inst) => {
+                const instLogo = findInstitution(inst)?.logo
+                const instTestIdKey = inst.toLowerCase().replace(/\s+/g, '-')
+                return (
+                  <button
+                    key={inst}
+                    type="button"
+                    className={`${styles['account-pill']} ${
+                      accountFilter === inst ? styles['account-pill-active'] : ''
+                    }`}
+                    onClick={() => setAccountFilter(inst)}
+                    aria-pressed={accountFilter === inst}
+                    data-testid={`account-filter-pill-${instTestIdKey}`}
+                    title={inst}
+                  >
+                    {instLogo ? (
+                      <img
+                        src={instLogo}
+                        alt=""
+                        className={styles['account-pill-logo']}
+                        aria-hidden="true"
+                        data-testid={`account-pill-logo-${instTestIdKey}`}
+                        onError={(e) => {
+                          ;(e.currentTarget as HTMLElement).style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      <Landmark size={13} className={styles['account-pill-icon']} aria-hidden="true" />
+                    )}
+                    <span className={styles['account-pill-name']}>{inst}</span>
+                    <span className={styles['account-pill-badge']}>
+                      {accountCounts[inst] ?? 0}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
+
+      {/* Sub-account Filter Bar for Sub-account Transfers */}
+      {scopeFilter === 'space-transfers' && subAccounts.length > 1 && (
+        <div className={styles['subaccount-filter-bar']} data-testid="subaccount-filter-bar">
+          <div className={styles['subaccount-filter-label']}>
+            <Layers size={14} aria-hidden="true" />
+            <span>{t.filterBySubAccount || 'Sub-account:'}</span>
+          </div>
+          <div className={styles['subaccount-filter-pills']}>
+            <button
+              type="button"
+              className={`${styles['subaccount-pill']} ${
+                subAccountFilter === 'all' ? styles['subaccount-pill-active'] : ''
+              }`}
+              onClick={() => setSubAccountFilter('all')}
+              aria-pressed={subAccountFilter === 'all'}
+              data-testid="subaccount-filter-pill-all"
+              title={t.allSubAccounts || 'All Sub-accounts'}
+            >
+              <span>{t.allSubAccounts || 'All Sub-accounts'}</span>
+              <span className={styles['subaccount-pill-badge']}>{subAccountCounts.all ?? 0}</span>
+            </button>
+
+            {subAccounts.map((sa) => (
+              <button
+                key={sa}
+                type="button"
+                className={`${styles['subaccount-pill']} ${
+                  subAccountFilter === sa ? styles['subaccount-pill-active'] : ''
+                }`}
+                onClick={() => setSubAccountFilter(sa)}
+                aria-pressed={subAccountFilter === sa}
+                data-testid={`subaccount-filter-pill-${sa.toLowerCase().replace(/\s+/g, '-')}`}
+                title={sa}
+              >
+                <span className={styles['subaccount-pill-name']}>{sa}</span>
+                <span className={styles['subaccount-pill-badge']}>
+                  {subAccountCounts[sa] ?? 0}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Transactions Table */}
       <div className={styles['table-container']}>
@@ -1143,8 +1263,13 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           <div className={styles['space-transfers-notice']} data-testid="space-transfers-notice">
             <Layers size={15} aria-hidden="true" />
             <span>
-              {t.spaceTransfersExcludedNotice ||
-                'Sub-account transfers are automatically excluded to prevent double counting.'}
+              {subAccountFilter !== 'all'
+                ? (
+                    t.spaceTransfersExcludedForSubAccountNotice ||
+                    'Sub-account transfers for {subAccount} are automatically excluded to prevent double counting.'
+                  ).replace('{subAccount}', subAccountFilter)
+                : t.spaceTransfersExcludedNotice ||
+                  'Sub-account transfers are automatically excluded to prevent double counting.'}
             </span>
           </div>
         )}
@@ -1156,17 +1281,17 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
               {accountFilter === 'current' || accountFilter === currentAccountName
                 ? (
                     t.internalTransfersCurrentAccountNotice ||
-                    'These internal transfers from {account} are excluded from income and expenses.'
+                    'These internal transfers from {account} are excluded from income and expenses and hidden from the transaction list.'
                   ).replace('{account}', currentAccountName)
                 : accountFilter !== 'all'
                   ? (
                       t.internalTransfersExistingAccountNotice ||
-                      'These internal transfers from {account} were already imported and will now also be excluded from income and expenses.'
+                      'These internal transfers from {account} were already imported and will now also be excluded from income and expenses and hidden from the transaction list.'
                     ).replace('{account}', accountFilter)
                   : existingAccountTransfers && existingAccountTransfers.length > 0
                     ? (
                         t.internalTransfersWithExistingNotice ||
-                        'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses.'
+                        'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses and hidden from the transaction list.'
                       ).replace('{existingCount}', String(existingAccountTransfers.length))
                     : t.internalTransfersNotice ||
                       'These transactions are internal transfers between your own accounts. They are excluded from income and expenses and hidden from standard views.'}
