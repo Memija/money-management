@@ -263,10 +263,11 @@ describe('Dashboard', () => {
     // Filter to Savings Space
     fireEvent.click(screen.getByTestId('subaccount-pill-Savings Space'))
 
-    // Transaction list should only have Rent, not Utilities
+    // Transaction list should only have Rent, not Utilities, and not show Bank B name
     const txList = screen.getByTestId('transaction-list')
     expect(within(txList).getAllByText('Rent').length).toBeGreaterThan(0)
     expect(within(txList).queryByText('Utilities')).not.toBeInTheDocument()
     expect(within(txList).queryByText('Salary')).not.toBeInTheDocument()
+    expect(within(txList).queryByText(/• Bank B/)).not.toBeInTheDocument()
   })
 })

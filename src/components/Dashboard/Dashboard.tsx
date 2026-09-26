@@ -53,6 +53,7 @@ const Dashboard: React.FC = () => {
     accounts: bankAccounts,
     totalBalance: allAccountsBalance,
     totalTransactionCount: allAccountsTxCount,
+    hasMultipleAccounts,
   } = useAccountBalances()
 
   // Transactions with active period filter applied
@@ -244,16 +245,18 @@ const Dashboard: React.FC = () => {
           <div className={styles['orb-3']} />
         </div>
         <main className="container">
-          {/* Bank & Account Selector */}
-          <AccountSelector
-            accounts={bankAccounts}
-            totalBalance={allAccountsBalance}
-            totalTransactionCount={allAccountsTxCount}
-            selectedInstitution={selectedInstitution}
-            onSelectInstitution={setSelectedInstitution}
-            selectedSubAccount={selectedSubAccount}
-            onSelectSubAccount={setSelectedSubAccount}
-          />
+          {/* Bank & Account Selector — only rendered when multiple institutions are present */}
+          {hasMultipleAccounts && (
+            <AccountSelector
+              accounts={bankAccounts}
+              totalBalance={allAccountsBalance}
+              totalTransactionCount={allAccountsTxCount}
+              selectedInstitution={selectedInstitution}
+              onSelectInstitution={setSelectedInstitution}
+              selectedSubAccount={selectedSubAccount}
+              onSelectSubAccount={setSelectedSubAccount}
+            />
+          )}
 
           <motion.section
             ref={heroRef}
@@ -375,6 +378,7 @@ const Dashboard: React.FC = () => {
             showGhost={showGhost}
             setShowGhost={setShowGhost}
             ghostCount={ghostCount}
+            showBankName={hasMultipleAccounts && selectedInstitution === 'all'}
           />
         </div>
         </main>
@@ -387,7 +391,7 @@ const Dashboard: React.FC = () => {
         title={detailModalConfig?.title ?? ''}
         variant={detailModalConfig?.variant ?? 'expense'}
         transactions={detailModalConfig?.transactions ?? []}
-        showInstitution={true}
+        showInstitution={hasMultipleAccounts && selectedInstitution === 'all'}
         isImport={false}
       />
 

@@ -17,6 +17,7 @@ interface TransactionItemProps {
   formatDate: (d: string) => string
   formatCurrency: (n: number) => string
   onCategoryChange: (tx: Transaction, newCategory: string) => void
+  showBankName?: boolean
 }
 
 export const TransactionItem = React.memo<TransactionItemProps>(({
@@ -25,6 +26,7 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
   formatDate,
   formatCurrency,
   onCategoryChange,
+  showBankName = true,
 }) => {
   const t = useLanguageStore((s) => s.t)
   const locale = useLanguageStore((s) => s.locale)
@@ -32,7 +34,8 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
   const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
   const isModifiedTx = Boolean(tx.isModified)
   const isDuplicateTx = Boolean(tx.isDuplicate || tx.forceImport || tx.importedByRuleId)
-  const institutionLogo = tx.institution ? findInstitution(tx.institution)?.logo : undefined
+  const institutionLogo =
+    showBankName && tx.institution ? findInstitution(tx.institution)?.logo : undefined
 
   return (
     <div
@@ -56,19 +59,24 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
           </p>
           <p className={styles.txMeta}>
             <span className={styles.txMetaText}>
-              {formatDate(tx.date)} •{' '}
-              {institutionLogo && (
-                <img
-                  src={institutionLogo}
-                  alt=""
-                  className={styles.institutionLogo}
-                  aria-hidden="true"
-                  onError={(e) => {
-                    ;(e.currentTarget as HTMLElement).style.display = 'none'
-                  }}
-                />
+              {formatDate(tx.date)}
+              {showBankName && tx.institution && (
+                <>
+                  {' • '}
+                  {institutionLogo && (
+                    <img
+                      src={institutionLogo}
+                      alt=""
+                      className={styles.institutionLogo}
+                      aria-hidden="true"
+                      onError={(e) => {
+                        ;(e.currentTarget as HTMLElement).style.display = 'none'
+                      }}
+                    />
+                  )}
+                  {tx.institution}
+                </>
               )}
-              {tx.institution}
               {tx.subAccount && ` • ${tx.subAccount}`}
             </span>
             {tx.isGhost && (

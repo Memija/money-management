@@ -38,8 +38,8 @@ export const AccountSelector: React.FC<AccountSelectorProps> = ({
     )
   }, [accounts, selectedInstitution])
 
-  // Don't render anything if there are no accounts imported
-  if (!accounts || accounts.length === 0) {
+  // Don't render anything if there are fewer than 2 accounts imported
+  if (!accounts || accounts.length <= 1) {
     return null
   }
 
@@ -58,38 +58,40 @@ export const AccountSelector: React.FC<AccountSelectorProps> = ({
       {/* Horizontal bank cards */}
       <div className={styles.cardsTrack} role="tablist" aria-label="Accounts list">
         {/* All Accounts card */}
-        <button
-          type="button"
-          role="tab"
-          aria-selected={selectedInstitution === 'all'}
-          data-testid="account-card-all"
-          className={`${styles.accountCard} ${
-            selectedInstitution === 'all' ? styles.accountCardActive : ''
-          }`}
-          onClick={() => onSelectInstitution('all')}
-        >
-          <div className={styles.cardTop}>
-            <div className={styles.brandGroup}>
-              <div className={styles.logoWrapper}>
-                <Landmark size={18} className={styles.fallbackIcon} aria-hidden="true" />
+        {accounts.length > 1 && (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={selectedInstitution === 'all'}
+            data-testid="account-card-all"
+            className={`${styles.accountCard} ${
+              selectedInstitution === 'all' ? styles.accountCardActive : ''
+            }`}
+            onClick={() => onSelectInstitution('all')}
+          >
+            <div className={styles.cardTop}>
+              <div className={styles.brandGroup}>
+                <div className={styles.logoWrapper}>
+                  <Landmark size={18} className={styles.fallbackIcon} aria-hidden="true" />
+                </div>
+                <h4 className={styles.accountName}>{t.allAccounts}</h4>
               </div>
-              <h4 className={styles.accountName}>{t.allAccounts}</h4>
+              <span className={styles.txBadge}>
+                {formatTransactionCount(totalTransactionCount)}
+              </span>
             </div>
-            <span className={styles.txBadge}>
-              {formatTransactionCount(totalTransactionCount)}
-            </span>
-          </div>
 
-          <div className={styles.cardBottom}>
-            <p
-              className={`${styles.balanceValue} ${
-                totalBalance >= 0 ? styles.balancePositive : styles.balanceNegative
-              }`}
-            >
-              {formatCurrency(totalBalance)}
-            </p>
-          </div>
-        </button>
+            <div className={styles.cardBottom}>
+              <p
+                className={`${styles.balanceValue} ${
+                  totalBalance >= 0 ? styles.balancePositive : styles.balanceNegative
+                }`}
+              >
+                {formatCurrency(totalBalance)}
+              </p>
+            </div>
+          </button>
+        )}
 
         {/* Per-bank cards */}
         {accounts.map((acc) => {

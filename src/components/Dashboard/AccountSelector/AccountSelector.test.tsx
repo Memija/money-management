@@ -152,4 +152,22 @@ describe('AccountSelector', () => {
     fireEvent.click(screen.getByTestId('subaccount-pill-Investment fund'))
     expect(onSelectSubAccount).toHaveBeenCalledWith('Investment fund')
   })
+
+  it('does NOT render Institutions section at all when only one bank is present', () => {
+    const singleAccount = [mockAccounts[0]] // N26 only
+    const { container } = render(
+      <AccountSelector
+        accounts={singleAccount}
+        totalBalance={1500}
+        totalTransactionCount={25}
+        selectedInstitution="all"
+        onSelectInstitution={vi.fn()}
+        selectedSubAccount="all"
+        onSelectSubAccount={vi.fn()}
+      />,
+    )
+
+    // Entire section should NOT render at all
+    expect(container.firstChild).toBeNull()
+  })
 })

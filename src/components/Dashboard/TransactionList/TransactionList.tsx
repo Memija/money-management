@@ -36,6 +36,7 @@ interface TransactionListProps {
   showGhost?: boolean
   setShowGhost?: (val: boolean) => void
   ghostCount?: number
+  showBankName?: boolean
 }
 
 type TypeFilter = 'all' | 'income' | 'expense' | 'transfers' | 'duplicates' | 'modified'
@@ -54,6 +55,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   showGhost = false,
   setShowGhost,
   ghostCount = 0,
+  showBankName,
 }) => {
   const t = useLanguageStore((s) => s.t)
   const customCategories = useAppStore((s) => s.customCategories)
@@ -61,6 +63,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   const customKeywords = useAppStore((s) => s.customKeywords)
   const setCustomKeywords = useAppStore((s) => s.setCustomKeywords)
   const { formatDate, formatCurrency, formatTransactionCount } = useFormatters()
+
+  const shouldShowBankName =
+    (showBankName !== undefined ? showBankName : institutionNames.length > 1) &&
+    selectedInstitution === 'all'
 
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE)
@@ -473,6 +479,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             formatDate={formatDate}
             formatCurrency={formatCurrency}
             onCategoryChange={handleCategoryChange}
+            showBankName={shouldShowBankName}
           />
         ))}
 

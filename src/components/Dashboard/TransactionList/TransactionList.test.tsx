@@ -256,6 +256,65 @@ describe('TransactionList Component', () => {
     expect(screen.queryByLabelText('All Institutions')).not.toBeInTheDocument()
   })
 
+  it('does not display bank name in transaction item meta when only 1 bank is present', () => {
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    // With 1 bank, meta should only show the date without the bullet and bank name
+    expect(screen.getByText('Date: 2023-01-01')).toBeInTheDocument()
+    expect(screen.getByText('Date: 2023-01-02')).toBeInTheDocument()
+    expect(screen.queryByText('Date: 2023-01-01 • Bank A')).not.toBeInTheDocument()
+  })
+
+  it('displays bank name in transaction item meta when showBankName is true / multiple banks are present', () => {
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        showBankName={true}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    expect(screen.getByText('Date: 2023-01-01 • Bank A')).toBeInTheDocument()
+    expect(screen.getByText('Date: 2023-01-02 • Bank B')).toBeInTheDocument()
+  })
+
+  it('does not display bank name when a specific institution is selected even if multiple institutions exist', () => {
+    render(
+      <TransactionList
+        filteredTx={[mockTransactions[0]]}
+        institutionNames={['Bank A', 'Bank B']}
+        showBankName={true}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="Bank A"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    // With a specific institution selected (Bank A), bank name is not shown as the user already knows that
+    expect(screen.getByText('Date: 2023-01-01')).toBeInTheDocument()
+    expect(screen.queryByText('Date: 2023-01-01 • Bank A')).not.toBeInTheDocument()
+  })
+
   it('filters transactions by type when clicking Income and Expenses tabs', () => {
     render(
       <TransactionList
