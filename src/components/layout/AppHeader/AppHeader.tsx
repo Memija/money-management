@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ChevronDown, Monitor, Moon, PieChart, PlusCircle, Settings,Sun } from 'lucide-react'
+import { ChevronDown, Eye, EyeOff, Monitor, Moon, PieChart, PlusCircle, Settings, Sun } from 'lucide-react'
 
 import { localeLabels, localeOrder } from '../../../i18n/translations'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import { type Theme, useThemeStore } from '../../../store/useThemeStore'
 
 import styles from './AppHeader.module.css'
@@ -12,6 +13,7 @@ const AppHeader: React.FC = () => {
   const { theme, resolvedTheme, setTheme } = useThemeStore()
   const { locale, t, setLocale } = useLanguageStore()
   const { importedAccounts, currentStep, cancelImport, resetImport, setStep } = useAppStore()
+  const { isPrivacyMode, togglePrivacyMode } = usePrivacyStore()
   const [isThemeOpen, setIsThemeOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
   const themeDropdownRef = useRef<HTMLDivElement>(null)
@@ -63,6 +65,17 @@ const AppHeader: React.FC = () => {
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [])
+
+  useEffect(() => {
+    const handlePrivacyKey = (e: KeyboardEvent) => {
+      if (e.altKey && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault()
+        togglePrivacyMode()
+      }
+    }
+    window.addEventListener('keydown', handlePrivacyKey)
+    return () => window.removeEventListener('keydown', handlePrivacyKey)
+  }, [togglePrivacyMode])
 
   const showDashboardNav = (importedAccounts || []).length > 0 && currentStep !== 'dashboard'
   const showNewImportNav = currentStep === 'dashboard' || currentStep === 'settings'
@@ -118,6 +131,25 @@ const AppHeader: React.FC = () => {
               <span className={styles['theme-switcher-label']}>{t.settingsTitle || 'Settings'}</span>
             </button>
           )}
+
+          {/* Privacy Mode Toggle */}
+          <button
+            type="button"
+            className={`${styles['theme-switcher-trigger']} ${isPrivacyMode ? styles['privacy-active'] : ''}`}
+            onClick={togglePrivacyMode}
+            aria-label={isPrivacyMode ? t.privacyModeActive || 'Privacy Mode Active' : t.privacyMode || 'Privacy Mode'}
+            title={t.privacyModeTooltip || 'Toggle Privacy Mode (Alt+P)'}
+            aria-pressed={isPrivacyMode}
+            id="header-privacy-mode-btn"
+            data-testid="header-privacy-mode-btn"
+          >
+            <span className={styles['theme-switcher-icon']}>
+              {isPrivacyMode ? <EyeOff size={15} /> : <Eye size={15} />}
+            </span>
+            <span className={styles['theme-switcher-label']}>
+              {isPrivacyMode ? (t.privacyModeActive || 'Privacy') : (t.privacyMode || 'Privacy')}
+            </span>
+          </button>
 
           {/* Language Switcher */}
           <div className={styles['theme-switcher']} ref={langDropdownRef}>

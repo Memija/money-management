@@ -77,7 +77,7 @@ const CustomMerchantTooltip: React.FC<CustomTooltipProps> = ({
       </div>
       <div className={styles.tooltipRow}>
         <span>{t.amount || 'Total Spent'}</span>
-        <span className={styles.tooltipValue}>{formatCurrency(data.amount)}</span>
+        <span className={`${styles.tooltipValue} privacy-blur`}>{formatCurrency(data.amount)}</span>
       </div>
       <div className={styles.tooltipRow}>
         <span>{t.numTransactions || 'Transactions'}</span>
@@ -90,7 +90,7 @@ const CustomMerchantTooltip: React.FC<CustomTooltipProps> = ({
               ? (t.perTransaction || 'Per transaction')
               : (isMobile ? (t.perTransactionShort || 'Avg. / tx') : (t.avgPerTransaction || 'Avg. / Transaction'))}
           </span>
-          <span className={styles.tooltipValue}>{formatCurrency(data.amount / data.count)}</span>
+          <span className={`${styles.tooltipValue} privacy-blur`}>{formatCurrency(data.amount / data.count)}</span>
         </div>
       )}
       {share && (
@@ -219,7 +219,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
           <div className={styles.statPillsGroup}>
             <div className={styles.statPill}>
               <span className={styles.statLabel}>{t.total || 'Total'}</span>
-              <span className={styles.statValue}>{formatCurrency(totalTopSpend)}</span>
+              <span className={`${styles.statValue} privacy-blur`}>{formatCurrency(totalTopSpend)}</span>
             </div>
             {topSharePct && (
               <div className={styles.statPill}>
@@ -305,7 +305,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
 
                     <div className={styles.merchantInfo}>
                       <div className={styles.nameCategoryRow}>
-                        <span className={styles.merchantName} title={merchant.name}>
+                        <span className={`${styles.merchantName} privacy-blur`} title={merchant.name}>
                           {merchant.name}
                         </span>
                         <span
@@ -323,7 +323,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
                       <div className={styles.metaRow}>
                         <span>{formatChargesCount(merchant.count)}</span>
                         <span className={styles.bulletDot}>•</span>
-                        <span>
+                        <span className="privacy-blur">
                           {merchant.count > 1 ? `~${formatCurrency(avgPerTx)}` : formatCurrency(merchant.amount)}{' '}
                           {t.perTransactionShort || '/ tx'}
                         </span>
@@ -332,7 +332,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
                   </div>
 
                   <div className={styles.rowRight}>
-                    <span className={styles.merchantAmount}>{formatCurrency(merchant.amount)}</span>
+                    <span className={`${styles.merchantAmount} privacy-blur`}>{formatCurrency(merchant.amount)}</span>
                     <span
                       className={styles.shareBadge}
                       title={`${shareOfTop}% ${t.ofTopSpend || 'of top spend'}`}

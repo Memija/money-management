@@ -88,7 +88,7 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = ({
               <span className={styles.statLabelMonthly}>{t.monthlyTotal}</span>
             </div>
             <div className={styles.statValue}>
-              <span className={styles.statAmountMonthly}>{formatCurrency(totalMonthly)}</span>
+              <span className={`${styles.statAmountMonthly} privacy-blur`}>{formatCurrency(totalMonthly)}</span>
               <span className={styles.statFreq}>{t.perMonth}</span>
             </div>
           </div>
@@ -101,7 +101,7 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = ({
               <span className={styles.statLabelYearly}>{t.yearlyTotal}</span>
             </div>
             <div className={styles.statValue}>
-              <span className={styles.statAmountYearly}>{formatCurrency(totalYearly)}</span>
+              <span className={`${styles.statAmountYearly} privacy-blur`}>{formatCurrency(totalYearly)}</span>
               <span className={styles.statFreq}>{t.perYear}</span>
             </div>
           </div>
@@ -133,7 +133,7 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = ({
                     {getCategoryIcon(expense.category, 20, customCategories, expense.name)}
                   </div>
                   <div className={styles.nameBlock}>
-                    <h4 className={styles.itemName} title={expense.name}>
+                    <h4 className={`${styles.itemName} privacy-blur`} title={expense.name}>
                       {expense.name}
                     </h4>
                     <div className={styles.categorySelectWrapper}>
@@ -157,13 +157,13 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = ({
               {/* Card Middle: Amount & History */}
               <div className={styles.cardPricing}>
                 <div className={styles.amountDisplay}>
-                  <span className={styles.amountValue}>
+                  <span className={`${styles.amountValue} privacy-blur`}>
                     {formatCurrency(expense.amount)}
                   </span>
                   <span className={styles.amountPeriod}>{t.perMonth}</span>
                 </div>
                 <div className={styles.projectionMeta}>
-                  <span className={styles.yearlyEst}>
+                  <span className={`${styles.yearlyEst} privacy-blur`}>
                     ~{formatCurrency(yearlyAmount)}{t.perYear}
                   </span>
                   <span className={styles.bulletDot}>•</span>

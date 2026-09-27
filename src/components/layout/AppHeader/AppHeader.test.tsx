@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import { useThemeStore } from '../../../store/useThemeStore'
 import AppHeader from './AppHeader'
 
@@ -95,5 +96,17 @@ describe('AppHeader', () => {
 
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(screen.queryByText('Bosanski')).not.toBeInTheDocument()
+  })
+
+  it('toggles privacy mode when button is clicked', () => {
+    render(<AppHeader />)
+    const privacyBtn = screen.getByTestId('header-privacy-mode-btn')
+    expect(privacyBtn).toBeInTheDocument()
+
+    fireEvent.click(privacyBtn)
+    expect(usePrivacyStore.getState().isPrivacyMode).toBe(true)
+
+    fireEvent.click(privacyBtn)
+    expect(usePrivacyStore.getState().isPrivacyMode).toBe(false)
   })
 })

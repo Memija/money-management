@@ -109,7 +109,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
               title={tx.description}
             />
           ) : (
-            <p className={styles['row-description']} title={tx.description}>
+            <p className={`${styles['row-description']} privacy-blur`} title={tx.description}>
               {tx.description}
             </p>
           )}
@@ -220,7 +220,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             title={formatCurrency(tx.amount)}
           />
         ) : (
-          <span title={`${isTxIncome ? '+' : ''}${formatCurrency(tx.amount)}`}>
+          <span className="privacy-blur" title={`${isTxIncome ? '+' : ''}${formatCurrency(tx.amount)}`}>
             {isTxIncome ? '+' : ''}
             {formatCurrency(tx.amount)}
           </span>

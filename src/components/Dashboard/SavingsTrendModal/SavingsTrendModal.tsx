@@ -49,9 +49,9 @@ const MonthRow: React.FC<MonthRowProps> = ({ month, income, expenses, saved, rat
       transition={{ delay, duration: 0.25, ease: 'easeOut' }}
     >
       <td className={styles['month-name']}>{month}</td>
-      <td className={styles['month-income']}>{formatCurrency(income)}</td>
-      <td className={styles['month-expenses']}>{formatCurrency(expenses)}</td>
-      <td className={`${styles['month-saved']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']}`}>
+      <td className={`${styles['month-income']} privacy-blur`}>{formatCurrency(income)}</td>
+      <td className={`${styles['month-expenses']} privacy-blur`}>{formatCurrency(expenses)}</td>
+      <td className={`${styles['month-saved']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']} privacy-blur`}>
         {isPositive ? '+' : ''}{formatCurrency(saved)}
       </td>
       <td className={`${styles['month-rate']} ${isPositive ? styles['rate-positive'] : styles['rate-negative']}`}>
@@ -147,7 +147,7 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
           </div>
           <div className={styles['hero-text']}>
             <p className={styles['hero-label']}>{isPositive ? (t.netSavedLabel || 'Net Saved') : (t.netDeficitLabel || 'Net Deficit')}</p>
-            <p className={styles['hero-value']}>
+            <p className={`${styles['hero-value']} privacy-blur`}>
               {isPositive ? '+' : ''}{formatCurrency(totalSaved)}
             </p>
           </div>
@@ -170,13 +170,13 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
             {bestMonth && (
               <div className={styles['highlight-pill-emerald']}>
                 <TrendingUp size={12} />
-                <span>{t.savingsBestMonth || 'Best'}: <strong>{bestMonth.name}</strong> (+{formatCurrency(bestMonth.saved)})</span>
+                <span>{t.savingsBestMonth || 'Best'}: <strong>{bestMonth.name}</strong> (<span className="privacy-blur">+{formatCurrency(bestMonth.saved)}</span>)</span>
               </div>
             )}
             {worstMonth && worstMonth.name !== bestMonth?.name && (
                <div className={styles['highlight-pill-rose']}>
                 <TrendingDown size={12} />
-                <span>{t.savingsWorstMonth || 'Worst'}: <strong>{worstMonth.name}</strong> ({formatCurrency(worstMonth.saved)})</span>
+                <span>{t.savingsWorstMonth || 'Worst'}: <strong>{worstMonth.name}</strong> (<span className="privacy-blur">{formatCurrency(worstMonth.saved)}</span>)</span>
               </div>
             )}
           </div>

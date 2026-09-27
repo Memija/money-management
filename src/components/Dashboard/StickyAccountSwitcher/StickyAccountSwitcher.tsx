@@ -7,6 +7,7 @@ import type { BankAccountSummary } from '../../../hooks/useAccountBalances'
 import { useDropdownPosition } from '../../../hooks/useDropdownPosition'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 
 import styles from './StickyAccountSwitcher.module.css'
 
@@ -36,6 +37,7 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
   hasMultipleAccounts,
 }) => {
   const t = useLanguageStore((s) => s.t)
+  const isPrivacyMode = usePrivacyStore((s) => s.isPrivacyMode)
   const { formatCurrency, formatTransactionCount } = useFormatters()
   const [isOpen, setIsOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -136,7 +138,7 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
         <span
           className={`${styles.statValue} ${
             displayBalance >= 0 ? styles.textPrimary : styles.textDanger
-          }`}
+          } privacy-blur`}
         >
           {formatCurrency(displayBalance)}
         </span>
@@ -154,8 +156,8 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-controls={isOpen ? listboxId : undefined}
-        aria-label={`${t.bankAccounts || 'Bank Accounts'}: ${labelText}, ${formatCurrency(displayBalance)}`}
-        title={`${labelText}: ${formatCurrency(displayBalance)}`}
+        aria-label={`${t.bankAccounts || 'Bank Accounts'}: ${labelText}${isPrivacyMode ? '' : `, ${formatCurrency(displayBalance)}`}`}
+        title={isPrivacyMode ? labelText : `${labelText}: ${formatCurrency(displayBalance)}`}
         data-testid="sticky-account-switcher-trigger"
       >
         {currentLogo ? (
@@ -177,7 +179,7 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
         <span
           className={`${styles.statValue} ${
             displayBalance >= 0 ? styles.textPrimary : styles.textDanger
-          }`}
+          } privacy-blur`}
         >
           {formatCurrency(displayBalance)}
         </span>
@@ -246,7 +248,7 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
                         <span
                           className={`${styles.balanceText} ${
                             totalBalance >= 0 ? styles.balancePositive : styles.balanceNegative
-                          }`}
+                          } privacy-blur`}
                         >
                           {formatCurrency(totalBalance)}
                         </span>
@@ -317,7 +319,7 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
                             <span
                               className={`${styles.balanceText} ${
                                 acc.balance >= 0 ? styles.balancePositive : styles.balanceNegative
-                              }`}
+                              } privacy-blur`}
                             >
                               {formatCurrency(acc.balance)}
                             </span>
@@ -352,7 +354,7 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
                                 <span className={styles.subName}>{t.allSubAccounts}</span>
                               </div>
                               <div className={styles.subOptionRight}>
-                                <span className={styles.subBalance}>
+                                <span className={`${styles.subBalance} privacy-blur`}>
                                   {formatCurrency(acc.balance)}
                                 </span>
                                 {selectedSubAccount === 'all' && (
@@ -383,7 +385,7 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
                                     <span className={styles.subName}>{sub.name}</span>
                                   </div>
                                   <div className={styles.subOptionRight}>
-                                    <span className={styles.subBalance}>
+                                    <span className={`${styles.subBalance} privacy-blur`}>
                                       {formatCurrency(sub.balance)}
                                     </span>
                                     {isSubSelected && (

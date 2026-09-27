@@ -561,3 +561,58 @@ svg.recharts-surface *:focus-visible {
   -webkit-tap-highlight-color: transparent !important;
 }
 
+/* ═══════════════════════════════════════════════════════
+   Privacy / Demo Mode Styling
+   ═══════════════════════════════════════════════════════ */
+[data-privacy-mode='true'] .privacy-blur {
+  filter: blur(12px) !important;
+  opacity: 0.22 !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  transition: filter 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  cursor: pointer;
+  display: inline-block;
+}
+
+[data-privacy-mode='true'] td.privacy-blur {
+  display: table-cell !important;
+}
+
+/* Heavy blur for large display balances */
+[data-privacy-mode='true'] h1.privacy-blur,
+[data-privacy-mode='true'] [class*='balance-amount'] {
+  filter: blur(36px) !important;
+  opacity: 0.15 !important;
+}
+
+/* Obfuscate axis numbers and chart labels */
+[data-privacy-mode='true'] .recharts-cartesian-axis-tick text,
+[data-privacy-mode='true'] .recharts-polar-angle-axis-tick text,
+[data-privacy-mode='true'] .recharts-pie-label-text {
+  filter: blur(6px) !important;
+  opacity: 0.2 !important;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+/* ─── Hover / Focus / Active reveal ─── */
+[data-privacy-mode='true'] .privacy-blur:hover,
+[data-privacy-mode='true'] .privacy-blur:focus-visible,
+[data-privacy-mode='true'] .privacy-blur:active,
+[data-privacy-mode='true'] h1.privacy-blur:hover,
+[data-privacy-mode='true'] h1.privacy-blur:focus-visible,
+[data-privacy-mode='true'] h1.privacy-blur:active,
+[data-privacy-mode='true'] [class*='balance-amount']:hover,
+[data-privacy-mode='true'] [class*='balance-amount']:focus-visible,
+[data-privacy-mode='true'] [class*='balance-amount']:active {
+  filter: blur(0px) !important;
+  opacity: 1 !important;
+}
+
+[data-privacy-mode='true'] .recharts-cartesian-axis-tick:hover text,
+[data-privacy-mode='true'] .recharts-polar-angle-axis-tick:hover text,
+[data-privacy-mode='true'] .recharts-pie-label-text:hover {
+  filter: blur(0px) !important;
+  opacity: 1 !important;
+}
+
+

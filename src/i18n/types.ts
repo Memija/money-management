@@ -492,6 +492,31 @@ export interface TranslationStrings {
   restoreFromBackup: string
   restoreBackupPrompt: string
   orDivider: string
+
+  // Privacy Mode
+  privacyMode: string
+  privacyModeActive: string
+  privacyModeTooltip: string
+
+  // Share Snapshot Modal
+  shareSnapshot: string
+  shareSnapshotTitle: string
+  shareSnapshotDesc: string
+  shareCardTheme: string
+  shareMaskAmounts: string
+  shareIncludeAmounts: string
+  downloadImage: string
+  copyImage: string
+  copyTextSummary: string
+  shareNative: string
+  imageCopiedSuccess: string
+  textCopiedSuccess: string
+  badgeSuperSaver: string
+  badgeHealthySaver: string
+  badgeBalanced: string
+  badgeBuilding: string
+  badgeHighSpending: string
+  privateFinanceWatermark: string
   dangerZone: string
   deleteAllDataTitle: string
   deleteAllDataDesc: string

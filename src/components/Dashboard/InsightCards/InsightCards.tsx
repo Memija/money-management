@@ -62,7 +62,7 @@ const AvgRow: React.FC<AvgRowProps> = ({ label, value, barWidth, color, customCo
       <div className={styles['avg-row-header']}>
         <span className={styles['avg-row-label']}>{label}</span>
         <span
-          className={`${styles['avg-row-value']} ${styles[`avg-value-${color}`]}`}
+          className={`${styles['avg-row-value']} ${styles[`avg-value-${color}`]} privacy-blur`}
           style={customColor ? { color: customColor } : undefined}
         >
           {value}
@@ -283,7 +283,7 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
             <div className={styles['card-text']}>
               <p className={styles.label}>{card.label}</p>
               <div className={styles['value-row']}>
-                <p className={styles.value}>{card.value}</p>
+                <p className={`${styles.value} ${i === 1 ? 'privacy-blur' : ''}`}>{card.value}</p>
                 {card.tooltip && (
                   <span className={styles['info-tooltip-wrapper']}>
                     <Info size={14} className={styles['tooltip-icon']} />

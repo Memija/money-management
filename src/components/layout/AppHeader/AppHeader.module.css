@@ -80,6 +80,19 @@
   background: var(--dropdown-item-active-bg);
 }
 
+.privacy-active {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  color: var(--primary) !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
+
+:global([data-theme='light']) .privacy-active {
+  background: rgba(5, 150, 105, 0.12) !important;
+  border-color: rgba(5, 150, 105, 0.4) !important;
+  color: #047857 !important;
+}
+
 .theme-switcher-icon {
   display: flex;
   align-items: center;

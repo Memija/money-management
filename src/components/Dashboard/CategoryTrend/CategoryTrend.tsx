@@ -79,7 +79,7 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
     <div className={styles.tooltipContainer}>
       <div className={styles.tooltipHeader}>
         <span className={styles.tooltipMonth}>{label}</span>
-        <span className={styles.tooltipTotalBadge}>{formatCurrency(totalMonth)}</span>
+        <span className={`${styles.tooltipTotalBadge} privacy-blur`}>{formatCurrency(totalMonth)}</span>
       </div>
       <div className={styles.tooltipList}>
         {sortedItems.map((item) => {
@@ -121,7 +121,7 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
                   {getCategoryLabel(catKey, t, locale, customCategories)}
                 </span>
               </div>
-              <span className={styles.tooltipAmount}>{formatCurrency(val)}</span>
+              <span className={`${styles.tooltipAmount} privacy-blur`}>{formatCurrency(val)}</span>
               <span className={styles.tooltipCatPct}>({pct})</span>
             </div>
           )
@@ -313,12 +313,12 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = ({
           <div className={styles.statPillsGroup}>
             <div className={styles.statPill}>
               <span className={styles.statLabel}>{t.monthlyAverage || 'Monthly Average'}</span>
-              <span className={styles.statValue}>{formatCurrency(monthlyAverage)}</span>
+              <span className={`${styles.statValue} privacy-blur`}>{formatCurrency(monthlyAverage)}</span>
             </div>
             {peakMonth.amount > 0 && (
               <div className={styles.statPill}>
                 <span className={styles.statLabel}>{t.peakMonth || 'Peak Month'}</span>
-                <span className={`${styles.statValue} ${styles.statValueHighlight}`}>
+                <span className={`${styles.statValue} ${styles.statValueHighlight} privacy-blur`}>
                   {peakMonth.month} • {formatCurrency(peakMonth.amount)}
                 </span>
               </div>

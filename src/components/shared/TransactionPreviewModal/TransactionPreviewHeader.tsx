@@ -56,7 +56,7 @@ export const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> =
             </span>
             {isIncome ? (
               <span
-                className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']}`}
+                className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']} privacy-blur`}
                 data-testid="modal-total-income"
               >
                 <TrendingUp size={12} aria-hidden="true" />
@@ -64,7 +64,7 @@ export const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> =
               </span>
             ) : isExpense ? (
               <span
-                className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']}`}
+                className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']} privacy-blur`}
                 data-testid="modal-total-expense"
               >
                 <TrendingDown size={12} aria-hidden="true" />
@@ -73,7 +73,7 @@ export const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> =
             ) : (
               <>
                 <span
-                  className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']}`}
+                  className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']} privacy-blur`}
                   title={`${t.inflows || 'Inflows'}: +${formatCurrency(totalInflows)}`}
                   data-testid="modal-total-inflow"
                 >
@@ -81,7 +81,7 @@ export const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> =
                   +{formatCurrency(totalInflows)}
                 </span>
                 <span
-                  className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']}`}
+                  className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']} privacy-blur`}
                   title={`${t.outflows || 'Outflows'}: -${formatCurrency(totalOutflows)}`}
                   data-testid="modal-total-outflow"
                 >

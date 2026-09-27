@@ -171,7 +171,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = ({
             <h3 className={styles.title}>{t.expenseCategories}</h3>
             <p className={styles.subtitle}>
               {formatCategoryCount(sortedCategories.length)} •{' '}
-              {formatCurrency(totalExpenses)}
+              <span className="privacy-blur">{formatCurrency(totalExpenses)}</span>
             </p>
           </div>
         </div>
@@ -199,7 +199,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = ({
 
             <div className={styles.statPill}>
               <span className={styles.statLabel}>{t.avgPerCategory}</span>
-              <span className={styles.statValue}>{formatCurrency(avgExpensePerCategory)}</span>
+              <span className={`${styles.statValue} privacy-blur`}>{formatCurrency(avgExpensePerCategory)}</span>
             </div>
           </div>
         </div>
@@ -276,7 +276,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = ({
                           </span>
                         </div>
                         <div className={styles.tooltipRow}>
-                          <span className={styles.tooltipValue}>
+                          <span className={`${styles.tooltipValue} privacy-blur`}>
                             {formatCurrency(data.value)}
                           </span>
                           <span
@@ -325,7 +325,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = ({
                   <p className={styles.centerCategoryLabel}>
                     {getCategoryLabel(hoveredCategory.name, t, locale, customCategories)}
                   </p>
-                  <p className={styles.centerAmount}>
+                  <p className={`${styles.centerAmount} privacy-blur`}>
                     {formatCurrency(hoveredCategory.value)}
                   </p>
                   <div className={styles.centerBadgesRow}>
@@ -358,7 +358,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = ({
                   className={styles.centerContent}
                 >
                   <p className={styles.centerDefaultLabel}>{t.expenses || 'Total'}</p>
-                  <p className={styles.centerTotalAmount}>
+                  <p className={`${styles.centerTotalAmount} privacy-blur`}>
                     {formatCurrency(totalExpenses)}
                   </p>
                   <p className={styles.centerCategoryCount}>
@@ -408,7 +408,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = ({
                       {getCategoryLabel(cat.name, t, locale, customCategories)}
                     </span>
                   </div>
-                  <span className={styles.cardValue}>{formatCurrency(cat.value)}</span>
+                  <span className={`${styles.cardValue} privacy-blur`}>{formatCurrency(cat.value)}</span>
                 </div>
 
                 <div className={styles.cardBottom}>

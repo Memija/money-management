@@ -219,7 +219,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   : netBalance >= 0
                     ? styles.statIncome
                     : styles.statExpense
-              }`}
+              } privacy-blur`}
             >
               {typeFilter === 'transfers'
                 ? formatCurrency(0)

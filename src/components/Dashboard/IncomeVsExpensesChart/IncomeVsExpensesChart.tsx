@@ -86,7 +86,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
           <span className={`${styles.tooltipDot} ${styles.pillDotIncome}`} />
           <span>{t.income || 'Income'}</span>
         </div>
-        <span className={`${styles.tooltipValue} ${styles.tooltipIncomeValue}`}>
+        <span className={`${styles.tooltipValue} ${styles.tooltipIncomeValue} privacy-blur`}>
           +{formatCurrency(income)}
         </span>
       </div>
@@ -97,7 +97,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
           <span className={`${styles.tooltipDot} ${styles.pillDotExpense}`} />
           <span>{t.expenses || 'Expenses'}</span>
         </div>
-        <span className={`${styles.tooltipValue} ${styles.tooltipExpenseValue}`}>
+        <span className={`${styles.tooltipValue} ${styles.tooltipExpenseValue} privacy-blur`}>
           -{formatCurrency(expenses)}
         </span>
       </div>
@@ -109,7 +109,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
         <span className={styles.tooltipNetLabel}>
           {isPositive ? (t.netSavedLabel || 'Net Saved') : (t.netDeficitLabel || 'Net Deficit')}
         </span>
-        <span className={`${styles.tooltipValue} ${isPositive ? styles.netPositive : styles.netNegative}`}>
+        <span className={`${styles.tooltipValue} ${isPositive ? styles.netPositive : styles.netNegative} privacy-blur`}>
           {isPositive ? '+' : ''}{formatCurrency(net)} ({formatSavingsRate(monthlyRate)})
         </span>
       </div>
@@ -249,7 +249,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = ({
                 title={isNetPositive ? (t.netSavedLabel || 'Net Saved') : (t.netDeficitLabel || 'Net Deficit')}
               >
                 {isNetPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                <span>{isNetPositive ? '+' : ''}{formatCurrency(netSaved)}</span>
+                <span className="privacy-blur">{isNetPositive ? '+' : ''}{formatCurrency(netSaved)}</span>
                 <span className={styles.pillLabel}>({formatSavingsRate(savingsRate)})</span>
               </div>
             </div>

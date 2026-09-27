@@ -3,6 +3,7 @@ import { Copy, Ghost, Sliders } from 'lucide-react'
 
 import { findInstitution } from '../../../data/institutions'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryIcon } from '../../../utils/category-icons'
@@ -30,6 +31,7 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
 }) => {
   const t = useLanguageStore((s) => s.t)
   const locale = useLanguageStore((s) => s.locale)
+  const isPrivacyMode = usePrivacyStore((s) => s.isPrivacyMode)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
   const isModifiedTx = Boolean(tx.isModified)
@@ -54,7 +56,7 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
           {getCategoryIcon(tx.category || 'Other', 20, customCategories, tx.description)}
         </div>
         <div className={styles.txDetails}>
-          <p className={styles.txDesc} title={tx.description}>
+          <p className={`${styles.txDesc} privacy-blur`} title={isPrivacyMode ? undefined : tx.description}>
             {tx.description}
           </p>
           <p className={styles.txMeta}>
@@ -110,9 +112,9 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
       <div className={styles.txRight}>
         <div className={styles.amountCol}>
           <p
-            className={
+            className={`${
               tx.type === 'income' ? styles.amountPositive : styles.amountNegative
-            }
+            } privacy-blur`}
           >
             {tx.type === 'income' ? '+' : ''}
             {formatCurrency(tx.amount)}

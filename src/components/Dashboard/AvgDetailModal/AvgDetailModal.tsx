@@ -42,7 +42,7 @@ const StatRow: React.FC<StatRowProps> = ({ label, value, icon, accent = 'blue', 
         </span>
       )}
     </span>
-    <span className={`${styles['stat-value']} ${styles[`stat-value-${accent}`]}`}>{value}</span>
+    <span className={`${styles['stat-value']} ${styles[`stat-value-${accent}`]} privacy-blur`}>{value}</span>
   </div>
 )
 

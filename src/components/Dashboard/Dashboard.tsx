@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { AnimatePresence,motion, useInView } from 'framer-motion'
-import { Landmark, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { Landmark, Share2, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 
 import { useAccountBalances } from '../../hooks/useAccountBalances'
 import type { PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
@@ -20,6 +20,7 @@ import { InsightCards } from './InsightCards'
 import { PeriodFilter } from './PeriodFilter'
 import { RecurringExpenses } from './RecurringExpenses'
 import { SavingsTrendModal } from './SavingsTrendModal/SavingsTrendModal'
+import { ShareSnapshotModal } from './ShareSnapshotModal'
 import { StickyAccountSwitcher } from './StickyAccountSwitcher'
 import { TopMerchants } from './TopMerchants'
 import { TransactionList } from './TransactionList'
@@ -48,6 +49,9 @@ const Dashboard: React.FC = () => {
 
   // Savings trend modal
   const [isSavingsTrendOpen, setIsSavingsTrendOpen] = useState(false)
+
+  // Social share snapshot modal
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
   const {
     accounts: bankAccounts,
@@ -194,19 +198,55 @@ const Dashboard: React.FC = () => {
     [importedAccounts],
   )
 
+  const periodLabel = useMemo(() => {
+    if (period.mode === 'all') return t.periodAll || 'All'
+    if (period.mode === 'year') return period.value
+    if (period.mode === 'quarter') {
+      const [year, quarter] = period.value.split('-Q')
+      return `Q${quarter} ${year}`
+    }
+    if (period.mode === 'month') {
+      return formatMonthYear(period.value)
+    }
+    return period.value
+  }, [period, formatMonthYear, t])
+
+  const shareCardCategories = useMemo(() => {
+    return analytics.categoryBreakdown.slice(0, 4).map((c) => ({
+      name: getCategoryLabel(c.name, t),
+      amount: c.value,
+      percent:
+        analytics.totalExpenses > 0 ? Math.round((c.value / analytics.totalExpenses) * 100) : 0,
+      color: c.color,
+    }))
+  }, [analytics.categoryBreakdown, analytics.totalExpenses, t])
 
   return (
     <div className={styles['dashboard-outer']}>
       {/* Subheader — plain flex item above the scroll area, no position tricks needed */}
       <div className={styles['subheader-bar']}>
         <div className={styles['subheader-inner']}>
-          <PeriodFilter
-            period={period}
-            onPeriodChange={setPeriod}
-            availableYears={analytics.availableYears}
-            availableQuarters={analytics.availableQuarters}
-            availableMonths={analytics.availableMonths}
-          />
+          <div className={styles['subheader-left']}>
+            <PeriodFilter
+              period={period}
+              onPeriodChange={setPeriod}
+              availableYears={analytics.availableYears}
+              availableQuarters={analytics.availableQuarters}
+              availableMonths={analytics.availableMonths}
+            />
+
+            <button
+              type="button"
+              className={styles['share-snapshot-btn']}
+              onClick={() => setIsShareModalOpen(true)}
+              title={t.shareSnapshot || 'Share Snapshot'}
+              aria-label={t.shareSnapshot || 'Share Snapshot'}
+              data-testid="dashboard-share-snapshot-btn"
+            >
+              <Share2 size={15} />
+              <span className={styles['share-btn-text']}>{t.shareSnapshot || 'Share Snapshot'}</span>
+            </button>
+          </div>
 
           {bankAccounts.length > 0 && (
             <div className={styles['sticky-stats']}>
@@ -236,13 +276,13 @@ const Dashboard: React.FC = () => {
                     <div className={styles['sticky-stat-item']}>
                       <TrendingUp size={14} className={styles['text-primary']} />
                       <span className={styles['sticky-stat-label']}>{t.income}:</span>
-                      <span className={styles['sticky-stat-value']}>{formatCurrency(analytics.totalIncome)}</span>
+                      <span className={`${styles['sticky-stat-value']} privacy-blur`}>{formatCurrency(analytics.totalIncome)}</span>
                     </div>
                     <div className={styles['sticky-stat-divider']} />
                     <div className={styles['sticky-stat-item']}>
                       <TrendingDown size={14} className={styles['text-danger']} />
                       <span className={styles['sticky-stat-label']}>{t.expenses}:</span>
-                      <span className={styles['sticky-stat-value']}>{formatCurrency(analytics.totalExpenses)}</span>
+                      <span className={`${styles['sticky-stat-value']} privacy-blur`}>{formatCurrency(analytics.totalExpenses)}</span>
                     </div>
                   </motion.div>
                 )}
@@ -313,7 +353,7 @@ const Dashboard: React.FC = () => {
                 )}
               </p>
             </div>
-          <h1 className={styles['balance-amount']}>{formatCurrency(displayBalance)}</h1>
+          <h1 className={`${styles['balance-amount']} privacy-blur`}>{formatCurrency(displayBalance)}</h1>
           <div className={styles['balance-stats']}>
             <div className={styles['stat-item']}>
               <div className={`${styles['icon-box']} ${styles['icon-income']}`}>
@@ -321,7 +361,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div className={styles['stat-text-container']}>
                 <p className={styles['stat-label']}>{t.income}</p>
-                <p className={styles['stat-value']}>{formatCurrency(analytics.totalIncome)}</p>
+                <p className={`${styles['stat-value']} privacy-blur`}>{formatCurrency(analytics.totalIncome)}</p>
               </div>
             </div>
             <div className={styles['stat-item']}>
@@ -330,7 +370,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div className={styles['stat-text-container']}>
                 <p className={styles['stat-label']}>{t.expenses}</p>
-                <p className={styles['stat-value']}>{formatCurrency(analytics.totalExpenses)}</p>
+                <p className={`${styles['stat-value']} privacy-blur`}>{formatCurrency(analytics.totalExpenses)}</p>
               </div>
             </div>
           </div>
@@ -441,6 +481,18 @@ const Dashboard: React.FC = () => {
         totalIncome={analytics.totalIncome}
         totalExpenses={analytics.totalExpenses}
         savingsRate={analytics.savingsRate}
+      />
+
+      {/* Social Share Snapshot Modal */}
+      <ShareSnapshotModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        periodLabel={periodLabel}
+        totalIncome={analytics.totalIncome}
+        totalExpenses={analytics.totalExpenses}
+        netSavings={analytics.balance}
+        savingsRate={analytics.savingsRate}
+        topCategories={shareCardCategories}
       />
     </div>
   )
