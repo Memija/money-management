@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { ImportedAccount } from '../../types'
 import { Settings } from './Settings'
 
 // Mock language store
@@ -57,7 +58,7 @@ vi.mock('../../store/useLanguageStore', () => ({
 const mockSetCustomKeywords = vi.fn()
 const mockSetStep = vi.fn()
 
-let mockImportedAccounts: any[] = []
+let mockImportedAccounts: ImportedAccount[] = []
 
 vi.mock('../../store/useAppStore', () => ({
   countDuplicateTransactionsInAccounts: vi.fn(() => 0),
@@ -157,8 +158,21 @@ describe('Settings Component', () => {
     mockImportedAccounts = [
       {
         institutionId: 'bank-1',
+        institutionName: 'Bank 1',
+        importedAt: '2026-03-01T00:00:00Z',
+        importedFingerprints: [],
         transactions: [],
-        duplicateTransactions: [{ id: 'dup-1' }],
+        duplicateTransactions: [
+          {
+            id: 'dup-1',
+            date: '2026-03-01',
+            description: 'Duplicate Transfer',
+            amount: -25,
+            currency: 'EUR',
+            type: 'expense',
+            institution: 'Bank 1',
+          },
+        ],
       },
     ]
     render(<Settings />)

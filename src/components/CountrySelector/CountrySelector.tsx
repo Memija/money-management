@@ -6,6 +6,7 @@ import { countries } from '../../data/countries'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import type { Country } from '../../types'
+import { RestoreBackupPrompt } from '../shared/RestoreBackupPrompt'
 
 import styles from './CountrySelector.module.css'
 
@@ -158,6 +159,9 @@ const CountrySelector: React.FC = () => {
       >
         {t.continue}
       </button>
+
+      {/* Restore from backup option */}
+      <RestoreBackupPrompt idPrefix="onboarding" />
     </div>
   )
 }

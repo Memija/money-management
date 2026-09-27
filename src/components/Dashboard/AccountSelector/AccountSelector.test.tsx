@@ -1,4 +1,3 @@
-import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -15,7 +14,7 @@ vi.mock('../../../hooks/useFormatters', () => ({
 
 // Mock useLanguageStore
 vi.mock('../../../store/useLanguageStore', () => ({
-  useLanguageStore: (selector?: (s: any) => any) => {
+  useLanguageStore: (selector?: (s: Record<string, unknown>) => unknown) => {
     const state = {
       t: {
         allAccounts: 'All Accounts',

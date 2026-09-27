@@ -6,6 +6,7 @@ import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { ImportedAccount } from '../../../types'
 import { DeleteConfirmationModal } from '../../shared/DeleteConfirmationModal'
+import { BackupRestore } from '../BackupRestore'
 
 import styles from './DataManagement.module.css'
 
@@ -52,11 +53,14 @@ export const DataManagement: React.FC<DataManagementProps> = ({ className }) => 
   }
 
   return (
-    <section
-      className={`${styles.container} ${className || ''}`}
-      aria-labelledby="data-management-heading"
-      id="data-management-section"
-    >
+    <div className={className}>
+      <BackupRestore />
+
+      <section
+        className={styles.container}
+        aria-labelledby="data-management-heading"
+        id="data-management-section"
+      >
       <div className={styles.header}>
         <div className={styles.titleWrapper}>
           <ShieldAlert size={22} className={styles.titleIcon} aria-hidden="true" />
@@ -259,5 +263,6 @@ export const DataManagement: React.FC<DataManagementProps> = ({ className }) => 
         />
       )}
     </section>
+  </div>
   )
 }

@@ -126,4 +126,11 @@ describe('CountrySelector', () => {
 
     expect(mockSelectCountry).toHaveBeenCalledWith(expect.objectContaining({ name: 'Germany' }))
   })
+
+  it('renders restore from backup option during onboarding', () => {
+    render(<CountrySelector />)
+
+    expect(screen.getByTestId('onboarding-restore-button')).toBeInTheDocument()
+    expect(screen.getByTestId('onboarding-restore-file-input')).toBeInTheDocument()
+  })
 })

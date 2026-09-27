@@ -458,6 +458,40 @@ export interface TranslationStrings {
   // Data Management
   dataManagementTitle: string
   dataManagementDesc: string
+  backupRestoreTitle: string
+  backupRestoreDesc: string
+  exportBackup: string
+  exportBackupDesc: string
+  exportBackupButton: string
+  exportBackupSuccess: string
+  restoreBackup: string
+  restoreBackupDesc: string
+  restoreBackupButton: string
+  restoreBackupSuccess: string
+  restoreBackupInvalidFile: string
+  restoreBackupErrorInvalidJson: string
+  restoreBackupErrorRootObject: string
+  restoreBackupErrorMissingAccounts: string
+  restoreBackupErrorAccountInvalid: string
+  restoreBackupErrorAccountMissingId: string
+  restoreBackupErrorAccountMissingName: string
+  restoreBackupErrorAccountMissingTransactions: string
+  restoreBackupErrorAccountInvalidList: string
+  restoreBackupErrorTxInvalid: string
+  restoreBackupErrorTxMissingId: string
+  restoreBackupErrorTxMissingDate: string
+  restoreBackupErrorTxInvalidAmount: string
+  restoreBackupErrorTxInvalidDescription: string
+  restoreBackupErrorTxMissingCurrency: string
+  restoreBackupErrorTxInvalidType: string
+  restoreBackupErrorCustomCategories: string
+  restoreBackupErrorDuplicateRules: string
+  restoreBackupConfirmTitle: string
+  restoreBackupConfirmMessage: string
+  restoreBackupConfirmButton: string
+  restoreFromBackup: string
+  restoreBackupPrompt: string
+  orDivider: string
   dangerZone: string
   deleteAllDataTitle: string
   deleteAllDataDesc: string

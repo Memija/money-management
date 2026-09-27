@@ -66,7 +66,7 @@ const AppHeader: React.FC = () => {
 
   const showDashboardNav = (importedAccounts || []).length > 0 && currentStep !== 'dashboard'
   const showNewImportNav = currentStep === 'dashboard' || currentStep === 'settings'
-  const showSettingsNav = currentStep === 'dashboard'
+  const showSettingsNav = currentStep !== 'settings'
 
   return (
     <header className={styles['app-header']} id="app-header">

@@ -12,7 +12,6 @@ import {
   Landmark,
   Layers,
   Lock,
-  Plus,
   RotateCcw,
   Search,
   Sliders,
@@ -63,6 +62,8 @@ export interface TransactionPreviewModalProps {
   isImport?: boolean
 }
 
+const EMPTY_EXCLUDED_TRANSACTIONS: Transaction[] = []
+
 export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = ({
   isOpen,
   onClose,
@@ -75,7 +76,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   internalTransferIds = new Set(),
   existingAccountTransfers = [],
   discardedSpaceCount = 0,
-  excludedSpaceTransactions,
+  excludedSpaceTransactions = EMPTY_EXCLUDED_TRANSACTIONS,
   initialFilter = 'all',
   onRemoveTransaction,
   onUpdateTransaction,
@@ -192,7 +193,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }, [unlockedDuplicateIds, localUnlockedDuplicateIds, alreadyDuplicatedIds])
 
   const activeTransactions = localTransactions
-  const activeExcluded = excludedSpaceTransactions ?? []
+  const activeExcluded = excludedSpaceTransactions ?? EMPTY_EXCLUDED_TRANSACTIONS
 
   const modifiedTransactions = useMemo(() => {
     return activeTransactions.filter((tx) => getIsModified(tx))

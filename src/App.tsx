@@ -35,6 +35,23 @@ const App: React.FC = () => {
   const currentStep = useAppStore((s) => s.currentStep)
   const t = useLanguageStore((s) => s.t)
 
+  const [hasHydrated, setHasHydrated] = React.useState(() => {
+    return useAppStore.persist?.hasHydrated?.() ?? true
+  })
+
+  React.useEffect(() => {
+    if (useAppStore.persist?.hasHydrated?.()) {
+      setHasHydrated(true)
+      return
+    }
+    const unsub = useAppStore.persist?.onFinishHydration?.(() => {
+      setHasHydrated(true)
+    })
+    return () => {
+      unsub?.()
+    }
+  }, [])
+
   const loadingFallback = (
     <div className={styles['loading-fallback']}>
       {t.loading}
@@ -54,6 +71,14 @@ const App: React.FC = () => {
   React.useEffect(() => {
     preloadDashboard()
   }, [])
+
+  if (!hasHydrated) {
+    return (
+      <div className={`app-container ${styles['onboarding-layout']}`}>
+        {loadingFallback}
+      </div>
+    )
+  }
 
   // Dashboard has its own full layout
   if (currentStep === 'dashboard') {

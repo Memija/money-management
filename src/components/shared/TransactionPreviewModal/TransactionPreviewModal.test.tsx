@@ -1367,7 +1367,7 @@ describe('TransactionPreviewModal (Shared)', () => {
   it('renders Excluded filter button with correct total count and filters all excluded transactions', () => {
     const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
     const duplicateTx = { ...mockTransactions[1], id: 'tx-dup', description: 'Locked Duplicate', amount: -50 }
-    const internalTransferTx = { ...mockTransactions[2], id: 'tx-internal', description: 'Draft Transfer to Savings', amount: -100 }
+    const internalTransferTx = { ...mockTransactions[1], id: 'tx-internal', description: 'Draft Transfer to Savings', amount: -100 }
     const spaceTx: Transaction = {
       id: 'tx-space',
       date: '2026-03-01',
@@ -1375,6 +1375,8 @@ describe('TransactionPreviewModal (Shared)', () => {
       amount: -200,
       type: 'expense',
       category: 'Transfer',
+      currency: 'EUR',
+      institution: 'Sparkasse',
     }
     const existingTransferTx: Transaction = {
       id: 'tx-existing',
@@ -1384,6 +1386,7 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'income',
       category: 'Transfer',
       isGhost: true,
+      currency: 'EUR',
       institution: 'Sparkasse',
     }
 
@@ -1454,6 +1457,8 @@ describe('TransactionPreviewModal (Shared)', () => {
       amount: -200,
       type: 'expense',
       category: 'Transfer',
+      currency: 'EUR',
+      institution: 'Sparkasse',
     }
 
     render(
@@ -1478,7 +1483,7 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('filters specifically by Internal Transfers when clicked', () => {
     const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
-    const internalTransferTx = { ...mockTransactions[2], id: 'tx-internal', description: 'Inter-Account Transfer', amount: -100 }
+    const internalTransferTx = { ...mockTransactions[1], id: 'tx-internal', description: 'Inter-Account Transfer', amount: -100 }
 
     render(
       <TransactionPreviewModal
@@ -1520,6 +1525,7 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'income',
       category: 'Transfer',
       isGhost: true,
+      currency: 'EUR',
       institution: 'Commerzbank',
     }
 
@@ -1602,6 +1608,7 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'income',
       category: 'Transfer',
       isGhost: true,
+      currency: 'EUR',
       institution: 'Commerzbank',
     }
 
@@ -1648,6 +1655,8 @@ describe('TransactionPreviewModal (Shared)', () => {
       amount: -400,
       type: 'expense',
       category: 'Transfer',
+      currency: 'EUR',
+      institution: 'Sparkasse',
     }
 
     render(
@@ -1689,6 +1698,7 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'expense',
       category: 'Transfer',
       isGhost: true,
+      currency: 'EUR',
       institution: 'N26',
     }
     const existingTx: Transaction = {
@@ -1699,6 +1709,7 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'income',
       category: 'Transfer',
       isGhost: true,
+      currency: 'EUR',
       institution: 'Commerzbank',
     }
 
@@ -1745,6 +1756,8 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'expense',
       category: 'Transfer',
       subAccount: 'Investment fund',
+      currency: 'EUR',
+      institution: 'Sparkasse',
     }
     const spaceTx2: Transaction = {
       id: 'tx-space-2',
@@ -1754,6 +1767,8 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'income',
       category: 'Transfer',
       subAccount: 'Investment fund',
+      currency: 'EUR',
+      institution: 'Sparkasse',
     }
     const spaceTx3: Transaction = {
       id: 'tx-space-3',
@@ -1763,6 +1778,8 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'expense',
       category: 'Transfer',
       subAccount: 'Wohnung und Auto',
+      currency: 'EUR',
+      institution: 'Sparkasse',
     }
 
     render(
@@ -1842,6 +1859,8 @@ describe('TransactionPreviewModal (Shared)', () => {
       type: 'expense',
       category: 'Transfer',
       subAccount: 'Investment fund',
+      currency: 'EUR',
+      institution: 'Sparkasse',
     }
 
     const { rerender } = render(
@@ -1867,6 +1886,8 @@ describe('TransactionPreviewModal (Shared)', () => {
       amount: -50,
       type: 'expense',
       category: 'Food',
+      currency: 'EUR',
+      institution: 'Sparkasse',
     }
     rerender(
       <TransactionPreviewModal
@@ -1890,6 +1911,7 @@ describe('TransactionPreviewModal (Shared)', () => {
       amount: -100,
       type: 'expense',
       category: 'Transfers',
+      currency: 'EUR',
       institution: 'N26',
     }
     const cbTx: Transaction = {
@@ -1899,6 +1921,7 @@ describe('TransactionPreviewModal (Shared)', () => {
       amount: 100,
       type: 'income',
       category: 'Transfers',
+      currency: 'EUR',
       institution: 'Commerzbank',
     }
 

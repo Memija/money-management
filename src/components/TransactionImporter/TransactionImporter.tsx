@@ -11,6 +11,7 @@ import { useLanguageStore } from '../../store/useLanguageStore'
 import type { ImportedAccount, ImportMethod, RuleModifications, Transaction } from '../../types'
 import { reconcileCrossAccountTransfers } from '../../utils/account-transfers'
 import { DeleteConfirmationModal } from '../shared/DeleteConfirmationModal'
+import { RestoreBackupPrompt } from '../shared/RestoreBackupPrompt'
 import { type ScopeFilter, TransactionPreviewModal } from '../shared/TransactionPreviewModal'
 import { DuplicateImportWarningModal } from './DuplicateImportWarningModal'
 import { ImportMethodSelector } from './ImportMethodSelector'
@@ -434,7 +435,12 @@ const TransactionImporter: React.FC = () => {
       </div>
 
       {/* Step 1: Choose method */}
-      {!method && <ImportMethodSelector t={t} onSelectMethod={setMethod} />}
+      {!method && (
+        <>
+          <ImportMethodSelector t={t} onSelectMethod={setMethod} />
+          <RestoreBackupPrompt idPrefix="importer" buttonLabel={t.restoreBackupPrompt} />
+        </>
+      )}
 
       {/* Step 2: Upload area / Paste */}
       {method && transactions.length === 0 && !loading && (

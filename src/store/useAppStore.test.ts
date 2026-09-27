@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import type { Country, FinancialInstitution, ImportedAccount, Transaction } from '../types'
+import type {
+  Country,
+  DuplicateOverrideRule,
+  FinancialInstitution,
+  ImportedAccount,
+  Transaction,
+} from '../types'
 import {
   countDuplicateTransactionsInAccounts,
   sanitizeDuplicateOverrideRules,
@@ -1314,13 +1320,13 @@ describe('useAppStore', () => {
           amount: -25.5,
           createdAt: '2026-03-01T00:00:00Z',
           applyCount: 1,
-        } as any,
+        } as unknown as DuplicateOverrideRule,
         {
           descriptionPattern: 'Aldi Sud',
           amount: -18.2,
           createdAt: '2026-03-01T00:00:00Z',
           applyCount: 2,
-        } as any,
+        } as unknown as DuplicateOverrideRule,
       ]
       const sanitized = sanitizeDuplicateOverrideRules(legacyRules)
       expect(sanitized).toHaveLength(2)
@@ -1489,9 +1495,9 @@ describe('useAppStore', () => {
         ],
       })
 
-      useAppStore.getState().removeDuplicateOverrideRule('' as any)
-      useAppStore.getState().removeDuplicateOverrideRule('   ' as any)
-      useAppStore.getState().removeDuplicateOverrideRule(undefined as any)
+      useAppStore.getState().removeDuplicateOverrideRule('' as unknown as string)
+      useAppStore.getState().removeDuplicateOverrideRule('   ' as unknown as string)
+      useAppStore.getState().removeDuplicateOverrideRule(undefined as unknown as string)
       useAppStore.getState().removeDuplicateOverrideRule('non-existent-id')
 
       expect(useAppStore.getState().duplicateOverrideRules).toHaveLength(2)
@@ -1659,7 +1665,7 @@ describe('useAppStore', () => {
         institutionId: 'de_commerzbank',
         institutionName: 'Commerzbank',
         transactions: [
-          { id: 'tx-1', amount: -50, date: '2026-09-01', description: 'Groceries' },
+          { id: 'tx-1', amount: -50, date: '2026-09-01', description: 'Groceries', currency: 'EUR', type: 'expense', institution: 'de_commerzbank' },
         ],
         importedAt: '2026-09-01T10:00:00Z',
         importedFingerprints: ['fp-1'],
@@ -1668,7 +1674,7 @@ describe('useAppStore', () => {
         institutionId: 'de_n26',
         institutionName: 'N26',
         transactions: [
-          { id: 'tx-2', amount: 100, date: '2026-09-02', description: 'Income' },
+          { id: 'tx-2', amount: 100, date: '2026-09-02', description: 'Income', currency: 'EUR', type: 'income', institution: 'de_n26' },
         ],
         importedAt: '2026-09-02T10:00:00Z',
         importedFingerprints: ['fp-2'],
@@ -1692,7 +1698,7 @@ describe('useAppStore', () => {
         institutionId: 'de_commerzbank',
         institutionName: 'Commerzbank',
         transactions: [
-          { id: 'tx-1', amount: -50, date: '2026-09-01', description: 'Groceries' },
+          { id: 'tx-1', amount: -50, date: '2026-09-01', description: 'Groceries', currency: 'EUR', type: 'expense', institution: 'de_commerzbank' },
         ],
         importedAt: '2026-09-01T10:00:00Z',
         importedFingerprints: ['fp-1'],

@@ -1,8 +1,9 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 import type { AppStep, Country, CustomCategory, DuplicateDeleteMode, DuplicateOverrideRule, FinancialInstitution, ImportedAccount, Transaction } from '../types'
 import { reconcileCrossAccountTransfers } from '../utils/account-transfers'
+import { idbStorage } from '../utils/storage/idb-storage'
 
 export interface AppState {
   currentStep: AppStep
@@ -945,7 +946,8 @@ export const useAppStore = create<AppState>()(
       },
     }),
     {
-      name: 'mm-app-storage',
+      name: 'saldio-app-storage',
+      storage: createJSONStorage(() => idbStorage),
       onRehydrateStorage: () => (state) => {
         if (state && Array.isArray(state.duplicateOverrideRules)) {
           state.duplicateOverrideRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
