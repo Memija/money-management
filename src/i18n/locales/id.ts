@@ -233,6 +233,7 @@ export const id: TranslationStrings = {
   allAccounts: 'Semua Akun',
   filterBySubAccount: 'Sub-akun:',
   allSubAccounts: 'Semua Sub-akun',
+  filterByCategory: 'Filter berdasarkan kategori',
   spaceTransfersExcludedForSubAccountNotice:
     'Transfer sub-akun untuk {subAccount} otomatis dikecualikan untuk mencegah perhitungan ganda.',
   currentImport: 'Impor Saat Ini',
@@ -554,6 +555,7 @@ export const id: TranslationStrings = {
   catHealthcare: 'Kesehatan',
   catSavings: 'Tabungan',
   catTransfers: 'Transfer',
+  catTravel: 'Perjalanan',
   catOther: 'Lainnya',
   countries: {
     de: 'Jerman',
@@ -620,10 +622,25 @@ export const id: TranslationStrings = {
     Transport: ['gojek', 'grab', 'bensin', 'tol', 'parkir', 'transportasi'],
     Entertainment: ['bioskop', 'netflix', 'spotify', 'hiburan', 'gym'],
     Insurance: ['asuransi', 'bpjs'],
-    Utilities: ['listrik', 'air', 'pdam', 'internet', 'pulsa', 'wifi', 'tagihan'],
+    Utilities: ['listrik', '\\bair\\b', 'pdam', 'internet', 'pulsa', 'wifi', 'tagihan'],
     Healthcare: ['dokter', 'apotek', 'rumah sakit', 'klinik', 'kesehatan'],
     Savings: ['tabungan', 'investasi', 'deposito'],
     Transfers: ['transfer', 'kirim uang', 'gopay', 'ovo', 'dana', 'linkaja'],
+    Travel: [
+      'hotel',
+      'tiket pesawat',
+      'pesawat',
+      'penerbangan',
+      'airbnb',
+      'booking.com',
+      'traveloka',
+      'tiket.com',
+      'hostel',
+      'liburan',
+      'wisata',
+      'perjalanan',
+      'penginapan',
+    ],
   },
 
   iconGroups: {

@@ -31,6 +31,12 @@ describe('category-utils', () => {
       expect(categorize('bolt receipt')).toBe('Transport')
     })
 
+    it('categorizes travel descriptions correctly', () => {
+      expect(categorize('Hotel booking reservation')).toBe('Travel')
+      expect(categorize('Lufthansa flight ticket')).toBe('Travel')
+      expect(categorize('Airbnb stay')).toBe('Travel')
+    })
+
     it('falls back to "Other" for unknown descriptions', () => {
       expect(categorize('Random unknown transaction 12345')).toBe('Other')
     })
@@ -70,6 +76,7 @@ describe('category-utils', () => {
       expect(resolveCanonicalCategory('Healthcare')).toBe('Healthcare')
       expect(resolveCanonicalCategory('Savings')).toBe('Savings')
       expect(resolveCanonicalCategory('Transfers')).toBe('Transfers')
+      expect(resolveCanonicalCategory('Travel')).toBe('Travel')
       expect(resolveCanonicalCategory('Other')).toBe('Other')
     })
 
@@ -93,6 +100,13 @@ describe('category-utils', () => {
       expect(resolveCanonicalCategory('Плата')).toBe('Salary')
       expect(resolveCanonicalCategory('Станарина')).toBe('Rent')
       expect(resolveCanonicalCategory('Намирнице')).toBe('Groceries')
+      // Travel across all supported languages
+      expect(resolveCanonicalCategory('Travel')).toBe('Travel')
+      expect(resolveCanonicalCategory('Podróże')).toBe('Travel')
+      expect(resolveCanonicalCategory('Reisen')).toBe('Travel')
+      expect(resolveCanonicalCategory('Putovanja')).toBe('Travel')
+      expect(resolveCanonicalCategory('Путовања')).toBe('Travel')
+      expect(resolveCanonicalCategory('Perjalanan')).toBe('Travel')
     })
 
     it('resolves categories from transaction keywords and descriptions', () => {
@@ -100,6 +114,9 @@ describe('category-utils', () => {
       expect(resolveCanonicalCategory('Rewe Supermarkt')).toBe('Groceries')
       expect(resolveCanonicalCategory('Monthly salary payroll')).toBe('Salary')
       expect(resolveCanonicalCategory('Uber ride to airport')).toBe('Transport')
+      expect(resolveCanonicalCategory('Booking.com reservation')).toBe('Travel')
+      expect(resolveCanonicalCategory('Airbnb accommodation')).toBe('Travel')
+      expect(resolveCanonicalCategory('Flight tickets')).toBe('Travel')
     })
 
     it('falls back to "Other" for unknown, whitespace, or falsy inputs', () => {

@@ -25,6 +25,7 @@ export interface CategoryKeywords {
   Healthcare: string[]
   Savings: string[]
   Transfers: string[]
+  Travel: string[]
 }
 
 export interface TranslationStrings {
@@ -244,6 +245,7 @@ export interface TranslationStrings {
   allAccounts: string
   filterBySubAccount: string
   allSubAccounts: string
+  filterByCategory: string
   spaceTransfersExcludedForSubAccountNotice: string
   currentImport: string
   internalTransfersCurrentAccountNotice: string
@@ -548,6 +550,7 @@ export interface TranslationStrings {
   catHealthcare: string
   catSavings: string
   catTransfers: string
+  catTravel: string
   catOther: string
 
   // Category keywords for auto-categorization

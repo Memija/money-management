@@ -234,6 +234,7 @@ export const pl: TranslationStrings = {
   allAccounts: 'Wszystkie konta',
   filterBySubAccount: 'Subkonto:',
   allSubAccounts: 'Wszystkie subkonta',
+  filterByCategory: 'Filtruj według kategorii',
   spaceTransfersExcludedForSubAccountNotice:
     'Przelewy na subkonto dla {subAccount} są automatycznie wykluczane, aby zapobiec podwójnemu liczeniu.',
   currentImport: 'Bieżący import',
@@ -555,6 +556,7 @@ export const pl: TranslationStrings = {
   catHealthcare: 'Opieka zdrowotna',
   catSavings: 'Oszczędności',
   catTransfers: 'Przelewy',
+  catTravel: 'Podróże',
   catOther: 'Inne',
   countries: {
     de: 'Niemcy',
@@ -650,6 +652,20 @@ export const pl: TranslationStrings = {
     Healthcare: ['lekarz', 'apteka', 'zdrowie', 'szpital'],
     Savings: ['oszczędności', 'lokata', 'konto oszczędnościowe'],
     Transfers: ['przelew', 'paypal', 'blik'],
+    Travel: [
+      'hotel',
+      '\\blot\\b',
+      'loty',
+      'lotnisko',
+      'linie lotnicze',
+      'airbnb',
+      'booking.com',
+      'hostel',
+      'wakacje',
+      'podróż',
+      'podroze',
+      'wycieczka',
+    ],
   },
 
   iconGroups: {

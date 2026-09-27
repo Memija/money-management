@@ -10,6 +10,7 @@ import {
   Search,
   SearchX,
   Sliders,
+  Tag,
   X,
 } from 'lucide-react'
 
@@ -17,7 +18,8 @@ import { useFormatters } from '../../../hooks/useFormatters'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
-import { normalizeDescription } from '../../../utils/category-utils'
+import { getCategoryIcon } from '../../../utils/category-icons'
+import { getCategoryLabel, normalizeDescription } from '../../../utils/category-utils'
 import { getVisiblePages } from '../../../utils/pagination-utils'
 import { Select } from '../../shared/Select'
 import { TransactionItem } from './TransactionItem'
@@ -29,10 +31,12 @@ interface TransactionListProps {
   institutionNames: string[]
   searchTerm: string
   setSearchTerm: (val: string) => void
+  selectedCategory?: string
+  setSelectedCategory?: (val: string) => void
   selectedInstitution?: string
   setSelectedInstitution?: (val: string) => void
-  sortOrder: 'newest' | 'oldest' | 'highest' | 'lowest'
-  setSortOrder: (val: 'newest' | 'oldest' | 'highest' | 'lowest') => void
+  sortOrder?: 'newest' | 'oldest' | 'highest' | 'lowest'
+  setSortOrder?: (val: 'newest' | 'oldest' | 'highest' | 'lowest') => void
   showGhost?: boolean
   setShowGhost?: (val: boolean) => void
   ghostCount?: number
@@ -48,14 +52,17 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   institutionNames,
   searchTerm,
   setSearchTerm,
+  selectedCategory,
+  setSelectedCategory,
   selectedInstitution = 'all',
-  sortOrder,
+  sortOrder = 'newest',
   setSortOrder,
   setShowGhost,
   ghostCount = 0,
   showBankName,
 }) => {
   const t = useLanguageStore((s) => s.t)
+  const locale = useLanguageStore((s) => s.locale)
   const customCategories = useAppStore((s) => s.customCategories)
   const setManualCategory = useAppStore((s) => s.setManualCategory)
   const customKeywords = useAppStore((s) => s.customKeywords)
@@ -67,11 +74,31 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     selectedInstitution === 'all'
 
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
+  const [internalCategory, setInternalCategory] = useState<string>('all')
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE)
   const [currentPage, setCurrentPage] = useState<number>(1)
 
-  const normalTx = useMemo(() => filteredTx.filter((tx) => !tx.isGhost), [filteredTx])
-  const ghostTx = useMemo(() => filteredTx.filter((tx) => tx.isGhost), [filteredTx])
+  const categoryFilter = selectedCategory !== undefined ? selectedCategory : internalCategory
+
+  const handleCategoryFilterChange = useCallback(
+    (cat: string) => {
+      if (setSelectedCategory) {
+        setSelectedCategory(cat)
+      } else {
+        setInternalCategory(cat)
+      }
+      setCurrentPage(1)
+    },
+    [setSelectedCategory],
+  )
+
+  const categoryFilteredTx = useMemo(() => {
+    if (categoryFilter === 'all') return filteredTx
+    return filteredTx.filter((tx) => (tx.category || 'Other') === categoryFilter)
+  }, [filteredTx, categoryFilter])
+
+  const normalTx = useMemo(() => categoryFilteredTx.filter((tx) => !tx.isGhost), [categoryFilteredTx])
+  const ghostTx = useMemo(() => categoryFilteredTx.filter((tx) => tx.isGhost), [categoryFilteredTx])
   const duplicateTx = useMemo(
     () =>
       normalTx.filter(
@@ -91,7 +118,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     let expTot = 0
     let ghosts = 0
 
-    for (const tx of filteredTx) {
+    for (const tx of categoryFilteredTx) {
       if (tx.isGhost) {
         ghosts++
         continue
@@ -114,7 +141,40 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       netBalance: incTot - expTot,
       visibleGhostCount: ghosts,
     }
-  }, [filteredTx])
+  }, [categoryFilteredTx])
+
+  // Collect available unique categories from unfiltered transactions in current scope
+  const availableCategories = useMemo(() => {
+    const set = new Set<string>()
+    for (const tx of filteredTx) {
+      if (tx.category) {
+        set.add(tx.category)
+      }
+    }
+    if (categoryFilter !== 'all') {
+      set.add(categoryFilter)
+    }
+    return Array.from(set).sort((a, b) => {
+      const labelA = getCategoryLabel(a, t, locale, customCategories)
+      const labelB = getCategoryLabel(b, t, locale, customCategories)
+      return labelA.localeCompare(labelB)
+    })
+  }, [filteredTx, categoryFilter, t, locale, customCategories])
+
+  const categoryOptions = useMemo(() => {
+    return [
+      {
+        value: 'all',
+        label: t.allCategories || 'All Categories',
+        icon: <Tag size={14} />,
+      },
+      ...availableCategories.map((cat) => ({
+        value: cat,
+        label: getCategoryLabel(cat, t, locale, customCategories),
+        icon: getCategoryIcon(cat, 14, customCategories),
+      })),
+    ]
+  }, [availableCategories, t, locale, customCategories])
 
   // Filter transactions by Type (All / Income / Expense / Transfers / Duplicates / Modified)
   // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', 'expense', 'duplicates', or 'modified'!
@@ -157,12 +217,16 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   const handleResetFilters = () => {
     setSearchTerm('')
     setTypeFilter('all')
+    handleCategoryFilterChange('all')
+    setSortOrder?.('newest')
     setCurrentPage(1)
   }
 
   const isFilterActive =
     searchTerm.trim().length > 0 ||
-    typeFilter !== 'all'
+    typeFilter !== 'all' ||
+    categoryFilter !== 'all' ||
+    sortOrder !== 'newest'
 
   return (
     <motion.div
@@ -368,11 +432,21 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </div>
 
           <Select
+            id="category-filter"
+            name="category-filter"
+            value={categoryFilter}
+            onChange={(val) => handleCategoryFilterChange(val as string)}
+            className={styles.txFilterSelectWrapper}
+            aria-label={t.filterByCategory || 'Filter by category'}
+            options={categoryOptions}
+          />
+
+          <Select
             id="sort-order"
             name="sort-order"
             value={sortOrder}
             onChange={(val) =>
-              setSortOrder(val as 'newest' | 'oldest' | 'highest' | 'lowest')
+              setSortOrder?.(val as 'newest' | 'oldest' | 'highest' | 'lowest')
             }
             className={styles.txFilterSelectWrapper}
             aria-label="Sort order"

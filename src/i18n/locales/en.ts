@@ -233,6 +233,7 @@ export const en: TranslationStrings = {
   allAccounts: 'All Accounts',
   filterBySubAccount: 'Sub-account:',
   allSubAccounts: 'All Sub-accounts',
+  filterByCategory: 'Filter by category',
   spaceTransfersExcludedForSubAccountNotice:
     'Sub-account transfers for {subAccount} are automatically excluded to prevent double counting.',
   currentImport: 'Current Import',
@@ -555,6 +556,7 @@ export const en: TranslationStrings = {
   catHealthcare: 'Healthcare',
   catSavings: 'Savings',
   catTransfers: 'Transfers',
+  catTravel: 'Travel',
   catOther: 'Other',
   countries: {
     de: 'Germany',
@@ -636,6 +638,19 @@ export const en: TranslationStrings = {
     Healthcare: ['doctor', 'pharmacy', 'health', 'healthcare', 'medical', 'medicine', 'prescription', 'clinic'],
     Savings: ['saving', 'savings', 'invest', 'investment'],
     Transfers: ['paypal', 'transfer'],
+    Travel: [
+      'hotel',
+      'flight',
+      'airline',
+      'airbnb',
+      'booking.com',
+      'hostel',
+      'travel',
+      'vacation',
+      '\\btrip\\b',
+      'tourism',
+      'resort',
+    ],
   },
 
   iconGroups: {

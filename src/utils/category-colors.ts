@@ -17,6 +17,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Insurance: '#64748b',    // Slate Grey
   Savings: '#14b8a6',      // Teal
   Transfers: '#06b6d4',    // Cyan
+  Travel: '#0ea5e9',       // Sky Blue
   Other: '#a855f7',        // Lilac
 }
 

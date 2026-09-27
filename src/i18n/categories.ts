@@ -13,6 +13,7 @@ export const DEFAULT_CATEGORY_KEYS = [
   'Healthcare',
   'Savings',
   'Transfers',
+  'Travel',
   'Other',
 ] as const
 
@@ -30,5 +31,6 @@ export const categoryI18nKeys: Record<string, keyof TranslationStrings> = {
   Healthcare: 'catHealthcare',
   Savings: 'catSavings',
   Transfers: 'catTransfers',
+  Travel: 'catTravel',
   Other: 'catOther',
 }

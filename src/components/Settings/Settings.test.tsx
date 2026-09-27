@@ -48,6 +48,7 @@ vi.mock('../../store/useLanguageStore', () => ({
         catGroceries: 'Lebensmittel',
         catUtilities: 'Nebenkosten',
         catHealthcare: 'Gesundheit',
+        catTravel: 'Reisen',
       },
     }
     return typeof selector === 'function' ? selector(state) : state

@@ -71,6 +71,7 @@ export function categorize(desc: string, customKeywords?: Record<string, string[
     'DiningOut',
     'Shopping',
     'Transport',
+    'Travel',
     'Entertainment',
     'Insurance',
     'Utilities',

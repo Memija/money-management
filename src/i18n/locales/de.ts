@@ -234,6 +234,7 @@ export const de: TranslationStrings = {
   allAccounts: 'Alle Konten',
   filterBySubAccount: 'Unterkonto:',
   allSubAccounts: 'Alle Unterkonten',
+  filterByCategory: 'Nach Kategorie filtern',
   spaceTransfersExcludedForSubAccountNotice:
     'Unterkonto-Umbuchungen für {subAccount} werden automatisch ausgeschlossen, um Doppelzählungen zu verhindern.',
   currentImport: 'Aktueller Import',
@@ -557,6 +558,7 @@ export const de: TranslationStrings = {
   catHealthcare: 'Gesundheit',
   catSavings: 'Sparen',
   catTransfers: 'Überweisungen',
+  catTravel: 'Reisen',
   catOther: 'Sonstiges',
   countries: {
     de: 'Deutschland',
@@ -652,6 +654,20 @@ export const de: TranslationStrings = {
     Healthcare: ['arzt', 'apotheke', 'kranken', 'gesundheit'],
     Savings: ['sparen', 'sparkonto', 'tagesgeld', 'festgeld', 'trade republic', 'depot', 'investition'],
     Transfers: ['überweisung', 'uberweisung', 'paypal'],
+    Travel: [
+      'hotel',
+      'flug',
+      'flugreise',
+      'airline',
+      'lufthansa',
+      'airbnb',
+      'booking.com',
+      'hostel',
+      'urlaub',
+      'reisen',
+      'reise',
+      'ferien',
+    ],
   },
 
   iconGroups: {

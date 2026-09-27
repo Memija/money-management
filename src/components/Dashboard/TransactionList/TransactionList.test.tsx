@@ -83,6 +83,8 @@ const mockTranslations = {
   hideInternalTransfers: 'Hide internal transfers',
   transfersTabNotice:
     'Internal transfers between your accounts are excluded from income and expenses (read-only).',
+  allCategories: 'All Categories',
+  filterByCategory: 'Filter by category',
 }
 
 const mockTransactions: Transaction[] = [
@@ -154,8 +156,8 @@ describe('TransactionList Component', () => {
     expect(screen.getByText('+$1000')).toBeInTheDocument()
 
     // Check categories
-    expect(screen.getByText('Cat: Food')).toBeInTheDocument()
-    expect(screen.getByText('Cat: Salary')).toBeInTheDocument()
+    expect(screen.getAllByText('Cat: Food').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Cat: Salary').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders empty state correctly', () => {
@@ -853,5 +855,194 @@ describe('TransactionList Component', () => {
     expect(screen.getByText('Modified Subscription')).toBeInTheDocument()
     expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
     expect(screen.queryByText('Salary')).not.toBeInTheDocument()
+  })
+
+  it('renders category filter dropdown with "All Categories" as default', () => {
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    const categorySelect = screen.getByLabelText('Filter by category')
+    expect(categorySelect).toBeInTheDocument()
+    expect(categorySelect).toHaveValue('all')
+
+    const trigger = screen.getByTestId('category-filter-trigger')
+    expect(trigger).toHaveTextContent('All Categories')
+  })
+
+  it('filters transactions when selecting a category from the dropdown', () => {
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    // Initially both Groceries and Salary are displayed
+    expect(screen.getByText('Groceries')).toBeInTheDocument()
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+
+    // Filter by 'Food' (Groceries has category 'Food')
+    const categorySelect = screen.getByLabelText('Filter by category')
+    fireEvent.change(categorySelect, { target: { value: 'Food' } })
+
+    // Groceries is shown, Salary is hidden
+    expect(screen.getByText('Groceries')).toBeInTheDocument()
+    expect(screen.queryByText('Salary')).not.toBeInTheDocument()
+    expect(screen.getByText('1 transactions')).toBeInTheDocument()
+
+    // Filter by 'Salary'
+    fireEvent.change(categorySelect, { target: { value: 'Salary' } })
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+    expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
+
+    // Reset back to 'all'
+    fireEvent.change(categorySelect, { target: { value: 'all' } })
+    expect(screen.getByText('Groceries')).toBeInTheDocument()
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+  })
+
+  it('resets category filter when reset button is clicked', () => {
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    const categorySelect = screen.getByLabelText('Filter by category')
+    fireEvent.change(categorySelect, { target: { value: 'Food' } })
+
+    expect(screen.getByText('Groceries')).toBeInTheDocument()
+    expect(screen.queryByText('Salary')).not.toBeInTheDocument()
+
+    const resetBtn = screen.getByRole('button', { name: 'Reset all filters' })
+    expect(resetBtn).toBeInTheDocument()
+    fireEvent.click(resetBtn)
+
+    expect(screen.getByText('Groceries')).toBeInTheDocument()
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+  })
+
+  it('clears category filter from empty state clear filters button', () => {
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    // Select Food category
+    const categorySelect = screen.getByLabelText('Filter by category')
+    fireEvent.change(categorySelect, { target: { value: 'Food' } })
+
+    // Click Income tab (Food is an expense, so income is 0)
+    const incomeTab = screen.getByRole('tab', { name: /Income/i })
+    fireEvent.click(incomeTab)
+
+    expect(screen.getByText('No transactions match')).toBeInTheDocument()
+
+    const clearBtn = screen.getByRole('button', { name: /^Clear/i })
+    expect(clearBtn).toBeInTheDocument()
+    fireEvent.click(clearBtn)
+
+    // Both should be restored
+    expect(screen.getByText('Groceries')).toBeInTheDocument()
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+  })
+
+  it('supports controlled selectedCategory and setSelectedCategory props', () => {
+    const setSelectedCategory = vi.fn()
+    render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedCategory="Salary"
+        setSelectedCategory={setSelectedCategory}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+      />
+    )
+
+    // Salary is visible, Groceries is hidden because selectedCategory is controlled as Salary
+    expect(screen.getByText('Salary')).toBeInTheDocument()
+    expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
+
+    const categorySelect = screen.getByLabelText('Filter by category')
+    fireEvent.change(categorySelect, { target: { value: 'Food' } })
+
+    expect(setSelectedCategory).toHaveBeenCalledWith('Food')
+  })
+
+  it('shows reset button when sort order is changed from newest and resets it when clicked', () => {
+    const setSortOrder = vi.fn()
+    const { rerender } = render(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={setSortOrder}
+      />
+    )
+
+    // Reset button should not be present when sortOrder is default and no filters active
+    expect(screen.queryByRole('button', { name: 'Reset all filters' })).not.toBeInTheDocument()
+
+    // Rerender with a non-default sortOrder
+    rerender(
+      <TransactionList
+        filteredTx={mockTransactions}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="highest"
+        setSortOrder={setSortOrder}
+      />
+    )
+
+    // Reset button should now be visible
+    const resetBtn = screen.getByRole('button', { name: 'Reset all filters' })
+    expect(resetBtn).toBeInTheDocument()
+
+    // Clicking reset button calls setSortOrder with 'newest'
+    fireEvent.click(resetBtn)
+    expect(setSortOrder).toHaveBeenCalledWith('newest')
   })
 })

@@ -234,6 +234,7 @@ export const bs: TranslationStrings = {
   allAccounts: 'Svi računi',
   filterBySubAccount: 'Podračun:',
   allSubAccounts: 'Svi podračuni',
+  filterByCategory: 'Filtriraj po kategoriji',
   spaceTransfersExcludedForSubAccountNotice:
     'Prijenosi na podračun za {subAccount} su automatski isključeni radi sprječavanja dvostrukog računanja.',
   currentImport: 'Trenutni uvoz',
@@ -556,6 +557,7 @@ export const bs: TranslationStrings = {
   catHealthcare: 'Zdravstvo',
   catSavings: 'Štednja',
   catTransfers: 'Transferi',
+  catTravel: 'Putovanja',
   catOther: 'Ostalo',
   countries: {
     de: 'Njemačka',
@@ -650,6 +652,21 @@ export const bs: TranslationStrings = {
     Healthcare: ['doktor', 'ljekar', 'lekar', 'apoteka', 'zdravlje', 'zdravstvo', 'zdrav', 'bolnica'],
     Savings: ['stednja', 'štednja'],
     Transfers: ['transfer', 'uplata', 'prenos'],
+    Travel: [
+      'hotel',
+      '\\blet\\b',
+      'letovi',
+      'avio',
+      'aviokarta',
+      'aerodrom',
+      'airbnb',
+      'booking.com',
+      'hostel',
+      'odmor',
+      'putovanje',
+      'putovanja',
+      'smjestaj',
+    ],
   },
 
   iconGroups: {

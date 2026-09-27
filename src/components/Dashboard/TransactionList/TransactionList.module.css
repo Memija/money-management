@@ -320,7 +320,7 @@
 .txFilterSelectWrapper {
   flex: 0 1 auto;
   min-width: 135px;
-  max-width: 190px;
+  max-width: 200px;
 }
 
 .txFilterSelect {
@@ -625,7 +625,7 @@
   }
 
   .txFilterSelectWrapper {
-    flex: 1 1 calc(50% - 0.5rem);
+    flex: 1 1 140px;
     min-width: 120px;
     max-width: none;
   }

@@ -179,6 +179,7 @@ export const CANONICAL_CATEGORY_ICONS: Record<string, IconComponent> = {
   Utilities: Zap,
   Savings: PiggyBank,
   Transfers: CreditCard,
+  Travel: Plane,
   Other: Package,
 }
 

@@ -16,8 +16,8 @@ export const POPULAR_MERCHANTS: MerchantSuggestion[] = [
   { id: 'twitch', name: 'Twitch', keyword: 'twitch', category: 'Entertainment', logo: 'SiTwitch', brandColor: '#9146FF', icon: 'Tv' },
   { id: 'steam', name: 'Steam', keyword: 'steam', category: 'Entertainment', logo: 'SiSteam', icon: 'Gamepad2' },
   { id: 'playstation', name: 'PlayStation', keyword: 'playstation', category: 'Entertainment', logo: 'SiPlaystation', brandColor: '#003791', icon: 'Gamepad2' },
-  { id: 'airbnb', name: 'Airbnb', keyword: 'airbnb', category: 'Entertainment', logo: 'SiAirbnb', brandColor: '#FF5A5F', icon: 'MapPin' },
-  { id: 'booking', name: 'Booking.com', keyword: 'booking', category: 'Entertainment', logo: 'SiBookingdotcom', brandColor: '#003580', icon: 'MapPin' },
+  { id: 'airbnb', name: 'Airbnb', keyword: 'airbnb', category: 'Travel', logo: 'SiAirbnb', brandColor: '#FF5A5F', icon: 'Plane' },
+  { id: 'booking', name: 'Booking.com', keyword: 'booking', category: 'Travel', logo: 'SiBookingdotcom', brandColor: '#003580', icon: 'Plane' },
 
   // Online Shopping & Retail
   { id: 'amazon', name: 'Amazon', keyword: 'amazon', category: 'Shopping', logo: 'FaAmazon', brandColor: '#FF9900', icon: 'Package' },

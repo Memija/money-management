@@ -24,6 +24,7 @@ describe('category-colors', () => {
         'Insurance',
         'Savings',
         'Transfers',
+        'Travel',
         'Other',
       ]
 
@@ -60,6 +61,7 @@ describe('category-colors', () => {
       expect(ICON_COLORS.Film).toBe(CATEGORY_COLORS.Entertainment)
       expect(ICON_COLORS.PiggyBank).toBe(CATEGORY_COLORS.Savings)
       expect(ICON_COLORS.CreditCard).toBe(CATEGORY_COLORS.Transfers)
+      expect(ICON_COLORS.Plane).toBe(CATEGORY_COLORS.Travel)
       expect(ICON_COLORS.Package).toBe(CATEGORY_COLORS.Other)
     })
   })
@@ -86,6 +88,7 @@ describe('category-colors', () => {
       expect(getCategoryColor('Insurance')).toBe(CATEGORY_COLORS.Insurance)
       expect(getCategoryColor('Savings')).toBe(CATEGORY_COLORS.Savings)
       expect(getCategoryColor('Transfers')).toBe(CATEGORY_COLORS.Transfers)
+      expect(getCategoryColor('Travel')).toBe(CATEGORY_COLORS.Travel)
       expect(getCategoryColor('Other')).toBe(CATEGORY_COLORS.Other)
     })
 
@@ -100,6 +103,12 @@ describe('category-colors', () => {
       // Serbian Cyrillic
       expect(getCategoryColor('Плата')).toBe(CATEGORY_COLORS.Salary)
       expect(getCategoryColor('Станарина')).toBe(CATEGORY_COLORS.Rent)
+      // Travel across languages
+      expect(getCategoryColor('Podróże')).toBe(CATEGORY_COLORS.Travel)
+      expect(getCategoryColor('Reisen')).toBe(CATEGORY_COLORS.Travel)
+      expect(getCategoryColor('Putovanja')).toBe(CATEGORY_COLORS.Travel)
+      expect(getCategoryColor('Путовања')).toBe(CATEGORY_COLORS.Travel)
+      expect(getCategoryColor('Perjalanan')).toBe(CATEGORY_COLORS.Travel)
     })
 
     describe('custom categories support', () => {
