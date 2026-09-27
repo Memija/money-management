@@ -29,8 +29,8 @@ interface TransactionListProps {
   institutionNames: string[]
   searchTerm: string
   setSearchTerm: (val: string) => void
-  selectedInstitution: string
-  setSelectedInstitution: (val: string) => void
+  selectedInstitution?: string
+  setSelectedInstitution?: (val: string) => void
   sortOrder: 'newest' | 'oldest' | 'highest' | 'lowest'
   setSortOrder: (val: 'newest' | 'oldest' | 'highest' | 'lowest') => void
   showGhost?: boolean
@@ -48,11 +48,9 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   institutionNames,
   searchTerm,
   setSearchTerm,
-  selectedInstitution,
-  setSelectedInstitution,
+  selectedInstitution = 'all',
   sortOrder,
   setSortOrder,
-  showGhost = false,
   setShowGhost,
   ghostCount = 0,
   showBankName,
@@ -158,14 +156,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
   const handleResetFilters = () => {
     setSearchTerm('')
-    setSelectedInstitution('all')
     setTypeFilter('all')
     setCurrentPage(1)
   }
 
   const isFilterActive =
     searchTerm.trim().length > 0 ||
-    selectedInstitution !== 'all' ||
     typeFilter !== 'all'
 
   return (
@@ -340,45 +336,6 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         </div>
 
         <div className={styles.controlsRight}>
-          {(ghostCount > 0 || visibleGhostCount > 0) && (
-            <button
-              type="button"
-              onClick={() => {
-                if (typeFilter === 'transfers') {
-                  setTypeFilter('all')
-                  setShowGhost?.(false)
-                } else {
-                  setShowGhost?.(true)
-                  setTypeFilter('transfers')
-                }
-                setCurrentPage(1)
-              }}
-              className={`${styles.ghostToggleBtn} ${
-                typeFilter === 'transfers' || showGhost ? styles.ghostToggleBtnActive : ''
-              }`}
-              title={
-                typeFilter === 'transfers' || showGhost
-                  ? (t.hideInternalTransfers || 'Hide internal transfers')
-                  : (t.showInternalTransfers || 'Show internal transfers')
-              }
-              aria-label={
-                typeFilter === 'transfers' || showGhost
-                  ? (t.hideInternalTransfers || 'Hide internal transfers')
-                  : (t.showInternalTransfers || 'Show internal transfers')
-              }
-              aria-pressed={typeFilter === 'transfers' || showGhost}
-            >
-              <Ghost size={14} aria-hidden="true" />
-              <span>
-                {typeFilter === 'transfers'
-                  ? t.ghostTransfersShown
-                  : (t.ghostTransfersHidden || '{count} internal transfers hidden').replace(
-                      '{count}',
-                      String(ghostCount || visibleGhostCount),
-                    )}
-              </span>
-            </button>
-          )}
           <div className={styles.txSearchWrapper}>
             <Search size={15} className={styles.searchIcon} aria-hidden="true" />
             <input
@@ -409,24 +366,6 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               </button>
             )}
           </div>
-
-          {institutionNames.length > 1 && (
-            <Select
-              id="institution-filter"
-              name="institution-filter"
-              value={selectedInstitution}
-              onChange={(val) => {
-                setSelectedInstitution(val)
-                setCurrentPage(1)
-              }}
-              className={styles.txFilterSelectWrapper}
-              aria-label={t.allInstitutions}
-              options={[
-                { value: 'all', label: t.allInstitutions },
-                ...institutionNames.map((n) => ({ value: n, label: n })),
-              ]}
-            />
-          )}
 
           <Select
             id="sort-order"

@@ -196,8 +196,7 @@ describe('TransactionList Component', () => {
     expect(setSearchTerm).toHaveBeenCalledWith('gro')
   })
 
-  it('handles institution filter change', () => {
-    const setSelectedInstitution = vi.fn()
+  it('does not allow institution changes in the All Transactions menu', () => {
     render(
       <TransactionList
         filteredTx={mockTransactions}
@@ -205,16 +204,13 @@ describe('TransactionList Component', () => {
         searchTerm=""
         setSearchTerm={vi.fn()}
         selectedInstitution="all"
-        setSelectedInstitution={setSelectedInstitution}
         sortOrder="newest"
         setSortOrder={vi.fn()}
       />
     )
 
-    const select = screen.getByLabelText('All Institutions')
-    fireEvent.change(select, { target: { value: 'Bank A' } })
-
-    expect(setSelectedInstitution).toHaveBeenCalledWith('Bank A')
+    expect(screen.queryByLabelText('All Institutions')).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: /all institutions/i })).not.toBeInTheDocument()
   })
 
   it('handles sort order change', () => {
@@ -238,7 +234,7 @@ describe('TransactionList Component', () => {
     expect(setSortOrder).toHaveBeenCalledWith('highest')
   })
 
-  it('does not render institution filter if less than 2 institutions exist', () => {
+  it('does not render institution filter regardless of the number of institutions', () => {
     render(
       <TransactionList
         filteredTx={mockTransactions}
@@ -246,7 +242,6 @@ describe('TransactionList Component', () => {
         searchTerm=""
         setSearchTerm={vi.fn()}
         selectedInstitution="all"
-        setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
       />
@@ -380,7 +375,7 @@ describe('TransactionList Component', () => {
     expect(setSearchTerm).toHaveBeenCalledWith('')
   })
 
-  it('allows resetting all filters using reset filters button', () => {
+  it('allows resetting all filters using reset filters button without altering the institution', () => {
     const setSearchTerm = vi.fn()
     const setSelectedInstitution = vi.fn()
     render(
@@ -401,7 +396,7 @@ describe('TransactionList Component', () => {
     fireEvent.click(resetBtn)
 
     expect(setSearchTerm).toHaveBeenCalledWith('')
-    expect(setSelectedInstitution).toHaveBeenCalledWith('all')
+    expect(setSelectedInstitution).not.toHaveBeenCalled()
   })
 
   it('displays total balance stat pill calculated from transactions', () => {
@@ -516,7 +511,7 @@ describe('TransactionList Component', () => {
     expect(screen.queryByRole('button', { name: 'Page 8' })).not.toBeInTheDocument()
   })
 
-  it('should display the ghost transfer toggle button when ghostCount > 0 and call setShowGhost on click', () => {
+  it('should display the transfers filter tab when ghostCount > 0 and call setShowGhost on click', () => {
     const setShowGhost = vi.fn()
     render(
       <TransactionList
@@ -534,11 +529,11 @@ describe('TransactionList Component', () => {
       />
     )
 
-    const toggleBtn = screen.getByRole('button', { name: 'Show internal transfers' })
-    expect(toggleBtn).toBeInTheDocument()
-    expect(toggleBtn).toHaveTextContent('5 internal transfers hidden')
+    const transfersTab = screen.getByRole('tab', { name: /Transfers/i })
+    expect(transfersTab).toBeInTheDocument()
+    expect(transfersTab).toHaveTextContent('5')
 
-    fireEvent.click(toggleBtn)
+    fireEvent.click(transfersTab)
     expect(setShowGhost).toHaveBeenCalledWith(true)
   })
 

@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { AnimatePresence,motion, useInView } from 'framer-motion'
-import { Landmark, Share2, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { Share2, TrendingDown, TrendingUp } from 'lucide-react'
 
 import { useAccountBalances } from '../../hooks/useAccountBalances'
 import type { PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
@@ -72,7 +72,6 @@ const Dashboard: React.FC = () => {
     setSelectedSubAccount,
     sortOrder,
     setSortOrder,
-    showGhost,
     setShowGhost,
     ghostCount,
   } = useTransactions(period)
@@ -309,51 +308,7 @@ const Dashboard: React.FC = () => {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className={`${styles['balance-hero']} ${displayBalance < 0 ? styles.negative : ''}`}
           >
-            <div className={styles['balance-label-wrapper']}>
-              {selectedAccountInfo?.logo ? (
-                <img
-                  src={selectedAccountInfo.logo}
-                  alt=""
-                  className={styles['hero-bank-logo']}
-                  aria-hidden="true"
-                  onError={(e) => {
-                    ;(e.currentTarget as HTMLElement).style.display = 'none'
-                  }}
-                />
-              ) : selectedInstitution === 'all' && bankAccounts.length > 1 ? (
-                <Landmark size={16} className={styles['text-primary']} aria-hidden="true" />
-              ) : (
-                <Wallet size={16} className={styles['text-muted']} aria-hidden="true" />
-              )}
-              <p className={styles['balance-label']}>
-                {bankAccounts.length === 1 ? (
-                  <>
-                    <span className={styles['hero-account-name']}>{bankAccounts[0].name}</span>
-                    <span className={styles['hero-label-separator']}>•</span>
-                    {selectedSubAccount !== 'all' ? (
-                      <span>{selectedSubAccount}</span>
-                    ) : (
-                      <span>{t.totalBalance}</span>
-                    )}
-                  </>
-                ) : selectedInstitution === 'all' ? (
-                  <span>{t.totalBalance}</span>
-                ) : selectedSubAccount !== 'all' ? (
-                  <span>
-                    {selectedAccountInfo?.name || selectedInstitution} • {selectedSubAccount}
-                  </span>
-                ) : (
-                  <>
-                    <span className={styles['hero-account-name']}>
-                      {selectedAccountInfo?.name || selectedInstitution}
-                    </span>
-                    <span className={styles['hero-label-separator']}>•</span>
-                    <span>{t.totalBalance}</span>
-                  </>
-                )}
-              </p>
-            </div>
-          <h1 className={`${styles['balance-amount']} privacy-blur`}>{formatCurrency(displayBalance)}</h1>
+            <h1 className={`${styles['balance-amount']} privacy-blur`}>{formatCurrency(displayBalance)}</h1>
           <div className={styles['balance-stats']}>
             <div className={styles['stat-item']}>
               <div className={`${styles['icon-box']} ${styles['icon-income']}`}>
@@ -440,10 +395,8 @@ const Dashboard: React.FC = () => {
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             selectedInstitution={selectedInstitution}
-            setSelectedInstitution={setSelectedInstitution}
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
-            showGhost={showGhost}
             setShowGhost={setShowGhost}
             ghostCount={ghostCount}
             showBankName={hasMultipleAccounts && selectedInstitution === 'all'}
