@@ -1,2 +1,2 @@
-export { AccountSelector } from './AccountSelector'
 export type { AccountSelectorProps } from './AccountSelector'
+export { AccountSelector } from './AccountSelector'

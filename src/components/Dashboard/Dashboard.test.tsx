@@ -248,20 +248,26 @@ describe('Dashboard', () => {
 
     render(<Dashboard />)
 
-    // Verify account cards are rendered
-    expect(screen.getByTestId('account-card-all')).toBeInTheDocument()
-    expect(screen.getByTestId('account-card-1')).toBeInTheDocument()
-    expect(screen.getByTestId('account-card-2')).toBeInTheDocument()
+    // Verify header switcher is rendered and open dropdown
+    const switcherTrigger = screen.getByTestId('sticky-account-switcher-trigger')
+    expect(switcherTrigger).toBeInTheDocument()
+    fireEvent.click(switcherTrigger)
+
+    // Verify account options in dropdown
+    expect(screen.getByTestId('sticky-account-option-all')).toBeInTheDocument()
+    expect(screen.getByTestId('sticky-account-option-1')).toBeInTheDocument()
+    expect(screen.getByTestId('sticky-account-option-2')).toBeInTheDocument()
 
     // Switch to Bank B
-    fireEvent.click(screen.getByTestId('account-card-2'))
+    fireEvent.click(screen.getByTestId('sticky-account-option-2'))
 
-    // Sub-accounts for Bank B should now be visible
-    expect(screen.getByTestId('subaccount-pill-Savings Space')).toBeInTheDocument()
-    expect(screen.getByTestId('subaccount-pill-Bills Space')).toBeInTheDocument()
+    // Open dropdown again — sub-accounts for Bank B should now be visible
+    fireEvent.click(screen.getByTestId('sticky-account-switcher-trigger'))
+    expect(screen.getByTestId('sticky-subaccount-option-Savings Space')).toBeInTheDocument()
+    expect(screen.getByTestId('sticky-subaccount-option-Bills Space')).toBeInTheDocument()
 
     // Filter to Savings Space
-    fireEvent.click(screen.getByTestId('subaccount-pill-Savings Space'))
+    fireEvent.click(screen.getByTestId('sticky-subaccount-option-Savings Space'))
 
     // Transaction list should only have Rent, not Utilities, and not show Bank B name
     const txList = screen.getByTestId('transaction-list')
@@ -269,5 +275,104 @@ describe('Dashboard', () => {
     expect(within(txList).queryByText('Utilities')).not.toBeInTheDocument()
     expect(within(txList).queryByText('Salary')).not.toBeInTheDocument()
     expect(within(txList).queryByText(/• Bank B/)).not.toBeInTheDocument()
+  })
+
+  it('ensures complete balance in total view matches sum of institution view balances when internal transfers are present', () => {
+    vi.mocked(useAppStore).mockImplementation((selector) => {
+      const state = {
+        importedAccounts: [
+          {
+            institutionId: 'bank-a',
+            institutionName: 'Bank A',
+            importedAt: '2024-01-01T12:00:00Z',
+            transactions: [
+              {
+                id: 'a1',
+                amount: 3000,
+                type: 'income',
+                date: '2024-01-01',
+                description: 'Salary',
+                institution: 'Bank A',
+              },
+              {
+                id: 'a2',
+                amount: -150,
+                type: 'expense',
+                date: '2024-01-02',
+                description: 'Groceries',
+                institution: 'Bank A',
+              },
+              // Transfer out to savings (single-legged ghost)
+              {
+                id: 'a3',
+                amount: -500,
+                type: 'expense',
+                date: '2024-01-03',
+                description: 'Transfer to Savings',
+                institution: 'Bank A',
+                isGhost: true,
+              },
+            ],
+          },
+          {
+            institutionId: 'bank-b',
+            institutionName: 'Bank B',
+            importedAt: '2024-01-01T12:00:00Z',
+            transactions: [
+              {
+                id: 'b1',
+                amount: 1000,
+                type: 'income',
+                date: '2024-01-01',
+                description: 'Bonus',
+                institution: 'Bank B',
+              },
+              {
+                id: 'b2',
+                amount: -200,
+                type: 'expense',
+                date: '2024-01-02',
+                description: 'Dining',
+                institution: 'Bank B',
+              },
+            ],
+          },
+        ],
+        resetImport: mockResetImport,
+      }
+      return typeof selector === 'function' ? selector(state as unknown as AppState) : state
+    })
+
+    render(<Dashboard />)
+
+    // Bank A ledger balance = 3000 - 150 - 500 = 2350
+    // Bank B ledger balance = 1000 - 200 = 800
+    // Total ledger balance = 2350 + 800 = 3150
+
+    // 1. In Total Balance view (All Accounts selected by default):
+    // Hero balance and header switcher should both show 3,150
+    const switcherTrigger = screen.getByTestId('sticky-account-switcher-trigger')
+    expect(switcherTrigger).toHaveTextContent(/3[.,]150/)
+    const heroSection = document.querySelector('section')!
+    expect(heroSection).toHaveTextContent(/3[.,]150/)
+
+    // 2. Click Bank A:
+    fireEvent.click(switcherTrigger)
+    fireEvent.click(screen.getByTestId('sticky-account-option-bank-a'))
+    // Hero balance and switcher should both show 2,350
+    expect(switcherTrigger).toHaveTextContent(/2[.,]350/)
+    expect(heroSection).toHaveTextContent(/2[.,]350/)
+
+    // 3. Click Bank B:
+    fireEvent.click(switcherTrigger)
+    fireEvent.click(screen.getByTestId('sticky-account-option-bank-b'))
+    // Hero balance and switcher should both show 800
+    expect(switcherTrigger).toHaveTextContent(/800/)
+    expect(heroSection).toHaveTextContent(/800/)
+
+    // 4. Return to All Accounts:
+    fireEvent.click(switcherTrigger)
+    fireEvent.click(screen.getByTestId('sticky-account-option-all'))
+    expect(heroSection).toHaveTextContent(/3[.,]150/)
   })
 })

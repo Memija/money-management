@@ -1,0 +1,411 @@
+/* ─────────────────────────────────────────────────
+   StickyAccountSwitcher styles
+───────────────────────────────────────────────── */
+.container {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+
+.staticItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.25rem 0.5rem;
+  margin: -0.25rem -0.5rem;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trigger:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:global([data-theme='light']) .trigger:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.triggerOpen {
+  background: rgba(99, 102, 241, 0.14) !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
+}
+
+:global([data-theme='light']) .triggerOpen {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.bankLogo {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.statLabel {
+  color: var(--text-dim);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  font-size: 0.75rem;
+}
+
+.statValue {
+  font-weight: 700;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.textPrimary {
+  color: var(--primary);
+}
+
+.textDanger {
+  color: #f43f5e;
+}
+
+.textMuted {
+  color: var(--text-muted);
+}
+
+.chevron {
+  color: var(--text-dim);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 0.1rem;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+/* ─────────────────────────────────────────────────
+   Dropdown Menu Portal
+───────────────────────────────────────────────── */
+.dropdown {
+  position: fixed;
+  z-index: 1000;
+  background: var(--dropdown-bg);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md, 14px);
+  box-shadow: var(--dropdown-shadow);
+  padding: 0.5rem;
+  min-width: 260px;
+  max-width: var(--dropdown-max-width, 320px);
+  max-height: var(--dropdown-max-height, 380px);
+  display: flex;
+  flex-direction: column;
+  color: var(--text-main);
+}
+
+:global([data-theme='light']) .dropdown {
+  box-shadow: 0 16px 40px -4px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.dropdownHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.6rem 0.5rem;
+  border-bottom: 1px solid var(--card-border);
+  margin-bottom: 0.35rem;
+}
+
+.headerTitleArea {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.headerIcon {
+  color: var(--primary);
+}
+
+.headerBadge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  border: 1px solid var(--card-border);
+}
+
+:global([data-theme='light']) .headerBadge {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.dropdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+/* Scrollbar within dropdown */
+.dropdownList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dropdownList::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 4px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--card-border);
+  margin: 0.25rem 0.25rem;
+}
+
+.bankGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  border: 1px solid transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.optionItem:hover {
+  background: var(--dropdown-item-hover);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme='light']) .optionItem:hover {
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.optionItem:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.optionItemActive {
+  background: var(--dropdown-item-active-bg) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.optionLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.iconCircle {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:global([data-theme='light']) .iconCircle {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.bankLogoSmall {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.fallbackIcon {
+  color: var(--primary);
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.1rem;
+}
+
+.accountName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.txCount {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+}
+
+.optionRight {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.balanceText {
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.balancePositive {
+  color: #10b981;
+}
+
+.balanceNegative {
+  color: #f43f5e;
+}
+
+.spacesBadge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--secondary);
+  background: rgba(99, 102, 241, 0.12);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.checkIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────
+   Sub-account space items
+───────────────────────────────────────────────── */
+.subAccountsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid rgba(99, 102, 241, 0.25);
+  margin-left: 0.85rem;
+  margin-top: 0.15rem;
+  margin-bottom: 0.25rem;
+}
+
+.subOptionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.subOptionItem:hover {
+  background: var(--dropdown-item-hover);
+  color: var(--text-main);
+}
+
+.subOptionItem:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.subOptionActive {
+  background: rgba(99, 102, 241, 0.12) !important;
+  color: var(--text-main) !important;
+  border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+.subOptionLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.subIcon {
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.subName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.subOptionRight {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.subBalance {
+  font-weight: 600;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.subOptionActive .subBalance {
+  color: var(--text-main);
+}
+
+@media (max-width: 640px) {
+  .statLabel {
+    display: none;
+  }
+}

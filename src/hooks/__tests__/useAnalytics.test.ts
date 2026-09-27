@@ -119,4 +119,50 @@ describe('useAnalytics hook', () => {
     expect(result.current.balance).toBe(2350) // 3000 - 650 = 2350
     expect(result.current.periodTransactions).toHaveLength(3)
   })
+
+  it('maintains true ledger balance in total view even when ghost transfers are excluded from income and expenses', () => {
+    const transactions: Transaction[] = [
+      {
+        id: 'tx-1',
+        date: '2026-08-01',
+        description: 'Monthly Salary',
+        amount: 3000,
+        currency: 'EUR',
+        type: 'income',
+        category: 'Salary',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-2',
+        date: '2026-08-05',
+        description: 'Groceries Supermarket',
+        amount: -150,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Groceries',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-ghost-out',
+        date: '2026-08-10',
+        description: 'Transfer to Savings',
+        amount: -500,
+        currency: 'EUR',
+        type: 'expense',
+        institution: 'Commerzbank',
+        isGhost: true,
+      },
+    ]
+
+    // In total view (includeGhosts: false), income and expenses exclude internal transfers,
+    // but the true ledger balance still deducts the transfer
+    const { result } = renderHook(() =>
+      useAnalytics(transactions, period, formatMonthYear, 'cat-color-', false),
+    )
+
+    expect(result.current.totalIncome).toBe(3000)
+    expect(result.current.totalExpenses).toBe(150)
+    expect(result.current.balance).toBe(2350) // 3000 - 150 - 500 = 2350
+    expect(result.current.periodTransactions).toHaveLength(2)
+  })
 })

@@ -1,9 +1,9 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { AnimatePresence,motion, useInView } from 'framer-motion'
-import { TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { Landmark, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 
-import type { PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
 import { useAccountBalances } from '../../hooks/useAccountBalances'
+import type { PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
 import { useAnalytics } from '../../hooks/useAnalytics'
 import { useFormatters } from '../../hooks/useFormatters'
 import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
@@ -12,7 +12,6 @@ import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import { getCategoryLabel, hasExtensiveCategoryData } from '../../utils/category-utils'
 import { TransactionPreviewModal } from '../shared/TransactionPreviewModal'
-import { AccountSelector } from './AccountSelector'
 import { AvgDetailModal } from './AvgDetailModal/AvgDetailModal'
 import { CategoryTrend } from './CategoryTrend'
 import { ExpenseCategories } from './ExpenseCategories'
@@ -21,6 +20,7 @@ import { InsightCards } from './InsightCards'
 import { PeriodFilter } from './PeriodFilter'
 import { RecurringExpenses } from './RecurringExpenses'
 import { SavingsTrendModal } from './SavingsTrendModal/SavingsTrendModal'
+import { StickyAccountSwitcher } from './StickyAccountSwitcher'
 import { TopMerchants } from './TopMerchants'
 import { TransactionList } from './TransactionList'
 
@@ -110,11 +110,36 @@ const Dashboard: React.FC = () => {
   const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(dashboardTransactions)
 
   const selectedAccountInfo = useMemo(() => {
-    if (selectedInstitution === 'all') return null
+    if (selectedInstitution === 'all') {
+      if (bankAccounts.length === 1) return bankAccounts[0]
+      return null
+    }
     return bankAccounts.find(
       (a) => a.id === selectedInstitution || a.name === selectedInstitution,
     )
   }, [bankAccounts, selectedInstitution])
+
+  // Current display balance: ensures complete ledger balance for 'all' period matches AccountSelector exactly
+  const displayBalance = useMemo(() => {
+    if (period.mode !== 'all') {
+      return analytics.balance
+    }
+    if (selectedInstitution === 'all') {
+      return allAccountsBalance
+    }
+    if (selectedSubAccount !== 'all') {
+      const sub = selectedAccountInfo?.subAccounts?.find((s) => s.name === selectedSubAccount)
+      return sub ? sub.balance : analytics.balance
+    }
+    return selectedAccountInfo ? selectedAccountInfo.balance : analytics.balance
+  }, [
+    period.mode,
+    selectedInstitution,
+    selectedSubAccount,
+    analytics.balance,
+    allAccountsBalance,
+    selectedAccountInfo,
+  ])
 
   // Consolidated modal configuration
   const detailModalConfig = useMemo(() => {
@@ -183,56 +208,47 @@ const Dashboard: React.FC = () => {
             availableMonths={analytics.availableMonths}
           />
 
-          <AnimatePresence>
-            {!isHeroInView && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-                className={styles['sticky-stats']}
-              >
-                <div className={styles['sticky-stat-item']}>
-                  {selectedAccountInfo?.logo ? (
-                    <img
-                      src={selectedAccountInfo.logo}
-                      alt=""
-                      className={styles['sticky-bank-logo']}
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <Wallet size={14} className={styles['text-muted']} />
-                  )}
-                  <span className={styles['sticky-stat-label']}>
-                    {selectedInstitution === 'all'
-                      ? `${t.totalBalance}:`
-                      : selectedSubAccount !== 'all'
-                        ? `${selectedSubAccount}:`
-                        : `${selectedAccountInfo?.name || selectedInstitution}:`}
-                  </span>
-                  <span
-                    className={`${styles['sticky-stat-value']} ${
-                      analytics.balance >= 0 ? styles['text-primary'] : styles['text-danger']
-                    }`}
+          {bankAccounts.length > 0 && (
+            <div className={styles['sticky-stats']}>
+              <StickyAccountSwitcher
+                accounts={bankAccounts}
+                totalBalance={allAccountsBalance}
+                totalTransactionCount={allAccountsTxCount}
+                selectedInstitution={selectedInstitution}
+                onSelectInstitution={setSelectedInstitution}
+                selectedSubAccount={selectedSubAccount}
+                onSelectSubAccount={setSelectedSubAccount}
+                selectedAccountInfo={selectedAccountInfo}
+                displayBalance={displayBalance}
+                hasMultipleAccounts={hasMultipleAccounts}
+              />
+
+              <AnimatePresence>
+                {!isHeroInView && (
+                  <motion.div
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className={styles['sticky-metrics-group']}
                   >
-                    {formatCurrency(analytics.balance)}
-                  </span>
-                </div>
-                <div className={styles['sticky-stat-divider']} />
-                <div className={styles['sticky-stat-item']}>
-                  <TrendingUp size={14} className={styles['text-primary']} />
-                  <span className={styles['sticky-stat-label']}>{t.income}:</span>
-                  <span className={styles['sticky-stat-value']}>{formatCurrency(analytics.totalIncome)}</span>
-                </div>
-                <div className={styles['sticky-stat-divider']} />
-                <div className={styles['sticky-stat-item']}>
-                  <TrendingDown size={14} className={styles['text-danger']} />
-                  <span className={styles['sticky-stat-label']}>{t.expenses}:</span>
-                  <span className={styles['sticky-stat-value']}>{formatCurrency(analytics.totalExpenses)}</span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    <div className={styles['sticky-stat-divider']} />
+                    <div className={styles['sticky-stat-item']}>
+                      <TrendingUp size={14} className={styles['text-primary']} />
+                      <span className={styles['sticky-stat-label']}>{t.income}:</span>
+                      <span className={styles['sticky-stat-value']}>{formatCurrency(analytics.totalIncome)}</span>
+                    </div>
+                    <div className={styles['sticky-stat-divider']} />
+                    <div className={styles['sticky-stat-item']}>
+                      <TrendingDown size={14} className={styles['text-danger']} />
+                      <span className={styles['sticky-stat-label']}>{t.expenses}:</span>
+                      <span className={styles['sticky-stat-value']}>{formatCurrency(analytics.totalExpenses)}</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </div>
 
@@ -245,28 +261,16 @@ const Dashboard: React.FC = () => {
           <div className={styles['orb-3']} />
         </div>
         <main className="container">
-          {/* Bank & Account Selector — only rendered when multiple institutions are present */}
-          {hasMultipleAccounts && (
-            <AccountSelector
-              accounts={bankAccounts}
-              totalBalance={allAccountsBalance}
-              totalTransactionCount={allAccountsTxCount}
-              selectedInstitution={selectedInstitution}
-              onSelectInstitution={setSelectedInstitution}
-              selectedSubAccount={selectedSubAccount}
-              onSelectSubAccount={setSelectedSubAccount}
-            />
-          )}
 
           <motion.section
             ref={heroRef}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className={`${styles['balance-hero']} ${analytics.balance < 0 ? styles.negative : ''}`}
+            className={`${styles['balance-hero']} ${displayBalance < 0 ? styles.negative : ''}`}
           >
             <div className={styles['balance-label-wrapper']}>
-              {selectedAccountInfo?.logo && (
+              {selectedAccountInfo?.logo ? (
                 <img
                   src={selectedAccountInfo.logo}
                   alt=""
@@ -276,16 +280,40 @@ const Dashboard: React.FC = () => {
                     ;(e.currentTarget as HTMLElement).style.display = 'none'
                   }}
                 />
+              ) : selectedInstitution === 'all' && bankAccounts.length > 1 ? (
+                <Landmark size={16} className={styles['text-primary']} aria-hidden="true" />
+              ) : (
+                <Wallet size={16} className={styles['text-muted']} aria-hidden="true" />
               )}
               <p className={styles['balance-label']}>
-                {selectedInstitution === 'all'
-                  ? t.totalBalance
-                  : selectedSubAccount !== 'all'
-                    ? `${selectedAccountInfo?.name || selectedInstitution} • ${selectedSubAccount}`
-                    : `${selectedAccountInfo?.name || selectedInstitution} ${t.totalBalance || 'Balance'}`}
+                {bankAccounts.length === 1 ? (
+                  <>
+                    <span className={styles['hero-account-name']}>{bankAccounts[0].name}</span>
+                    <span className={styles['hero-label-separator']}>•</span>
+                    {selectedSubAccount !== 'all' ? (
+                      <span>{selectedSubAccount}</span>
+                    ) : (
+                      <span>{t.totalBalance}</span>
+                    )}
+                  </>
+                ) : selectedInstitution === 'all' ? (
+                  <span>{t.totalBalance}</span>
+                ) : selectedSubAccount !== 'all' ? (
+                  <span>
+                    {selectedAccountInfo?.name || selectedInstitution} • {selectedSubAccount}
+                  </span>
+                ) : (
+                  <>
+                    <span className={styles['hero-account-name']}>
+                      {selectedAccountInfo?.name || selectedInstitution}
+                    </span>
+                    <span className={styles['hero-label-separator']}>•</span>
+                    <span>{t.totalBalance}</span>
+                  </>
+                )}
               </p>
             </div>
-          <h1 className={styles['balance-amount']}>{formatCurrency(analytics.balance)}</h1>
+          <h1 className={styles['balance-amount']}>{formatCurrency(displayBalance)}</h1>
           <div className={styles['balance-stats']}>
             <div className={styles['stat-item']}>
               <div className={`${styles['icon-box']} ${styles['icon-income']}`}>
@@ -318,7 +346,7 @@ const Dashboard: React.FC = () => {
           avgTransaction={analytics.avgTransaction}
           totalIncome={analytics.totalIncome}
           totalExpenses={analytics.totalExpenses}
-          balance={analytics.balance}
+          balance={displayBalance}
           topCategory={analytics.topCategory}
           topCategories={analytics.topCategories}
           savingsRate={analytics.savingsRate}

@@ -1,12 +1,11 @@
 import React, { Suspense } from 'react'
 
+import CountrySelector from './components/CountrySelector'
+import ImportReview from './components/ImportReview'
+import InstitutionSelector from './components/InstitutionSelector'
 import AppHeader from './components/layout/AppHeader'
 import { ErrorBoundary } from './components/shared/ErrorBoundary'
-
-import CountrySelector from './components/CountrySelector'
-import InstitutionSelector from './components/InstitutionSelector'
 import TransactionImporter from './components/TransactionImporter'
-import ImportReview from './components/ImportReview'
 
 const LazyDashboard = React.lazy(() => import('./components/Dashboard'))
 const Settings = React.lazy(() => import('./components/Settings'))

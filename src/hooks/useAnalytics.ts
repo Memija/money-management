@@ -248,10 +248,15 @@ export const useAnalytics = (
     const avgAll = totalCount > 0 ? (income + expenses) / totalCount : 0
     const rate = income > 0 ? ((income - expenses) / income) * 100 : 0
 
+    // Calculate true net balance across all transactions in the period (including internal transfers)
+    // to ensure total balance and single-institution balances remain ledger-accurate
+    const periodAllRaw = filterByPeriod(allRawTransactions, period)
+    const netBalance = periodAllRaw.reduce((sum, t) => sum + (Number(t.amount) || 0), 0)
+
     return {
       totalIncome: income,
       totalExpenses: expenses,
-      balance: income - expenses,
+      balance: Math.round(netBalance * 100) / 100,
       incomeCount: iCount,
       expenseCount: eCount,
       avgExpense: Math.round(avgE * 100) / 100,
@@ -262,7 +267,7 @@ export const useAnalytics = (
       medianTransaction: Math.round(getMedian(allArr) * 100) / 100,
       savingsRate: Math.round(rate * 10) / 10,
     }
-  }, [periodTransactions])
+  }, [periodTransactions, allRawTransactions, period])
 
   // Top category
   const topCategory = useMemo(() => {
