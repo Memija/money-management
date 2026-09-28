@@ -464,7 +464,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
             name="category-filter"
             value={categoryFilter}
             onChange={(val) => handleCategoryFilterChange(val as string)}
-            className={styles.txFilterSelectWrapper}
+            className={`${styles.txFilterSelectWrapper} ${styles.categorySelectWrapper}`}
             aria-label={t.filterByCategory || 'Filter by category'}
             options={categoryOptions}
           />
@@ -476,7 +476,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
             onChange={(val) =>
               setSortOrder?.(val as 'newest' | 'oldest' | 'highest' | 'lowest')
             }
-            className={styles.txFilterSelectWrapper}
+            className={`${styles.txFilterSelectWrapper} ${styles.sortSelectWrapper}`}
             aria-label="Sort order"
             options={[
               { value: 'newest', label: t.newestFirst },
