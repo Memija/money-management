@@ -24,7 +24,7 @@ export interface StickyAccountSwitcherProps {
   hasMultipleAccounts: boolean
 }
 
-export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
+export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = React.memo(({
   accounts,
   totalBalance,
   totalTransactionCount,
@@ -408,4 +408,6 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = ({
         )}
     </div>
   )
-}
+})
+
+StickyAccountSwitcher.displayName = 'StickyAccountSwitcher'

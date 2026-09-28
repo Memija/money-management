@@ -47,7 +47,7 @@ type TypeFilter = 'all' | 'income' | 'expense' | 'transfers' | 'duplicates' | 'm
 
 const DEFAULT_PAGE_SIZE = 10
 
-export const TransactionList: React.FC<TransactionListProps> = ({
+export const TransactionList: React.FC<TransactionListProps> = React.memo(({
   filteredTx,
   institutionNames,
   searchTerm,
@@ -92,37 +92,53 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     [setSelectedCategory],
   )
 
-  const categoryFilteredTx = useMemo(() => {
-    if (categoryFilter === 'all') return filteredTx
-    return filteredTx.filter((tx) => (tx.category || 'Other') === categoryFilter)
-  }, [filteredTx, categoryFilter])
+  // Single-pass computation for filtered categories, types, counts, and financial totals
+  const {
+    normalTx,
+    ghostTx,
+    duplicateTx,
+    modifiedTx,
+    duplicateCount,
+    modifiedCount,
+    incomeCount,
+    expenseCount,
+    netBalance,
+    visibleGhostCount,
+  } = useMemo(() => {
+    const isAllCat = categoryFilter === 'all'
+    const normal: Transaction[] = []
+    const ghost: Transaction[] = []
+    const duplicate: Transaction[] = []
+    const modified: Transaction[] = []
 
-  const normalTx = useMemo(() => categoryFilteredTx.filter((tx) => !tx.isGhost), [categoryFilteredTx])
-  const ghostTx = useMemo(() => categoryFilteredTx.filter((tx) => tx.isGhost), [categoryFilteredTx])
-  const duplicateTx = useMemo(
-    () =>
-      normalTx.filter(
-        (tx) => (tx.isDuplicate || tx.forceImport || tx.importedByRuleId) && !tx.isModified,
-      ),
-    [normalTx],
-  )
-  const modifiedTx = useMemo(() => normalTx.filter((tx) => tx.isModified), [normalTx])
-  const duplicateCount = duplicateTx.length
-  const modifiedCount = modifiedTx.length
-
-  // Calculate summary counts & values (excluding internal ghost transfers from financial totals)
-  const { incomeCount, expenseCount, netBalance, visibleGhostCount } = useMemo(() => {
     let incCount = 0
     let expCount = 0
     let incTot = 0
     let expTot = 0
     let ghosts = 0
 
-    for (const tx of categoryFilteredTx) {
-      if (tx.isGhost) {
-        ghosts++
+    for (let i = 0; i < filteredTx.length; i++) {
+      const tx = filteredTx[i]
+      if (!isAllCat && (tx.category || 'Other') !== categoryFilter) {
         continue
       }
+
+      if (tx.isGhost) {
+        ghosts++
+        ghost.push(tx)
+        continue
+      }
+
+      normal.push(tx)
+      const isMod = Boolean(tx.isModified)
+      const isDup = Boolean(tx.isDuplicate || tx.forceImport || tx.importedByRuleId)
+
+      if (isMod) {
+        modified.push(tx)
+      } else if (isDup) {
+        duplicate.push(tx)
+      }
+
       const amt = Math.abs(tx.amount)
       if (tx.type === 'income') {
         incCount++
@@ -134,6 +150,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     }
 
     return {
+      normalTx: normal,
+      ghostTx: ghost,
+      duplicateTx: duplicate,
+      modifiedTx: modified,
+      duplicateCount: duplicate.length,
+      modifiedCount: modified.length,
       incomeCount: incCount,
       expenseCount: expCount,
       incomeTotal: incTot,
@@ -141,28 +163,26 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       netBalance: incTot - expTot,
       visibleGhostCount: ghosts,
     }
-  }, [categoryFilteredTx])
+  }, [filteredTx, categoryFilter])
 
-  // Collect available unique categories from unfiltered transactions in current scope
+  // Collect available unique categories from unfiltered transactions in current scope (decoupled from categoryFilter)
   const availableCategories = useMemo(() => {
     const set = new Set<string>()
-    for (const tx of filteredTx) {
-      if (tx.category) {
-        set.add(tx.category)
+    for (let i = 0; i < filteredTx.length; i++) {
+      const cat = filteredTx[i].category
+      if (cat) {
+        set.add(cat)
       }
-    }
-    if (categoryFilter !== 'all') {
-      set.add(categoryFilter)
     }
     return Array.from(set).sort((a, b) => {
       const labelA = getCategoryLabel(a, t, locale, customCategories)
       const labelB = getCategoryLabel(b, t, locale, customCategories)
       return labelA.localeCompare(labelB)
     })
-  }, [filteredTx, categoryFilter, t, locale, customCategories])
+  }, [filteredTx, t, locale, customCategories])
 
   const categoryOptions = useMemo(() => {
-    return [
+    const options = [
       {
         value: 'all',
         label: t.allCategories || 'All Categories',
@@ -174,7 +194,15 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         icon: getCategoryIcon(cat, 14, customCategories),
       })),
     ]
-  }, [availableCategories, t, locale, customCategories])
+    if (categoryFilter !== 'all' && !availableCategories.includes(categoryFilter)) {
+      options.push({
+        value: categoryFilter,
+        label: getCategoryLabel(categoryFilter, t, locale, customCategories),
+        icon: getCategoryIcon(categoryFilter, 14, customCategories),
+      })
+    }
+    return options
+  }, [availableCategories, categoryFilter, t, locale, customCategories])
 
   // Filter transactions by Type (All / Income / Expense / Transfers / Duplicates / Modified)
   // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', 'expense', 'duplicates', or 'modified'!
@@ -601,4 +629,6 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       )}
     </motion.div>
   )
-}
+})
+
+TransactionList.displayName = 'TransactionList'

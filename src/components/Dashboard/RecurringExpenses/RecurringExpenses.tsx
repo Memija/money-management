@@ -18,7 +18,7 @@ interface RecurringExpensesProps {
   totalMonthly: number
 }
 
-export const RecurringExpenses: React.FC<RecurringExpensesProps> = ({
+export const RecurringExpenses: React.FC<RecurringExpensesProps> = React.memo(({
   recurringExpenses,
   totalMonthly,
 }) => {
@@ -198,4 +198,6 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = ({
       </div>
     </motion.div>
   )
-}
+})
+
+RecurringExpenses.displayName = 'RecurringExpenses'

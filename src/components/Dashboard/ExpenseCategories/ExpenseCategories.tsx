@@ -36,7 +36,7 @@ const getRankBadgeClass = (index: number) => {
   return styles.rankDefault
 }
 
-export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = ({
+export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(({
   categoryBreakdown,
   totalExpenses,
   onCategoryClick,
@@ -431,4 +431,6 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = ({
       </div>
     </motion.div>
   )
-}
+})
+
+ExpenseCategories.displayName = 'ExpenseCategories'

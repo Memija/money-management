@@ -84,7 +84,7 @@ const AvgRow: React.FC<AvgRowProps> = ({ label, value, barWidth, color, customCo
   </div>
 )
 
-export const InsightCards: React.FC<InsightCardsProps> = ({
+export const InsightCards: React.FC<InsightCardsProps> = React.memo(({
   transactionCount,
   incomeCount,
   expenseCount,
@@ -300,4 +300,6 @@ export const InsightCards: React.FC<InsightCardsProps> = ({
       ))}
     </div>
   )
-}
+})
+
+InsightCards.displayName = 'InsightCards'

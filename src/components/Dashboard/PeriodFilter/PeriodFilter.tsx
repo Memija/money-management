@@ -17,7 +17,7 @@ interface PeriodFilterProps {
 
 const MODES: PeriodMode[] = ['all', 'year', 'quarter', 'month']
 
-export const PeriodFilter: React.FC<PeriodFilterProps> = ({
+export const PeriodFilter: React.FC<PeriodFilterProps> = React.memo(({
   period,
   onPeriodChange,
   availableYears,
@@ -103,4 +103,6 @@ export const PeriodFilter: React.FC<PeriodFilterProps> = ({
       )}
     </div>
   )
-}
+})
+
+PeriodFilter.displayName = 'PeriodFilter'

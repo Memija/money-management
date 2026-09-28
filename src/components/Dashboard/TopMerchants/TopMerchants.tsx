@@ -161,7 +161,7 @@ const CustomYAxisTick: React.FC<CustomYAxisTickProps> = ({
   )
 }
 
-export const TopMerchants: React.FC<TopMerchantsProps> = ({
+export const TopMerchants: React.FC<TopMerchantsProps> = React.memo(({
   merchants,
   totalExpenses = 0,
   onMerchantClick,
@@ -426,4 +426,6 @@ export const TopMerchants: React.FC<TopMerchantsProps> = ({
       )}
     </motion.div>
   )
-}
+})
+
+TopMerchants.displayName = 'TopMerchants'

@@ -117,7 +117,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
   )
 }
 
-export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = ({
+export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React.memo(({
   monthlyData,
   totalIncome: propIncome,
   totalExpenses: propExpenses,
@@ -454,4 +454,6 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = ({
       </div>
     </motion.div>
   )
-}
+})
+
+IncomeVsExpensesChart.displayName = 'IncomeVsExpensesChart'

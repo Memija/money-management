@@ -163,6 +163,9 @@ export function getTransactionCategory(
   if (manualCategories && manualCategories[t.id]) {
     return manualCategories[t.id]
   }
+  if (t.category) {
+    return t.category
+  }
   return categorize(t.description, customKeywords)
 }
 
@@ -188,6 +191,20 @@ interface PluralTemplates {
   plural?: string
 }
 
+const pluralRulesCache = new Map<string, Intl.PluralRules>()
+function getPluralRules(locale: string): Intl.PluralRules {
+  let pr = pluralRulesCache.get(locale)
+  if (!pr) {
+    try {
+      pr = new Intl.PluralRules(locale)
+    } catch {
+      pr = new Intl.PluralRules('en')
+    }
+    pluralRulesCache.set(locale, pr)
+  }
+  return pr
+}
+
 /**
  * Resolves the appropriate plural template string based on count and locale.
  * Uses Intl.PluralRules for accurate CLDR grammatical categories (one, few, many, other)
@@ -203,7 +220,7 @@ export function resolvePluralTemplate(
   let rule: Intl.LDMLPluralRule = 'other'
 
   try {
-    rule = new Intl.PluralRules(locale).select(abs)
+    rule = getPluralRules(locale).select(abs)
   } catch {
     rule = abs === 1 ? 'one' : 'other'
   }

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Layers, RotateCcw, TrendingUp } from 'lucide-react'
 import {
@@ -131,7 +131,7 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
   )
 }
 
-export const CategoryTrend: React.FC<CategoryTrendProps> = ({
+export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(({
   data,
   onCategoryClick,
   fullWidth,
@@ -200,88 +200,101 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = ({
     return Number.isInteger(inK) ? `€${inK}k` : `€${inK.toFixed(1)}k`
   }
 
+  // Precompute bounds (topCategory and bottomCategory) for every month's payload to avoid O(N*M) loops in renderStackedBar
+  const monthBoundsMap = useMemo(() => {
+    const map = new Map<string, { top: string; bottom: string }>()
+    for (let eIdx = 0; eIdx < data.length; eIdx++) {
+      const entry = data[eIdx]
+      let topCategory = ''
+      let bottomCategory = ''
+      for (let i = categories.length - 1; i >= 0; i--) {
+        const cat = categories[i]
+        if (Number(entry[cat]) > 0) {
+          topCategory = cat
+          break
+        }
+      }
+      for (let i = 0; i < categories.length; i++) {
+        const cat = categories[i]
+        if (Number(entry[cat]) > 0) {
+          bottomCategory = cat
+          break
+        }
+      }
+      map.set(String(entry.month), { top: topCategory, bottom: bottomCategory })
+    }
+    return map
+  }, [data, categories])
+
   // Custom shape for stacked bars: renders each category as a refined floating capsule segment with rounded corners, subtle gap, and glass sheen
-  const renderStackedBar = (barProps: unknown) => {
-    const p = barProps as {
-      x?: number
-      y?: number
-      width?: number
-      height?: number
-      payload?: Record<string, unknown>
-      dataKey?: string
-    }
-    if (!p || !p.height || p.height <= 0 || !p.width || p.width <= 0) return null
-
-    // Determine topmost and bottommost non-zero categories in this month's stack
-    let topCategory = ''
-    let bottomCategory = ''
-    for (let i = categories.length - 1; i >= 0; i--) {
-      const cat = categories[i]
-      if (p.payload && Number(p.payload[cat]) > 0) {
-        topCategory = cat
-        break
+  const renderStackedBar = useCallback(
+    (barProps: unknown) => {
+      const p = barProps as {
+        x?: number
+        y?: number
+        width?: number
+        height?: number
+        payload?: Record<string, unknown>
+        dataKey?: string
       }
-    }
-    for (let i = 0; i < categories.length; i++) {
-      const cat = categories[i]
-      if (p.payload && Number(p.payload[cat]) > 0) {
-        bottomCategory = cat
-        break
+      if (!p || !p.height || p.height <= 0 || !p.width || p.width <= 0) return null
+
+      const monthKey = String(p.payload?.month ?? '')
+      const bounds = monthBoundsMap.get(monthKey)
+      const isTop = bounds ? p.dataKey === bounds.top : false
+      const isBottom = bounds ? p.dataKey === bounds.bottom : false
+
+      // Calculate rounded corner radius: [topLeft, topRight, bottomRight, bottomLeft]
+      let radius: [number, number, number, number]
+      if (isTop && isBottom) {
+        radius = [8, 8, 8, 8]
+      } else if (isTop) {
+        radius = [8, 8, 3, 3]
+      } else if (isBottom) {
+        radius = [3, 3, 8, 8]
+      } else {
+        radius = [3, 3, 3, 3]
       }
-    }
 
-    const isTop = p.dataKey === topCategory
-    const isBottom = p.dataKey === bottomCategory
+      const rawX = p.x ?? 0
+      const rawY = p.y ?? 0
+      const rawWidth = p.width ?? 0
+      const rawHeight = p.height ?? 0
 
-    // Calculate rounded corner radius: [topLeft, topRight, bottomRight, bottomLeft]
-    let radius: [number, number, number, number]
-    if (isTop && isBottom) {
-      radius = [8, 8, 8, 8]
-    } else if (isTop) {
-      radius = [8, 8, 3, 3]
-    } else if (isBottom) {
-      radius = [3, 3, 8, 8]
-    } else {
-      radius = [3, 3, 3, 3]
-    }
+      // Check if this month's column is currently hovered
+      const isMonthHovered = hoveredMonth !== null && String(p.payload?.month) === hoveredMonth
+      const isAnyMonthHovered = hoveredMonth !== null
+      const isDimmedByMonth = isAnyMonthHovered && !isMonthHovered
 
-    const rawX = p.x ?? 0
-    const rawY = p.y ?? 0
-    const rawWidth = p.width ?? 0
-    const rawHeight = p.height ?? 0
+      // Active column expands slightly (+3px) when hovered over
+      const hoverExpand = isMonthHovered ? 3 : 0
+      const width = rawWidth + hoverExpand
+      const x = rawX - hoverExpand / 2
 
-    // Check if this month's column is currently hovered
-    const isMonthHovered = hoveredMonth !== null && String(p.payload?.month) === hoveredMonth
-    const isAnyMonthHovered = hoveredMonth !== null
-    const isDimmedByMonth = isAnyMonthHovered && !isMonthHovered
+      // Provide a crisp vertical gap separation between segments so they float as elegant capsules
+      const gap = rawHeight > 10 ? 2.5 : rawHeight > 4 ? 1.5 : 0.5
+      const y = rawY + gap / 2
+      const height = Math.max(1.5, rawHeight - gap)
 
-    // Active column expands slightly (+3px) when hovered over
-    const hoverExpand = isMonthHovered ? 3 : 0
-    const width = rawWidth + hoverExpand
-    const x = rawX - hoverExpand / 2
+      const adjustedProps = {
+        ...(barProps as Record<string, unknown>),
+        x,
+        y,
+        width,
+        height,
+        radius,
+      }
 
-    // Provide a crisp vertical gap separation between segments so they float as elegant capsules
-    const gap = rawHeight > 10 ? 2.5 : rawHeight > 4 ? 1.5 : 0.5
-    const y = rawY + gap / 2
-    const height = Math.max(1.5, rawHeight - gap)
-
-    const adjustedProps = {
-      ...(barProps as Record<string, unknown>),
-      x,
-      y,
-      width,
-      height,
-      radius,
-    }
-
-    return (
-      <g
-        className={`${styles.barSegmentGroup} ${isMonthHovered ? styles.barSegmentHovered : ''} ${isDimmedByMonth ? styles.barSegmentDimmed : ''}`}
-      >
-        <Rectangle {...adjustedProps} />
-      </g>
-    )
-  }
+      return (
+        <g
+          className={`${styles.barSegmentGroup} ${isMonthHovered ? styles.barSegmentHovered : ''} ${isDimmedByMonth ? styles.barSegmentDimmed : ''}`}
+        >
+          <Rectangle {...adjustedProps} />
+        </g>
+      )
+    },
+    [monthBoundsMap, hoveredMonth],
+  )
 
   if (data.length === 0) {
     return null
@@ -566,4 +579,6 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = ({
       </div>
     </motion.div>
   )
-}
+})
+
+CategoryTrend.displayName = 'CategoryTrend'

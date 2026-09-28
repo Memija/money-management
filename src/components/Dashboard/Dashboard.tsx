@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { startTransition, useCallback, useMemo, useRef, useState } from 'react'
 import { AnimatePresence,motion, useInView } from 'framer-motion'
 import { Share2, TrendingDown, TrendingUp } from 'lucide-react'
 
@@ -52,6 +52,40 @@ const Dashboard: React.FC = () => {
 
   // Social share snapshot modal
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+
+  const handlePeriodChange = useCallback((nextPeriod: PeriodFilterType) => {
+    startTransition(() => {
+      setPeriod(nextPeriod)
+    })
+  }, [])
+
+  const handleIncomeDetailClick = useCallback(() => {
+    setActiveDetailModal({ type: 'filter', filter: 'income' })
+  }, [])
+
+  const handleExpenseDetailClick = useCallback(() => {
+    setActiveDetailModal({ type: 'filter', filter: 'expense' })
+  }, [])
+
+  const handleSavingsTrendOpen = useCallback(() => {
+    setIsSavingsTrendOpen(true)
+  }, [])
+
+  const handleAvgIncomeClick = useCallback(() => {
+    setAvgDetailType('income')
+  }, [])
+
+  const handleAvgExpenseClick = useCallback(() => {
+    setAvgDetailType('expense')
+  }, [])
+
+  const handleCategoryDetailClick = useCallback((cat: string) => {
+    setActiveDetailModal({ type: 'category', category: cat })
+  }, [])
+
+  const handleMerchantDetailClick = useCallback((merchant: string) => {
+    setActiveDetailModal({ type: 'merchant', merchant })
+  }, [])
 
   const {
     accounts: bankAccounts,
@@ -228,7 +262,7 @@ const Dashboard: React.FC = () => {
           <div className={styles['subheader-left']}>
             <PeriodFilter
               period={period}
-              onPeriodChange={setPeriod}
+              onPeriodChange={handlePeriodChange}
               availableYears={analytics.availableYears}
               availableQuarters={analytics.availableQuarters}
               availableMonths={analytics.availableMonths}
@@ -345,12 +379,12 @@ const Dashboard: React.FC = () => {
           topCategory={analytics.topCategory}
           topCategories={analytics.topCategories}
           savingsRate={analytics.savingsRate}
-          onIncomeClick={() => setActiveDetailModal({ type: 'filter', filter: 'income' })}
-          onExpenseClick={() => setActiveDetailModal({ type: 'filter', filter: 'expense' })}
-          onAllClick={() => setIsSavingsTrendOpen(true)}
-          onAvgIncomeClick={() => setAvgDetailType('income')}
-          onAvgExpenseClick={() => setAvgDetailType('expense')}
-          onCategoryClick={(cat) => setActiveDetailModal({ type: 'category', category: cat })}
+          onIncomeClick={handleIncomeDetailClick}
+          onExpenseClick={handleExpenseDetailClick}
+          onAllClick={handleSavingsTrendOpen}
+          onAvgIncomeClick={handleAvgIncomeClick}
+          onAvgExpenseClick={handleAvgExpenseClick}
+          onCategoryClick={handleCategoryDetailClick}
         />
 
         {/* Charts Grid */}
@@ -366,7 +400,7 @@ const Dashboard: React.FC = () => {
           <ExpenseCategories
             categoryBreakdown={analytics.categoryBreakdown}
             totalExpenses={analytics.totalExpenses}
-            onCategoryClick={(cat) => setActiveDetailModal({ type: 'category', category: cat })}
+            onCategoryClick={handleCategoryDetailClick}
           />
 
           {/* Recurring Expenses */}
@@ -379,7 +413,7 @@ const Dashboard: React.FC = () => {
           <TopMerchants
             merchants={analytics.topMerchants}
             totalExpenses={analytics.totalExpenses}
-            onMerchantClick={(merchant) => setActiveDetailModal({ type: 'merchant', merchant })}
+            onMerchantClick={handleMerchantDetailClick}
             fullWidth={isCategoryTrendFullWidth}
           />
           <CategoryTrend

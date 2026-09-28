@@ -82,6 +82,22 @@ export const getLocalizedWeekdays = (locale: string): string[] => {
   })
 }
 
+const monthYearCache = new Map<string, string>()
+const monthYearDtfCache = new Map<string, Intl.DateTimeFormat>()
+
+function getMonthYearDtf(locale: string, yearFormat: '2-digit' | 'numeric'): Intl.DateTimeFormat {
+  const key = `${locale}_${yearFormat}`
+  let dtf = monthYearDtfCache.get(key)
+  if (!dtf) {
+    dtf = new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      year: yearFormat,
+    })
+    monthYearDtfCache.set(key, dtf)
+  }
+  return dtf
+}
+
 /**
  * Formats a date string (e.g., '2024-05' or '2024-05-15') to a localized month and year.
  * Dynamically uses MONTH_FALLBACKS for locales that require custom abbreviations,
@@ -92,6 +108,11 @@ export const formatMonthYearLocalized = (
   locale: string,
   yearFormat: '2-digit' | 'numeric' = '2-digit',
 ): string => {
+  const cacheKey = `${dateString}_${locale}_${yearFormat}`
+  const cached = monthYearCache.get(cacheKey)
+  if (cached !== undefined) return cached
+
+  let result = ''
   const parts = dateString.split('-')
   if (parts.length >= 2) {
     const yearNum = parts[0]
@@ -101,14 +122,16 @@ export const formatMonthYearLocalized = (
       if (locale in MONTH_FALLBACKS) {
         const months = getLocalizedMonthNames(locale, 'short')
         const yearStr = yearFormat === '2-digit' ? yearNum.slice(-2) : yearNum
-        return `${months[monthIndex]} ${yearStr}`
+        result = `${months[monthIndex]} ${yearStr}`
       }
     }
   }
 
-  const intlLocale = locale in MONTH_FALLBACKS ? 'de-DE' : locale
-  return new Date(dateString + '-01').toLocaleDateString(intlLocale, {
-    month: 'short',
-    year: yearFormat,
-  })
+  if (!result) {
+    const intlLocale = locale in MONTH_FALLBACKS ? 'de-DE' : locale
+    result = getMonthYearDtf(intlLocale, yearFormat).format(new Date(dateString + '-01'))
+  }
+
+  monthYearCache.set(cacheKey, result)
+  return result
 }
