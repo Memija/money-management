@@ -425,6 +425,7 @@ const Dashboard: React.FC = () => {
           {/* Transactions Table */}
           <TransactionList
             filteredTx={filteredTx}
+            allTransactions={allTransactions}
             institutionNames={institutionNames}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}

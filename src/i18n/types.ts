@@ -22,6 +22,7 @@ export interface CategoryKeywords {
   Entertainment: string[]
   Insurance: string[]
   Utilities: string[]
+  Communication: string[]
   Healthcare: string[]
   Savings: string[]
   Transfers: string[]
@@ -186,6 +187,12 @@ export interface TranslationStrings {
   bulkApplyOffer: string
   applyToAll: string
   dismiss: string
+  batchCategoryTitle: string
+  batchCategoryPrompt: string
+  batchCategoryOnlyThis: string
+  batchCategoryUpdateAll: string
+  batchCategoryRememberRule: string
+  batchCategoryMatchingTransactions: string
   bulkApplyUnlockedOffer: string
   bulkApplyUnlockedOfferSingular: string
   applyToAllUnlocked: string
@@ -547,6 +554,7 @@ export interface TranslationStrings {
   catEntertainment: string
   catInsurance: string
   catUtilities: string
+  catCommunication: string
   catHealthcare: string
   catSavings: string
   catTransfers: string

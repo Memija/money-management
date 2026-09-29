@@ -47,6 +47,7 @@ vi.mock('../../store/useLanguageStore', () => ({
         catTransport: 'Transport',
         catGroceries: 'Lebensmittel',
         catUtilities: 'Nebenkosten',
+        catCommunication: 'Kommunikation',
         catHealthcare: 'Gesundheit',
         catTravel: 'Reisen',
       },

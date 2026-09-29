@@ -19,8 +19,13 @@ import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
 import { getCategoryIcon } from '../../../utils/category-icons'
-import { getCategoryLabel, normalizeDescription } from '../../../utils/category-utils'
+import {
+  extractCleanDescription,
+  findRelatedTransactions,
+  getCategoryLabel,
+} from '../../../utils/category-utils'
 import { getVisiblePages } from '../../../utils/pagination-utils'
+import { BatchCategoryModal } from '../../shared/BatchCategoryModal'
 import { Select } from '../../shared/Select'
 import { TransactionItem } from './TransactionItem'
 
@@ -28,6 +33,7 @@ import styles from './TransactionList.module.css'
 
 interface TransactionListProps {
   filteredTx: Transaction[]
+  allTransactions?: Transaction[]
   institutionNames: string[]
   searchTerm: string
   setSearchTerm: (val: string) => void
@@ -49,6 +55,7 @@ const DEFAULT_PAGE_SIZE = 10
 
 export const TransactionList: React.FC<TransactionListProps> = React.memo(({
   filteredTx,
+  allTransactions,
   institutionNames,
   searchTerm,
   setSearchTerm,
@@ -65,6 +72,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
   const locale = useLanguageStore((s) => s.locale)
   const customCategories = useAppStore((s) => s.customCategories)
   const setManualCategory = useAppStore((s) => s.setManualCategory)
+  const setManualCategoriesBulk = useAppStore((s) => s.setManualCategoriesBulk)
   const customKeywords = useAppStore((s) => s.customKeywords)
   const setCustomKeywords = useAppStore((s) => s.setCustomKeywords)
   const { formatDate, formatCurrency, formatTransactionCount } = useFormatters()
@@ -77,6 +85,11 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
   const [internalCategory, setInternalCategory] = useState<string>('all')
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE)
   const [currentPage, setCurrentPage] = useState<number>(1)
+  const [pendingBatchCategory, setPendingBatchCategory] = useState<{
+    targetTx: Transaction
+    newCategory: string
+    relatedTx: Transaction[]
+  } | null>(null)
 
   const categoryFilter = selectedCategory !== undefined ? selectedCategory : internalCategory
 
@@ -230,16 +243,65 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
 
   const handleCategoryChange = useCallback(
     (tx: Transaction, newCategory: string) => {
+      const currentCategory = tx.category || 'Other'
+      if (newCategory === currentCategory) {
+        return
+      }
+
+      // Check for related transactions across candidate pool
+      const candidatePool = allTransactions || filteredTx
+      const related = findRelatedTransactions(tx, candidatePool, newCategory)
+
+      if (related.length > 0) {
+        setPendingBatchCategory({
+          targetTx: tx,
+          newCategory,
+          relatedTx: related,
+        })
+        return
+      }
+
+      // If no related transactions exist, update directly without interrupting
       setManualCategory(tx.id, newCategory)
-      const norm = normalizeDescription(tx.description)
-      if (norm.length >= 3) {
+      const cleanDesc = extractCleanDescription(tx.description)
+      if (cleanDesc.length >= 3) {
         const existingKeywords = customKeywords[newCategory] || []
-        if (!existingKeywords.some((kw) => kw.toLowerCase() === norm.toLowerCase())) {
-          setCustomKeywords(newCategory, [...existingKeywords, norm])
+        if (!existingKeywords.some((kw) => kw.toLowerCase() === cleanDesc.toLowerCase())) {
+          setCustomKeywords(newCategory, [...existingKeywords, cleanDesc])
         }
       }
     },
-    [setManualCategory, customKeywords, setCustomKeywords],
+    [allTransactions, filteredTx, setManualCategory, customKeywords, setCustomKeywords],
+  )
+
+  const handleConfirmBatchOnlyThis = useCallback(
+    (targetTx: Transaction, newCat: string) => {
+      setManualCategory(targetTx.id, newCat)
+    },
+    [setManualCategory],
+  )
+
+  const handleConfirmBatchAll = useCallback(
+    (targetTx: Transaction, relatedTx: Transaction[], newCat: string, rememberRule: boolean) => {
+      const mapping: Record<string, string> = {
+        [targetTx.id]: newCat,
+      }
+      for (let i = 0; i < relatedTx.length; i++) {
+        mapping[relatedTx[i].id] = newCat
+      }
+      setManualCategoriesBulk(mapping)
+
+      if (rememberRule) {
+        const cleanDesc = extractCleanDescription(targetTx.description)
+        if (cleanDesc.length >= 3) {
+          const existingKeywords = customKeywords[newCat] || []
+          if (!existingKeywords.some((kw) => kw.toLowerCase() === cleanDesc.toLowerCase())) {
+            setCustomKeywords(newCat, [...existingKeywords, cleanDesc])
+          }
+        }
+      }
+    },
+    [setManualCategoriesBulk, customKeywords, setCustomKeywords],
   )
 
   const handleResetFilters = () => {
@@ -627,6 +689,19 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
           )}
         </div>
       )}
+
+      {/* Batch Category Confirmation Modal */}
+      <BatchCategoryModal
+        isOpen={pendingBatchCategory !== null}
+        targetTransaction={pendingBatchCategory?.targetTx ?? null}
+        newCategory={pendingBatchCategory?.newCategory ?? ''}
+        relatedTransactions={pendingBatchCategory?.relatedTx ?? []}
+        onClose={() => setPendingBatchCategory(null)}
+        onConfirmOnlyThis={handleConfirmBatchOnlyThis}
+        onConfirmAll={handleConfirmBatchAll}
+        formatCurrency={formatCurrency}
+        formatDate={formatDate}
+      />
     </motion.div>
   )
 })

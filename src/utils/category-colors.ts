@@ -12,6 +12,8 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Shopping: '#ec4899',     // Hot Pink
   Transport: '#3b82f6',    // Vibrant Blue
   Utilities: '#eab308',    // Electric Gold / Yellow
+  Communication: '#0284c7',// Sky Blue / Ocean Tech
+  Internet: '#0284c7',
   Healthcare: '#ef4444',   // Medical Red
   Entertainment: '#8b5cf6',// Violet / Purple
   Insurance: '#64748b',    // Slate Grey
@@ -30,7 +32,7 @@ export const ICON_COLORS: Record<string, string> = {
   Wallet: '#10b981', Banknote: '#10b981', Coins: '#eab308', Receipt: '#64748b',
   // Home & Utilities
   Home: '#6366f1', Zap: '#eab308', Droplet: '#06b6d4', Flame: '#f97316',
-  Wifi: '#3b82f6', Wrench: '#64748b', Trash2: '#64748b', Key: '#f59e0b', Building2: '#64748b',
+  Wifi: '#0284c7', Wrench: '#64748b', Trash2: '#64748b', Key: '#f59e0b', Building2: '#64748b',
   // Food & Drink
   ShoppingCart: '#f97316', Utensils: '#f43f5e', Coffee: '#78350f', Wine: '#be123c',
   Pizza: '#f43f5e', Apple: '#f97316', Carrot: '#f97316',

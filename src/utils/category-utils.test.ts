@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { localeOrder, translations, type TranslationStrings } from '../i18n/translations'
+import type { Transaction } from '../types'
 import {
   categorize,
+  extractCleanDescription,
+  findRelatedTransactions,
   formatCategoryCount,
   formatCategoryPercent,
   formatChargesCount,
@@ -10,6 +13,7 @@ import {
   formatTransactionCount,
   getCategoryLabel,
   hasExtensiveCategoryData,
+  isRelatedTransaction,
   resolveCanonicalCategory,
   resolvePluralTemplate,
 } from './category-utils'
@@ -35,6 +39,13 @@ describe('category-utils', () => {
       expect(categorize('Hotel booking reservation')).toBe('Travel')
       expect(categorize('Lufthansa flight ticket')).toBe('Travel')
       expect(categorize('Airbnb stay')).toBe('Travel')
+    })
+
+    it('categorizes communication and internet descriptions correctly', () => {
+      expect(categorize('Vodafone bill')).toBe('Communication')
+      expect(categorize('Telekom internet flat')).toBe('Communication')
+      expect(categorize('O2 mobile data')).toBe('Communication')
+      expect(categorize('Internet pretplata')).toBe('Communication')
     })
 
     it('falls back to "Other" for unknown descriptions', () => {
@@ -73,6 +84,8 @@ describe('category-utils', () => {
       expect(resolveCanonicalCategory('Entertainment')).toBe('Entertainment')
       expect(resolveCanonicalCategory('Insurance')).toBe('Insurance')
       expect(resolveCanonicalCategory('Utilities')).toBe('Utilities')
+      expect(resolveCanonicalCategory('Communication')).toBe('Communication')
+      expect(resolveCanonicalCategory('Internet')).toBe('Communication')
       expect(resolveCanonicalCategory('Healthcare')).toBe('Healthcare')
       expect(resolveCanonicalCategory('Savings')).toBe('Savings')
       expect(resolveCanonicalCategory('Transfers')).toBe('Transfers')
@@ -107,6 +120,12 @@ describe('category-utils', () => {
       expect(resolveCanonicalCategory('Putovanja')).toBe('Travel')
       expect(resolveCanonicalCategory('Путовања')).toBe('Travel')
       expect(resolveCanonicalCategory('Perjalanan')).toBe('Travel')
+      // Communication across all supported languages
+      expect(resolveCanonicalCategory('Kommunikation')).toBe('Communication')
+      expect(resolveCanonicalCategory('Komunikacja')).toBe('Communication')
+      expect(resolveCanonicalCategory('Komunikacija')).toBe('Communication')
+      expect(resolveCanonicalCategory('Комуникација')).toBe('Communication')
+      expect(resolveCanonicalCategory('Komunikasi')).toBe('Communication')
     })
 
     it('resolves categories from transaction keywords and descriptions', () => {
@@ -613,5 +632,135 @@ describe('category-utils', () => {
       expect(hasExtensiveCategoryData(data, 2)).toBe(false)
     })
   })
+
+  describe('extractCleanDescription', () => {
+    it('strips SEPA End-to-End reference noise cleanly', () => {
+      const desc1 =
+        'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542586686C116'
+      const desc2 =
+        'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542491879C1159'
+
+      expect(extractCleanDescription(desc1)).toBe(
+        'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung',
+      )
+      expect(extractCleanDescription(desc2)).toBe(
+        'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung',
+      )
+      expect(extractCleanDescription(desc1)).toBe(extractCleanDescription(desc2))
+    })
+
+    it('strips banking prefixes such as Auftraggeber and Empfänger', () => {
+      expect(extractCleanDescription('Auftraggeber: REWE Markt Koeln')).toBe('REWE Markt Koeln')
+      expect(extractCleanDescription('Empfänger: Deutsche Telekom AG')).toBe('Deutsche Telekom AG')
+    })
+
+    it('strips dates, times, and long alphanumeric transaction IDs', () => {
+      expect(extractCleanDescription('NETFLIX.COM 12.05.2024 14:30 TX99281726354')).toBe(
+        'NETFLIX.COM',
+      )
+    })
+
+    it('handles empty and invalid inputs gracefully', () => {
+      expect(extractCleanDescription('')).toBe('')
+      // @ts-expect-error Testing invalid runtime input
+      expect(extractCleanDescription(null)).toBe('')
+    })
+  })
+
+  describe('isRelatedTransaction', () => {
+    it('matches user example CHECK24 transactions with differing SEPA references', () => {
+      const desc1 =
+        'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542586686C116'
+      const desc2 =
+        'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542491879C1159'
+
+      expect(isRelatedTransaction(desc1, desc2)).toBe(true)
+    })
+
+    it('matches transactions with shared core merchant prefix on word boundary', () => {
+      const desc1 = 'CHECK24 Vergleichsportal Mobilfunk GmbH'
+      const desc2 = 'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung'
+      expect(isRelatedTransaction(desc1, desc2)).toBe(true)
+    })
+
+    it('does not match completely unrelated transactions', () => {
+      expect(isRelatedTransaction('Telekom Deutschland GmbH', 'Vodafone West GmbH')).toBe(false)
+      expect(isRelatedTransaction('Bar', 'Barclays Bank')).toBe(false)
+    })
+  })
+
+  describe('findRelatedTransactions', () => {
+    it('finds related transactions and excludes self, ghosts, and target category matches', () => {
+      const targetTx: Transaction = {
+        id: 'tx-1',
+        date: '2024-03-01',
+        amount: 25.5,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description:
+          'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542586686C116',
+        category: 'Other',
+        type: 'income',
+      }
+
+      const allTx: Transaction[] = [
+        targetTx,
+        {
+          id: 'tx-2',
+          date: '2024-03-05',
+          amount: 15.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description:
+            'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542491879C1159',
+          category: 'Other',
+          type: 'income',
+        },
+        {
+          id: 'tx-3',
+          date: '2024-03-10',
+          amount: 50.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description: 'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung',
+          category: 'Communication', // Already in target category
+          type: 'income',
+        },
+        {
+          id: 'tx-4',
+          date: '2024-03-12',
+          amount: 10.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description:
+            'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C111111111C111',
+          category: 'Other',
+          type: 'income',
+          isGhost: true, // Ghost should be excluded
+        },
+        {
+          id: 'tx-5',
+          date: '2024-03-15',
+          amount: 100.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description: 'REWE Supermarkt Muenchen',
+          category: 'Groceries',
+          type: 'expense',
+        },
+      ]
+
+      // Filter with targetCategory = 'Communication'
+      // tx-1 is self (excluded)
+      // tx-2 has category 'Other' -> matches, included
+      // tx-3 already has category 'Communication' -> excluded
+      // tx-4 is ghost -> excluded
+      // tx-5 unrelated -> excluded
+      const related = findRelatedTransactions(targetTx, allTx, 'Communication')
+      expect(related).toHaveLength(1)
+      expect(related[0].id).toBe('tx-2')
+    })
+  })
 })
+
 

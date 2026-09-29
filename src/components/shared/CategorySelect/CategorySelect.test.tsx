@@ -34,6 +34,7 @@ vi.mock('../../../store/useLanguageStore', () => ({
       manageInSettingsHint: 'Want multi-language translations or rules? Manage in Settings',
       catDiningOut: 'Dining Out',
       catGroceries: 'Groceries',
+      catCommunication: 'Communication',
       catTravel: 'Travel',
       catOther: 'Other',
       icons: {

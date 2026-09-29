@@ -19,6 +19,7 @@ describe('category-colors', () => {
         'Shopping',
         'Transport',
         'Utilities',
+        'Communication',
         'Healthcare',
         'Entertainment',
         'Insurance',
@@ -57,6 +58,7 @@ describe('category-colors', () => {
       expect(ICON_COLORS.ShoppingBag).toBe(CATEGORY_COLORS.Shopping)
       expect(ICON_COLORS.Car).toBe(CATEGORY_COLORS.Transport)
       expect(ICON_COLORS.Zap).toBe(CATEGORY_COLORS.Utilities)
+      expect(ICON_COLORS.Wifi).toBe(CATEGORY_COLORS.Communication)
       expect(ICON_COLORS.HeartPulse).toBe(CATEGORY_COLORS.Healthcare)
       expect(ICON_COLORS.Film).toBe(CATEGORY_COLORS.Entertainment)
       expect(ICON_COLORS.PiggyBank).toBe(CATEGORY_COLORS.Savings)
@@ -83,6 +85,7 @@ describe('category-colors', () => {
       expect(getCategoryColor('Shopping')).toBe(CATEGORY_COLORS.Shopping)
       expect(getCategoryColor('Transport')).toBe(CATEGORY_COLORS.Transport)
       expect(getCategoryColor('Utilities')).toBe(CATEGORY_COLORS.Utilities)
+      expect(getCategoryColor('Communication')).toBe(CATEGORY_COLORS.Communication)
       expect(getCategoryColor('Healthcare')).toBe(CATEGORY_COLORS.Healthcare)
       expect(getCategoryColor('Entertainment')).toBe(CATEGORY_COLORS.Entertainment)
       expect(getCategoryColor('Insurance')).toBe(CATEGORY_COLORS.Insurance)
@@ -103,6 +106,11 @@ describe('category-colors', () => {
       // Serbian Cyrillic
       expect(getCategoryColor('Плата')).toBe(CATEGORY_COLORS.Salary)
       expect(getCategoryColor('Станарина')).toBe(CATEGORY_COLORS.Rent)
+      // Communication across languages
+      expect(getCategoryColor('Kommunikation')).toBe(CATEGORY_COLORS.Communication)
+      expect(getCategoryColor('Komunikacja')).toBe(CATEGORY_COLORS.Communication)
+      expect(getCategoryColor('Комуникација')).toBe(CATEGORY_COLORS.Communication)
+      expect(getCategoryColor('Komunikasi')).toBe(CATEGORY_COLORS.Communication)
       // Travel across languages
       expect(getCategoryColor('Podróże')).toBe(CATEGORY_COLORS.Travel)
       expect(getCategoryColor('Reisen')).toBe(CATEGORY_COLORS.Travel)

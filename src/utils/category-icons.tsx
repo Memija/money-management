@@ -177,6 +177,8 @@ export const CANONICAL_CATEGORY_ICONS: Record<string, IconComponent> = {
   Entertainment: Film,
   Insurance: Building2,
   Utilities: Zap,
+  Communication: Wifi,
+  Internet: Wifi,
   Savings: PiggyBank,
   Transfers: CreditCard,
   Travel: Plane,

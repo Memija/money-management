@@ -8,6 +8,7 @@ import { TransactionList } from './TransactionList'
 
 // Mock the framer-motion module
 vi.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, className, ...props }: HTMLAttributes<HTMLDivElement>) => (
       <div className={className} data-testid="motion-div" {...props}>
@@ -1045,4 +1046,172 @@ describe('TransactionList Component', () => {
     fireEvent.click(resetBtn)
     expect(setSortOrder).toHaveBeenCalledWith('newest')
   })
+
+  describe('Batch Category Updates', () => {
+    const singleTx: Transaction[] = [
+      {
+        id: 'tx-solo',
+        date: '2024-03-01',
+        amount: 50,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'Unique One-Off Store Berlin',
+        category: 'Other',
+        type: 'expense',
+      },
+    ]
+
+    const check24Tx: Transaction[] = [
+      {
+        id: 'tx-check24-1',
+        date: '2024-03-01',
+        amount: 25.5,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description:
+          'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542586686C116',
+        category: 'Other',
+        type: 'income',
+      },
+      {
+        id: 'tx-check24-2',
+        date: '2024-03-15',
+        amount: 15.0,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description:
+          'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542491879C1159',
+        category: 'Other',
+        type: 'income',
+      },
+    ]
+
+    it('updates category directly without modal when no related transactions exist', () => {
+      render(
+        <TransactionList
+          filteredTx={singleTx}
+          allTransactions={singleTx}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+        />,
+      )
+
+      // Click the category select button to open dropdown
+      const triggerBtn = screen.getByRole('button', { name: /Cat: Other/i })
+      fireEvent.click(triggerBtn)
+
+      // Select Communication
+      const commOption = screen.getByRole('option', { name: /Cat: Communication/i })
+      fireEvent.click(commOption)
+
+      // Modal should NOT be shown
+      expect(screen.queryByText('Update Related Transactions')).not.toBeInTheDocument()
+    })
+
+    it('opens BatchCategoryModal when related transactions with SEPA references exist', () => {
+      render(
+        <TransactionList
+          filteredTx={check24Tx}
+          allTransactions={check24Tx}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+        />,
+      )
+
+      // Open category dropdown on the first transaction
+      const triggerButtons = screen.getAllByRole('button', { name: /Cat: Other/i })
+      fireEvent.click(triggerButtons[0])
+
+      // Select Communication
+      const commOption = screen.getByRole('option', { name: /Cat: Communication/i })
+      fireEvent.click(commOption)
+
+      // BatchCategoryModal should open!
+      expect(screen.getByText('Update Related Transactions')).toBeInTheDocument()
+      expect(screen.getByTestId('related-tx-tx-check24-2')).toBeInTheDocument()
+      expect(screen.getByTestId('batch-category-update-all-btn')).toBeInTheDocument()
+      expect(screen.getByTestId('batch-category-only-this-btn')).toBeInTheDocument()
+      expect(screen.getByTestId('batch-category-cancel-btn')).toBeInTheDocument()
+    })
+
+    it('updates only the single transaction when user chooses "Only this transaction"', () => {
+      render(
+        <TransactionList
+          filteredTx={check24Tx}
+          allTransactions={check24Tx}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+        />,
+      )
+
+      const triggerButtons = screen.getAllByRole('button', { name: /Cat: Other/i })
+      fireEvent.click(triggerButtons[0])
+
+      const commOption = screen.getByRole('option', { name: /Cat: Communication/i })
+      fireEvent.click(commOption)
+
+      // Click "Only this transaction"
+      const onlyThisBtn = screen.getByTestId('batch-category-only-this-btn')
+      fireEvent.click(onlyThisBtn)
+
+      // Modal should close
+      expect(screen.queryByText('Update Related Transactions')).not.toBeInTheDocument()
+    })
+
+    it('updates all related transactions in bulk when user chooses "Update all"', () => {
+      render(
+        <TransactionList
+          filteredTx={check24Tx}
+          allTransactions={check24Tx}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+        />,
+      )
+
+      const triggerButtons = screen.getAllByRole('button', { name: /Cat: Other/i })
+      fireEvent.click(triggerButtons[0])
+
+      const commOption = screen.getByRole('option', { name: /Cat: Communication/i })
+      fireEvent.click(commOption)
+
+      // Click "Update all"
+      const updateAllBtn = screen.getByTestId('batch-category-update-all-btn')
+      fireEvent.click(updateAllBtn)
+
+      // Modal should close
+      expect(screen.queryByText('Update Related Transactions')).not.toBeInTheDocument()
+    })
+
+    it('closes modal without changing category when user clicks cancel', () => {
+      render(
+        <TransactionList
+          filteredTx={check24Tx}
+          allTransactions={check24Tx}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+        />,
+      )
+
+      const triggerButtons = screen.getAllByRole('button', { name: /Cat: Other/i })
+      fireEvent.click(triggerButtons[0])
+
+      const commOption = screen.getByRole('option', { name: /Cat: Communication/i })
+      fireEvent.click(commOption)
+
+      expect(screen.getByText('Update Related Transactions')).toBeInTheDocument()
+
+      // Click Cancel
+      const cancelBtn = screen.getByTestId('batch-category-cancel-btn')
+      fireEvent.click(cancelBtn)
+
+      // Modal should close
+      expect(screen.queryByText('Update Related Transactions')).not.toBeInTheDocument()
+    })
+  })
 })
+
