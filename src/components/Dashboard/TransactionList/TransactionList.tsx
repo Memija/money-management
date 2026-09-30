@@ -115,6 +115,8 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
     modifiedCount,
     incomeCount,
     expenseCount,
+    incomeTotal,
+    expenseTotal,
     netBalance,
     visibleGhostCount,
   } = useMemo(() => {
@@ -177,6 +179,93 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
       visibleGhostCount: ghosts,
     }
   }, [filteredTx, categoryFilter])
+
+  // Dynamic stat pills reflecting active category and type filters
+  const statPillInfo = useMemo(() => {
+    let countLabel: string
+    let countValue: number
+
+    if (categoryFilter !== 'all') {
+      countLabel = getCategoryLabel(categoryFilter, t, locale, customCategories)
+    } else if (typeFilter === 'transfers') {
+      countLabel = t.internalTransfers || 'Transfers'
+    } else if (typeFilter === 'duplicates') {
+      countLabel = t.duplicate || 'Duplicates'
+    } else if (typeFilter === 'modified') {
+      countLabel = t.modified || 'Modified'
+    } else if (typeFilter === 'income') {
+      countLabel = t.income || 'Income'
+    } else if (typeFilter === 'expense') {
+      countLabel = t.expenses || 'Expenses'
+    } else {
+      countLabel = t.all || 'All'
+    }
+
+    if (typeFilter === 'transfers') {
+      countValue = ghostCount || visibleGhostCount
+    } else if (typeFilter === 'duplicates') {
+      countValue = duplicateCount
+    } else if (typeFilter === 'modified') {
+      countValue = modifiedCount
+    } else if (typeFilter === 'income') {
+      countValue = incomeCount
+    } else if (typeFilter === 'expense') {
+      countValue = expenseCount
+    } else {
+      countValue = normalTx.length
+    }
+
+    let amountLabel: string
+    let amountClass: string
+    let formattedAmount: string
+
+    if (typeFilter === 'transfers') {
+      amountLabel = `${t.totalBalance || 'Total Balance'} (0 impact)`
+      amountClass = styles.statNeutral
+      formattedAmount = formatCurrency(0)
+    } else if (typeFilter === 'income') {
+      amountLabel = t.totalIncome || t.income || 'Income'
+      amountClass = styles.statIncome
+      formattedAmount = `${incomeTotal > 0 ? '+' : ''}${formatCurrency(incomeTotal)}`
+    } else if (typeFilter === 'expense') {
+      amountLabel = t.totalExpenses || t.expenses || 'Expenses'
+      amountClass = styles.statExpense
+      formattedAmount = `${expenseTotal > 0 ? '-' : ''}${formatCurrency(expenseTotal)}`
+    } else if (categoryFilter !== 'all') {
+      amountLabel = t.categoryBalance || 'Category Balance'
+      amountClass = netBalance >= 0 ? styles.statIncome : styles.statExpense
+      formattedAmount = `${netBalance >= 0 ? '+' : ''}${formatCurrency(netBalance)}`
+    } else {
+      amountLabel = t.totalBalance || 'Total Balance'
+      amountClass = netBalance >= 0 ? styles.statIncome : styles.statExpense
+      formattedAmount = `${netBalance >= 0 ? '+' : ''}${formatCurrency(netBalance)}`
+    }
+
+    return {
+      countLabel,
+      countValue,
+      amountLabel,
+      formattedAmount,
+      amountClass,
+    }
+  }, [
+    categoryFilter,
+    typeFilter,
+    t,
+    locale,
+    customCategories,
+    ghostCount,
+    visibleGhostCount,
+    duplicateCount,
+    modifiedCount,
+    incomeCount,
+    expenseCount,
+    normalTx.length,
+    incomeTotal,
+    expenseTotal,
+    netBalance,
+    formatCurrency,
+  ])
 
   // Collect available unique categories from unfiltered transactions in current scope (decoupled from categoryFilter)
   const availableCategories = useMemo(() => {
@@ -341,39 +430,15 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
 
         <div className={styles.statPillsGroup}>
           <div className={styles.statPill}>
-            <span className={styles.statLabel}>
-              {typeFilter === 'transfers'
-                ? (t.internalTransfers || 'Transfers')
-                : typeFilter === 'duplicates'
-                  ? (t.duplicate || 'Duplicates')
-                  : t.all}
-            </span>
-            <span className={styles.statValue}>
-              {typeFilter === 'transfers'
-                ? (ghostCount || visibleGhostCount)
-                : typeFilter === 'duplicates'
-                  ? duplicateCount
-                  : normalTx.length}
-            </span>
+            <span className={styles.statLabel}>{statPillInfo.countLabel}</span>
+            <span className={styles.statValue}>{statPillInfo.countValue}</span>
           </div>
           <div className={styles.statPill}>
-            <span className={styles.statLabel}>
-              {typeFilter === 'transfers'
-                ? `${t.totalBalance || 'Total Balance'} (0 impact)`
-                : (t.totalBalance || 'Total Balance')}
-            </span>
+            <span className={styles.statLabel}>{statPillInfo.amountLabel}</span>
             <span
-              className={`${styles.statValue} ${
-                typeFilter === 'transfers'
-                  ? styles.statNeutral
-                  : netBalance >= 0
-                    ? styles.statIncome
-                    : styles.statExpense
-              } privacy-blur`}
+              className={`${styles.statValue} ${statPillInfo.amountClass} privacy-blur`}
             >
-              {typeFilter === 'transfers'
-                ? formatCurrency(0)
-                : `${netBalance >= 0 ? '+' : ''}${formatCurrency(netBalance)}`}
+              {statPillInfo.formattedAmount}
             </span>
           </div>
         </div>

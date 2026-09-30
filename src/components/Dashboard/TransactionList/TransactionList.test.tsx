@@ -86,6 +86,10 @@ const mockTranslations = {
     'Internal transfers between your accounts are excluded from income and expenses (read-only).',
   allCategories: 'All Categories',
   filterByCategory: 'Filter by category',
+  categoryBalance: 'Category Balance',
+  totalIncome: 'Total Income',
+  totalExpenses: 'Total Expenses',
+  modified: 'Modified',
 }
 
 const mockTransactions: Transaction[] = [
@@ -1212,6 +1216,66 @@ describe('TransactionList Component', () => {
       // Modal should close
       expect(screen.queryByText('Update Related Transactions')).not.toBeInTheDocument()
     })
+
+    it('updates stat pills labels and amounts when category filter changes', () => {
+      render(
+        <TransactionList
+          filteredTx={mockTransactions}
+          institutionNames={['Bank A', 'Bank B']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          selectedInstitution="all"
+          setSelectedInstitution={vi.fn()}
+          sortOrder="newest"
+          setSortOrder={vi.fn()}
+        />,
+      )
+
+      // Initially with "all" category: Stat Pill 1 is All (2), Stat Pill 2 is Total Balance (+$950)
+      expect(screen.getAllByText('All').length).toBeGreaterThanOrEqual(1)
+      expect(screen.getByText('Total Balance')).toBeInTheDocument()
+      expect(screen.getByText('+$950')).toBeInTheDocument()
+
+      // Change category filter to Food
+      const categorySelect = screen.getByLabelText('Filter by category')
+      fireEvent.change(categorySelect, { target: { value: 'Food' } })
+
+      // Stat Pill 1 label updates to Cat: Food, count 1
+      expect(screen.getAllByText('Cat: Food').length).toBeGreaterThanOrEqual(1)
+      // Stat Pill 2 label updates to Category Balance, net amount $-50
+      expect(screen.getByText('Category Balance')).toBeInTheDocument()
+      expect(screen.getByText('$-50')).toBeInTheDocument()
+    })
+
+    it('updates stat pills labels and amounts when type filter tab changes to Income and Expenses', () => {
+      render(
+        <TransactionList
+          filteredTx={mockTransactions}
+          institutionNames={['Bank A', 'Bank B']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          selectedInstitution="all"
+          setSelectedInstitution={vi.fn()}
+          sortOrder="newest"
+          setSortOrder={vi.fn()}
+        />,
+      )
+
+      // Switch to Income tab
+      const incomeTab = screen.getByRole('tab', { name: /Income/i })
+      fireEvent.click(incomeTab)
+
+      expect(screen.getByText('Total Income')).toBeInTheDocument()
+      expect(screen.getAllByText('+$1000').length).toBeGreaterThanOrEqual(1)
+
+      // Switch to Expenses tab
+      const expensesTab = screen.getByRole('tab', { name: /Expenses/i })
+      fireEvent.click(expensesTab)
+
+      expect(screen.getByText('Total Expenses')).toBeInTheDocument()
+      expect(screen.getByText('-$50')).toBeInTheDocument()
+    })
   })
 })
+
 

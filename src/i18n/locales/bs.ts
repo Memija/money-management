@@ -315,6 +315,7 @@ export const bs: TranslationStrings = {
 
   newImport: 'Novi uvoz',
   totalBalance: 'Ukupni saldo',
+  categoryBalance: 'Saldo kategorije',
   accountBalance: 'Saldo računa',
   subAccounts: 'Podračuni',
   bankAccounts: 'Bankovni računi',

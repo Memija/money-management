@@ -314,6 +314,7 @@ export const id: TranslationStrings = {
 
   newImport: 'Impor Baru',
   totalBalance: 'Total Saldo',
+  categoryBalance: 'Saldo Kategori',
   accountBalance: 'Saldo Akun',
   subAccounts: 'Sub-akun',
   bankAccounts: 'Akun Bank',

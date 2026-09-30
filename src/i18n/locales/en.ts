@@ -314,6 +314,7 @@ export const en: TranslationStrings = {
 
   newImport: 'New Import',
   totalBalance: 'Total Balance',
+  categoryBalance: 'Category Balance',
   accountBalance: 'Account Balance',
   subAccounts: 'Sub-accounts',
   bankAccounts: 'Bank Accounts',

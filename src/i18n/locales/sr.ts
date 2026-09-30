@@ -317,6 +317,7 @@ export const sr: TranslationStrings = {
 
   newImport: 'Нови увоз',
   totalBalance: 'Укупно стање',
+  categoryBalance: 'Стање категорије',
   accountBalance: 'Стање рачуна',
   subAccounts: 'Подрачуни',
   bankAccounts: 'Банковни рачуни',

@@ -315,6 +315,7 @@ export const pl: TranslationStrings = {
 
   newImport: 'Nowy import',
   totalBalance: 'Saldo całkowite',
+  categoryBalance: 'Saldo kategorii',
   accountBalance: 'Saldo konta',
   subAccounts: 'Subkonta',
   bankAccounts: 'Konta bankowe',

@@ -310,6 +310,7 @@ export interface TranslationStrings {
   // Dashboard
   newImport: string
   totalBalance: string
+  categoryBalance: string
   accountBalance: string
   subAccounts: string
   bankAccounts: string
