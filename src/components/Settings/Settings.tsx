@@ -19,7 +19,7 @@ import styles from './Settings.module.css'
 export const Settings: React.FC = () => {
   const t = useLanguageStore((s) => s.t)
   const currentLocale = useLanguageStore((s) => s.locale)
-  const { customKeywords, customCategories, importedAccounts, setCustomKeywords, setStep } = useAppStore()
+  const { customKeywords, customCategories, importedAccounts, duplicateOverrideRules, setCustomKeywords, setStep } = useAppStore()
   
   const [selectedCategory, setSelectedCategory] = useState<string>(DEFAULT_CATEGORY_KEYS[0])
   const [newKeyword, setNewKeyword] = useState('')
@@ -44,6 +44,10 @@ export const Settings: React.FC = () => {
       category,
       categoryKeywords.filter((k) => k !== keyword)
     )
+  }
+
+  const handleRemoveCategoryRules = (category: string) => {
+    setCustomKeywords(category, [])
   }
 
   const hasKeywords = Object.values(customKeywords).some(keywords => keywords && keywords.length > 0)
@@ -98,7 +102,7 @@ export const Settings: React.FC = () => {
           <span>{t.categoriesAndRules || 'Categories & Rules'}</span>
         </button>
 
-        {importedAccounts.some((a) => (a.duplicateTransactions?.length ?? 0) > 0) && (
+        {((duplicateOverrideRules?.length ?? 0) > 0 || importedAccounts.some((a) => (a.duplicateTransactions?.length ?? 0) > 0)) && (
           <button
             type="button"
             role="tab"
@@ -137,9 +141,6 @@ export const Settings: React.FC = () => {
       <div className={styles.contentGrid}>
         {/* Left Column: Form */}
         <div className={styles.formSection}>
-
-          <div className={styles.sectionSpacer} />
-
           <div className={`glass-card ${styles.formCard}`}>
             <div className={styles.cardHeader}>
               <h3>{t.createCustomRule}</h3>
@@ -265,28 +266,45 @@ export const Settings: React.FC = () => {
                   >
                     <div className={styles.keywordCardHeader}>
                       <div className={styles.keywordGroupTitle}>
-                        {(() => {
-                          const IconComp = getCategoryIcon(catKey, 20)
-                          return IconComp
-                        })()}
+                        {getCategoryIcon(catKey, 20, customCategories)}
                         <span className={styles.keywordGroupLabel}>
                           {getCategoryLabel(catKey, t, currentLocale, customCategories)}
                         </span>
                       </div>
-                      <span className={styles.countBadge}>{keywords.length}</span>
+                      <div className={styles.keywordCardActions}>
+                        <span className={styles.countBadge}>{keywords.length}</span>
+                        <button
+                          type="button"
+                          className={styles.removeCategoryBtn}
+                          onClick={() => handleRemoveCategoryRules(catKey)}
+                          title={`${t.deleteCategory || 'Delete'} ${getCategoryLabel(catKey, t, currentLocale, customCategories)}`}
+                          aria-label={`${t.deleteCategory || 'Delete'} ${getCategoryLabel(catKey, t, currentLocale, customCategories)}`}
+                          data-testid={`remove-category-rules-${catKey}`}
+                        >
+                          <X size={15} />
+                        </button>
+                      </div>
                     </div>
                     <div className={styles.tags}>
                       <AnimatePresence>
                         {keywords.map((kw) => (
                           <motion.div 
                             key={kw} 
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: 'auto' }}
-                            exit={{ opacity: 0, width: 0 }}
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.85 }}
+                            transition={{ duration: 0.15 }}
                             className={styles.tag}
                           >
-                            <span className={styles.tagText}>{kw}</span>
-                            <button onClick={() => handleRemoveKeyword(catKey, kw)} aria-label="Remove keyword">
+                            <span className={styles.tagText} title={kw}>{kw}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveKeyword(catKey, kw)}
+                              aria-label={`${t.deleteCategory || 'Remove'} ${kw}`}
+                              title={`${t.deleteCategory || 'Remove'} ${kw}`}
+                              className={styles.removeTagBtn}
+                              data-testid={`remove-rule-btn-${kw}`}
+                            >
                               <X size={14} />
                             </button>
                           </motion.div>

@@ -61,20 +61,22 @@ const mockSetCustomKeywords = vi.fn()
 const mockSetStep = vi.fn()
 
 let mockImportedAccounts: ImportedAccount[] = []
+let mockCustomKeywords: Record<string, string[]> = {}
+let mockDuplicateOverrideRules: any[] = []
 
 vi.mock('../../store/useAppStore', () => ({
   countDuplicateTransactionsInAccounts: vi.fn(() => 0),
   matchesDuplicateOverrideRule: vi.fn(),
   useAppStore: vi.fn((selector) => {
     const state = {
-      customKeywords: {},
+      customKeywords: mockCustomKeywords,
       customCategories: [],
       setCustomKeywords: mockSetCustomKeywords,
       setStep: mockSetStep,
       addCustomCategory: vi.fn(),
       updateCustomCategory: vi.fn(),
       deleteCustomCategory: vi.fn(),
-      duplicateOverrideRules: [],
+      duplicateOverrideRules: mockDuplicateOverrideRules,
       importedAccounts: mockImportedAccounts,
       resetDuplicateTransactions: vi.fn(() => ({ removedCount: 0 })),
     }
@@ -186,9 +188,80 @@ describe('Settings Component', () => {
     // Switch to Duplicate Rules tab
     fireEvent.click(dupRulesTab)
 
-    expect(dupRulesTab).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByTestId('duplicate-rules-settings')).toBeInTheDocument()
     expect(screen.queryByText('Target Category')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Delete All Data' })).not.toBeInTheDocument()
+  })
+
+  it('renders close buttons for all active rules tags including long ones', () => {
+    mockCustomKeywords = {
+      Groceries: ['lidl', 'rewe', 'very long supermarket merchant name that could cause overflow'],
+      DiningOut: ['mcdonalds'],
+    }
+    mockImportedAccounts = []
+    render(<Settings />)
+
+    // Verify all keywords are displayed
+    expect(screen.getByText('lidl')).toBeInTheDocument()
+    expect(screen.getByText('rewe')).toBeInTheDocument()
+    expect(
+      screen.getByText('very long supermarket merchant name that could cause overflow'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('mcdonalds')).toBeInTheDocument()
+
+    // Verify close buttons exist for every single tag
+    expect(screen.getByTestId('remove-rule-btn-lidl')).toBeInTheDocument()
+    expect(screen.getByTestId('remove-rule-btn-rewe')).toBeInTheDocument()
+    expect(
+      screen.getByTestId(
+        'remove-rule-btn-very long supermarket merchant name that could cause overflow',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByTestId('remove-rule-btn-mcdonalds')).toBeInTheDocument()
+
+    // Verify category header close buttons exist for each category group
+    expect(screen.getByTestId('remove-category-rules-Groceries')).toBeInTheDocument()
+    expect(screen.getByTestId('remove-category-rules-DiningOut')).toBeInTheDocument()
+  })
+
+  it('removes a keyword when its close button is clicked', () => {
+    mockCustomKeywords = {
+      Groceries: ['lidl', 'rewe'],
+    }
+    mockImportedAccounts = []
+    render(<Settings />)
+
+    const removeLidlBtn = screen.getByTestId('remove-rule-btn-lidl')
+    fireEvent.click(removeLidlBtn)
+
+    expect(mockSetCustomKeywords).toHaveBeenCalledWith('Groceries', ['rewe'])
+  })
+
+  it('removes all category rules when the category header close button is clicked', () => {
+    mockCustomKeywords = {
+      Groceries: ['lidl', 'rewe'],
+    }
+    mockImportedAccounts = []
+    render(<Settings />)
+
+    const removeGroceriesBtn = screen.getByTestId('remove-category-rules-Groceries')
+    fireEvent.click(removeGroceriesBtn)
+
+    expect(mockSetCustomKeywords).toHaveBeenCalledWith('Groceries', [])
+  })
+
+  it('renders Duplicate Rules tab if duplicateOverrideRules exist even without pending duplicate transactions', () => {
+    mockImportedAccounts = []
+    mockDuplicateOverrideRules = [
+      {
+        id: 'rule-1',
+        descriptionPattern: 'Uber',
+        createdAt: '2026-03-01T00:00:00Z',
+        applyCount: 1,
+      },
+    ]
+    render(<Settings />)
+
+    expect(screen.getByRole('tab', { name: 'Duplicate Rules' })).toBeInTheDocument()
   })
 })

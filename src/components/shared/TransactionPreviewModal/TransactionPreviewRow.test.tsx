@@ -292,4 +292,29 @@ describe('TransactionPreviewRow', () => {
     // No remove button
     expect(screen.queryByRole('button', { name: 'Remove transaction' })).not.toBeInTheDocument()
   })
+
+  it('renders informative badge and does not display category label for 0-euro informative transactions', () => {
+    const zeroTx: Transaction = {
+      ...mockTx,
+      id: 'tx-zero',
+      amount: 0,
+      category: undefined,
+    }
+
+    render(
+      <TransactionPreviewRow
+        {...defaultProps}
+        tx={zeroTx}
+        t={{
+          ...defaultProps.t,
+          informative: 'Informative',
+        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+      />,
+    )
+
+    const badge = screen.getByTestId('preview-informative-badge-tx-zero')
+    expect(badge).toBeInTheDocument()
+    expect(badge).toHaveTextContent('Informative')
+    expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
+  })
 })

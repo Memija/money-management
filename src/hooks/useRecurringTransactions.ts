@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
-import { getTransactionCategory, normalizeDescription } from '../utils/category-utils'
+import { getTransactionCategory, isInformativeTransaction, normalizeDescription } from '../utils/category-utils'
 
 export interface RecurringExpense {
   id: string
@@ -38,10 +38,10 @@ export const useRecurringTransactions = (
   return useMemo(() => {
     // 1. Filter for non-ghost expenses and ensure category is present
     const expenses = allRawTransactions
-      .filter((t) => t.type === 'expense' && !t.isGhost)
+      .filter((t) => t.type === 'expense' && !t.isGhost && !isInformativeTransaction(t))
       .map((t) => ({
         ...t,
-        category: t.category || getTransactionCategory(t, customKeywords, manualCategories),
+        category: getTransactionCategory(t, customKeywords, manualCategories),
       }))
 
     // 2. Group by normalized description

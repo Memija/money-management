@@ -343,6 +343,7 @@ export const en: TranslationStrings = {
   perPage: 'Per page:',
   internalTransfer: 'Internal Transfer',
   internalTransfers: 'Internal Transfers',
+  informative: 'Informative',
   ghostTransfersHidden: '{count} internal transfers hidden',
   ghostTransfersShown: 'Showing internal transfers',
   showInternalTransfers: 'Show internal transfers',

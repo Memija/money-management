@@ -203,6 +203,16 @@
   color: #e11d48;
 }
 
+.amountNeutral {
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  margin: 0;
+  white-space: nowrap;
+}
+
 .categoryBadgeWrapper {
   width: 150px;
   flex-shrink: 0;

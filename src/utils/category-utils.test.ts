@@ -12,7 +12,9 @@ import {
   formatPopularMerchantsCount,
   formatTransactionCount,
   getCategoryLabel,
+  getTransactionCategory,
   hasExtensiveCategoryData,
+  isInformativeTransaction,
   isRelatedTransaction,
   resolveCanonicalCategory,
   resolvePluralTemplate,
@@ -759,6 +761,197 @@ describe('category-utils', () => {
       const related = findRelatedTransactions(targetTx, allTx, 'Communication')
       expect(related).toHaveLength(1)
       expect(related[0].id).toBe('tx-2')
+    })
+
+    it('excludes informative 0-euro candidate transactions', () => {
+      const targetTx: Transaction = {
+        id: 'tx-1',
+        date: '2024-03-01',
+        amount: 25.5,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'Telekom Deutschland GmbH End-to-End-Ref.: REF1',
+        category: 'Communication',
+        type: 'expense',
+      }
+
+      const allTx: Transaction[] = [
+        targetTx,
+        {
+          id: 'tx-2',
+          date: '2024-03-05',
+          amount: 0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description: 'Telekom Deutschland GmbH End-to-End-Ref.: REF2',
+          type: 'income',
+        },
+        {
+          id: 'tx-3',
+          date: '2024-03-10',
+          amount: -45.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description: 'Telekom Deutschland GmbH End-to-End-Ref.: REF3',
+          category: 'Other',
+          type: 'expense',
+        },
+      ]
+
+      const related = findRelatedTransactions(targetTx, allTx, 'Communication')
+      expect(related).toHaveLength(1)
+      expect(related[0].id).toBe('tx-3')
+    })
+
+    it('returns empty array when target transaction has 0 amount', () => {
+      const targetTx: Transaction = {
+        id: 'tx-zero',
+        date: '2024-03-01',
+        amount: 0,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'Telekom Deutschland GmbH Hinweis',
+        type: 'income',
+      }
+
+      const allTx: Transaction[] = [
+        targetTx,
+        {
+          id: 'tx-1',
+          date: '2024-03-05',
+          amount: -45.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description: 'Telekom Deutschland GmbH Flatrate',
+          type: 'expense',
+        },
+      ]
+
+      const related = findRelatedTransactions(targetTx, allTx)
+      expect(related).toEqual([])
+    })
+  })
+
+  describe('isInformativeTransaction', () => {
+    it('returns true when amount is 0, -0, or 0.00', () => {
+      expect(isInformativeTransaction({ amount: 0 })).toBe(true)
+      expect(isInformativeTransaction({ amount: -0 })).toBe(true)
+      expect(isInformativeTransaction({ amount: 0.0 })).toBe(true)
+    })
+
+    it('returns false for positive or negative amounts', () => {
+      expect(isInformativeTransaction({ amount: 10 })).toBe(false)
+      expect(isInformativeTransaction({ amount: -0.01 })).toBe(false)
+      expect(isInformativeTransaction({ amount: 100.5 })).toBe(false)
+    })
+
+    it('returns false for null, undefined, or missing amount', () => {
+      expect(isInformativeTransaction(null)).toBe(false)
+      expect(isInformativeTransaction(undefined)).toBe(false)
+      expect(isInformativeTransaction({} as { amount: number })).toBe(false)
+    })
+  })
+
+  describe('getTransactionCategory', () => {
+    it('returns undefined for informative 0-euro transactions regardless of description', () => {
+      const txSalary: Transaction = {
+        id: 'tx-0-salary',
+        date: '2024-01-01',
+        amount: 0,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'Monthly salary payment Lohn Gehalt',
+        type: 'income',
+      }
+      expect(getTransactionCategory(txSalary)).toBeUndefined()
+
+      const txGroceries: Transaction = {
+        id: 'tx-0-rewe',
+        date: '2024-01-01',
+        amount: 0,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'REWE Supermarkt Einkauf',
+        type: 'expense',
+      }
+      expect(getTransactionCategory(txGroceries)).toBeUndefined()
+    })
+
+    it('returns undefined for 0-euro transaction even if custom keywords match', () => {
+      const tx: Transaction = {
+        id: 'tx-custom',
+        date: '2024-01-01',
+        amount: 0,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'MyCustomKeyword Notice',
+        type: 'income',
+      }
+      const customKeywords = { Groceries: ['mycustomkeyword'] }
+      expect(getTransactionCategory(tx, customKeywords)).toBeUndefined()
+    })
+
+    it('returns undefined for 0-euro transaction even if manual category override is present', () => {
+      const tx: Transaction = {
+        id: 'tx-manual',
+        date: '2024-01-01',
+        amount: 0,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'Informative bank message',
+        type: 'income',
+      }
+      const manualCategories = { 'tx-manual': 'Savings' }
+      expect(getTransactionCategory(tx, undefined, manualCategories)).toBeUndefined()
+    })
+
+    it('returns undefined for 0-euro transaction even if category was set on the object', () => {
+      const tx: Transaction = {
+        id: 'tx-with-cat',
+        date: '2024-01-01',
+        amount: 0,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'Informative notice',
+        category: 'Insurance',
+        type: 'income',
+      }
+      expect(getTransactionCategory(tx)).toBeUndefined()
+    })
+
+    it('correctly categorizes non-zero transactions', () => {
+      const txSalary: Transaction = {
+        id: 'tx-salary',
+        date: '2024-01-01',
+        amount: 2500,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'Monthly salary payment',
+        type: 'income',
+      }
+      expect(getTransactionCategory(txSalary)).toBe('Salary')
+
+      const txGroceries: Transaction = {
+        id: 'tx-groceries',
+        date: '2024-01-01',
+        amount: -55.2,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'REWE Markt Berlin',
+        type: 'expense',
+      }
+      expect(getTransactionCategory(txGroceries)).toBe('Groceries')
+
+      const txOther: Transaction = {
+        id: 'tx-other',
+        date: '2024-01-01',
+        amount: -12,
+        currency: 'EUR',
+        institution: 'Bank A',
+        description: 'Unrecognized payment',
+        type: 'expense',
+      }
+      expect(getTransactionCategory(txOther)).toBe('Other')
     })
   })
 })

@@ -2127,6 +2127,25 @@
   flex-shrink: 0;
 }
 
+.informative-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: var(--text-dim);
+  font-size: 0.675rem;
+  font-weight: 600;
+}
+
+:global([data-theme='light']) .informative-pill {
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.3);
+  color: #475569;
+}
+
 .already-imported-sub-pill {
   opacity: 0.85;
   font-weight: 500;
@@ -2342,6 +2361,10 @@
 
 .amount-negative {
   color: var(--text-main);
+}
+
+.amount-neutral {
+  color: var(--text-dim) !important;
 }
 
 .row-actions {

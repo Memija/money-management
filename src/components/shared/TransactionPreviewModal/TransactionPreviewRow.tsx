@@ -1,12 +1,12 @@
 import React from 'react'
-import { Ghost, Layers, Lock, RotateCcw, Trash2, Unlock } from 'lucide-react'
+import { Ghost, Info, Layers, Lock, RotateCcw, Trash2, Unlock } from 'lucide-react'
 
 import { findInstitution } from '../../../data/institutions'
 import type { TranslationStrings } from '../../../i18n/types'
 import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryIcon } from '../../../utils/category-icons'
-import { getCategoryLabel } from '../../../utils/category-utils'
+import { getCategoryLabel, isInformativeTransaction } from '../../../utils/category-utils'
 import { DatePicker } from '../DatePicker'
 
 import styles from './TransactionPreviewModal.module.css'
@@ -78,7 +78,10 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
     !effectiveIsSpaceTransfer &&
     !isExistingAccountTransfer,
   )
-  const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
+  const isZeroAmount = isInformativeTransaction(tx)
+  const categoryColor = isZeroAmount
+    ? 'var(--text-dim)'
+    : getCategoryColor(tx.category || 'Other', customCategories)
   const isTxIncome = tx.type === 'income'
 
   return (
@@ -93,7 +96,11 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
           style={{ '--cat-color': categoryColor } as React.CSSProperties}
           aria-hidden="true"
         >
-          {getCategoryIcon(tx.category || 'Other', 18, customCategories, tx.description)}
+          {isZeroAmount ? (
+            <Info size={18} color="var(--text-dim)" aria-hidden="true" />
+          ) : (
+            getCategoryIcon(tx.category || 'Other', 18, customCategories, tx.description)
+          )}
         </div>
 
         <div className={styles['row-text']}>
@@ -136,6 +143,14 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             )}
             {tx.category && (
               <span>{getCategoryLabel(tx.category, t, locale, customCategories)}</span>
+            )}
+            {isZeroAmount && (
+              <span
+                className={styles['informative-pill']}
+                data-testid={`preview-informative-badge-${tx.id}`}
+              >
+                {t.informative || 'Informative'}
+              </span>
             )}
             {effectiveIsDuplicate && !hideDuplicateBadge && (
               isAlreadyDuplicated ? (
@@ -197,8 +212,13 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
       </div>
 
       <div
-        className={`${styles['row-amount']} ${isTxIncome ? styles['amount-positive'] : styles['amount-negative']
-          }`}
+        className={`${styles['row-amount']} ${
+          isZeroAmount
+            ? styles['amount-neutral']
+            : isTxIncome
+              ? styles['amount-positive']
+              : styles['amount-negative']
+        }`}
       >
         {isEditable ? (
           <input
@@ -220,8 +240,8 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             title={formatCurrency(tx.amount)}
           />
         ) : (
-          <span className="privacy-blur" title={`${isTxIncome ? '+' : ''}${formatCurrency(tx.amount)}`}>
-            {isTxIncome ? '+' : ''}
+          <span className="privacy-blur" title={`${!isZeroAmount && isTxIncome ? '+' : ''}${formatCurrency(tx.amount)}`}>
+            {!isZeroAmount && isTxIncome ? '+' : ''}
             {formatCurrency(tx.amount)}
           </span>
         )}

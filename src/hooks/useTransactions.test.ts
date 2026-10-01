@@ -97,6 +97,25 @@ describe('useTransactions', () => {
     expect(result.current.allTransactions[0].category).toBe('Other')
   })
 
+  it('should never categorize informative transactions with an amount of 0', () => {
+    useAppStore.setState({
+      importedAccounts: [
+        makeAccount('bank-a', {
+          transactions: [
+            makeTx({ description: 'Monthly Salary Payment', amount: 0 }),
+            makeTx({ description: 'REWE Markt Berlin', amount: 0 }),
+            makeTx({ description: 'Random bank notice', amount: 0 }),
+          ],
+        }),
+      ],
+    })
+
+    const { result } = renderHook(() => useTransactions())
+    expect(result.current.allTransactions[0].category).toBeUndefined()
+    expect(result.current.allTransactions[1].category).toBeUndefined()
+    expect(result.current.allTransactions[2].category).toBeUndefined()
+  })
+
   // ---- Institution filter --------------------------------------------------
 
   it('should return all transactions when selectedInstitution is "all"', () => {

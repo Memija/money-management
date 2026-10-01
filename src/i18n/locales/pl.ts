@@ -344,6 +344,7 @@ export const pl: TranslationStrings = {
   perPage: 'Na stronę:',
   internalTransfer: 'Przelew własny',
   internalTransfers: 'Przelewy własne',
+  informative: 'Informacyjne',
   ghostTransfersHidden: 'Ukryto {count} przelewów własnych',
   ghostTransfersShown: 'Widoczne przelewy własne',
   showInternalTransfers: 'Pokaż przelewy własne',

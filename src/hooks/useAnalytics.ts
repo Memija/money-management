@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
 import { getCategoryColor } from '../utils/category-colors'
-import { getTransactionCategory } from '../utils/category-utils'
+import { getTransactionCategory, isInformativeTransaction } from '../utils/category-utils'
 
 const sortCategories = (a: [string, number], b: [string, number]) => {
   if (a[0] === 'Other' && b[0] !== 'Other') return 1
@@ -161,13 +161,15 @@ export const useAnalytics = (
 
   // Categorize all active transactions once if not already categorized
   const allTransactions = useMemo(() => {
-    const allAlreadyCategorized = activeRawTransactions.every((t) => typeof t.category === 'string')
+    const allAlreadyCategorized = activeRawTransactions.every((t) =>
+      isInformativeTransaction(t) ? t.category === undefined : typeof t.category === 'string',
+    )
     if (allAlreadyCategorized) {
       return activeRawTransactions
     }
     return activeRawTransactions.map((t) => ({
       ...t,
-      category: t.category || getTransactionCategory(t, customKeywords, manualCategories),
+      category: getTransactionCategory(t, customKeywords, manualCategories),
     }))
   }, [activeRawTransactions, customKeywords, manualCategories])
 
@@ -273,7 +275,7 @@ export const useAnalytics = (
   const topCategory = useMemo(() => {
     const map: Record<string, number> = {}
     periodTransactions
-      .filter((t) => t.type === 'expense')
+      .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
       .forEach((t) => {
         const cat = t.category || 'Other'
         map[cat] = (map[cat] || 0) + Math.abs(t.amount)
@@ -293,7 +295,7 @@ export const useAnalytics = (
   const topCategories = useMemo(() => {
     const map: Record<string, number> = {}
     periodTransactions
-      .filter((t) => t.type === 'expense')
+      .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
       .forEach((t) => {
         const cat = t.category || 'Other'
         map[cat] = (map[cat] || 0) + Math.abs(t.amount)
@@ -313,7 +315,7 @@ export const useAnalytics = (
   const categoryBreakdown = useMemo(() => {
     const map: Record<string, number> = {}
     periodTransactions
-      .filter((t) => t.type === 'expense')
+      .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
       .forEach((t) => {
         const cat = t.category || 'Other'
         map[cat] = (map[cat] || 0) + Math.abs(t.amount)
@@ -365,7 +367,7 @@ export const useAnalytics = (
     > = {}
 
     periodTransactions
-      .filter((t) => t.type === 'expense')
+      .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
       .forEach((t) => {
         const name = t.description.trim().replace(/\s+/g, ' ')
         const key = name.toLowerCase()
@@ -404,7 +406,7 @@ export const useAnalytics = (
   const monthlyCategoryData = useMemo(() => {
     const map: Record<string, Record<string, number>> = {}
     periodTransactions
-      .filter((t) => t.type === 'expense')
+      .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
       .forEach((t) => {
         const month = t.date.substring(0, 7)
         const cat = t.category || 'Other'

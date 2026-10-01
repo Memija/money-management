@@ -153,14 +153,27 @@ export function getCategoryLabel(
 }
 
 /**
+ * Checks whether a transaction is an informative entry with a value of 0 euro.
+ * Informative transactions have no impact on the balance and are never categorized.
+ */
+export function isInformativeTransaction(tx?: { amount?: number } | null): boolean {
+  if (!tx || typeof tx.amount !== 'number') return false
+  return tx.amount === 0
+}
+
+/**
  * Helper to resolve the final category for a transaction,
  * applying manual overrides and custom keywords.
+ * Informative transactions with a value of 0 euro are never categorized.
  */
 export function getTransactionCategory(
   t: Transaction,
   customKeywords?: Record<string, string[]>,
   manualCategories?: Record<string, string>,
-): string {
+): string | undefined {
+  if (isInformativeTransaction(t)) {
+    return undefined
+  }
   if (manualCategories && manualCategories[t.id]) {
     return manualCategories[t.id]
   }
@@ -275,13 +288,13 @@ export function findRelatedTransactions(
   allTransactions: Transaction[],
   targetCategory?: string,
 ): Transaction[] {
-  if (!targetTx || !allTransactions || allTransactions.length === 0) return []
+  if (!targetTx || !allTransactions || allTransactions.length === 0 || isInformativeTransaction(targetTx)) return []
 
   const seenIds = new Set<string>()
   const results: Transaction[] = []
 
   for (const candidate of allTransactions) {
-    if (!candidate || candidate.id === targetTx.id || candidate.isGhost) {
+    if (!candidate || candidate.id === targetTx.id || candidate.isGhost || isInformativeTransaction(candidate)) {
       continue
     }
 

@@ -343,6 +343,7 @@ export const id: TranslationStrings = {
   perPage: 'Per halaman:',
   internalTransfer: 'Transfer Internal',
   internalTransfers: 'Transfer Internal',
+  informative: 'Informatif',
   ghostTransfersHidden: '{count} transfer internal disembunyikan',
   ghostTransfersShown: 'Menampilkan transfer internal',
   showInternalTransfers: 'Tampilkan transfer internal',

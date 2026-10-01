@@ -339,6 +339,7 @@ export interface TranslationStrings {
   perPage: string
   internalTransfer: string
   internalTransfers: string
+  informative: string
   ghostTransfersHidden: string
   ghostTransfersShown: string
   showInternalTransfers: string

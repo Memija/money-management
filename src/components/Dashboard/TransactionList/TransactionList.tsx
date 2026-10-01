@@ -23,6 +23,7 @@ import {
   extractCleanDescription,
   findRelatedTransactions,
   getCategoryLabel,
+  isInformativeTransaction,
 } from '../../../utils/category-utils'
 import { getVisiblePages } from '../../../utils/pagination-utils'
 import { BatchCategoryModal } from '../../shared/BatchCategoryModal'
@@ -134,8 +135,10 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
 
     for (let i = 0; i < filteredTx.length; i++) {
       const tx = filteredTx[i]
-      if (!isAllCat && (tx.category || 'Other') !== categoryFilter) {
-        continue
+      if (!isAllCat) {
+        if (!tx.category || tx.category !== categoryFilter) {
+          continue
+        }
       }
 
       if (tx.isGhost) {
@@ -332,6 +335,9 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
 
   const handleCategoryChange = useCallback(
     (tx: Transaction, newCategory: string) => {
+      if (isInformativeTransaction(tx)) {
+        return
+      }
       const currentCategory = tx.category || 'Other'
       if (newCategory === currentCategory) {
         return
@@ -376,7 +382,9 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
         [targetTx.id]: newCat,
       }
       for (let i = 0; i < relatedTx.length; i++) {
-        mapping[relatedTx[i].id] = newCat
+        if (!isInformativeTransaction(relatedTx[i])) {
+          mapping[relatedTx[i].id] = newCat
+        }
       }
       setManualCategoriesBulk(mapping)
 

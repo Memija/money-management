@@ -126,6 +126,12 @@
   align-items: start;
 }
 
+@media (min-width: 900px) {
+  .contentGrid {
+    grid-template-columns: minmax(320px, 380px) 1fr;
+  }
+}
+
 .formSection {
   position: relative;
   z-index: 10;
@@ -428,6 +434,8 @@
 .keywordCard {
   padding: 1.5rem;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .keywordCardHeader {
@@ -437,18 +445,30 @@
   margin-bottom: 1.25rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--card-border);
+  gap: 0.75rem;
 }
 
 .keywordGroupTitle {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .keywordGroupLabel {
   font-weight: 600;
   font-size: 1.05rem;
   color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.keywordCardActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .countBadge {
@@ -460,17 +480,37 @@
   border-radius: 12px;
 }
 
+.removeCategoryBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.removeCategoryBtn:hover {
+  color: #fff;
+  background: #f43f5e;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+  width: 100%;
 }
 
 .tag {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 0.5rem 0.4rem 0.85rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.85rem;
   background: var(--bg-elevated);
   border: 1px solid var(--card-border);
   border-radius: 20px;
@@ -478,8 +518,9 @@
   font-weight: 500;
   color: var(--text-main);
   transition: var(--transition);
-  overflow: hidden;
   box-shadow: var(--shadow-sm);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .tag:hover {
@@ -490,22 +531,29 @@
 
 .tagText {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
-.tag button {
+.removeTagBtn {
   background: var(--glass-bg);
   border: none;
   color: var(--text-dim);
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2rem;
+  padding: 0;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   transition: var(--transition);
+  flex-shrink: 0;
 }
 
-.tag button:hover {
+.removeTagBtn:hover {
   color: #fff;
   background: #f43f5e;
 }

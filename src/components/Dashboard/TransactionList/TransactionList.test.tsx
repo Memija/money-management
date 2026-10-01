@@ -1275,6 +1275,34 @@ describe('TransactionList Component', () => {
       expect(screen.getByText('Total Expenses')).toBeInTheDocument()
       expect(screen.getByText('-$50')).toBeInTheDocument()
     })
+
+    it('renders informative transactions with a read-only informative badge and neutral amount', () => {
+      const zeroTx: Transaction = {
+        id: 'tx-zero',
+        date: '2024-03-01',
+        description: 'Bank Note / Hinweis',
+        amount: 0,
+        currency: 'EUR',
+        institution: 'Bank A',
+        type: 'income',
+      }
+
+      render(
+        <TransactionList
+          filteredTx={[zeroTx]}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          selectedInstitution="all"
+          setSelectedInstitution={vi.fn()}
+          sortOrder="newest"
+          setSortOrder={vi.fn()}
+        />,
+      )
+
+      expect(screen.getByTestId('tx-informative-readonly-tx-zero')).toBeInTheDocument()
+      expect(screen.getByText('Informative')).toBeInTheDocument()
+    })
   })
 })
 

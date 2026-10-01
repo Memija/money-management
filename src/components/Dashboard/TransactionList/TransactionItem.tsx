@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Copy, Ghost, Sliders } from 'lucide-react'
+import { Copy, Ghost, Info, Sliders } from 'lucide-react'
 
 import { findInstitution } from '../../../data/institutions'
 import { useLanguageStore } from '../../../store/useLanguageStore'
@@ -7,7 +7,7 @@ import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryIcon } from '../../../utils/category-icons'
-import { getCategoryLabel } from '../../../utils/category-utils'
+import { getCategoryLabel, isInformativeTransaction } from '../../../utils/category-utils'
 import { CategorySelect } from '../../shared/CategorySelect'
 
 import styles from './TransactionItem.module.css'
@@ -33,7 +33,10 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
   const locale = useLanguageStore((s) => s.locale)
   const isPrivacyMode = usePrivacyStore((s) => s.isPrivacyMode)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const categoryColor = getCategoryColor(tx.category || 'Other', customCategories)
+  const isZeroAmount = isInformativeTransaction(tx)
+  const categoryColor = isZeroAmount
+    ? 'var(--text-dim)'
+    : getCategoryColor(tx.category || 'Other', customCategories)
   const isModifiedTx = Boolean(tx.isModified)
   const isDuplicateTx = Boolean(tx.isDuplicate || tx.forceImport || tx.importedByRuleId)
   const institutionLogo =
@@ -53,7 +56,11 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
           className={styles.iconBox}
           aria-hidden="true"
         >
-          {getCategoryIcon(tx.category || 'Other', 20, customCategories, tx.description)}
+          {isZeroAmount ? (
+            <Info size={20} color="var(--text-dim)" aria-hidden="true" />
+          ) : (
+            getCategoryIcon(tx.category || 'Other', 20, customCategories, tx.description)
+          )}
         </div>
         <div className={styles.txDetails}>
           <p className={`${styles.txDesc} privacy-blur`} title={isPrivacyMode ? undefined : tx.description}>
@@ -113,10 +120,14 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
         <div className={styles.amountCol}>
           <p
             className={`${
-              tx.type === 'income' ? styles.amountPositive : styles.amountNegative
+              isZeroAmount
+                ? styles.amountNeutral
+                : tx.type === 'income'
+                  ? styles.amountPositive
+                  : styles.amountNegative
             } privacy-blur`}
           >
-            {tx.type === 'income' ? '+' : ''}
+            {!isZeroAmount && tx.type === 'income' ? '+' : ''}
             {formatCurrency(tx.amount)}
           </p>
         </div>
@@ -128,6 +139,14 @@ export const TransactionItem = React.memo<TransactionItemProps>(({
               title={t.internalTransfer || 'Internal Transfer'}
             >
               {getCategoryLabel(tx.category || 'Other', t, locale, customCategories)}
+            </span>
+          ) : isZeroAmount ? (
+            <span
+              className={styles.readOnlyBadge}
+              data-testid={`tx-informative-readonly-${tx.id}`}
+              title={t.informative || 'Informative'}
+            >
+              {t.informative || 'Informative'}
             </span>
           ) : (
             <CategorySelect

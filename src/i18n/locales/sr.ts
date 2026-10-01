@@ -346,6 +346,7 @@ export const sr: TranslationStrings = {
   perPage: 'По страници:',
   internalTransfer: 'Интерни пренос',
   internalTransfers: 'Интерни преноси',
+  informative: 'Информативно',
   ghostTransfersHidden: '{count} интерних преноса скривено',
   ghostTransfersShown: 'Приказани интерни преноси',
   showInternalTransfers: 'Прикажи интерне преносе',

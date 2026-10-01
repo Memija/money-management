@@ -344,6 +344,7 @@ export const de: TranslationStrings = {
   perPage: 'Pro Seite:',
   internalTransfer: 'Interne Umbuchung',
   internalTransfers: 'Interne Umbuchungen',
+  informative: 'Informativ',
   ghostTransfersHidden: '{count} interne Umbuchungen ausgeblendet',
   ghostTransfersShown: 'Interne Umbuchungen sichtbar',
   showInternalTransfers: 'Interne Umbuchungen anzeigen',

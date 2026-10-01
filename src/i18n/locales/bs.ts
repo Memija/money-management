@@ -344,6 +344,7 @@ export const bs: TranslationStrings = {
   perPage: 'Po stranici:',
   internalTransfer: 'Interni prijenos',
   internalTransfers: 'Interni prijenosi',
+  informative: 'Informativno',
   ghostTransfersHidden: '{count} internih prijenosa skriveno',
   ghostTransfersShown: 'Prikazani interni prijenosi',
   showInternalTransfers: 'Prikaži interne prijenose',
