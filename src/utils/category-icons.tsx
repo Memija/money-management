@@ -168,6 +168,8 @@ export const COFFEE_REGEX = new RegExp(`(${[...coffeeKeywords].join('|')})`, 'i'
 export const CANONICAL_CATEGORY_ICONS: Record<string, IconComponent> = {
   Salary: Briefcase,
   Rent: Home,
+  Loans: Landmark,
+  Taxes: Receipt,
   Groceries: ShoppingCart,
   'Dining Out': Utensils,
   DiningOut: Utensils,

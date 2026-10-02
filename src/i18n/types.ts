@@ -15,6 +15,7 @@ export type Locale = 'en' | 'id' | 'pl' | 'bs' | 'sr' | 'de'
 export interface CategoryKeywords {
   Salary: string[]
   Rent: string[]
+  Loans: string[]
   Groceries: string[]
   DiningOut: string[]
   Shopping: string[]
@@ -27,6 +28,7 @@ export interface CategoryKeywords {
   Savings: string[]
   Transfers: string[]
   Travel: string[]
+  Taxes: string[]
 }
 
 export interface TranslationStrings {
@@ -549,6 +551,7 @@ export interface TranslationStrings {
   // Expense category labels
   catSalary: string
   catRent: string
+  catLoans: string
   catGroceries: string
   catDiningOut: string
   catShopping: string
@@ -561,6 +564,7 @@ export interface TranslationStrings {
   catSavings: string
   catTransfers: string
   catTravel: string
+  catTaxes: string
   catOther: string
 
   // Category keywords for auto-categorization

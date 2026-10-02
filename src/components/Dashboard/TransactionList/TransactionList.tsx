@@ -21,6 +21,7 @@ import type { Transaction } from '../../../types'
 import { getCategoryIcon } from '../../../utils/category-icons'
 import {
   extractCleanDescription,
+  extractMerchantKeyword,
   findRelatedTransactions,
   getCategoryLabel,
   isInformativeTransaction,
@@ -359,10 +360,20 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
       // If no related transactions exist, update directly without interrupting
       setManualCategory(tx.id, newCategory)
       const cleanDesc = extractCleanDescription(tx.description)
-      if (cleanDesc.length >= 3) {
+      const merchantKeyword = extractMerchantKeyword(tx.description)
+      const candidates = [merchantKeyword, cleanDesc].filter((kw) => kw && kw.trim().length >= 3)
+      if (candidates.length > 0) {
         const existingKeywords = customKeywords[newCategory] || []
-        if (!existingKeywords.some((kw) => kw.toLowerCase() === cleanDesc.toLowerCase())) {
-          setCustomKeywords(newCategory, [...existingKeywords, cleanDesc])
+        const updated = [...existingKeywords]
+        let changed = false
+        for (const cand of candidates) {
+          if (!updated.some((k) => k.toLowerCase() === cand.toLowerCase())) {
+            updated.push(cand)
+            changed = true
+          }
+        }
+        if (changed) {
+          setCustomKeywords(newCategory, updated)
         }
       }
     },
@@ -390,10 +401,20 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(({
 
       if (rememberRule) {
         const cleanDesc = extractCleanDescription(targetTx.description)
-        if (cleanDesc.length >= 3) {
+        const merchantKeyword = extractMerchantKeyword(targetTx.description)
+        const candidates = [merchantKeyword, cleanDesc].filter((kw) => kw && kw.trim().length >= 3)
+        if (candidates.length > 0) {
           const existingKeywords = customKeywords[newCat] || []
-          if (!existingKeywords.some((kw) => kw.toLowerCase() === cleanDesc.toLowerCase())) {
-            setCustomKeywords(newCat, [...existingKeywords, cleanDesc])
+          const updated = [...existingKeywords]
+          let changed = false
+          for (const cand of candidates) {
+            if (!updated.some((k) => k.toLowerCase() === cand.toLowerCase())) {
+              updated.push(cand)
+              changed = true
+            }
+          }
+          if (changed) {
+            setCustomKeywords(newCat, updated)
           }
         }
       }

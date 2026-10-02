@@ -13,6 +13,8 @@ describe('category-colors', () => {
       const requiredCategories = [
         'Salary',
         'Rent',
+        'Loans',
+        'Taxes',
         'Groceries',
         'Dining Out',
         'DiningOut',
@@ -64,6 +66,7 @@ describe('category-colors', () => {
       expect(ICON_COLORS.PiggyBank).toBe(CATEGORY_COLORS.Savings)
       expect(ICON_COLORS.CreditCard).toBe(CATEGORY_COLORS.Transfers)
       expect(ICON_COLORS.Plane).toBe(CATEGORY_COLORS.Travel)
+      expect(ICON_COLORS.Receipt).toBe(CATEGORY_COLORS.Taxes)
       expect(ICON_COLORS.Package).toBe(CATEGORY_COLORS.Other)
     })
   })
@@ -80,6 +83,8 @@ describe('category-colors', () => {
     it('returns exact match for canonical category keys', () => {
       expect(getCategoryColor('Salary')).toBe(CATEGORY_COLORS.Salary)
       expect(getCategoryColor('Rent')).toBe(CATEGORY_COLORS.Rent)
+      expect(getCategoryColor('Loans')).toBe(CATEGORY_COLORS.Loans)
+      expect(getCategoryColor('Taxes')).toBe(CATEGORY_COLORS.Taxes)
       expect(getCategoryColor('Groceries')).toBe(CATEGORY_COLORS.Groceries)
       expect(getCategoryColor('Dining Out')).toBe(CATEGORY_COLORS['Dining Out'])
       expect(getCategoryColor('Shopping')).toBe(CATEGORY_COLORS.Shopping)
@@ -117,6 +122,13 @@ describe('category-colors', () => {
       expect(getCategoryColor('Putovanja')).toBe(CATEGORY_COLORS.Travel)
       expect(getCategoryColor('Путовања')).toBe(CATEGORY_COLORS.Travel)
       expect(getCategoryColor('Perjalanan')).toBe(CATEGORY_COLORS.Travel)
+      // Taxes across languages
+      expect(getCategoryColor('Steuern')).toBe(CATEGORY_COLORS.Taxes)
+      expect(getCategoryColor('Taxes')).toBe(CATEGORY_COLORS.Taxes)
+      expect(getCategoryColor('Porezi')).toBe(CATEGORY_COLORS.Taxes)
+      expect(getCategoryColor('Порези')).toBe(CATEGORY_COLORS.Taxes)
+      expect(getCategoryColor('Podatki')).toBe(CATEGORY_COLORS.Taxes)
+      expect(getCategoryColor('Pajak')).toBe(CATEGORY_COLORS.Taxes)
     })
 
     describe('custom categories support', () => {
@@ -198,9 +210,13 @@ describe('category-colors', () => {
         { input: 'Kino Unterhaltung', expected: CATEGORY_COLORS.Entertainment },
         { input: 'Zabava i igre', expected: CATEGORY_COLORS.Entertainment },
 
+        // Taxes
+        { input: 'Annual property tax', expected: CATEGORY_COLORS.Taxes },
+        { input: 'Finanzkasse Steuern', expected: CATEGORY_COLORS.Taxes },
+        { input: 'Poreska uprava', expected: CATEGORY_COLORS.Taxes },
+
         // Insurance
         { input: 'Life insurance policy', expected: CATEGORY_COLORS.Insurance },
-        { input: 'Annual property tax', expected: CATEGORY_COLORS.Insurance },
         { input: 'Allianz Versicherung', expected: CATEGORY_COLORS.Insurance },
         { input: 'Zivotno osiguranje', expected: CATEGORY_COLORS.Insurance },
 

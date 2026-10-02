@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { ImportedAccount } from '../../types'
+import type { DuplicateOverrideRule, ImportedAccount } from '../../types'
 import { Settings } from './Settings'
 
 // Mock language store
@@ -50,6 +50,7 @@ vi.mock('../../store/useLanguageStore', () => ({
         catCommunication: 'Kommunikation',
         catHealthcare: 'Gesundheit',
         catTravel: 'Reisen',
+        catTaxes: 'Steuern',
       },
     }
     return typeof selector === 'function' ? selector(state) : state
@@ -62,7 +63,7 @@ const mockSetStep = vi.fn()
 
 let mockImportedAccounts: ImportedAccount[] = []
 let mockCustomKeywords: Record<string, string[]> = {}
-let mockDuplicateOverrideRules: any[] = []
+let mockDuplicateOverrideRules: DuplicateOverrideRule[] = []
 
 vi.mock('../../store/useAppStore', () => ({
   countDuplicateTransactionsInAccounts: vi.fn(() => 0),

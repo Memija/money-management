@@ -231,7 +231,7 @@ function detectColumnIndices(header: string[]): ColumnIndices {
 function parseRow(row: string[], indices: ColumnIndices, institution: string): Transaction | null {
   if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) return null
 
-  const { dateIdx, descIdx, amountIdx, sollIdx, habenIdx, refIdx, ownIbanIdx, counterpartyIbanIdx, accountIdx } = indices
+  const { dateIdx, descIdx, amountIdx, sollIdx, habenIdx, refIdx, ownIbanIdx, counterpartyIbanIdx, accountIdx, partnerIdx } = indices
 
   const rawAmount = row[amountIdx]
   const rawAmountStr = rawAmount?.toString().trim() ?? ''
@@ -251,8 +251,17 @@ function parseRow(row: string[], indices: ColumnIndices, institution: string): T
   if (!desc && refIdx !== -1) {
     desc = row[refIdx]?.toString?.()?.trim() ?? ''
   }
+
+  let partner: string | undefined
+  if (partnerIdx !== -1 && partnerIdx !== descIdx) {
+    const rawPartner = row[partnerIdx]?.toString?.()?.trim()
+    if (rawPartner) {
+      partner = rawPartner
+    }
+  }
+
   if (!desc) {
-    desc = 'Unknown'
+    desc = partner || 'Unknown'
   }
 
   let counterpartyIban: string | undefined
@@ -304,6 +313,7 @@ function parseRow(row: string[], indices: ColumnIndices, institution: string): T
     counterpartyIban,
     ownIban,
     subAccount,
+    partner,
   }
 }
 

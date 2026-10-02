@@ -6,6 +6,8 @@ import { resolveCanonicalCategory } from './category-utils'
 export const CATEGORY_COLORS: Record<string, string> = {
   Salary: '#10b981',       // Emerald Green
   Rent: '#6366f1',         // Indigo
+  Loans: '#d97706',        // Amber / Bronze
+  Taxes: '#475569',        // Dark Slate / Steel
   Groceries: '#f97316',    // Warm Orange
   'Dining Out': '#f43f5e', // Rose
   DiningOut: '#f43f5e',
@@ -29,7 +31,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
 export const ICON_COLORS: Record<string, string> = {
   // Finance
   PiggyBank: '#14b8a6', CreditCard: '#06b6d4', Briefcase: '#10b981', Landmark: '#94a3b8',
-  Wallet: '#10b981', Banknote: '#10b981', Coins: '#eab308', Receipt: '#64748b',
+  Wallet: '#10b981', Banknote: '#10b981', Coins: '#eab308', Receipt: '#475569',
   // Home & Utilities
   Home: '#6366f1', Zap: '#eab308', Droplet: '#06b6d4', Flame: '#f97316',
   Wifi: '#0284c7', Wrench: '#64748b', Trash2: '#64748b', Key: '#f59e0b', Building2: '#64748b',

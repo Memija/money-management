@@ -3,6 +3,8 @@ import type { TranslationStrings } from './translations'
 export const DEFAULT_CATEGORY_KEYS = [
   'Salary',
   'Rent',
+  'Loans',
+  'Taxes',
   'Groceries',
   'Dining Out',
   'Shopping',
@@ -21,6 +23,8 @@ export const DEFAULT_CATEGORY_KEYS = [
 export const categoryI18nKeys: Record<string, keyof TranslationStrings> = {
   Salary: 'catSalary',
   Rent: 'catRent',
+  Loans: 'catLoans',
+  Taxes: 'catTaxes',
   Groceries: 'catGroceries',
   'Dining Out': 'catDiningOut',
   DiningOut: 'catDiningOut',

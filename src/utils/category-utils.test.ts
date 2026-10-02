@@ -5,6 +5,7 @@ import type { Transaction } from '../types'
 import {
   categorize,
   extractCleanDescription,
+  extractMerchantKeyword,
   findRelatedTransactions,
   formatCategoryCount,
   formatCategoryPercent,
@@ -78,6 +79,7 @@ describe('category-utils', () => {
     it('resolves exact canonical category keys', () => {
       expect(resolveCanonicalCategory('Salary')).toBe('Salary')
       expect(resolveCanonicalCategory('Rent')).toBe('Rent')
+      expect(resolveCanonicalCategory('Loans')).toBe('Loans')
       expect(resolveCanonicalCategory('Groceries')).toBe('Groceries')
       expect(resolveCanonicalCategory('Dining Out')).toBe('Dining Out')
       expect(resolveCanonicalCategory('DiningOut')).toBe('Dining Out')
@@ -122,12 +124,13 @@ describe('category-utils', () => {
       expect(resolveCanonicalCategory('Putovanja')).toBe('Travel')
       expect(resolveCanonicalCategory('Путовања')).toBe('Travel')
       expect(resolveCanonicalCategory('Perjalanan')).toBe('Travel')
-      // Communication across all supported languages
-      expect(resolveCanonicalCategory('Kommunikation')).toBe('Communication')
-      expect(resolveCanonicalCategory('Komunikacja')).toBe('Communication')
-      expect(resolveCanonicalCategory('Komunikacija')).toBe('Communication')
-      expect(resolveCanonicalCategory('Комуникација')).toBe('Communication')
-      expect(resolveCanonicalCategory('Komunikasi')).toBe('Communication')
+      // Loans across all supported languages
+      expect(resolveCanonicalCategory('Loans')).toBe('Loans')
+      expect(resolveCanonicalCategory('Kredite & Darlehen')).toBe('Loans')
+      expect(resolveCanonicalCategory('Krediti')).toBe('Loans')
+      expect(resolveCanonicalCategory('Кредити')).toBe('Loans')
+      expect(resolveCanonicalCategory('Kredyty i Pożyczki')).toBe('Loans')
+      expect(resolveCanonicalCategory('Pinjaman & Kredit')).toBe('Loans')
     })
 
     it('resolves categories from transaction keywords and descriptions', () => {
@@ -952,6 +955,351 @@ describe('category-utils', () => {
         type: 'expense',
       }
       expect(getTransactionCategory(txOther)).toBe('Other')
+    })
+  })
+
+  describe('improved categorization & boundary precision', () => {
+    describe('boundary matching & false-positive elimination', () => {
+      it('does not classify words containing "car" as Transport', () => {
+        expect(categorize('Mastercard Debit Payment')).not.toBe('Transport')
+        expect(categorize('Credit card payment')).not.toBe('Transport')
+        expect(categorize('Healthcare Clinic')).not.toBe('Transport')
+        expect(categorize('Carpet cleaning service')).not.toBe('Transport')
+        expect(categorize('Oscar Wilde Books')).not.toBe('Transport')
+        // But actual standalone car or Uber matches Transport
+        expect(categorize('Rental car trip')).toBe('Transport')
+        expect(categorize('Uber car ride')).toBe('Transport')
+      })
+
+      it('does not classify words containing "weg" as Rent', () => {
+        expect(categorize('Bewegung Studio')).not.toBe('Rent')
+        expect(categorize('Unterwegs Kiosk')).not.toBe('Rent')
+        expect(categorize('Zahlungsweg Gebühr')).not.toBe('Rent')
+        // But WEG Hausgeld or Miete matches Rent
+        expect(categorize('WEG Hausgeld 01/2024')).toBe('Rent')
+        expect(categorize('Monatliche Miete')).toBe('Rent')
+      })
+
+      it('does not classify words containing "auto" as Transport', () => {
+        expect(categorize('Geldautomat Abhebung')).not.toBe('Transport')
+        expect(categorize('Automatic transfer')).not.toBe('Transport')
+        // But standalone auto matches Transport
+        expect(categorize('Auto Service Werkstatt')).toBe('Transport')
+      })
+
+      it('does not classify words containing "essen" or the city Essen as Dining Out', () => {
+        expect(categorize('Messer Shop')).not.toBe('Dining Out')
+        expect(categorize('Interessenverband')).not.toBe('Dining Out')
+        expect(categorize('Sparkasse Essen')).not.toBe('Dining Out')
+        expect(categorize('Essen Hbf Reisezentrum')).not.toBe('Dining Out')
+        // But dining / restaurant matches
+        expect(categorize('Restaurant Essen & Trinken')).toBe('Dining Out')
+        expect(categorize('McDonalds Essen')).toBe('Dining Out')
+      })
+
+      it('does not classify words containing "rent" or "tax" falsely', () => {
+        expect(categorize('Current account fee')).not.toBe('Rent')
+        expect(categorize('Parent company transfer')).not.toBe('Rent')
+        expect(categorize('Contactless payment')).not.toBe('Taxes')
+        expect(categorize('Syntax error tool')).not.toBe('Taxes')
+        expect(categorize('Property tax')).toBe('Taxes')
+        expect(categorize('Apartment rent')).toBe('Rent')
+      })
+
+      it('does not classify Volkswagen or Belohnung as Salary', () => {
+        expect(categorize('Volkswagen Leasing')).not.toBe('Salary')
+        expect(categorize('Belohnung Bonus')).not.toBe('Salary')
+        expect(categorize('Monatlicher Lohn')).toBe('Salary')
+        expect(categorize('Minimum wage')).toBe('Salary')
+      })
+    })
+
+    describe('integrated popular merchant dictionary', () => {
+      it('categorizes popular entertainment merchants correctly', () => {
+        expect(categorize('Steam Games')).toBe('Entertainment')
+        expect(categorize('Steampowered')).toBe('Entertainment')
+        expect(categorize('PlayStation Network')).toBe('Entertainment')
+        expect(categorize('Twitch Interactive')).toBe('Entertainment')
+        expect(categorize('Spotify AB')).toBe('Entertainment')
+        expect(categorize('Netflix.com')).toBe('Entertainment')
+      })
+
+      it('categorizes popular retail & shopping merchants correctly', () => {
+        expect(categorize('IKEA Deutschland')).toBe('Shopping')
+        expect(categorize('Apple Store Berlin')).toBe('Shopping')
+        expect(categorize('Zalando Payments')).toBe('Shopping')
+        expect(categorize('Zara Filiale 123')).toBe('Shopping')
+        expect(categorize('AMZN Mktp DE')).toBe('Shopping')
+      })
+
+      it('categorizes popular dining & food delivery merchants correctly', () => {
+        expect(categorize('Uber Eats Order')).toBe('Dining Out')
+        expect(categorize('Deliveroo London')).toBe('Dining Out')
+        expect(categorize('Lieferando.de')).toBe('Dining Out')
+        expect(categorize('Starbucks Coffee')).toBe('Dining Out')
+        expect(categorize('Burger King')).toBe('Dining Out')
+      })
+
+      it('categorizes popular transport & mobility merchants correctly', () => {
+        expect(categorize('Shell Station 0492')).toBe('Transport')
+        expect(categorize('Aral Tankstelle')).toBe('Transport')
+        expect(categorize('Deutsche Bahn Vertrieb')).toBe('Transport')
+        expect(categorize('DB Regio Ticket')).toBe('Transport')
+      })
+
+      it('categorizes popular grocery merchants across countries', () => {
+        expect(categorize('Lidl Dienstleistung')).toBe('Groceries')
+        expect(categorize('Kaufland Berlin')).toBe('Groceries')
+        expect(categorize('Aldi Süd')).toBe('Groceries')
+        expect(categorize('Aldi Sued')).toBe('Groceries')
+        expect(categorize('Biedronka')).toBe('Groceries')
+        expect(categorize('Bingo d.o.o.')).toBe('Groceries')
+      })
+    })
+
+    describe('payment processor disambiguation', () => {
+      it('prioritizes specific merchant over payment processors like PayPal or Klarna', () => {
+        expect(categorize('PAYPAL *SPOTIFY')).toBe('Entertainment')
+        expect(categorize('PAYPAL *STEAM GAMES')).toBe('Entertainment')
+        expect(categorize('PAYPAL *REWE MARKT')).toBe('Groceries')
+        expect(categorize('KLARNA *ZALANDO')).toBe('Shopping')
+        expect(categorize('PAYPAL *UBER EATS')).toBe('Dining Out')
+      })
+
+      it('falls back to Transfers when PayPal is a direct transfer without known retail merchant', () => {
+        expect(categorize('PAYPAL *JOHN DOE')).toBe('Transfers')
+        expect(categorize('PayPal Guthaben')).toBe('Transfers')
+      })
+    })
+
+    describe('context-aware categorization', () => {
+      it('prevents expenses from being categorized as Salary', () => {
+        const expenseTx: Transaction = {
+          id: 'tx-exp-salary',
+          date: '2024-01-01',
+          amount: -50,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description: 'Salary software subscription',
+          type: 'expense',
+        }
+        expect(getTransactionCategory(expenseTx)).not.toBe('Salary')
+
+        const incomeTx: Transaction = {
+          id: 'tx-inc-salary',
+          date: '2024-01-01',
+          amount: 3000,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description: 'Monthly salary payment',
+          type: 'income',
+        }
+        expect(getTransactionCategory(incomeTx)).toBe('Salary')
+      })
+
+      it('incorporates partner column when present in transaction', () => {
+        const txWithPartner: Transaction = {
+          id: 'tx-partner',
+          date: '2024-01-01',
+          amount: -45.5,
+          currency: 'EUR',
+          institution: 'Bank A',
+          partner: 'REWE Markt',
+          description: 'Kartenzahlung vom 12.03. Terminal 49102',
+          type: 'expense',
+        }
+        expect(getTransactionCategory(txWithPartner)).toBe('Groceries')
+      })
+    })
+
+    describe('extractMerchantKeyword', () => {
+      it('extracts clean merchant keywords by stripping legal entity forms and noise', () => {
+        expect(extractMerchantKeyword('Rewe Markt GmbH & Co. KG Filiale 481')).toBe('Rewe Markt')
+        expect(extractMerchantKeyword('Kaufland 4912 Berlin')).toBe('Kaufland')
+        expect(extractMerchantKeyword('Deutsche Telekom AG')).toBe('Deutsche Telekom')
+        expect(extractMerchantKeyword('Zalando Payments GmbH')).toBe('Zalando Payments')
+      })
+    })
+
+    describe('loan payment categorization', () => {
+      it('categorizes German KREDITRATE bank bookings as Loans', () => {
+        expect(
+          categorize(
+            'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KREDITRATE End-to-End-Ref',
+          ),
+        ).toBe('Loans')
+        expect(categorize('KREDITRATE 502')).toBe('Loans')
+        expect(categorize('Monatliche Tilgungsrate Darlehen')).toBe('Loans')
+        expect(categorize('Baufinanzierung Annuität')).toBe('Loans')
+      })
+
+      it('categorizes English, Bosnian, and other loan keywords as Loans', () => {
+        expect(categorize('Personal loan installment')).toBe('Loans')
+        expect(categorize('Car loan repayment')).toBe('Loans')
+        expect(categorize('Rata kredita za stan')).toBe('Loans')
+        expect(categorize('Otplata kredita')).toBe('Loans')
+        expect(categorize('Spłata raty kredytu')).toBe('Loans')
+        expect(categorize('Cicilan pinjaman bank')).toBe('Loans')
+      })
+    })
+
+    describe('insurance provider and camelCase policy categorization', () => {
+      it('categorizes iptiQ and AeguronRisikoLV bank bookings as Insurance', () => {
+        expect(
+          categorize(
+            'IPTIQ LIFE SA NIEDERLASSUNG DEUTSCH LAND AeguronRisikoLV 09/26 6267061-P End-to-End-R',
+          ),
+        ).toBe('Insurance')
+        expect(categorize('AeguronRisikoLV 09/26')).toBe('Insurance')
+        expect(categorize('HUK-Coburg Haftpflicht')).toBe('Insurance')
+        expect(categorize('Allianz Lebensversicherung')).toBe('Insurance')
+        expect(categorize('CosmosDirekt Hausrat')).toBe('Insurance')
+      })
+    })
+
+    describe('travel, tour operator, and airline categorization across countries', () => {
+      it('categorizes German TUI booking strings as Travel', () => {
+        expect(
+          categorize(
+            'TUI Deutschland GmbH VG.80319110 03.10.2026-HER End-to-End-Ref.: 000220030170552026 Manda',
+          ),
+        ).toBe('Travel')
+        expect(categorize('TUIfly Buchung 49102')).toBe('Travel')
+        expect(categorize('Dertour Pauschalreise Mallorca')).toBe('Travel')
+        expect(categorize('Alltours Flug & Hotel')).toBe('Travel')
+        expect(categorize('AIDA Cruises Kreuzfahrt')).toBe('Travel')
+      })
+
+      it('categorizes global and multi-country travel providers as Travel', () => {
+        expect(categorize('TUI UK Holidays')).toBe('Travel')
+        expect(categorize('Ryanair flight Dublin-Berlin')).toBe('Travel')
+        expect(categorize('easyJet airline booking')).toBe('Travel')
+        expect(categorize('Wizz Air flight ticket')).toBe('Travel')
+        expect(categorize('Expedia hotel reservation')).toBe('Travel')
+        expect(categorize('ITAKA biuro podróży')).toBe('Travel')
+        expect(categorize('Wakacje.pl rezerwacja')).toBe('Travel')
+        expect(categorize('Centrotours ljetovanje Turska')).toBe('Travel')
+        expect(categorize('Filip Travel aranžman Grčka')).toBe('Travel')
+        expect(categorize('Traveloka tiket pesawat')).toBe('Travel')
+      })
+
+      it('categorizes rest-of-the-world airlines across Americas, Asia, Oceania, Middle East, and Africa as Travel', () => {
+        // North America
+        expect(categorize('Delta Air Lines Flight 204')).toBe('Travel')
+        expect(categorize('American Airlines Ticket')).toBe('Travel')
+        expect(categorize('United Airlines Reservation')).toBe('Travel')
+        expect(categorize('Southwest Airlines Flight')).toBe('Travel')
+        expect(categorize('Air Canada Montreal-Paris')).toBe('Travel')
+
+        // Latin America
+        expect(categorize('LATAM Airlines Santiago-Lima')).toBe('Travel')
+        expect(categorize('Avianca Bogota')).toBe('Travel')
+        expect(categorize('Aeromexico CDMX')).toBe('Travel')
+
+        // Asia & Oceania
+        expect(categorize('Singapore Airlines Changi-Frankfurt')).toBe('Travel')
+        expect(categorize('Cathay Pacific Hong Kong')).toBe('Travel')
+        expect(categorize('Qantas Airways Sydney')).toBe('Travel')
+        expect(categorize('Japan Airlines Tokyo')).toBe('Travel')
+        expect(categorize('Korean Air Seoul')).toBe('Travel')
+
+        // Middle East & Africa
+        expect(categorize('Qatar Airways Doha')).toBe('Travel')
+        expect(categorize('Etihad Airways Abu Dhabi')).toBe('Travel')
+        expect(categorize('Ethiopian Airlines Addis Ababa')).toBe('Travel')
+      })
+
+      it('categorizes global hotel chains and OTAs across the rest of the world as Travel', () => {
+        expect(categorize('Marriott Bonvoy New York')).toBe('Travel')
+        expect(categorize('Hilton Honors Tokyo')).toBe('Travel')
+        expect(categorize('Grand Hyatt Dubai')).toBe('Travel')
+        expect(categorize('Holiday Inn Express London')).toBe('Travel')
+        expect(categorize('AccorHotels Sofitel Paris')).toBe('Travel')
+        expect(categorize('Trip.com Flight & Hotel')).toBe('Travel')
+        expect(categorize('Priceline Car & Hotel')).toBe('Travel')
+        expect(categorize('Kayak Vacation Booking')).toBe('Travel')
+        expect(categorize('Vrbo Beachfront Villa')).toBe('Travel')
+      })
+
+      it('categorizes global car rental providers as Transport', () => {
+        expect(categorize('Sixt Rent a Car')).toBe('Transport')
+        expect(categorize('Hertz Rent a Car Munich Airport')).toBe('Transport')
+        expect(categorize('Avis Rent a Car')).toBe('Transport')
+        expect(categorize('Enterprise Rent-A-Car')).toBe('Transport')
+      })
+    })
+
+    describe('tax payments and fiscal obligations categorization', () => {
+      it('categorizes German tax authority bookings and advance payments as Taxes', () => {
+        expect(
+          categorize(
+            'Finanzkasse Nidda HELADEFF DE98500500000001000439 Steuernummer 00345234717 Vorauszahl',
+          ),
+        ).toBe('Taxes')
+        expect(categorize('Finanzamt Frankfurt am Main')).toBe('Taxes')
+        expect(categorize('Einkommensteuer-Vorauszahlung Q3')).toBe('Taxes')
+        expect(categorize('Gewerbesteuer Stadt Bad Homburg')).toBe('Taxes')
+        expect(categorize('Umsatzsteuer-Vorauszahlung 08/2026')).toBe('Taxes')
+        expect(categorize('Bundeskasse Steuern')).toBe('Taxes')
+      })
+
+      it('categorizes international tax payments across countries as Taxes', () => {
+        expect(categorize('IRS US Tax Payment')).toBe('Taxes')
+        expect(categorize('HMRC Income Tax')).toBe('Taxes')
+        expect(categorize('Property tax assessment')).toBe('Taxes')
+        expect(categorize('Porezna uprava uplata poreza')).toBe('Taxes')
+        expect(categorize('Poreska uprava doprinosi')).toBe('Taxes')
+        expect(categorize('Urząd Skarbowy zapłata podatku')).toBe('Taxes')
+        expect(categorize('Dirjen Pajak SPT Tahunan')).toBe('Taxes')
+      })
+
+      it('categorizes worldwide tax authorities and revenue agencies as Taxes', () => {
+        // North America
+        expect(categorize('Canada Revenue Agency CRA Payment')).toBe('Taxes')
+        expect(categorize('CRA Tax / ARC')).toBe('Taxes')
+        expect(categorize('California Franchise Tax Board')).toBe('Taxes')
+        expect(categorize('US Treasury Tax Refund')).toBe('Taxes')
+        expect(categorize('Servicio de Administracion Tributaria Impuestos')).toBe('Taxes')
+
+        // Europe
+        expect(categorize('DGFiP Prelevement Impots')).toBe('Taxes')
+        expect(categorize('Direction Generale des Finances Publiques')).toBe('Taxes')
+        expect(categorize('Tresor Public Taxe Fonciere')).toBe('Taxes')
+        expect(categorize('Agenzia delle Entrate Modello F24')).toBe('Taxes')
+        expect(categorize('Agencia Tributaria AEAT IRPF')).toBe('Taxes')
+        expect(categorize('Hacienda Publica Retenciones')).toBe('Taxes')
+        expect(categorize('Belastingdienst Inkomstenbelasting')).toBe('Taxes')
+        expect(categorize('Eidgenössische Steuerverwaltung ESTV')).toBe('Taxes')
+        expect(categorize('Finanzamt Österreich Vorauszahlung')).toBe('Taxes')
+        expect(categorize('Autoridade Tributaria e Aduaneira')).toBe('Taxes')
+        expect(categorize('Skatteverket Skatt')).toBe('Taxes')
+        expect(categorize('Skatteetaten Innbetaling')).toBe('Taxes')
+        expect(categorize('Skattestyrelsen Restskat')).toBe('Taxes')
+        expect(categorize('Revenue Commissioners Ireland')).toBe('Taxes')
+
+        // Latin America
+        expect(categorize('Receita Federal Imposto de Renda')).toBe('Taxes')
+        expect(categorize('Pagamento IPTU Municipio')).toBe('Taxes')
+        expect(categorize('AFIP Pago de Impuestos')).toBe('Taxes')
+        expect(categorize('SII Impuestos Internos')).toBe('Taxes')
+        expect(categorize('DIAN Impuestos')).toBe('Taxes')
+        expect(categorize('SUNAT Tributos')).toBe('Taxes')
+
+        // Asia & Pacific
+        expect(categorize('Australian Taxation Office ATO Payment')).toBe('Taxes')
+        expect(categorize('Inland Revenue Department IRD Tax')).toBe('Taxes')
+        expect(categorize('Income Tax Department CBDT Advance Tax')).toBe('Taxes')
+        expect(categorize('Inland Revenue Authority IRAS')).toBe('Taxes')
+        expect(categorize('Lembaga Hasil Dalam Negeri LHDN')).toBe('Taxes')
+        expect(categorize('National Tax Agency Zeimusho')).toBe('Taxes')
+
+        // Middle East & Africa
+        expect(categorize('South African Revenue Service SARS Tax')).toBe('Taxes')
+        expect(categorize('Federal Tax Authority VAT')).toBe('Taxes')
+        expect(categorize('ZATCA Tax Payment')).toBe('Taxes')
+        expect(categorize('Federal Inland Revenue Service FIRS')).toBe('Taxes')
+        expect(categorize('Kenya Revenue Authority KRA')).toBe('Taxes')
+      })
     })
   })
 })

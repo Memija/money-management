@@ -7,6 +7,8 @@ export interface Transaction {
   category?: string
   type: 'income' | 'expense'
   institution: string
+  /** Payee or partner name if extracted from dedicated statement column. */
+  partner?: string
   /** True if this transaction is an internal transfer between the user's own accounts. */
   isGhost?: boolean
   /** ID of the paired reciprocal transaction in the other account. */
