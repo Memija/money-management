@@ -1,16 +1,17 @@
 import React from 'react'
 import { FaAmazon } from 'react-icons/fa'
 import {
-  SiAirbnb, SiAldisud, SiAllegro, SiApple, SiAral, SiAsda, SiAuchan,
-  SiBookingdotcom, SiBurgerking, SiCarrefour, SiCoop, SiDeliveroo,
-  SiDeutschebahn, SiDeutschetelekom, SiDm, SiDoordash, SiEbay, SiEdeka, SiGojek, SiGrab, SiIkea, SiJusteat, SiKaufland, SiKfc,
-  SiKlarna, SiLidl,
-  SiLyft, SiMastercard,
-  SiMcdonalds,
-  SiMorrisons, SiN26, SiNetflix, SiNike, SiO2,
-  SiOrange, SiPaypal, SiPlaystation, SiRevolut, SiRewe,
-  SiShell, SiShopee, SiSparkasse,
-  SiSpotify, SiStarbucks, SiSteam, SiTarget, SiTesco, SiTwitch, SiUber, SiUbereats, SiVisa, SiVodafone, SiWise, SiYoutube, SiZabka, SiZalando, SiZara
+  SiAirbnb, SiAldisud, SiAliexpress, SiAllegro, SiApple, SiApplepay, SiAral, SiAsda, SiAuchan,
+  SiBankofamerica, SiBarclays, SiBinance, SiBookingdotcom, SiBunq, SiBurgerking, SiCarrefour,
+  SiCashapp, SiChase, SiCoinbase, SiCommerzbank, SiCoop, SiDeliveroo,
+  SiDeutschebahn, SiDeutschebank, SiDeutschetelekom, SiDiscord, SiDm, SiDoordash, SiDuolingo, SiEbay, SiEdeka,
+  SiEpicgames, SiEtsy, SiGithub, SiGlovo, SiGojek, SiGooglepay, SiGrab, SiHellofresh, SiHsbc, SiIkea, SiJusteat, SiKaufland, SiKfc,
+  SiKlarna, SiLidl, SiLyft, SiMastercard, SiMcdonalds, SiMediamarkt, SiMoneygram, SiMonzo,
+  SiMorrisons, SiN26, SiNetflix, SiNike, SiO2, SiOrange, SiPayoneer, SiPaypal,
+  SiPlaystation, SiRevolut, SiRewe, SiRossmann, SiShell, SiShopee, SiSparkasse,
+  SiSpotify, SiStarbucks, SiStarlingbank, SiSteam, SiStrava, SiStripe, SiTarget, SiTesco, SiTwitch, SiUber,
+  SiUbereats, SiVenmo, SiVinted, SiVisa, SiVodafone, SiWesternunion, SiWise, SiYoutube,
+  SiZabka, SiZalando, SiZara
 } from 'react-icons/si'
 import {
   Activity,
@@ -45,6 +46,7 @@ import {
   Monitor,
   Music,
   Package,
+  Percent,
   PiggyBank,
   Pill,
   Pizza,
@@ -77,6 +79,7 @@ import {
 import { type MerchantSuggestion, POPULAR_MERCHANTS } from '../data/merchants'
 import { translations } from '../i18n/translations'
 import type { CustomCategory } from '../types'
+import { repairBrokenWords } from './categorizer/description-cleaning'
 import { getCategoryColor, ICON_COLORS } from './category-colors'
 import { resolveCanonicalCategory } from './category-utils'
 
@@ -90,6 +93,220 @@ export interface MerchantBrandInfo {
   initials: string
 }
 
+const createBankImageLogo = (src: string, alt: string): IconComponent => {
+  const BankLogo: IconComponent = ({ size = 16, className }) => (
+    <img
+      src={src}
+      alt={alt}
+      width={typeof size === 'number' ? size : undefined}
+      height={typeof size === 'number' ? size : undefined}
+      style={{
+        width: typeof size === 'number' ? `${size}px` : size,
+        height: typeof size === 'number' ? `${size}px` : size,
+        objectFit: 'contain',
+        borderRadius: '3px',
+        display: 'inline-block',
+        verticalAlign: 'middle',
+      }}
+      className={className}
+    />
+  )
+  BankLogo.displayName = `${alt}Logo`
+  return BankLogo
+}
+
+export const ComdirectLogo = createBankImageLogo('/banks/comdirect.png', 'comdirect')
+export const DkbLogo = createBankImageLogo('/banks/dkb.png', 'DKB')
+export const IngLogo = createBankImageLogo('/banks/ing-de.png', 'ING')
+export const PostbankLogo = createBankImageLogo('/banks/postbank.png', 'Postbank')
+export const TradeRepublicLogo = createBankImageLogo('/banks/trade-republic.png', 'Trade Republic')
+export const ScalableCapitalLogo = createBankImageLogo('/banks/scalable-capital.png', 'Scalable Capital')
+export const VolksbankLogo = createBankImageLogo('/banks/volksbank-other.png', 'Volksbank')
+export const TargobankLogo = createBankImageLogo('/banks/targobank.png', 'Targobank')
+export const SpardaBankLogo = createBankImageLogo('/banks/sparda-bank.png', 'Sparda-Bank')
+export const C24Logo = createBankImageLogo('/banks/c24.png', 'C24 Bank')
+export const ConsorsbankLogo = createBankImageLogo('/banks/consorsbank.png', 'Consorsbank')
+
+export const RmvLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '3px',
+      flexShrink: 0,
+    }}
+    className={className}
+    aria-label="RMV"
+    role="img"
+  >
+    <rect width="48" height="48" rx="8" fill="#005B9C" />
+    <path
+      d="M 6 37 Q 24 31 42 37"
+      stroke="#FFCC00"
+      strokeWidth="3.5"
+      fill="none"
+      strokeLinecap="round"
+    />
+    <text
+      x="50%"
+      y="49%"
+      dominantBaseline="central"
+      textAnchor="middle"
+      fill="#FFFFFF"
+      fontWeight="900"
+      fontSize="16"
+      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      letterSpacing="-0.5px"
+    >
+      RMV
+    </text>
+  </svg>
+)
+RmvLogo.displayName = 'RmvLogo'
+
+export const HvvLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '3px',
+      flexShrink: 0,
+    }}
+    className={className}
+    aria-label="HVV"
+    role="img"
+  >
+    <rect width="48" height="48" rx="8" fill="#004B87" />
+    <path d="M 0 34 L 48 24 L 48 48 L 0 48 Z" fill="#D40E14" />
+    <text
+      x="50%"
+      y="47%"
+      dominantBaseline="central"
+      textAnchor="middle"
+      fill="#FFFFFF"
+      fontWeight="900"
+      fontSize="16"
+      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    >
+      hvv
+    </text>
+  </svg>
+)
+HvvLogo.displayName = 'HvvLogo'
+
+export const FlixLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '3px',
+      flexShrink: 0,
+    }}
+    className={className}
+    aria-label="Flix"
+    role="img"
+  >
+    <rect width="48" height="48" rx="8" fill="#73D700" />
+    <text
+      x="50%"
+      y="50%"
+      dominantBaseline="central"
+      textAnchor="middle"
+      fill="#FFFFFF"
+      fontWeight="900"
+      fontSize="14"
+      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      letterSpacing="-0.5px"
+    >
+      FLIX
+    </text>
+  </svg>
+)
+FlixLogo.displayName = 'FlixLogo'
+
+export const OebbLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '3px',
+      flexShrink: 0,
+    }}
+    className={className}
+    aria-label="ÖBB"
+    role="img"
+  >
+    <rect width="48" height="48" rx="8" fill="#D91A15" />
+    <text
+      x="50%"
+      y="50%"
+      dominantBaseline="central"
+      textAnchor="middle"
+      fill="#FFFFFF"
+      fontWeight="900"
+      fontSize="15"
+      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    >
+      ÖBB
+    </text>
+  </svg>
+)
+OebbLogo.displayName = 'OebbLogo'
+
+export const VrrLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '3px',
+      flexShrink: 0,
+    }}
+    className={className}
+    aria-label="VRR"
+    role="img"
+  >
+    <rect width="48" height="48" rx="8" fill="#009640" />
+    <text
+      x="50%"
+      y="50%"
+      dominantBaseline="central"
+      textAnchor="middle"
+      fill="#FFFFFF"
+      fontWeight="900"
+      fontSize="15"
+      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    >
+      VRR
+    </text>
+  </svg>
+)
+VrrLogo.displayName = 'VrrLogo'
+
 export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiNetflix, SiSpotify, SiUber, SiStarbucks, SiSteam, SiMcdonalds,
   SiIkea, SiApple, SiPaypal, SiAirbnb, SiNike, SiDm, SiRewe,
@@ -99,12 +316,20 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiCarrefour, SiBookingdotcom, SiAllegro, SiJusteat, SiEbay, SiAuchan,
   SiZabka, SiAsda, SiMorrisons, SiCoop, SiTarget, SiBurgerking, SiKfc,
   SiDoordash, SiUbereats, SiRevolut, SiWise, SiKlarna, SiN26, SiMastercard,
-  SiVisa, SiZara, SiLyft, SiYoutube, SiTwitch, SiPlaystation, SiSparkasse
+  SiVisa, SiZara, SiLyft, SiYoutube, SiTwitch, SiPlaystation, SiSparkasse,
+  SiWesternunion, SiMoneygram, SiApplepay, SiBankofamerica, SiBarclays, SiBinance,
+  SiCashapp, SiChase, SiCoinbase, SiCommerzbank, SiDeutschebank, SiGlovo,
+  SiGooglepay, SiHsbc, SiMonzo, SiPayoneer, SiStripe, SiVenmo,
+  SiRossmann, SiMediamarkt, SiVinted, SiAliexpress, SiEtsy, SiHellofresh,
+  SiBunq, SiStarlingbank, SiEpicgames, SiDiscord, SiGithub, SiDuolingo, SiStrava,
+  ComdirectLogo, DkbLogo, IngLogo, PostbankLogo, TradeRepublicLogo,
+  ScalableCapitalLogo, VolksbankLogo, TargobankLogo, SpardaBankLogo, C24Logo, ConsorsbankLogo,
+  RmvLogo, HvvLogo, FlixLogo, OebbLogo, VrrLogo
 }
 
 export const AVAILABLE_ICONS: Record<string, IconComponent> = {
   // Finance
-  PiggyBank, CreditCard, Briefcase, Landmark, Wallet, Banknote, Coins, Receipt,
+  PiggyBank, CreditCard, Briefcase, Landmark, Wallet, Banknote, Coins, Receipt, Percent,
   // Home & Utilities
   Home, Zap, Droplet, Flame, Wifi, Wrench, Trash2, Key, Building2,
   // Food & Drink
@@ -124,7 +349,7 @@ export const AVAILABLE_ICONS: Record<string, IconComponent> = {
 export const ICON_GROUPS = [
   {
     name: 'Finance',
-    icons: ['PiggyBank', 'CreditCard', 'Briefcase', 'Landmark', 'Wallet', 'Banknote', 'Coins', 'Receipt']
+    icons: ['PiggyBank', 'CreditCard', 'Briefcase', 'Landmark', 'Wallet', 'Banknote', 'Coins', 'Receipt', 'Percent']
   },
   {
     name: 'Home & Utilities',
@@ -182,9 +407,61 @@ export const CANONICAL_CATEGORY_ICONS: Record<string, IconComponent> = {
   Communication: Wifi,
   Internet: Wifi,
   Savings: PiggyBank,
+  Cash: Banknote,
   Transfers: CreditCard,
   Travel: Plane,
+  Crypto: Coins,
+  'Bank Fees': Percent,
+  BankFees: Percent,
+  Fees: Percent,
   Other: Package,
+}
+
+/**
+ * Calculates the match score (length of the matched keyword/alias) of a merchant
+ * against a lowercased text string. Returns 0 if no match.
+ */
+function getMerchantMatchScore(merchant: MerchantSuggestion, textLower: string): number {
+  let best = 0
+  const terms = [merchant.keyword, ...(merchant.aliases || [])]
+  for (const term of terms) {
+    const termLower = term.toLowerCase()
+    if (textLower.includes(termLower)) {
+      if (termLower.length > best) {
+        best = termLower.length
+      }
+    }
+  }
+  return best
+}
+
+/**
+ * Finds the most specific matching popular merchant for a given text
+ * by checking its keyword, aliases, and display name.
+ */
+export function findMatchingMerchant(text: string): MerchantSuggestion | undefined {
+  if (!text) return undefined
+  const repaired = repairBrokenWords(text)
+  const textLower = repaired.trim().toLowerCase()
+  let bestMerchant: MerchantSuggestion | undefined
+  let bestScore = 0
+
+  for (const merchant of POPULAR_MERCHANTS) {
+    let score = getMerchantMatchScore(merchant, textLower)
+    const nameLower = merchant.name.toLowerCase()
+    if (nameLower.includes(textLower) && textLower.length > score) {
+      score = textLower.length
+    } else if (textLower.includes(nameLower) && nameLower.length > score) {
+      score = nameLower.length
+    }
+
+    if (score > bestScore) {
+      bestScore = score
+      bestMerchant = merchant
+    }
+  }
+
+  return bestMerchant
 }
 
 export function getCategoryIcon(
@@ -203,11 +480,9 @@ export function getCategoryIcon(
     }
   }
 
-  // 1.5. Check if it matches a popular merchant based on description
+  // 1.5. Check if it matches a popular merchant based on description (prioritize most specific match)
   if (description) {
-    const descLower = description.toLowerCase()
-    const merchant = POPULAR_MERCHANTS.find((m) => descLower.includes(m.keyword.toLowerCase()))
-
+    const merchant = findMatchingMerchant(description)
     if (merchant) {
       if (merchant.logo && MERCHANT_LOGOS[merchant.logo]) {
         const LogoComp = MERCHANT_LOGOS[merchant.logo]
@@ -237,12 +512,7 @@ export function getCategoryIcon(
 
 export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
   const nameTrimmed = name.trim()
-  const nameLower = nameTrimmed.toLowerCase()
-  const merchant = POPULAR_MERCHANTS.find(
-    (m) =>
-      nameLower.includes(m.keyword.toLowerCase()) ||
-      m.name.toLowerCase().includes(nameLower)
-  )
+  const merchant = findMatchingMerchant(nameTrimmed)
 
   const words = nameTrimmed.split(/\s+/)
   const initials =

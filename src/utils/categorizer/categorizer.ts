@@ -1,5 +1,6 @@
 import { POPULAR_MERCHANTS } from '../../data/merchants'
 import { type CategoryKeywords, translations } from '../../i18n/translations'
+import { repairBrokenWords } from './description-cleaning'
 
 export interface CategorizeOptions {
   customKeywords?: Record<string, string[]>
@@ -50,7 +51,12 @@ const merchantCategoryPatterns: Record<string, string[]> = {}
 const transferMerchantPatterns: string[] = []
 
 for (const merchant of POPULAR_MERCHANTS) {
-  const cat = merchant.category === 'Dining Out' ? 'DiningOut' : merchant.category
+  const cat =
+    merchant.category === 'Dining Out'
+      ? 'DiningOut'
+      : merchant.category === 'Bank Fees'
+        ? 'BankFees'
+        : merchant.category
   const words = [merchant.keyword, ...(merchant.aliases || [])]
   if (cat === 'Transfers') {
     transferMerchantPatterns.push(...words)
@@ -114,6 +120,11 @@ const CAR_OR_EQUIPMENT_RENTAL_REGEX =
 const INCOME_TAX_REGEX =
   /(?:\b(?:income\s+tax|einkommensteuer|podatek\s+dochodowy|porez\s+na\s+dohodak|pajak\s+penghasilan|pph)\b)/i
 
+// Regex to detect cash withdrawal in Polish context (e.g. 'Wypłata z bankomatu', 'Wypłata gotówki')
+// to prevent ATM withdrawals from misclassifying as personal Salary (wypłata).
+const POLISH_ATM_WITHDRAWAL_REGEX =
+  /(?:\b(?:wyp[lł]ata|wyplata)\s+(?:z\s+bankomatu|got[oó]wki|w\s+bankomacie)\b)/i
+
 const defaultCategoryCache = new Map<string, string>()
 
 /**
@@ -141,11 +152,12 @@ export function categorize(
     }
   }
 
-  // Combine partner and description if partner is available
-  const fullText = options?.partner
+  // Combine partner and description if partner is available, repairing broken line-wrap words
+  const rawText = options?.partner
     ? `${options.partner} ${desc}`.trim()
     : desc.trim()
 
+  const fullText = repairBrokenWords(rawText)
   const d = fullText.toLowerCase()
 
   // 1. First evaluate user's custom keywords (highest priority)
@@ -158,11 +170,13 @@ export function categorize(
         try {
           if (new RegExp(pat, 'iu').test(d)) {
             if (cat === 'DiningOut') return 'Dining Out'
+            if (cat === 'BankFees') return 'Bank Fees'
             return cat
           }
         } catch {
           if (d.includes(w.toLowerCase())) {
             if (cat === 'DiningOut') return 'Dining Out'
+            if (cat === 'BankFees') return 'Bank Fees'
             return cat
           }
         }
@@ -184,6 +198,7 @@ export function categorize(
   for (const cat of structuralCategories) {
     if (cat === 'Salary') {
       if (INCOME_TAX_REGEX.test(d)) continue
+      if (POLISH_ATM_WITHDRAWAL_REGEX.test(d)) continue
       if (isExpense) {
         const isExplicitSalaryPayment =
           /\b(?:salary\s+payment|monthly\s+salary|gehaltszahlung|lohnauszahlung)\b/i.test(d)
@@ -207,7 +222,8 @@ export function categorize(
       if (cat === 'DiningOut' && GERMAN_CITY_ESSEN_REGEX.test(d)) {
         continue
       }
-      const result = cat === 'DiningOut' ? 'Dining Out' : cat
+      const result =
+        cat === 'DiningOut' ? 'Dining Out' : cat === 'BankFees' ? 'Bank Fees' : cat
       if (!customKeywords) defaultCategoryCache.set(cacheKey, result)
       return result
     }
@@ -215,6 +231,9 @@ export function categorize(
 
   // 4. General category matching
   let order: (keyof CategoryKeywords)[] = [
+    'Cash',
+    'BankFees',
+    'Crypto',
     'Groceries',
     'DiningOut',
     'Shopping',
@@ -231,6 +250,8 @@ export function categorize(
   if (isIncome) {
     order = [
       'Savings',
+      'Crypto',
+      'Cash',
       'Groceries',
       'Shopping',
       'DiningOut',
@@ -241,6 +262,7 @@ export function categorize(
       'Communication',
       'Utilities',
       'Healthcare',
+      'BankFees',
     ]
   }
 
@@ -252,7 +274,8 @@ export function categorize(
         continue
       }
 
-      const result = cat === 'DiningOut' ? 'Dining Out' : cat
+      const result =
+        cat === 'DiningOut' ? 'Dining Out' : cat === 'BankFees' ? 'Bank Fees' : cat
       if (!customKeywords) {
         defaultCategoryCache.set(cacheKey, result)
       }

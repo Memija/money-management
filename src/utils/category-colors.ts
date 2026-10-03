@@ -20,8 +20,13 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Entertainment: '#8b5cf6',// Violet / Purple
   Insurance: '#64748b',    // Slate Grey
   Savings: '#14b8a6',      // Teal
+  Cash: '#84cc16',         // Lime Green
   Transfers: '#06b6d4',    // Cyan
   Travel: '#0ea5e9',       // Sky Blue
+  Crypto: '#f59e0b',       // Amber / Crypto Gold
+  'Bank Fees': '#be123c',  // Rose / Crimson
+  BankFees: '#be123c',
+  Fees: '#be123c',
   Other: '#a855f7',        // Lilac
 }
 
@@ -31,7 +36,8 @@ export const CATEGORY_COLORS: Record<string, string> = {
 export const ICON_COLORS: Record<string, string> = {
   // Finance
   PiggyBank: '#14b8a6', CreditCard: '#06b6d4', Briefcase: '#10b981', Landmark: '#94a3b8',
-  Wallet: '#10b981', Banknote: '#10b981', Coins: '#eab308', Receipt: '#475569',
+  Wallet: '#10b981', Banknote: '#84cc16', Coins: '#eab308', Receipt: '#475569',
+  Percent: '#be123c',
   // Home & Utilities
   Home: '#6366f1', Zap: '#eab308', Droplet: '#06b6d4', Flame: '#f97316',
   Wifi: '#0284c7', Wrench: '#64748b', Trash2: '#64748b', Key: '#f59e0b', Building2: '#64748b',

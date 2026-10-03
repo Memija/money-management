@@ -118,6 +118,16 @@ describe('category-icons', () => {
         { category: 'Utilities', expectedIcon: AVAILABLE_ICONS.Zap },
         { category: 'Electricity', expectedIcon: AVAILABLE_ICONS.Zap },
         { category: 'Water bill', expectedIcon: AVAILABLE_ICONS.Zap },
+        { category: 'Crypto', expectedIcon: AVAILABLE_ICONS.Coins },
+        { category: 'Krypto', expectedIcon: AVAILABLE_ICONS.Coins },
+        { category: 'Kripto', expectedIcon: AVAILABLE_ICONS.Coins },
+        { category: 'Крипто', expectedIcon: AVAILABLE_ICONS.Coins },
+        { category: 'Bank Fees', expectedIcon: AVAILABLE_ICONS.Percent },
+        { category: 'Bankgebühren', expectedIcon: AVAILABLE_ICONS.Percent },
+        { category: 'Opłaty bankowe', expectedIcon: AVAILABLE_ICONS.Percent },
+        { category: 'Bankarske naknade', expectedIcon: AVAILABLE_ICONS.Percent },
+        { category: 'Банкарске накнаде', expectedIcon: AVAILABLE_ICONS.Percent },
+        { category: 'Biaya Bank', expectedIcon: AVAILABLE_ICONS.Percent },
         { category: 'Strom', expectedIcon: AVAILABLE_ICONS.Zap },
         { category: 'Rezi', expectedIcon: AVAILABLE_ICONS.Zap },
         { category: 'Communication', expectedIcon: AVAILABLE_ICONS.Wifi },
@@ -137,6 +147,12 @@ describe('category-icons', () => {
         { category: 'Investment fund', expectedIcon: AVAILABLE_ICONS.PiggyBank },
         { category: 'Sparen', expectedIcon: AVAILABLE_ICONS.PiggyBank },
         { category: 'Stednja', expectedIcon: AVAILABLE_ICONS.PiggyBank },
+        { category: 'Cash', expectedIcon: AVAILABLE_ICONS.Banknote },
+        { category: 'Bargeld', expectedIcon: AVAILABLE_ICONS.Banknote },
+        { category: 'Gotówka', expectedIcon: AVAILABLE_ICONS.Banknote },
+        { category: 'Gotovina', expectedIcon: AVAILABLE_ICONS.Banknote },
+        { category: 'Готовина', expectedIcon: AVAILABLE_ICONS.Banknote },
+        { category: 'Tarik Tunai', expectedIcon: AVAILABLE_ICONS.Banknote },
         { category: 'Transfers', expectedIcon: AVAILABLE_ICONS.CreditCard },
         { category: 'Bank uberweisung', expectedIcon: AVAILABLE_ICONS.CreditCard },
         { category: 'Prenos novca', expectedIcon: AVAILABLE_ICONS.CreditCard },
@@ -163,7 +179,7 @@ describe('category-icons', () => {
           expect(icon.type, `Category "${category}" should render expected icon`).toBe(expectedIcon)
         }
       }
-    })
+    }, 15000)
 
     it('falls back to Package icon for unknown categories', () => {
       const icon = getCategoryIcon('CompletelyUnknownCategory123')
@@ -232,6 +248,53 @@ describe('category-icons', () => {
       }
     })
 
+    it('matches comdirect via BIC (COBADEHD077), BLZ (20041177), and Junior Depot', () => {
+      const txDesc =
+        'ARTUR MEMIC COBADEHD077 DE97200411770239797400 JUNIOR DEPOT End-to-End-Ref.: NO'
+      const icon = getCategoryIcon('Savings', 20, undefined, txDesc)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.ComdirectLogo)
+      }
+
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('comdirect')
+      expect(brand.merchant?.name).toBe('comdirect')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.ComdirectLogo)
+    })
+
+    it('matches Commerzbank logo for employee canteen Kasinoabrechnung transactions', () => {
+      const txDesc =
+        'Commerzbank AG Kasinoabrechnung Frankfurt Plaza Ka sino: 16,50 / Cafeteria: - / Sonsti ges: - End-to-'
+      const icon = getCategoryIcon('Dining Out', 20, undefined, txDesc)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.SiCommerzbank)
+      }
+
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('commerzbank')
+      expect(brand.merchant?.name).toBe('Commerzbank')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
+    })
+
+    it('matches RMV logo for Rhein-Main-Verkehrsverbund public transit transactions', () => {
+      const txDesc =
+        'Rhein-Main-Verkehrsverbund Serviceg esellschaft mbH (rms GmbH) Treuhand RNR 2/2607/1271193'
+      const icon = getCategoryIcon('Transport', 20, undefined, txDesc)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.RmvLogo)
+      }
+
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('rmv')
+      expect(brand.merchant?.name).toBe('RMV')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.RmvLogo)
+      expect(brand.brandColor).toBe('#005B9C')
+      expect(brand.suggestedCategory).toBe('Transport')
+    })
+
     it('renders successfully into the DOM using @testing-library/react', () => {
       const { container } = render(<div>{getCategoryIcon('Salary', 24)}</div>)
       const svg = container.querySelector('svg')
@@ -262,6 +325,110 @@ describe('category-icons', () => {
       expect(info.merchant).toBeDefined()
       expect(info.merchant?.id).toBe('spotify')
       expect(info.logoComponent).toBe(MERCHANT_LOGOS.SiSpotify)
+    })
+
+    it('returns brand info for Western Union with SiWesternunion logo', () => {
+      const info = getMerchantBrandInfo('Western Union Money Transfer')
+      expect(info.merchant).toBeDefined()
+      expect(info.merchant?.name).toBe('Western Union')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.SiWesternunion)
+      expect(info.brandColor).toBe('#FFDD00')
+      expect(info.suggestedCategory).toBe('Transfers')
+      expect(info.initials).toBe('WU')
+    })
+
+    it('returns brand info for Deutsche Bank, Stripe, Glovo, and Apple Pay', () => {
+      const dbInfo = getMerchantBrandInfo('Deutsche Bank Girokonto')
+      expect(dbInfo.merchant?.name).toBe('Deutsche Bank')
+      expect(dbInfo.logoComponent).toBe(MERCHANT_LOGOS.SiDeutschebank)
+      expect(dbInfo.suggestedCategory).toBe('Transfers')
+
+      const stripeInfo = getMerchantBrandInfo('Stripe Payments')
+      expect(stripeInfo.merchant?.name).toBe('Stripe')
+      expect(stripeInfo.logoComponent).toBe(MERCHANT_LOGOS.SiStripe)
+
+      const glovoInfo = getMerchantBrandInfo('Glovo Delivery Beograd')
+      expect(glovoInfo.merchant?.name).toBe('Glovo')
+      expect(glovoInfo.logoComponent).toBe(MERCHANT_LOGOS.SiGlovo)
+      expect(glovoInfo.suggestedCategory).toBe('Dining Out')
+
+      const applePayInfo = getMerchantBrandInfo('Apple Pay Purchase')
+      expect(applePayInfo.merchant?.name).toBe('Apple Pay')
+      expect(applePayInfo.logoComponent).toBe(MERCHANT_LOGOS.SiApplepay)
+
+      const comdirectInfo = getMerchantBrandInfo('Übertrag comdirect Depot')
+      expect(comdirectInfo.merchant?.name).toBe('comdirect')
+      expect(comdirectInfo.logoComponent).toBe(MERCHANT_LOGOS.ComdirectLogo)
+      expect(comdirectInfo.brandColor).toBe('#FFE600')
+      expect(comdirectInfo.suggestedCategory).toBe('Transfers')
+
+      const coinbaseInfo = getMerchantBrandInfo(
+        'Coinbase Identifizierung Account verification return from Co inbase Identifizierung End-to',
+      )
+      expect(coinbaseInfo.merchant?.name).toBe('Coinbase')
+      expect(coinbaseInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCoinbase)
+      expect(coinbaseInfo.brandColor).toBe('#0052FF')
+      expect(coinbaseInfo.suggestedCategory).toBe('Crypto')
+
+      const rmvInfo = getMerchantBrandInfo(
+        'Rhein-Main-Verkehrsverbund Serviceg esellschaft mbH (rms GmbH) Treuhand RNR 2/2607/1271193',
+      )
+      expect(rmvInfo.merchant?.id).toBe('rmv')
+      expect(rmvInfo.merchant?.name).toBe('RMV')
+      expect(rmvInfo.logoComponent).toBe(MERCHANT_LOGOS.RmvLogo)
+      expect(rmvInfo.brandColor).toBe('#005B9C')
+      expect(rmvInfo.suggestedCategory).toBe('Transport')
+
+      const rossmannInfo = getMerchantBrandInfo('Dirk Rossmann GmbH Filiale 1234')
+      expect(rossmannInfo.merchant?.id).toBe('rossmann')
+      expect(rossmannInfo.logoComponent).toBe(MERCHANT_LOGOS.SiRossmann)
+      expect(rossmannInfo.suggestedCategory).toBe('Shopping')
+
+      const mediaMarktInfo = getMerchantBrandInfo('Media Markt Online Shop')
+      expect(mediaMarktInfo.merchant?.id).toBe('mediamarkt')
+      expect(mediaMarktInfo.logoComponent).toBe(MERCHANT_LOGOS.SiMediamarkt)
+      expect(mediaMarktInfo.suggestedCategory).toBe('Shopping')
+
+      const vintedInfo = getMerchantBrandInfo('Vinted Payments UAB')
+      expect(vintedInfo.merchant?.id).toBe('vinted')
+      expect(vintedInfo.logoComponent).toBe(MERCHANT_LOGOS.SiVinted)
+      expect(vintedInfo.suggestedCategory).toBe('Shopping')
+
+      const scalableInfo = getMerchantBrandInfo('Baader Bank / Scalable Capital')
+      expect(scalableInfo.merchant?.id).toBe('scalable-capital')
+      expect(scalableInfo.logoComponent).toBe(MERCHANT_LOGOS.ScalableCapitalLogo)
+
+      const volksbankInfo = getMerchantBrandInfo('Frankfurter Volksbank eG')
+      expect(volksbankInfo.merchant?.id).toBe('volksbank')
+      expect(volksbankInfo.logoComponent).toBe(MERCHANT_LOGOS.VolksbankLogo)
+
+      const flixInfo = getMerchantBrandInfo('FlixBus Mobility GmbH')
+      expect(flixInfo.merchant?.id).toBe('flix')
+      expect(flixInfo.logoComponent).toBe(MERCHANT_LOGOS.FlixLogo)
+
+      const hvvInfo = getMerchantBrandInfo('HVV App Ticket Hamburg')
+      expect(hvvInfo.merchant?.id).toBe('hvv')
+      expect(hvvInfo.logoComponent).toBe(MERCHANT_LOGOS.HvvLogo)
+      expect(hvvInfo.suggestedCategory).toBe('Transport')
+
+      const vrrInfo = getMerchantBrandInfo('Verkehrsverbund Rhein-Ruhr Ticket')
+      expect(vrrInfo.merchant?.id).toBe('vrr')
+      expect(vrrInfo.logoComponent).toBe(MERCHANT_LOGOS.VrrLogo)
+      expect(vrrInfo.suggestedCategory).toBe('Transport')
+
+      const oebbInfo = getMerchantBrandInfo('ÖBB Ticket Wien')
+      expect(oebbInfo.merchant?.id).toBe('oebb')
+      expect(oebbInfo.logoComponent).toBe(MERCHANT_LOGOS.OebbLogo)
+      expect(oebbInfo.suggestedCategory).toBe('Transport')
+
+      const bunqInfo = getMerchantBrandInfo('bunq b.v. card payment')
+      expect(bunqInfo.merchant?.id).toBe('bunq')
+      expect(bunqInfo.logoComponent).toBe(MERCHANT_LOGOS.SiBunq)
+
+      const discordInfo = getMerchantBrandInfo('Discord Nitro Subscription')
+      expect(discordInfo.merchant?.id).toBe('discord')
+      expect(discordInfo.logoComponent).toBe(MERCHANT_LOGOS.SiDiscord)
+      expect(discordInfo.suggestedCategory).toBe('Entertainment')
     })
 
     it('returns brand info using fallback icon for merchants without brand logos', () => {

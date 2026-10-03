@@ -17,6 +17,7 @@ import {
   hasExtensiveCategoryData,
   isInformativeTransaction,
   isRelatedTransaction,
+  repairBrokenWords,
   resolveCanonicalCategory,
   resolvePluralTemplate,
 } from './category-utils'
@@ -36,6 +37,13 @@ describe('category-utils', () => {
     it('categorizes transport descriptions correctly', () => {
       expect(categorize('Uber trip')).toBe('Transport')
       expect(categorize('bolt receipt')).toBe('Transport')
+      expect(categorize('HVV Ticket Hamburg')).toBe('Transport')
+      expect(categorize('VRR Ticket Düsseldorf')).toBe('Transport')
+      expect(categorize('VVS Mobil Stuttgart')).toBe('Transport')
+      expect(categorize('VRS Ticket Köln')).toBe('Transport')
+      expect(categorize('ÖBB Nightjet Wien')).toBe('Transport')
+      expect(categorize('SBB Fahrkarte Zürich')).toBe('Transport')
+      expect(categorize('TIER Scooter Fahrt')).toBe('Transport')
     })
 
     it('categorizes travel descriptions correctly', () => {
@@ -92,8 +100,13 @@ describe('category-utils', () => {
       expect(resolveCanonicalCategory('Internet')).toBe('Communication')
       expect(resolveCanonicalCategory('Healthcare')).toBe('Healthcare')
       expect(resolveCanonicalCategory('Savings')).toBe('Savings')
+      expect(resolveCanonicalCategory('Cash')).toBe('Cash')
       expect(resolveCanonicalCategory('Transfers')).toBe('Transfers')
       expect(resolveCanonicalCategory('Travel')).toBe('Travel')
+      expect(resolveCanonicalCategory('Crypto')).toBe('Crypto')
+      expect(resolveCanonicalCategory('Bank Fees')).toBe('Bank Fees')
+      expect(resolveCanonicalCategory('BankFees')).toBe('Bank Fees')
+      expect(resolveCanonicalCategory('Fees')).toBe('Bank Fees')
       expect(resolveCanonicalCategory('Other')).toBe('Other')
     })
 
@@ -131,6 +144,23 @@ describe('category-utils', () => {
       expect(resolveCanonicalCategory('Кредити')).toBe('Loans')
       expect(resolveCanonicalCategory('Kredyty i Pożyczki')).toBe('Loans')
       expect(resolveCanonicalCategory('Pinjaman & Kredit')).toBe('Loans')
+      // Cash across all supported languages
+      expect(resolveCanonicalCategory('Cash')).toBe('Cash')
+      expect(resolveCanonicalCategory('Bargeld')).toBe('Cash')
+      expect(resolveCanonicalCategory('Gotówka')).toBe('Cash')
+      expect(resolveCanonicalCategory('Gotovina')).toBe('Cash')
+      expect(resolveCanonicalCategory('Готовина')).toBe('Cash')
+      expect(resolveCanonicalCategory('Tarik Tunai')).toBe('Cash')
+      expect(resolveCanonicalCategory('Crypto')).toBe('Crypto')
+      expect(resolveCanonicalCategory('Krypto')).toBe('Crypto')
+      expect(resolveCanonicalCategory('Kripto')).toBe('Crypto')
+      expect(resolveCanonicalCategory('Крипто')).toBe('Crypto')
+      // Bank Fees across all supported languages
+      expect(resolveCanonicalCategory('Bankgebühren')).toBe('Bank Fees')
+      expect(resolveCanonicalCategory('Opłaty bankowe')).toBe('Bank Fees')
+      expect(resolveCanonicalCategory('Bankarske naknade')).toBe('Bank Fees')
+      expect(resolveCanonicalCategory('Банкарске накнаде')).toBe('Bank Fees')
+      expect(resolveCanonicalCategory('Biaya Bank')).toBe('Bank Fees')
     })
 
     it('resolves categories from transaction keywords and descriptions', () => {
@@ -654,6 +684,14 @@ describe('category-utils', () => {
       expect(extractCleanDescription(desc1)).toBe(extractCleanDescription(desc2))
     })
 
+    it('strips truncated End-to- noise and cleans Kasino breakdown items', () => {
+      const desc =
+        'Commerzbank AG Kasinoabrechnung Frankfurt Plaza Ka sino: 16,50 / Cafeteria: - / Sonsti ges: - End-to-'
+      expect(extractCleanDescription(desc)).toBe(
+        'Commerzbank AG Kasinoabrechnung Frankfurt Plaza Kasino 16 50 Cafeteria - Sonstiges',
+      )
+    })
+
     it('strips banking prefixes such as Auftraggeber and Empfänger', () => {
       expect(extractCleanDescription('Auftraggeber: REWE Markt Koeln')).toBe('REWE Markt Koeln')
       expect(extractCleanDescription('Empfänger: Deutsche Telekom AG')).toBe('Deutsche Telekom AG')
@@ -1038,6 +1076,7 @@ describe('category-utils', () => {
         expect(categorize('Lieferando.de')).toBe('Dining Out')
         expect(categorize('Starbucks Coffee')).toBe('Dining Out')
         expect(categorize('Burger King')).toBe('Dining Out')
+        expect(categorize('Glovo Delivery')).toBe('Dining Out')
       })
 
       it('categorizes popular transport & mobility merchants correctly', () => {
@@ -1045,6 +1084,15 @@ describe('category-utils', () => {
         expect(categorize('Aral Tankstelle')).toBe('Transport')
         expect(categorize('Deutsche Bahn Vertrieb')).toBe('Transport')
         expect(categorize('DB Regio Ticket')).toBe('Transport')
+        expect(
+          categorize(
+            'Rhein-Main-Verkehrsverbund Serviceg esellschaft mbH (rms GmbH) Treuhand RNR 2/2607/1271193',
+          ),
+        ).toBe('Transport')
+        expect(categorize('RMV Go Ticket')).toBe('Transport')
+        expect(categorize('rms GmbH Treuhand Deutschlandticket')).toBe('Transport')
+        expect(categorize('BVG Fahrinfo App')).toBe('Transport')
+        expect(categorize('MVG Ticket München')).toBe('Transport')
       })
 
       it('categorizes popular grocery merchants across countries', () => {
@@ -1069,6 +1117,144 @@ describe('category-utils', () => {
       it('falls back to Transfers when PayPal is a direct transfer without known retail merchant', () => {
         expect(categorize('PAYPAL *JOHN DOE')).toBe('Transfers')
         expect(categorize('PayPal Guthaben')).toBe('Transfers')
+        expect(categorize('Western Union Money Transfer')).toBe('Transfers')
+        expect(categorize('Westernunion International')).toBe('Transfers')
+        expect(categorize('MoneyGram Transfer Ref: 9812')).toBe('Transfers')
+        expect(categorize('Stripe Payments Payout')).toBe('Transfers')
+        expect(categorize('Payoneer Inc Payout')).toBe('Transfers')
+        expect(categorize('Venmo Transfer')).toBe('Transfers')
+        expect(categorize('Coinbase Ireland Deposit')).toBe('Crypto')
+        expect(categorize('Übertrag comdirect Bank')).toBe('Transfers')
+        expect(categorize('DKB Überweisung')).toBe('Transfers')
+      })
+
+      it('categorizes payment processor transactions with purchase phrases as Shopping across all languages', () => {
+        // User example: German with broken line-wrap word "Ei nkauf"
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1052883197217/PP.4585.PP/. , Ihr Ei nkauf bei End-to-End-Ref.: 1052',
+          ),
+        ).toBe('Shopping')
+
+        // German standard purchase phrases and word splits
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A, Ihr Einkauf bei End-to-End-Ref.: 1052',
+          ),
+        ).toBe('Shopping')
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1046262432022 PP.4585.PP . PayPal ( Europe) S.a r.l. et Cie, SCA, Ihr E inkauf bei PayPal (Europe) S.a r.l. et Cie, SCA End-to-End-Ref.: 1046262432022 PP.4585.PP PAYPAL Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend19.11.2025 •',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('PayPal * Ihr Einkauf bei StoreX')).toBe('Shopping')
+        expect(categorize('PayPal * Ihr E inkauf bei StoreX')).toBe('Shopping')
+        expect(categorize('PayPal * Ihr Eink auf bei StoreY')).toBe('Shopping')
+        expect(categorize('PayPal * Ihr E in kauf bei StoreZ')).toBe('Shopping')
+        expect(categorize('Klarna * Ihr Einkauf bei Modewelt')).toBe('Shopping')
+        expect(categorize('SumUp * Ihr Ein kauf bei Modehaus')).toBe('Shopping')
+
+        // English purchase phrases and broken words
+        expect(categorize('PayPal Pte. Ltd. Your purchase at TechGadgets')).toBe('Shopping')
+        expect(categorize('PayPal Pte. Ltd. Your pur chase at End-to-End-Ref: 8812')).toBe('Shopping')
+        expect(categorize('POS Purchase at Main Street')).toBe('Shopping')
+
+        // Polish purchase phrases and broken words
+        expect(categorize('PayPal Europe Twój zakup w Sklep')).toBe('Shopping')
+        expect(categorize('PayPal Europe Twój za kup w End-to-End-Ref: 9912')).toBe('Shopping')
+        expect(categorize('Płatność za zakupy w Galerii')).toBe('Shopping')
+
+        // Bosnian purchase phrases and broken words
+        expect(categorize('PayPal Europe Vaša kupovina kod Trgovina')).toBe('Shopping')
+        expect(categorize('PayPal Europe Vaša kupo vina kod Ref: 1052')).toBe('Shopping')
+        expect(categorize('Plaćanje kupovine karticom')).toBe('Shopping')
+
+        // Serbian purchase phrases (Cyrillic and Latin)
+        expect(categorize('PayPal Europe Ваша куповина код Трговина')).toBe('Shopping')
+        expect(categorize('PayPal Europe Ваша купо вина код Реф: 1052')).toBe('Shopping')
+        expect(categorize('Плаћање куповине картицом')).toBe('Shopping')
+
+        // Indonesian purchase phrases and broken words
+        expect(categorize('PayPal Pembelian Anda di Toko')).toBe('Shopping')
+        expect(categorize('PayPal Pem belian Anda di Ref: 1052')).toBe('Shopping')
+        expect(categorize('Transaksi pembelian di Mall')).toBe('Shopping')
+
+        // Corporate canteens, cafeterias, and staff dining (e.g. Kasinoabrechnung, Cafeteria)
+        expect(
+          categorize(
+            'Commerzbank AG Kasinoabrechnung Frankfurt Plaza Ka sino: 16,50 / Cafeteria: - / Sonsti ges: - End-to-',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Commerzbank AG Cafeteria Mittagessen')).toBe('Dining Out')
+        expect(categorize('Mitarbeiter Kasinoabrechnung')).toBe('Dining Out')
+        expect(categorize('Betriebskantine Essen')).toBe('Dining Out')
+        expect(categorize('Uni Mensa Cafeteria')).toBe('Dining Out')
+      })
+    })
+
+    describe('repairBrokenWords', () => {
+      it('repairs broken words across multiple languages', () => {
+        expect(repairBrokenWords('Ihr E inkauf bei')).toBe('Ihr Einkauf bei')
+        expect(repairBrokenWords('Ihr Ei nkauf bei')).toBe('Ihr Einkauf bei')
+        expect(repairBrokenWords('Ihr Ein kauf bei')).toBe('Ihr Einkauf bei')
+        expect(repairBrokenWords('Ihr Eink auf bei')).toBe('Ihr Einkauf bei')
+        expect(repairBrokenWords('Ihr E in kauf bei')).toBe('Ihr Einkauf bei')
+        expect(repairBrokenWords('Ihr Ei- nkauf bei')).toBe('Ihr Einkauf bei')
+        expect(repairBrokenWords('Ihr E- inkauf bei')).toBe('Ihr Einkauf bei')
+        expect(repairBrokenWords('Waren e inkauf')).toBe('Wareneinkauf')
+        expect(repairBrokenWords('Bar geld auszahlung')).toBe('Bargeldauszahlung')
+        expect(repairBrokenWords('Bargeld auszahlung')).toBe('Bargeldauszahlung')
+        expect(repairBrokenWords('Ka sino: 16,50')).toBe('Kasino: 16,50')
+        expect(repairBrokenWords('Sonsti ges: -')).toBe('Sonstiges: -')
+        expect(repairBrokenWords('Cafe teria: -')).toBe('Cafeteria: -')
+        expect(repairBrokenWords('Steuer belastung')).toBe('Steuerbelastung')
+        expect(repairBrokenWords('Vorab pauschale')).toBe('Vorabpauschale')
+        expect(repairBrokenWords('Steuer abzug')).toBe('Steuerabzug')
+        expect(repairBrokenWords('Kapital ertragsteuer')).toBe('Kapitalertragsteuer')
+        expect(repairBrokenWords('Your pur chase at')).toBe('Your Purchase at')
+        expect(repairBrokenWords('Twój za kup w')).toBe('Twój Zakup w')
+        expect(repairBrokenWords('Vaša kupo vina kod')).toBe('Vaša Kupovina kod')
+        expect(repairBrokenWords('Ваша купо вина код')).toBe('Ваша Куповина код')
+        expect(repairBrokenWords('Pem belian Anda di')).toBe('Pembelian Anda di')
+        expect(repairBrokenWords('Co inbase Identifizierung')).toBe('Coinbase Identifizierung')
+        expect(repairBrokenWords('Coin base')).toBe('Coinbase')
+        expect(repairBrokenWords('Bi nance Pay')).toBe('Binance Pay')
+        expect(repairBrokenWords('Kra ken exchange')).toBe('Kraken exchange')
+        expect(repairBrokenWords('Bit panda GmbH')).toBe('Bitpanda GmbH')
+        expect(repairBrokenWords('Account verifi cation')).toBe('Account Verification')
+        expect(repairBrokenWords('Rechnungs abschluss')).toBe('Rechnungsabschluss')
+        expect(repairBrokenWords('Soll zinsen')).toBe('Sollzinsen')
+        expect(repairBrokenWords('Haben zinsen')).toBe('Habenzinsen')
+        expect(repairBrokenWords('Dispo zinsen')).toBe('Dispozinsen')
+        expect(repairBrokenWords('Konto führung')).toBe('Kontoführung')
+        expect(repairBrokenWords('Bank gebühren')).toBe('Bankgebühren')
+        expect(repairBrokenWords('Serviceg esellschaft')).toBe('Servicegesellschaft')
+        expect(repairBrokenWords('Verkehrs verbund')).toBe('Verkehrsverbund')
+      })
+    })
+
+    describe('tax and investment tax categorization', () => {
+      it('categorizes German Vorabpauschale and investment tax bookings as Taxes', () => {
+        expect(
+          categorize(
+            'Steuerbelastung auf Vorabpauschale gem. § 18 InvStG Depotbestand: 000000000000005,211 ISHSV-',
+          ),
+        ).toBe('Taxes')
+        expect(categorize('Vorabpauschale 2026 gem. § 18 InvStG')).toBe('Taxes')
+        expect(categorize('Steuerabzug Vorabpauschale comdirect')).toBe('Taxes')
+        expect(categorize('Trade Republic Steuerabrechnung')).toBe('Taxes')
+        expect(categorize('Kapitalertragsteuer und Solidaritätszuschlag')).toBe('Taxes')
+        expect(categorize('Finanzamt Vorauszahlung Q1')).toBe('Taxes')
+        expect(categorize('Quellensteuer Dividende')).toBe('Taxes')
+      })
+
+      it('categorizes international investment and capital taxes as Taxes', () => {
+        expect(categorize('Advance Tax Payment')).toBe('Taxes')
+        expect(categorize('Investment fund tax charge')).toBe('Taxes')
+        expect(categorize('Podatek Belki od zysków kapitałowych')).toBe('Taxes')
+        expect(categorize('Porez na kapitalnu dobit')).toBe('Taxes')
+        expect(categorize('Порез на капиталну добит')).toBe('Taxes')
+        expect(categorize('PPh final pajak dividen')).toBe('Taxes')
       })
     })
 
@@ -1299,6 +1485,70 @@ describe('category-utils', () => {
         expect(categorize('ZATCA Tax Payment')).toBe('Taxes')
         expect(categorize('Federal Inland Revenue Service FIRS')).toBe('Taxes')
         expect(categorize('Kenya Revenue Authority KRA')).toBe('Taxes')
+      })
+    })
+
+    describe('cash withdrawal categorization', () => {
+      it('categorizes cash withdrawals and ATM transactions as Cash', () => {
+        expect(
+          categorize(
+            'Deutsche Bank//Bad Homburg/DE 2026-07-06T12:49:30 KFN 0 VJ 2812 Bargeldauszahlung',
+          ),
+        ).toBe('Cash')
+        expect(categorize('ATM Cash Withdrawal')).toBe('Cash')
+        expect(categorize('Geldautomat Abhebung')).toBe('Cash')
+        expect(categorize('Bargeldabhebung')).toBe('Cash')
+        expect(categorize('Wypłata z bankomatu')).toBe('Cash')
+        expect(categorize('Podizanje gotovine na bankomatu')).toBe('Cash')
+        expect(categorize('Исплата на банкомату')).toBe('Cash')
+        expect(categorize('Tarik tunai ATM')).toBe('Cash')
+      })
+    })
+
+    describe('crypto categorization', () => {
+      it('categorizes crypto exchange and verification transactions as Crypto', () => {
+        expect(
+          categorize(
+            'Coinbase Identifizierung Account verification return from Co inbase Identifizierung End-to',
+          ),
+        ).toBe('Crypto')
+        expect(categorize('Coinbase Ireland Limited')).toBe('Crypto')
+        expect(categorize('Binance Pay crypto transfer')).toBe('Crypto')
+        expect(categorize('Kraken Bitcoin purchase')).toBe('Crypto')
+        expect(categorize('Bitpanda GmbH crypto buy')).toBe('Crypto')
+        expect(categorize('Crypto.com Visa card top up')).toBe('Crypto')
+        expect(categorize('Kauf von Bitcoin BTC')).toBe('Crypto')
+        expect(categorize('Ethereum ETH transfer')).toBe('Crypto')
+        expect(categorize('Solana SOL stake')).toBe('Crypto')
+      })
+    })
+
+    describe('bank fees and charges categorization', () => {
+      it('categorizes account settlements, debit interest, and maintenance fees as Bank Fees', () => {
+        // User example: Rechnungsabschluss with Sollzinsen
+        expect(
+          categorize(
+            'Rechnungsabschluss Konto 646293100 EUR BLZ 500 400 00 vom 31.03.2026 bis 30.06.2026 Sollzinsen',
+          ),
+        ).toBe('Bank Fees')
+        expect(categorize('Sollzinsen Q1')).toBe('Bank Fees')
+        expect(categorize('Dispozinsen Girokonto')).toBe('Bank Fees')
+        expect(categorize('Kontoführungsgebühr')).toBe('Bank Fees')
+        expect(categorize('Rechnungsabschlussgebühr')).toBe('Bank Fees')
+        expect(categorize('Monthly account maintenance fee')).toBe('Bank Fees')
+        expect(categorize('Opłata za prowadzenie konta')).toBe('Bank Fees')
+        expect(categorize('Naknada za vođenje računa')).toBe('Bank Fees')
+        expect(categorize('Накнада за вођење рачуна')).toBe('Bank Fees')
+        expect(categorize('Biaya administrasi bank')).toBe('Bank Fees')
+      })
+
+      it('categorizes positive credit interest income as Savings', () => {
+        expect(
+          categorize('Habenzinsen Tagesgeldkonto', undefined, { type: 'income', amount: 15.2 }),
+        ).toBe('Savings')
+        expect(
+          categorize('Zinsgutschrift Sparkonto', undefined, { type: 'income', amount: 50.0 }),
+        ).toBe('Savings')
       })
     })
   })

@@ -1,5 +1,6 @@
 import type { Transaction } from '../../types'
 import { extractIbans } from '../account-transfers'
+import { repairBrokenWords } from '../categorizer/description-cleaning'
 import { generateId, inferType, parseAmount, parseCurrency, parseDate } from './helpers'
 import { ALL_SUMMARY_KEYWORDS } from './parser-i18n'
 
@@ -39,7 +40,7 @@ function parseDoubleDateStrategy(
   while ((m = deRegex.exec(remainingText)) !== null) {
     const amountStr = m[3].replace(/\s/g, '')
     const amount = parseAmount(amountStr)
-    const desc = m[2].replace(/\s+/g, ' ').trim()
+    const desc = repairBrokenWords(m[2].replace(/\s+/g, ' ').trim())
     // Blank out the matched text so it doesn't match the fallback regexes
     remainingText =
       remainingText.slice(0, m.index) +
@@ -82,7 +83,7 @@ function parseSingleDateStrategy(
   while ((m = deRegexSingleDate.exec(remainingText)) !== null) {
     const amountStr = m[3].replace(/\s/g, '')
     const amount = parseAmount(amountStr)
-    const desc = m[2].replace(/\s+/g, ' ').trim()
+    const desc = repairBrokenWords(m[2].replace(/\s+/g, ' ').trim())
     remainingText =
       remainingText.slice(0, m.index) +
       ' '.repeat(m[0].length) +
@@ -127,7 +128,7 @@ function parseFallbackStrategy(text: string, institution: string): Transaction[]
     if (dMatch && aMatch) {
       const amountStr = aMatch[1].replace(/\s/g, '')
       const amount = parseAmount(amountStr)
-      const desc = line.replace(dMatch[0], '').replace(aMatch[0], '').replace(/\s+/g, ' ').trim()
+      const desc = repairBrokenWords(line.replace(dMatch[0], '').replace(aMatch[0], '').replace(/\s+/g, ' ').trim())
       if (isSummaryLine(desc)) {
         continue
       }

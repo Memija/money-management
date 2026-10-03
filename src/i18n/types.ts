@@ -26,9 +26,12 @@ export interface CategoryKeywords {
   Communication: string[]
   Healthcare: string[]
   Savings: string[]
+  Cash: string[]
   Transfers: string[]
   Travel: string[]
   Taxes: string[]
+  Crypto: string[]
+  BankFees: string[]
 }
 
 export interface TranslationStrings {
@@ -562,9 +565,12 @@ export interface TranslationStrings {
   catCommunication: string
   catHealthcare: string
   catSavings: string
+  catCash: string
   catTransfers: string
   catTravel: string
   catTaxes: string
+  catCrypto: string
+  catBankFees: string
   catOther: string
 
   // Category keywords for auto-categorization

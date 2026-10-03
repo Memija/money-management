@@ -13,7 +13,12 @@ for (const locale of Object.values(translations)) {
   for (const [canonicalKey, i18nKey] of Object.entries(categoryI18nKeys)) {
     const label = locale[i18nKey]
     if (typeof label === 'string') {
-      const normalized = canonicalKey === 'DiningOut' ? 'Dining Out' : canonicalKey
+      const normalized =
+        canonicalKey === 'DiningOut'
+          ? 'Dining Out'
+          : canonicalKey === 'BankFees' || canonicalKey === 'Fees'
+            ? 'Bank Fees'
+            : canonicalKey
       localizedCategoryMap[label.toLowerCase()] = normalized
     }
   }
@@ -30,7 +35,9 @@ export function resolveCanonicalCategory(name: string): string {
 
   // 1. Exact match against canonical category keys
   if (categoryI18nKeys[trimmed]) {
-    return trimmed === 'DiningOut' ? 'Dining Out' : trimmed
+    if (trimmed === 'DiningOut') return 'Dining Out'
+    if (trimmed === 'BankFees' || trimmed === 'Fees') return 'Bank Fees'
+    return trimmed
   }
 
   // 2. Exact match against localized category labels across all languages

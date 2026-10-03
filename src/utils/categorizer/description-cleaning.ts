@@ -9,13 +9,134 @@ export function isInformativeTransaction(tx?: { amount?: number } | null): boole
   return tx.amount === 0
 }
 
+const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
+  // German line-break word splits
+  [
+    /(?:e|ei|ein|eink|einkau)[-\s]+(?:in[-\s]*kauf|n[-\s]*kauf|k[-\s]*auf|nkauf|kauf|auf|f)/iu,
+    'Einkauf',
+  ],
+  [
+    /(?:e|ei|ein|eink|einkäu|einkaeu)[-\s]+(?:in[-\s]*käufe|n[-\s]*käufe|k[-\s]*äufe|inkäufe|nkäufe|käufe|äufe|fe|in[-\s]*kaeufe|n[-\s]*kaeufe|k[-\s]*aeufe|inkaeufe|nkaeufe|kaeufe|aeufe)/iu,
+    'Einkäufe',
+  ],
+  [/(?:waren|warene|warenei|warenein)[-\s]+(?:einkauf|inkauf|nkauf|kauf)/iu, 'Wareneinkauf'],
+  [/(?:karten|kartene|kartenei|kartenein)[-\s]+(?:einkauf|inkauf|nkauf|kauf)/iu, 'Karteneinkauf'],
+  [
+    /(?:bar)[-\s]+(?:geld)[-\s]+(?:auszahlung)|(?:bar|bargeld)[-\s]+(?:geldauszahlung|auszahlung)/iu,
+    'Bargeldauszahlung',
+  ],
+  [
+    /(?:bar)[-\s]+(?:geld)[-\s]+(?:abhebung)|(?:bar|bargeld)[-\s]+(?:geldabhebung|abhebung)/iu,
+    'Bargeldabhebung',
+  ],
+  [/(?:bar)[-\s]+(?:geld)/iu, 'Bargeld'],
+  [/(?:aus)[-\s]+(?:zahlung)/iu, 'Auszahlung'],
+  [/(?:ein)[-\s]+(?:zahlung)/iu, 'Einzahlung'],
+  [
+    /(?:last)[-\s]+(?:schrift)[-\s]+(?:einzug)|(?:last|lastschrift)[-\s]+(?:schrifteinzug|einzug)/iu,
+    'Lastschrifteinzug',
+  ],
+  [/(?:kasino|kasinoab)[-\s]+(?:abrechnung|rechnung)/iu, 'Kasinoabrechnung'],
+  [/(?:ka|kas|kasi)[-\s]+(?:sino|ino|no)/iu, 'Kasino'],
+  [/(?:ca|cas|casi)[-\s]+(?:sino|ino|no)/iu, 'Casino'],
+  [/(?:kan|kanti)[-\s]+(?:tine|ne)/iu, 'Kantine'],
+  [/(?:kantinen|kantinenab)[-\s]+(?:abrechnung|rechnung)/iu, 'Kantinenabrechnung'],
+  [/(?:ca|cafe|cafete|cafeter)[-\s]+(?:feteria|teria|ria|ia)/iu, 'Cafeteria'],
+  [/(?:son|sonsti|sonstig)[-\s]+(?:stiges|ges|es)/iu, 'Sonstiges'],
+  [/(?:ab|abrech)[-\s]+(?:rechnung|nung)/iu, 'Abrechnung'],
+  [/(?:last)[-\s]+(?:schrift)/iu, 'Lastschrift'],
+  [/(?:über|uber)[-\s]+(?:weisung)/iu, 'Überweisung'],
+  [/(?:gut)[-\s]+(?:schrift)/iu, 'Gutschrift'],
+  [/(?:dauer)[-\s]+(?:auftrag)/iu, 'Dauerauftrag'],
+  [/(?:karten)[-\s]+(?:zahlung)/iu, 'Kartenzahlung'],
+  [/(?:geld)[-\s]+(?:automat)/iu, 'Geldautomat'],
+  [/(?:neben)[-\s]+(?:kosten)/iu, 'Nebenkosten'],
+  [/(?:wohnungs?)[-\s]+(?:miete)/iu, 'Wohnungsmiete'],
+  [/(?:kalt)[-\s]+(?:miete)/iu, 'Kaltmiete'],
+  [/(?:warm)[-\s]+(?:miete)/iu, 'Warmmiete'],
+  [/(?:kredit)[-\s]+(?:rate)/iu, 'Kreditrate'],
+  [/(?:tilgungs?)[-\s]+(?:rate)/iu, 'Tilgungsrate'],
+  [/(?:darlehens?)[-\s]+(?:rate)/iu, 'Darlehensrate'],
+  [/(?:steuer)[-\s]+(?:belastung)/iu, 'Steuerbelastung'],
+  [/(?:vorab)[-\s]+(?:pauschale)/iu, 'Vorabpauschale'],
+  [/(?:steuer)[-\s]+(?:abzug)/iu, 'Steuerabzug'],
+  [/(?:steuer)[-\s]+(?:abrechnung)/iu, 'Steuerabrechnung'],
+  [/(?:kapital|kapitaler)[-\s]+(?:ertragsteuer|tragsteuer|ertragssteuer|tragssteuer)/iu, 'Kapitalertragsteuer'],
+  [/(?:solidaritäts|solidaritaets|soli)[-\s]+(?:zuschlag)/iu, 'Solidaritätszuschlag'],
+  [/(?:kirchen)[-\s]+(?:steuer)/iu, 'Kirchensteuer'],
+  [/(?:abgeltungs?)[-\s]+(?:steuer)/iu, 'Abgeltungsteuer'],
+  [/(?:einkommen)[-\s]+(?:steuer)/iu, 'Einkommensteuer'],
+  [/(?:co|coin)[-\s]+(?:inbase|base)/iu, 'Coinbase'],
+  [/(?:bi|bin)[-\s]+(?:nance|ance)/iu, 'Binance'],
+  [/(?:kra)[-\s]+(?:ken)/iu, 'Kraken'],
+  [/(?:bit)[-\s]+(?:panda)/iu, 'Bitpanda'],
+  [/(?:identi|identifiz)[-\s]+(?:fizierung|ierung)/iu, 'Identifizierung'],
+  [/(?:veri|verifi|verifica)[-\s]+(?:fication|cation|tion)/iu, 'Verification'],
+  [/(?:rechnungs|rechnung)[-\s]+(?:abschluss|schluss)/iu, 'Rechnungsabschluss'],
+  [/(?:soll)[-\s]+(?:zinsen|zins)/iu, 'Sollzinsen'],
+  [/(?:haben)[-\s]+(?:zinsen|zins)/iu, 'Habenzinsen'],
+  [/(?:dispo)[-\s]+(?:zinsen|zins)/iu, 'Dispozinsen'],
+  [/(?:überziehungs|uberziehungs)[-\s]+(?:zinsen|zins)/iu, 'Überziehungszinsen'],
+  [/(?:konto)[-\s]+(?:führung|fuehrung)/iu, 'Kontoführung'],
+  [/(?:kontoführungs?|kontofuehrungs?)[-\s]+(?:gebühr|gebuehr)/iu, 'Kontoführungsgebühr'],
+  [/(?:bank)[-\s]+(?:gebühren|gebuehren|gebühr|gebuehr)/iu, 'Bankgebühren'],
+  [
+    /(?:service|serviceg|servicege|serviceges)[-\s]+(?:gesellschaft|esellschaft|sellschaft|ellschaft)/iu,
+    'Servicegesellschaft',
+  ],
+  [/(?:verkehr|verkehrs|verkehrsve|verkehrsver)[-\s]+(?:verbund|erbund|rbund|bund)/iu, 'Verkehrsverbund'],
+  // English line-break word splits
+  [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
+  [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],
+  [/(?:pay)[-\s]+(?:roll)/iu, 'Payroll'],
+  [/(?:grocer)[-\s]+(?:ies)|(?:groce)[-\s]+(?:ries)/iu, 'Groceries'],
+  [/(?:trans)[-\s]+(?:fer)/iu, 'Transfer'],
+  // Polish line-break word splits
+  [/(?:za|zak)[-\s]+(?:kupy|upy)/iu, 'Zakupy'],
+  [/(?:za|zak)[-\s]+(?:kup|up)/iu, 'Zakup'],
+  [/(?:wy|wyp)[-\s]+(?:płata|łata)/iu, 'Wypłata'],
+  [/(?:wy|wyp)[-\s]+(?:plata|lata)/iu, 'Wyplata'],
+  [/(?:płat|plat)[-\s]+(?:ność|nosc)/iu, 'Płatność'],
+  [/(?:banko)[-\s]+(?:mat)/iu, 'Bankomat'],
+  [/(?:prze)[-\s]+(?:lew)/iu, 'Przelew'],
+  // Bosnian / Croatian / Serbian line-break word splits
+  [/(?:ku|kupo|kupov)[-\s]+(?:povina|vina|ina)/iu, 'Kupovina'],
+  [/(?:ку|купо|купов)[-\s]+(?:повина|вина|ина)/iu, 'Куповина'],
+  [/(?:goto|gotov)[-\s]+(?:vina|ina)/iu, 'Gotovina'],
+  [/(?:гото|готов)[-\s]+(?:вина|ина)/iu, 'Готовина'],
+  [/(?:банко)[-\s]+(?:мат)/iu, 'Банкомат'],
+  // Indonesian line-break word splits
+  [/(?:pem|pemb)[-\s]+(?:belian|elian)/iu, 'Pembelian'],
+  [/(?:be|bel)[-\s]+(?:lanja|anja)/iu, 'Belanja'],
+  [/(?:trans)[-\s]+(?:aksi)/iu, 'Transaksi'],
+]
+
+const COMPILED_WORD_REPAIR_RULES: Array<[RegExp, string]> = WORD_REPAIR_RULES.map(([regex, rep]) => [
+  new RegExp(`(?<![\\p{L}\\p{N}])(?:${regex.source})(?![\\p{L}\\p{N}])`, 'giu'),
+  rep,
+])
+
+/**
+ * Repairs common banking words split by line breaks, column wrapping, or OCR noise
+ * (e.g. "Ei nkauf" -> "Einkauf", "Pur chase" -> "Purchase", "Za kup" -> "Zakup").
+ */
+export function repairBrokenWords(text: string): string {
+  if (!text || typeof text !== 'string') return ''
+
+  let repaired = text
+  for (const [pattern, replacement] of COMPILED_WORD_REPAIR_RULES) {
+    repaired = repaired.replace(pattern, replacement)
+  }
+  return repaired
+}
+
 /**
  * Normalizes a transaction description by stripping dates, long numbers,
  * special characters, and excess whitespace.
  */
 export const normalizeDescription = (desc: string): string => {
   return (
-    desc
+    repairBrokenWords(desc)
       .toLowerCase()
       // Remove dates like DD/MM/YYYY, DD.MM.YY, DD-MM
       .replace(/\b\d{1,2}[-./]\d{1,2}([-./]\d{2,4})?\b/g, '')
@@ -37,7 +158,7 @@ export const normalizeDescription = (desc: string): string => {
 export function extractCleanDescription(desc: string): string {
   if (!desc || typeof desc !== 'string') return ''
 
-  let cleaned = desc.trim()
+  let cleaned = repairBrokenWords(desc.trim())
 
   // 1. Remove common German / European banking prefixes
   cleaned = cleaned.replace(
@@ -49,7 +170,7 @@ export function extractCleanDescription(desc: string): string {
   // Handles: End-to-End-Ref.: ..., End to End Ref: ..., EREF+..., KREF+..., MREF+..., CRED+...,
   // DEBT+..., SVWZ+..., Mandatsref: ..., Referenz: ..., Reference: ..., Ref. Nr: ..., IBAN: ..., BIC: ...
   cleaned = cleaned.replace(
-    /(?:\b(?:End[-\s]?to[-\s]?End[-\s]?(?:Ref(?:\.|erenz|-Id)?)|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID)\s*[:+]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+).*/i,
+    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT)\s*[:+]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+).*/i,
     '',
   )
 
