@@ -125,6 +125,16 @@ const INCOME_TAX_REGEX =
 const POLISH_ATM_WITHDRAWAL_REGEX =
   /(?:\b(?:wyp[lł]ata|wyplata)\s+(?:z\s+bankomatu|got[oó]wki|w\s+bankomacie)\b)/i
 
+// Regex to detect SEPA and credit transfer / standing order reference patterns
+// (e.g. 'CCB.321.UE.328580', 'CD-SCT-12345', 'SEPA-Überweisung', 'Dauerauftrag', 'Umbuchung')
+const SEPA_TRANSFER_REGEX =
+  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da)\.\d+\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*[a-z0-9_.-]*(?:ue|da|sct)[a-z0-9_.-]*\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?transfer)\b)/i
+
+// Regex to detect explicit tax authority or specific tax duty/assessment context
+// to prevent regular bank transfers with tax-related memos/references from misclassifying as Taxes.
+const EXPLICIT_TAX_AUTHORITY_OR_DUTY_REGEX =
+  /(?:\b(?:finanzamt|finanzkasse|bundeskasse|steuerverwaltung|steuerbeh[oö]rde|irs|hmrc|cra|belastingdienst|dgfip|agenzia\s+delle\s+entrate|agencia\s+tributaria|receita\s+federal|porezn[ae]|poresk[ae]|urzad\s+skarbowy|urząd\s+skarbowy|dirjen\s+pajak)\b|\b(?:einkommensteuer|grundsteuer|gewerbesteuer|umsatzsteuer|kirchensteuer|vorabpauschale|invstg|kapitalertragsteuer|quellensteuer|solidarit[aä]tszuschlag|steuernummer|steuer[- ]?id|steuerbescheid|steuererkl[aä]rung|tax\s+payment|tax\s+assessment|tax\s+bill|tax\s+return|tax\s+refund|tax\s+office|tax\s+authority|income\s+tax|property\s+tax|sales\s+tax|corporate\s+tax|capital\s+gains\s+tax|council\s+tax|advance\s+tax)\b)/i
+
 const defaultCategoryCache = new Map<string, string>()
 
 /**
@@ -208,6 +218,11 @@ export function categorize(
     if (cat === 'Rent' && CAR_OR_EQUIPMENT_RENTAL_REGEX.test(d)) {
       continue
     }
+    if (cat === 'Taxes' && SEPA_TRANSFER_REGEX.test(d)) {
+      if (!EXPLICIT_TAX_AUTHORITY_OR_DUTY_REGEX.test(d)) {
+        continue
+      }
+    }
     const rx = categoryRegexes[cat]
     if (rx?.test(d)) {
       if (!customKeywords) defaultCategoryCache.set(cacheKey, cat)
@@ -284,7 +299,11 @@ export function categorize(
   }
 
   // 5. Transfers & Payment processor fallback (e.g. direct PayPal/Klarna without specific retail merchant)
-  if (transferMerchantsRegex?.test(d) || categoryRegexes.Transfers?.test(d)) {
+  if (
+    transferMerchantsRegex?.test(d) ||
+    categoryRegexes.Transfers?.test(d) ||
+    SEPA_TRANSFER_REGEX.test(d)
+  ) {
     if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Transfers')
     return 'Transfers'
   }

@@ -44,12 +44,26 @@ describe('category-utils', () => {
       expect(categorize('ÖBB Nightjet Wien')).toBe('Transport')
       expect(categorize('SBB Fahrkarte Zürich')).toBe('Transport')
       expect(categorize('TIER Scooter Fahrt')).toBe('Transport')
+      expect(
+        categorize(
+          'Mercedes-Benz AG DEUTDEFFXXX DE20500700100092001700 Bitte geben Sie bei Bezahlung Ihre'
+        )
+      ).toBe('Transport')
+      expect(categorize('BMW Bank Leasingrate')).toBe('Transport')
+      expect(categorize('Volkswagen Leasing GmbH')).toBe('Transport')
+      expect(categorize('Audi Zentrum Berlin')).toBe('Transport')
+      expect(categorize('Porsche Zentrum Stuttgart')).toBe('Transport')
     })
 
     it('categorizes travel descriptions correctly', () => {
       expect(categorize('Hotel booking reservation')).toBe('Travel')
       expect(categorize('Lufthansa flight ticket')).toBe('Travel')
       expect(categorize('Airbnb stay')).toBe('Travel')
+      expect(
+        categorize(
+          'holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Anel Mem'
+        )
+      ).toBe('Travel')
     })
 
     it('categorizes communication and internet descriptions correctly', () => {
@@ -57,6 +71,70 @@ describe('category-utils', () => {
       expect(categorize('Telekom internet flat')).toBe('Communication')
       expect(categorize('O2 mobile data')).toBe('Communication')
       expect(categorize('Internet pretplata')).toBe('Communication')
+    })
+
+    it('categorizes SumUp card payments at retail merchants as Shopping', () => {
+      expect(
+        categorize(
+          'SumUp .Metzgerei Enk/Louisenstrass 2024-10-26T12:41:33 KFN 0 VJ 2412 Kartenzahlung'
+        )
+      ).toBe('Shopping')
+      expect(categorize('Kartenzahlung Metzgerei Schmidt')).toBe('Shopping')
+    })
+
+    it('categorizes Tchibo retail transactions as Shopping', () => {
+      expect(
+        categorize(
+          'TCHIBO GMBH DRESDEFF200 DE14200800000816170700 20319230661010 End-to-End-Ref.: MOB.'
+        )
+      ).toBe('Shopping')
+      expect(categorize('Tchibo Filiale Hamburg')).toBe('Shopping')
+      expect(categorize('Tchibo.de Online Shop')).toBe('Shopping')
+    })
+
+    it('categorizes Dell retail and hardware transactions as Shopping (not ordinary Transfers)', () => {
+      expect(
+        categorize(
+          'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421'
+        )
+      ).toBe('Shopping')
+      expect(categorize('Dell Technologies Online Store')).toBe('Shopping')
+      expect(categorize('Dell.com Hardware Purchase')).toBe('Shopping')
+    })
+
+    it('categorizes tech hardware and electronics brands as Shopping', () => {
+      expect(categorize('Acer Computer Store')).toBe('Shopping')
+      expect(categorize('HP Store Online Purchase')).toBe('Shopping')
+      expect(categorize('Logitech G Official Store')).toBe('Shopping')
+      expect(categorize('Razer Store Europe')).toBe('Shopping')
+      expect(categorize('Sony Electronics Direct')).toBe('Shopping')
+    })
+
+    it('categorizes fair parken and parking transactions as Transport', () => {
+      expect(
+        categorize(
+          'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-'
+        )
+      ).toBe('Transport')
+      expect(categorize('fair parken Parkplatz')).toBe('Transport')
+      expect(categorize('Parkhaus Hauptbahnhof Parkgebühr')).toBe('Transport')
+      expect(categorize('EasyPark Parking Fee')).toBe('Transport')
+    })
+
+    it('categorizes Süwag electricity and utility transactions as Utilities (not Transfers)', () => {
+      const suewagRaw =
+        'Süwag COBADEFFXXX DE69500400000257744300 Kunden-Nr.: 263614738 Rechnungsnr:'
+      expect(categorize(suewagRaw)).toBe('Utilities')
+      expect(categorize('Süwag Energie AG Strom')).toBe('Utilities')
+      expect(categorize('E.ON Energie Deutschland')).toBe('Utilities')
+      expect(categorize('Vattenfall Europe Stromrechnung')).toBe('Utilities')
+    })
+
+    it('categorizes Tomorrow bank transactions as Transfers', () => {
+      const desc =
+        'ANEL MEMIC - TOMORROW SOBKDEBBXXX DE58110101002097425357 FÜR DIE ZUKUNFT End-to-End-'
+      expect(categorize(desc)).toBe('Transfers')
+      expect(categorize('Tomorrow Bank Überweisung')).toBe('Transfers')
     })
 
     it('falls back to "Other" for unknown descriptions', () => {
@@ -703,6 +781,54 @@ describe('category-utils', () => {
       )
     })
 
+    it('cleans SumUp card terminal transactions, ISO timestamps, and terminal codes', () => {
+      const desc =
+        'SumUp .Metzgerei Enk/Louisenstrass 2024-10-26T12:41:33 KFN 0 VJ 2412 Kartenzahlung'
+      expect(extractCleanDescription(desc)).toBe('SumUp .Metzgerei Enk Louisenstrass')
+      expect(extractMerchantKeyword(desc)).toBe('Metzgerei Enk Louisenstrass')
+    })
+
+    it('cleans Süwag utility transaction stripping customer ref, IBAN, and BIC', () => {
+      const desc =
+        'Süwag COBADEFFXXX DE69500400000257744300 Kunden-Nr.: 263614738 Rechnungsnr:'
+      expect(extractCleanDescription(desc)).toBe('Süwag')
+      expect(extractMerchantKeyword(desc)).toBe('Süwag')
+    })
+
+    it('cleans Tchibo retail transaction stripping corporate form, IBAN, BIC, and reference', () => {
+      const desc =
+        'TCHIBO GMBH DRESDEFF200 DE14200800000816170700 20319230661010 End-to-End-Ref.: MOB.'
+      expect(extractCleanDescription(desc)).toBe('TCHIBO GMBH')
+      expect(extractMerchantKeyword(desc)).toBe('TCHIBO')
+    })
+
+    it('cleans Mercedes-Benz transaction stripping BIC, IBAN, and German remittance instructions', () => {
+      const desc =
+        'Mercedes-Benz AG DEUTDEFFXXX DE20500700100092001700 Bitte geben Sie bei Bezahlung Ihre '
+      expect(extractCleanDescription(desc)).toBe('Mercedes-Benz AG')
+      expect(extractMerchantKeyword(desc)).toBe('Mercedes-Benz')
+    })
+
+    it('cleans Tomorrow bank transaction stripping BIC, IBAN, and End-to-End reference prefix', () => {
+      const desc =
+        'ANEL MEMIC - TOMORROW SOBKDEBBXXX DE58110101002097425357 FÜR DIE ZUKUNFT End-to-End-'
+      expect(extractCleanDescription(desc)).toBe('ANEL MEMIC - TOMORROW FÜR DIE ZUKUNFT')
+    })
+
+    it('cleans Dell transaction stripping corporate form, BIC, IBAN, and End-to-End reference', () => {
+      const desc =
+        'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421'
+      expect(extractCleanDescription(desc)).toBe('Dell GmbH')
+      expect(extractMerchantKeyword(desc)).toBe('Dell')
+    })
+
+    it('cleans fair parken transaction stripping BIC, IBAN, Aktenzeichen, and End-to- reference', () => {
+      const desc =
+        'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-'
+      expect(extractCleanDescription(desc)).toBe('FAIR PARKEN GMBH')
+      expect(extractMerchantKeyword(desc)).toBe('FAIR PARKEN')
+    })
+
     it('handles empty and invalid inputs gracefully', () => {
       expect(extractCleanDescription('')).toBe('')
       // @ts-expect-error Testing invalid runtime input
@@ -1126,6 +1252,22 @@ describe('category-utils', () => {
         expect(categorize('Coinbase Ireland Deposit')).toBe('Crypto')
         expect(categorize('Übertrag comdirect Bank')).toBe('Transfers')
         expect(categorize('DKB Überweisung')).toBe('Transfers')
+        expect(
+          categorize(
+            'BILJANA JOSIC Tax End-to-End-Ref.: CCB.321.UE.328580 Kundenreferenz: CCB.321.UE.328580',
+          ),
+        ).toBe('Transfers')
+        expect(
+          categorize(
+            'BILJANA JOSIC End-to-End-Ref.: CCB.321.UE.328580 Kundenreferenz: CCB.321.UE.328580',
+          ),
+        ).toBe('Transfers')
+        expect(categorize('CD-SCT-20260401-12345 Max Mustermann')).toBe('Transfers')
+        expect(categorize('SEPA-Überweisung an Max Mustermann')).toBe('Transfers')
+        expect(
+          categorize('Finanzamt Frankfurt am Main End-to-End-Ref.: CCB.321.UE.998877'),
+        ).toBe('Taxes')
+        expect(categorize('Einkommensteuer Vorauszahlung CCB.321.UE.112233')).toBe('Taxes')
       })
 
       it('categorizes payment processor transactions with purchase phrases as Shopping across all languages', () => {

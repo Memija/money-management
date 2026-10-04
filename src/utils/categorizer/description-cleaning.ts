@@ -85,12 +85,15 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
     'Servicegesellschaft',
   ],
   [/(?:verkehr|verkehrs|verkehrsve|verkehrsver)[-\s]+(?:verbund|erbund|rbund|bund)/iu, 'Verkehrsverbund'],
+  [/(?:reise|reisebu|reisebuch)[-\s]+(?:buchung|chung)/iu, 'Reisebuchung'],
   // English line-break word splits
   [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
   [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],
   [/(?:pay)[-\s]+(?:roll)/iu, 'Payroll'],
   [/(?:grocer)[-\s]+(?:ies)|(?:groce)[-\s]+(?:ries)/iu, 'Groceries'],
   [/(?:trans)[-\s]+(?:fer)/iu, 'Transfer'],
+  [/(?:holi|holid|holiday)[-\s]+(?:day|days|s)/iu, 'Holidays'],
+  [/(?:holi)[-\s]+(?:day)/iu, 'Holiday'],
   // Polish line-break word splits
   [/(?:za|zak)[-\s]+(?:kupy|upy)/iu, 'Zakupy'],
   [/(?:za|zak)[-\s]+(?:kup|up)/iu, 'Zakup'],
@@ -166,27 +169,40 @@ export function extractCleanDescription(desc: string): string {
     '',
   )
 
-  // 2. Strip SEPA reference metadata tags and everything following them when appended at the end
+  // 2. Strip SEPA reference metadata tags, remittance instructions, and everything following them when appended at the end
   // Handles: End-to-End-Ref.: ..., End to End Ref: ..., EREF+..., KREF+..., MREF+..., CRED+...,
-  // DEBT+..., SVWZ+..., Mandatsref: ..., Referenz: ..., Reference: ..., Ref. Nr: ..., IBAN: ..., BIC: ...
+  // DEBT+..., SVWZ+..., Mandatsref: ..., Referenz: ..., Reference: ..., Ref. Nr: ..., IBAN: ..., BIC: ...,
+  // Kunden-Nr.: ..., Rechnungsnr: ..., Vertrags-Nr.: ..., Zählernummer: ...,
+  // Bitte geben Sie bei Bezahlung / Zahlung / Überweisung ...
   cleaned = cleaned.replace(
-    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT)\s*[:+]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+).*/i,
+    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|Kunden[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Rechnungs[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer))\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
     '',
   )
 
-  // 3. Remove date formats (DD.MM.YYYY, DD/MM/YYYY, DD-MM-YY, etc.) and timestamps
+  // 3. Remove date formats (ISO YYYY-MM-DDTHH:MM:SS, DD.MM.YYYY, DD/MM/YYYY, DD-MM-YY, etc.) and timestamps
+  cleaned = cleaned.replace(/\b\d{4}-\d{2}-\d{2}(?:[T\s]\d{2}:\d{2}(?::\d{2})?)?\b/gi, ' ')
   cleaned = cleaned.replace(
     /\b(?:am\s+)?\d{1,2}[-./]\d{1,2}(?:[-./]\d{2,4})?(?:\s+(?:um\s+)?\d{1,2}:\d{2}(?::\d{2})?)?\b/gi,
     ' ',
   )
 
-  // 4. Remove standalone long numeric or alphanumeric reference codes (8+ chars with digits, e.g. terminal/auth IDs)
+  // 4. Remove terminal transaction codes and payment method noise (e.g. KFN 0 VJ 2412, Kartenzahlung)
+  cleaned = cleaned.replace(/\bKFN\s+\d+\s+VJ\s+\d+\b/gi, ' ')
+  cleaned = cleaned.replace(/\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz)\b/gi, ' ')
+
+  // 5. Remove standalone IBANs (compact or spaced) and SWIFT BICs
+  cleaned = cleaned.replace(/\b[A-Za-z]{2}\d{2}(?:\s*[A-Za-z0-9]{4}){2,7}(?:\s*[A-Za-z0-9]{1,4})?\b/g, ' ')
+  cleaned = cleaned.replace(/\b[A-Za-z]{6}[A-Za-z0-9]{2}(?:[A-Za-z0-9]{3})?\b/gi, (match) => {
+    return /XXX$/i.test(match) || /\d/.test(match) ? ' ' : match
+  })
+
+  // 6. Remove standalone long numeric or alphanumeric reference codes (8+ chars with digits, e.g. terminal/auth IDs)
   cleaned = cleaned.replace(/\b[A-Za-z0-9]*\d[A-Za-z0-9]{7,}\b/g, ' ')
 
-  // 5. Remove standalone numbers with 4+ digits (e.g. postal codes, terminal codes, internal IDs)
+  // 7. Remove standalone numbers with 4+ digits (e.g. postal codes, terminal codes, internal IDs)
   cleaned = cleaned.replace(/\b\d{4,}\b/g, ' ')
 
-  // 6. Clean up extraneous punctuation while preserving periods, ampersands, and hyphens in brand names
+  // 7. Clean up extraneous punctuation while preserving periods, ampersands, and hyphens in brand names
   cleaned = cleaned
     .replace(/[^\w\s\u00C0-\u024F\u0400-\u04FF.&-]/g, ' ')
     .replace(/\s+/g, ' ')
@@ -208,7 +224,10 @@ export function extractMerchantKeyword(desc: string): string {
   let merchant = extractCleanDescription(desc)
   if (!merchant) return ''
 
-  // 1. Remove corporate legal entity suffixes
+  // 1. Strip leading payment gateway / aggregator prefixes like "SumUp .", "SumUp *", "PayPal *"
+  merchant = merchant.replace(/^(?:SumUp|PayPal|Stripe)\s*[.*-]\s*/i, '')
+
+  // 2. Remove corporate legal entity suffixes
   merchant = merchant.replace(
     /\b(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|se|ltd\.?|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\.?o\.?o\.?|bv|s\.?a\.?r\.?l\.?)\b/gi,
     ' ',

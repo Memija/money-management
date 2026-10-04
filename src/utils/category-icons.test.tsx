@@ -295,6 +295,144 @@ describe('category-icons', () => {
       expect(brand.suggestedCategory).toBe('Transport')
     })
 
+    it('matches BP logo for BP gas station transactions', () => {
+      const txDesc =
+        'BP Tankstelle, Sattledt AT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 2026-0'
+      const icon = getCategoryIcon('Transport', 20, undefined, txDesc)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.BpLogo)
+      }
+
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('bp')
+      expect(brand.merchant?.name).toBe('BP')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.BpLogo)
+      expect(brand.brandColor).toBe('#007A3D')
+      expect(brand.suggestedCategory).toBe('Transport')
+    })
+
+    it('matches TUI logo for TUI vacation and travel transactions', () => {
+      const txDesc =
+        'TUI Deutschland GmbH VG.80319110 03.10.2026-HER End-to-End-Ref.: 000220030170552026 Mand'
+      const icon = getCategoryIcon('Travel', 20, undefined, txDesc)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.TuiLogo)
+      }
+
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('tui')
+      expect(brand.merchant?.name).toBe('TUI')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.TuiLogo)
+      expect(brand.suggestedCategory).toBe('Travel')
+    })
+
+    it('matches Dell logo and Shopping category for Dell hardware transactions', () => {
+      const txDesc =
+        'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421'
+      const icon = getCategoryIcon('Shopping', 20, undefined, txDesc)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.DellLogo)
+      }
+
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('dell')
+      expect(brand.merchant?.name).toBe('Dell')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.DellLogo)
+      expect(brand.brandColor).toBe('#007DB8')
+      expect(brand.suggestedCategory).toBe('Shopping')
+    })
+
+    it('matches major tech & electronics logos (Acer, HP, Microsoft, Logitech, Canon, Philips, Sony, Nvidia, Bose)', () => {
+      // Acer
+      const acerInfo = getMerchantBrandInfo('Acer Computer Store Berlin')
+      expect(acerInfo.merchant?.id).toBe('acer')
+      expect(acerInfo.logoComponent).toBe(MERCHANT_LOGOS.SiAcer)
+      expect(acerInfo.brandColor).toBe('#83B81A')
+      expect(acerInfo.suggestedCategory).toBe('Shopping')
+
+      // HP
+      const hpInfo = getMerchantBrandInfo('HP Store Online Purchase')
+      expect(hpInfo.merchant?.id).toBe('hp')
+      expect(hpInfo.logoComponent).toBe(MERCHANT_LOGOS.HpLogo)
+      expect(hpInfo.brandColor).toBe('#0096D6')
+      expect(hpInfo.suggestedCategory).toBe('Shopping')
+
+      // Microsoft
+      const msInfo = getMerchantBrandInfo('Microsoft Store Surface Pro')
+      expect(msInfo.merchant?.id).toBe('microsoft')
+      expect(msInfo.logoComponent).toBe(MERCHANT_LOGOS.MicrosoftLogo)
+      expect(msInfo.brandColor).toBe('#00A4EF')
+      expect(msInfo.suggestedCategory).toBe('Shopping')
+
+      // Logitech
+      const logiInfo = getMerchantBrandInfo('Logitech G Gaming Mouse')
+      expect(logiInfo.merchant?.id).toBe('logitech')
+      expect(logiInfo.logoComponent).toBe(MERCHANT_LOGOS.LogitechLogo)
+      expect(logiInfo.brandColor).toBe('#00B8FC')
+      expect(logiInfo.suggestedCategory).toBe('Shopping')
+
+      // Canon
+      const canonInfo = getMerchantBrandInfo('Canon Camera Deutschland')
+      expect(canonInfo.merchant?.id).toBe('canon')
+      expect(canonInfo.logoComponent).toBe(MERCHANT_LOGOS.CanonLogo)
+      expect(canonInfo.brandColor).toBe('#CC0000')
+      expect(canonInfo.suggestedCategory).toBe('Shopping')
+
+      // Philips
+      const philipsInfo = getMerchantBrandInfo('Philips GmbH Electronics')
+      expect(philipsInfo.merchant?.id).toBe('philips')
+      expect(philipsInfo.logoComponent).toBe(MERCHANT_LOGOS.PhilipsLogo)
+      expect(philipsInfo.brandColor).toBe('#0B5EAA')
+      expect(philipsInfo.suggestedCategory).toBe('Shopping')
+
+      // Sony
+      const sonyInfo = getMerchantBrandInfo('Sony Electronics Center')
+      expect(sonyInfo.merchant?.id).toBe('sony')
+      expect(sonyInfo.logoComponent).toBe(MERCHANT_LOGOS.SiSony)
+      expect(sonyInfo.brandColor).toBe('#000000')
+      expect(sonyInfo.suggestedCategory).toBe('Shopping')
+
+      // NVIDIA
+      const nvidiaInfo = getMerchantBrandInfo('NVIDIA GeForce Graphics')
+      expect(nvidiaInfo.merchant?.id).toBe('nvidia')
+      expect(nvidiaInfo.logoComponent).toBe(MERCHANT_LOGOS.SiNvidia)
+      expect(nvidiaInfo.brandColor).toBe('#76B900')
+      expect(nvidiaInfo.suggestedCategory).toBe('Shopping')
+
+      // Bose
+      const boseInfo = getMerchantBrandInfo('Bose Audio Headphones')
+      expect(boseInfo.merchant?.id).toBe('bose')
+      expect(boseInfo.logoComponent).toBe(MERCHANT_LOGOS.SiBose)
+      expect(boseInfo.brandColor).toBe('#000000')
+      expect(boseInfo.suggestedCategory).toBe('Shopping')
+    })
+
+    it('matches fair parken and EasyPark logos for parking transactions', () => {
+      const fairParkenTx =
+        'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-'
+      const fairIcon = getCategoryIcon('Transport', 20, undefined, fairParkenTx)
+      expect(React.isValidElement(fairIcon)).toBe(true)
+      if (React.isValidElement(fairIcon)) {
+        expect(fairIcon.type).toBe(MERCHANT_LOGOS.FairParkenLogo)
+      }
+
+      const fairInfo = getMerchantBrandInfo(fairParkenTx)
+      expect(fairInfo.merchant?.id).toBe('fair-parken')
+      expect(fairInfo.logoComponent).toBe(MERCHANT_LOGOS.FairParkenLogo)
+      expect(fairInfo.brandColor).toBe('#002D62')
+      expect(fairInfo.suggestedCategory).toBe('Transport')
+
+      const easyParkTx = 'EasyPark Parkgebuehren Hamburg'
+      const easyInfo = getMerchantBrandInfo(easyParkTx)
+      expect(easyInfo.merchant?.id).toBe('easypark')
+      expect(easyInfo.logoComponent).toBe(MERCHANT_LOGOS.EasyParkLogo)
+      expect(easyInfo.brandColor).toBe('#E5007D')
+      expect(easyInfo.suggestedCategory).toBe('Transport')
+    })
+
     it('renders successfully into the DOM using @testing-library/react', () => {
       const { container } = render(<div>{getCategoryIcon('Salary', 24)}</div>)
       const svg = container.querySelector('svg')
@@ -429,6 +567,359 @@ describe('category-icons', () => {
       expect(discordInfo.merchant?.id).toBe('discord')
       expect(discordInfo.logoComponent).toBe(MERCHANT_LOGOS.SiDiscord)
       expect(discordInfo.suggestedCategory).toBe('Entertainment')
+
+      const bpInfo = getMerchantBrandInfo(
+        'BP Tankstelle, Sattledt AT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 2026-0',
+      )
+      expect(bpInfo.merchant?.id).toBe('bp')
+      expect(bpInfo.merchant?.name).toBe('BP')
+      expect(bpInfo.logoComponent).toBe(MERCHANT_LOGOS.BpLogo)
+      expect(bpInfo.brandColor).toBe('#007A3D')
+      expect(bpInfo.suggestedCategory).toBe('Transport')
+
+      // Short term isolation: 'bp' should not falsely match words containing 'bp' as a substring
+      const subpageInfo = getMerchantBrandInfo('Subpage Web Design Studio')
+      expect(subpageInfo.merchant?.id).not.toBe('bp')
+
+      const jetInfo = getMerchantBrandInfo('JET Tankstelle Wien')
+      expect(jetInfo.merchant?.id).toBe('jet')
+      expect(jetInfo.logoComponent).toBe(MERCHANT_LOGOS.JetLogo)
+      expect(jetInfo.suggestedCategory).toBe('Transport')
+
+      const essoInfo = getMerchantBrandInfo('Esso Station München')
+      expect(essoInfo.merchant?.id).toBe('esso')
+      expect(essoInfo.logoComponent).toBe(MERCHANT_LOGOS.EssoLogo)
+      expect(essoInfo.suggestedCategory).toBe('Transport')
+
+      const aviaInfo = getMerchantBrandInfo('AVIA Tankstelle Frankfurt')
+      expect(aviaInfo.merchant?.id).toBe('avia')
+      expect(aviaInfo.logoComponent).toBe(MERCHANT_LOGOS.AviaLogo)
+      expect(aviaInfo.suggestedCategory).toBe('Transport')
+
+      const eniInfo = getMerchantBrandInfo('Eni Station Salzburg')
+      expect(eniInfo.merchant?.id).toBe('eni')
+      expect(eniInfo.logoComponent).toBe(MERCHANT_LOGOS.EniLogo)
+      expect(eniInfo.suggestedCategory).toBe('Transport')
+
+      const turmoelInfo = getMerchantBrandInfo('Turmöl Quick Linz')
+      expect(turmoelInfo.merchant?.id).toBe('turmoel')
+      expect(turmoelInfo.logoComponent).toBe(MERCHANT_LOGOS.TurmoelLogo)
+      expect(turmoelInfo.suggestedCategory).toBe('Transport')
+
+      const asfinagInfo = getMerchantBrandInfo('ASFINAG Maut Shop Wien')
+      expect(asfinagInfo.merchant?.id).toBe('asfinag')
+      expect(asfinagInfo.logoComponent).toBe(MERCHANT_LOGOS.AsfinagLogo)
+      expect(asfinagInfo.suggestedCategory).toBe('Transport')
+
+      const teslaInfo = getMerchantBrandInfo('Tesla Supercharger Salzburg')
+      expect(teslaInfo.merchant?.id).toBe('tesla-supercharger')
+      expect(teslaInfo.logoComponent).toBe(MERCHANT_LOGOS.SiTesla)
+      expect(teslaInfo.suggestedCategory).toBe('Transport')
+
+      const ionityInfo = getMerchantBrandInfo('IONITY HPC Charging')
+      expect(ionityInfo.merchant?.id).toBe('ionity')
+      expect(ionityInfo.logoComponent).toBe(MERCHANT_LOGOS.IonityLogo)
+      expect(ionityInfo.suggestedCategory).toBe('Transport')
+
+      const enbwInfo = getMerchantBrandInfo('EnBW mobility+ Ladestation')
+      expect(enbwInfo.merchant?.id).toBe('enbw-mobility')
+      expect(enbwInfo.logoComponent).toBe(MERCHANT_LOGOS.EnbwLogo)
+      expect(enbwInfo.suggestedCategory).toBe('Transport')
+
+      const fastnedInfo = getMerchantBrandInfo('Fastned B.V. Charging')
+      expect(fastnedInfo.merchant?.id).toBe('fastned')
+      expect(fastnedInfo.logoComponent).toBe(MERCHANT_LOGOS.FastnedLogo)
+      expect(fastnedInfo.suggestedCategory).toBe('Transport')
+
+      const tuiInfo = getMerchantBrandInfo(
+        'TUI Deutschland GmbH VG.80319110 03.10.2026-HER End-to-End-Ref.: 000220030170552026 Mand',
+      )
+      expect(tuiInfo.merchant?.id).toBe('tui')
+      expect(tuiInfo.merchant?.name).toBe('TUI')
+      expect(tuiInfo.logoComponent).toBe(MERCHANT_LOGOS.TuiLogo)
+      expect(tuiInfo.brandColor).toBe('#D40E14')
+      expect(tuiInfo.suggestedCategory).toBe('Travel')
+
+      // Short term isolation: 'tui' should not falsely match words like 'intuitiv'
+      const intuitiveInfo = getMerchantBrandInfo('Intuitiv Software Systems')
+      expect(intuitiveInfo.merchant?.id).not.toBe('tui')
+
+      const lufthansaInfo = getMerchantBrandInfo('Deutsche Lufthansa Ticket')
+      expect(lufthansaInfo.merchant?.id).toBe('lufthansa')
+      expect(lufthansaInfo.logoComponent).toBe(MERCHANT_LOGOS.SiLufthansa)
+      expect(lufthansaInfo.suggestedCategory).toBe('Travel')
+
+      const ryanairInfo = getMerchantBrandInfo('Ryanair Flight STN')
+      expect(ryanairInfo.merchant?.id).toBe('ryanair')
+      expect(ryanairInfo.logoComponent).toBe(MERCHANT_LOGOS.SiRyanair)
+      expect(ryanairInfo.suggestedCategory).toBe('Travel')
+
+      const easyjetInfo = getMerchantBrandInfo('easyJet Airline Booking')
+      expect(easyjetInfo.merchant?.id).toBe('easyjet')
+      expect(easyjetInfo.logoComponent).toBe(MERCHANT_LOGOS.SiEasyjet)
+      expect(easyjetInfo.suggestedCategory).toBe('Travel')
+
+      const dertourInfo = getMerchantBrandInfo('DERTOUR Pauschalreise')
+      expect(dertourInfo.merchant?.id).toBe('dertour')
+      expect(dertourInfo.logoComponent).toBe(MERCHANT_LOGOS.DertourLogo)
+      expect(dertourInfo.suggestedCategory).toBe('Travel')
+
+      const alltoursInfo = getMerchantBrandInfo('alltours Flugreisen')
+      expect(alltoursInfo.merchant?.id).toBe('alltours')
+      expect(alltoursInfo.logoComponent).toBe(MERCHANT_LOGOS.AlltoursLogo)
+      expect(alltoursInfo.suggestedCategory).toBe('Travel')
+
+      const schauinslandInfo = getMerchantBrandInfo('Schauinsland-Reisen GmbH')
+      expect(schauinslandInfo.merchant?.id).toBe('schauinsland')
+      expect(schauinslandInfo.logoComponent).toBe(MERCHANT_LOGOS.SchauinslandLogo)
+      expect(schauinslandInfo.suggestedCategory).toBe('Travel')
+
+      const marriottInfo = getMerchantBrandInfo('Marriott Bonvoy Hotel')
+      expect(marriottInfo.merchant?.id).toBe('marriott')
+      expect(marriottInfo.logoComponent).toBe(MERCHANT_LOGOS.SiMarriott)
+      expect(marriottInfo.suggestedCategory).toBe('Travel')
+
+      const hiltonInfo = getMerchantBrandInfo('Hilton Honors Frankfurt')
+      expect(hiltonInfo.merchant?.id).toBe('hilton')
+      expect(hiltonInfo.logoComponent).toBe(MERCHANT_LOGOS.SiHilton)
+      expect(hiltonInfo.suggestedCategory).toBe('Travel')
+
+      const pennyInfo = getMerchantBrandInfo('Penny Markt Filiale')
+      expect(pennyInfo.merchant?.id).toBe('penny')
+      expect(pennyInfo.logoComponent).toBe(MERCHANT_LOGOS.SiPenny)
+      expect(pennyInfo.suggestedCategory).toBe('Groceries')
+
+      const nettoInfo = getMerchantBrandInfo('Netto Marken-Discount')
+      expect(nettoInfo.merchant?.id).toBe('netto')
+      expect(nettoInfo.logoComponent).toBe(MERCHANT_LOGOS.SiNetto)
+      expect(nettoInfo.suggestedCategory).toBe('Groceries')
+
+      const bvgInfo = getMerchantBrandInfo('BVG Ticket Berlin')
+      expect(bvgInfo.merchant?.id).toBe('bvg')
+      expect(bvgInfo.logoComponent).toBe(MERCHANT_LOGOS.SiBvg)
+      expect(bvgInfo.suggestedCategory).toBe('Transport')
+
+      const check24Info = getMerchantBrandInfo('CHECK24 Vergleichsportal GmbH')
+      expect(check24Info.merchant?.id).toBe('check24')
+      expect(check24Info.logoComponent).toBe(MERCHANT_LOGOS.Check24Logo)
+      expect(check24Info.suggestedCategory).toBe('Shopping')
+      expect(check24Info.brandColor).toBe('#002D72')
+
+      const chech24Info = getMerchantBrandInfo('Chech24')
+      expect(chech24Info.merchant?.id).toBe('check24')
+      expect(chech24Info.logoComponent).toBe(MERCHANT_LOGOS.Check24Logo)
+      expect(chech24Info.suggestedCategory).toBe('Shopping')
+
+      const c24Info = getMerchantBrandInfo('C24 Bank GmbH')
+      expect(c24Info.merchant?.id).toBe('c24')
+      expect(c24Info.logoComponent).toBe(MERCHANT_LOGOS.C24Logo)
+      expect(c24Info.suggestedCategory).toBe('Transfers')
+
+      const dhlInfo = getMerchantBrandInfo('DHL Paket Delivery')
+      expect(dhlInfo.merchant?.id).toBe('dhl')
+      expect(dhlInfo.logoComponent).toBe(MERCHANT_LOGOS.SiDhl)
+      expect(dhlInfo.suggestedCategory).toBe('Shopping')
+
+      const postInfo = getMerchantBrandInfo('Deutsche Post Filiale')
+      expect(postInfo.merchant?.id).toBe('deutsche-post')
+      expect(postInfo.logoComponent).toBe(MERCHANT_LOGOS.SiDeutschepost)
+      expect(postInfo.suggestedCategory).toBe('Shopping')
+
+      const tchiboInfo = getMerchantBrandInfo(
+        'TCHIBO GMBH DRESDEFF200 DE14200800000816170700 20319230661010 End-to-End-Ref.: MOB.'
+      )
+      expect(tchiboInfo.merchant?.id).toBe('tchibo')
+      expect(tchiboInfo.logoComponent).toBe(MERCHANT_LOGOS.TchiboLogo)
+      expect(tchiboInfo.suggestedCategory).toBe('Shopping')
+      expect(tchiboInfo.brandColor).toBe('#072042')
+
+      const dellInfo = getMerchantBrandInfo(
+        'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421'
+      )
+      expect(dellInfo.merchant?.id).toBe('dell')
+      expect(dellInfo.logoComponent).toBe(MERCHANT_LOGOS.DellLogo)
+      expect(dellInfo.suggestedCategory).toBe('Shopping')
+      expect(dellInfo.brandColor).toBe('#007DB8')
+
+      const fairParkenInfo = getMerchantBrandInfo(
+        'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-'
+      )
+      expect(fairParkenInfo.merchant?.id).toBe('fair-parken')
+      expect(fairParkenInfo.logoComponent).toBe(MERCHANT_LOGOS.FairParkenLogo)
+      expect(fairParkenInfo.suggestedCategory).toBe('Transport')
+      expect(fairParkenInfo.brandColor).toBe('#002D62')
+
+      const beitragInfo = getMerchantBrandInfo('ARD ZDF Deutschlandradio Beitragsservice')
+      expect(beitragInfo.merchant?.id).toBe('rundfunkbeitrag')
+      expect(beitragInfo.logoComponent).toBe(MERCHANT_LOGOS.BeitragsserviceLogo)
+      expect(beitragInfo.suggestedCategory).toBe('Utilities')
+
+      const tkInfo = getMerchantBrandInfo('Techniker Krankenkasse Beitrag')
+      expect(tkInfo.merchant?.id).toBe('tk')
+      expect(tkInfo.logoComponent).toBe(MERCHANT_LOGOS.TkLogo)
+      expect(tkInfo.suggestedCategory).toBe('Healthcare')
+
+      const aokInfo = getMerchantBrandInfo('AOK Bayern Gesundheitskasse')
+      expect(aokInfo.merchant?.id).toBe('aok')
+      expect(aokInfo.logoComponent).toBe(MERCHANT_LOGOS.AokLogo)
+      expect(aokInfo.suggestedCategory).toBe('Healthcare')
+
+      const einsUndEinsInfo = getMerchantBrandInfo('1&1 Telecom GmbH')
+      expect(einsUndEinsInfo.merchant?.id).toBe('1und1')
+      expect(einsUndEinsInfo.logoComponent).toBe(MERCHANT_LOGOS.EinsUndEinsLogo)
+      expect(einsUndEinsInfo.suggestedCategory).toBe('Communication')
+
+      const daznInfo = getMerchantBrandInfo('DAZN Subscription Dach')
+      expect(daznInfo.merchant?.id).toBe('dazn')
+      expect(daznInfo.logoComponent).toBe(MERCHANT_LOGOS.SiDazn)
+      expect(daznInfo.suggestedCategory).toBe('Entertainment')
+
+      const skyInfo = getMerchantBrandInfo('Sky Deutschland Abo')
+      expect(skyInfo.merchant?.id).toBe('sky')
+      expect(skyInfo.logoComponent).toBe(MERCHANT_LOGOS.SiSky)
+      expect(skyInfo.suggestedCategory).toBe('Entertainment')
+
+      const shopApothekeInfo = getMerchantBrandInfo('Shop-Apotheke Bestellung')
+      expect(shopApothekeInfo.merchant?.id).toBe('shop-apotheke')
+      expect(shopApothekeInfo.logoComponent).toBe(MERCHANT_LOGOS.ShopApothekeLogo)
+      expect(shopApothekeInfo.suggestedCategory).toBe('Healthcare')
+      expect(shopApothekeInfo.brandColor).toBe('#E30613')
+
+      const sumupInfo = getMerchantBrandInfo('SumUp .Metzgerei Enk/Louisenstrass 2024-10-26T12:41:33 KFN 0 VJ 2412 Kartenzahlung')
+      expect(sumupInfo.merchant?.id).toBe('sumup')
+      expect(sumupInfo.logoComponent).toBe(MERCHANT_LOGOS.SumupLogo)
+      expect(sumupInfo.suggestedCategory).toBe('Shopping')
+      expect(sumupInfo.brandColor).toBe('#0050FF')
+
+      const suewagInfo = getMerchantBrandInfo('Süwag COBADEFFXXX DE69500400000257744300 Kunden-Nr.: 263614738 Rechnungsnr:')
+      expect(suewagInfo.merchant?.id).toBe('suewag')
+      expect(suewagInfo.logoComponent).toBe(MERCHANT_LOGOS.SuewagLogo)
+      expect(suewagInfo.suggestedCategory).toBe('Utilities')
+      expect(suewagInfo.brandColor).toBe('#004B87')
+
+      const eurowingsInfo = getMerchantBrandInfo('holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Anel Mem')
+      expect(eurowingsInfo.merchant?.id).toBe('eurowings')
+      expect(eurowingsInfo.logoComponent).toBe(MERCHANT_LOGOS.EurowingsLogo)
+      expect(eurowingsInfo.suggestedCategory).toBe('Travel')
+      expect(eurowingsInfo.brandColor).toBe('#7A1B3B')
+
+      const condorInfo = getMerchantBrandInfo('Condor Flugdienst DE1234 Frankfurt-Palma')
+      expect(condorInfo.merchant?.id).toBe('condor')
+      expect(condorInfo.logoComponent).toBe(MERCHANT_LOGOS.CondorLogo)
+      expect(condorInfo.suggestedCategory).toBe('Travel')
+      expect(condorInfo.brandColor).toBe('#FFB800')
+
+      const barmerInfo = getMerchantBrandInfo('BARMER Krankenkasse Monatsbeitrag')
+      expect(barmerInfo.merchant?.id).toBe('barmer')
+      expect(barmerInfo.logoComponent).toBe(MERCHANT_LOGOS.BarmerLogo)
+      expect(barmerInfo.suggestedCategory).toBe('Healthcare')
+      expect(barmerInfo.brandColor).toBe('#007A3D')
+
+      const dakInfo = getMerchantBrandInfo('DAK Gesundheit Beitrag')
+      expect(dakInfo.merchant?.id).toBe('dak')
+      expect(dakInfo.logoComponent).toBe(MERCHANT_LOGOS.DakLogo)
+      expect(dakInfo.suggestedCategory).toBe('Healthcare')
+      expect(dakInfo.brandColor).toBe('#E4002B')
+
+      const docmorrisInfo = getMerchantBrandInfo('DocMorris Apotheke Bestellung')
+      expect(docmorrisInfo.merchant?.id).toBe('docmorris')
+      expect(docmorrisInfo.logoComponent).toBe(MERCHANT_LOGOS.DocMorrisLogo)
+      expect(docmorrisInfo.suggestedCategory).toBe('Healthcare')
+      expect(docmorrisInfo.brandColor).toBe('#008542')
+
+      const obiInfo = getMerchantBrandInfo('OBI Baumarkt Frankfurt')
+      expect(obiInfo.merchant?.id).toBe('obi')
+      expect(obiInfo.logoComponent).toBe(MERCHANT_LOGOS.ObiLogo)
+      expect(obiInfo.suggestedCategory).toBe('Shopping')
+      expect(obiInfo.brandColor).toBe('#FF6600')
+
+      const bauhausInfo = getMerchantBrandInfo('Bauhaus Fachcentrum Werkzeuge')
+      expect(bauhausInfo.merchant?.id).toBe('bauhaus')
+      expect(bauhausInfo.logoComponent).toBe(MERCHANT_LOGOS.BauhausLogo)
+      expect(bauhausInfo.suggestedCategory).toBe('Shopping')
+      expect(bauhausInfo.brandColor).toBe('#D40000')
+
+      const hornbachInfo = getMerchantBrandInfo('Hornbach Baumarkt Baustoffe')
+      expect(hornbachInfo.merchant?.id).toBe('hornbach')
+      expect(hornbachInfo.logoComponent).toBe(MERCHANT_LOGOS.HornbachLogo)
+      expect(hornbachInfo.suggestedCategory).toBe('Shopping')
+      expect(hornbachInfo.brandColor).toBe('#F28C00')
+
+      const allianzInfo = getMerchantBrandInfo('Allianz Versicherung Monatsbeitrag')
+      expect(allianzInfo.merchant?.id).toBe('allianz')
+      expect(allianzInfo.logoComponent).toBe(MERCHANT_LOGOS.AllianzLogo)
+      expect(allianzInfo.suggestedCategory).toBe('Insurance')
+      expect(allianzInfo.brandColor).toBe('#003780')
+
+      const hukInfo = getMerchantBrandInfo('HUK-COBURG Haftpflichtversicherung')
+      expect(hukInfo.merchant?.id).toBe('huk')
+      expect(hukInfo.logoComponent).toBe(MERCHANT_LOGOS.HukLogo)
+      expect(hukInfo.suggestedCategory).toBe('Insurance')
+      expect(hukInfo.brandColor).toBe('#FFCC00')
+
+      const sixtInfo = getMerchantBrandInfo('Sixt Autovermietung Muenchen Airport')
+      expect(sixtInfo.merchant?.id).toBe('sixt')
+      expect(sixtInfo.logoComponent).toBe(MERCHANT_LOGOS.SixtLogo)
+      expect(sixtInfo.suggestedCategory).toBe('Transport')
+      expect(sixtInfo.brandColor).toBe('#FF5F00')
+
+      const mercedesInfo = getMerchantBrandInfo(
+        'Mercedes-Benz AG DEUTDEFFXXX DE20500700100092001700 Bitte geben Sie bei Bezahlung Ihre'
+      )
+      expect(mercedesInfo.merchant?.id).toBe('mercedes')
+      expect(mercedesInfo.logoComponent).toBe(MERCHANT_LOGOS.MercedesLogo)
+      expect(mercedesInfo.suggestedCategory).toBe('Transport')
+      expect(mercedesInfo.brandColor).toBe('#000000')
+
+      const bmwInfo = getMerchantBrandInfo('BMW Bank Niederlassung Muenchen')
+      expect(bmwInfo.merchant?.id).toBe('bmw')
+      expect(bmwInfo.logoComponent).toBe(MERCHANT_LOGOS.BmwLogo)
+      expect(bmwInfo.suggestedCategory).toBe('Transport')
+      expect(bmwInfo.brandColor).toBe('#0066B1')
+
+      const vwInfo = getMerchantBrandInfo('Volkswagen Leasing GmbH')
+      expect(vwInfo.merchant?.id).toBe('volkswagen')
+      expect(vwInfo.logoComponent).toBe(MERCHANT_LOGOS.VolkswagenLogo)
+      expect(vwInfo.suggestedCategory).toBe('Transport')
+      expect(vwInfo.brandColor).toBe('#001E50')
+
+      const audiInfo = getMerchantBrandInfo('Audi Zentrum Frankfurt')
+      expect(audiInfo.merchant?.id).toBe('audi')
+      expect(audiInfo.logoComponent).toBe(MERCHANT_LOGOS.AudiLogo)
+      expect(audiInfo.suggestedCategory).toBe('Transport')
+      expect(audiInfo.brandColor).toBe('#BB0A30')
+
+      const porscheInfo = getMerchantBrandInfo('Porsche Zentrum Stuttgart')
+      expect(porscheInfo.merchant?.id).toBe('porsche')
+      expect(porscheInfo.logoComponent).toBe(MERCHANT_LOGOS.PorscheLogo)
+      expect(porscheInfo.suggestedCategory).toBe('Transport')
+      expect(porscheInfo.brandColor).toBe('#D5001C')
+
+      const teslaMotorsInfo = getMerchantBrandInfo('Tesla Motors Germany GmbH')
+      expect(teslaMotorsInfo.merchant?.id).toBe('tesla')
+      expect(teslaMotorsInfo.logoComponent).toBe(MERCHANT_LOGOS.SiTesla)
+      expect(teslaMotorsInfo.suggestedCategory).toBe('Transport')
+      expect(teslaMotorsInfo.brandColor).toBe('#E82127')
+
+      const toyotaInfo = getMerchantBrandInfo('Toyota Motor Europe')
+      expect(toyotaInfo.merchant?.id).toBe('toyota')
+      expect(toyotaInfo.logoComponent).toBe(MERCHANT_LOGOS.SiToyota)
+      expect(toyotaInfo.suggestedCategory).toBe('Transport')
+      expect(toyotaInfo.brandColor).toBe('#EB0A1E')
+
+      const fordInfo = getMerchantBrandInfo('Ford-Werke GmbH Koeln')
+      expect(fordInfo.merchant?.id).toBe('ford')
+      expect(fordInfo.logoComponent).toBe(MERCHANT_LOGOS.SiFord)
+      expect(fordInfo.suggestedCategory).toBe('Transport')
+      expect(fordInfo.brandColor).toBe('#002C6C')
+
+      const tomorrowInfo = getMerchantBrandInfo(
+        'ANEL MEMIC - TOMORROW SOBKDEBBXXX DE58110101002097425357 FÜR DIE ZUKUNFT End-to-End-'
+      )
+      expect(tomorrowInfo.merchant?.id).toBe('tomorrow')
+      expect(tomorrowInfo.logoComponent).toBe(MERCHANT_LOGOS.TomorrowLogo)
+      expect(tomorrowInfo.suggestedCategory).toBe('Transfers')
+      expect(tomorrowInfo.brandColor).toBe('#FF8454')
     })
 
     it('returns brand info using fallback icon for merchants without brand logos', () => {
