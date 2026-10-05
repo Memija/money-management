@@ -66,16 +66,27 @@ function getMerchantMatchScore(merchant: MerchantSuggestion, textLower: string):
   return best
 }
 
+const PAYMENT_PROCESSOR_IDS = new Set<string>([
+  'paypal',
+  'klarna',
+  'stripe',
+  'sumup',
+  'payoneer',
+])
+
 /**
  * Finds the most specific matching popular merchant for a given text
  * by checking its keyword, aliases, and display name.
+ * Prioritizes the underlying merchant over payment processors/intermediaries (e.g. Booking.com over PayPal).
  */
 export function findMatchingMerchant(text: string): MerchantSuggestion | undefined {
   if (!text) return undefined
   const repaired = repairBrokenWords(text)
   const textLower = repaired.trim().toLowerCase()
-  let bestMerchant: MerchantSuggestion | undefined
-  let bestScore = 0
+  let bestDirectMerchant: MerchantSuggestion | undefined
+  let bestDirectScore = 0
+  let bestProcessorMerchant: MerchantSuggestion | undefined
+  let bestProcessorScore = 0
 
   for (const merchant of POPULAR_MERCHANTS) {
     let score = getMerchantMatchScore(merchant, textLower)
@@ -92,13 +103,23 @@ export function findMatchingMerchant(text: string): MerchantSuggestion | undefin
       }
     }
 
-    if (score > bestScore) {
-      bestScore = score
-      bestMerchant = merchant
+    if (score > 0) {
+      if (PAYMENT_PROCESSOR_IDS.has(merchant.id)) {
+        if (score > bestProcessorScore) {
+          bestProcessorScore = score
+          bestProcessorMerchant = merchant
+        }
+      } else {
+        if (score > bestDirectScore) {
+          bestDirectScore = score
+          bestDirectMerchant = merchant
+        }
+      }
     }
   }
 
-  return bestMerchant
+  // Prioritize the actual underlying retail / service / travel merchant over payment intermediaries
+  return bestDirectMerchant || bestProcessorMerchant
 }
 
 export function getCategoryIcon(

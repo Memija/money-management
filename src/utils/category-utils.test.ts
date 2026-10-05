@@ -110,6 +110,45 @@ describe('category-utils', () => {
       expect(categorize('Sony Electronics Direct')).toBe('Shopping')
     })
 
+    it('categorizes INTRA-TEC building supplies and hardware transactions as Shopping', () => {
+      expect(
+        categorize(
+          'INTRA-TEC GmbH COKSDE33XXX DE32370502990312020901 Order 589490 End-to-End-Ref.: CCB.',
+        ),
+      ).toBe('Shopping')
+      expect(categorize('INTRA-TEC Online Shop')).toBe('Shopping')
+      expect(categorize('Schrauben-Hammer.de')).toBe('Shopping')
+    })
+
+    it('categorizes cadooz shopping transactions as Shopping', () => {
+      expect(
+        categorize(
+          'cadooz GmbH DEUTDEHHXXX DE30200700000070730703 230503-663021 End-to-End-Ref.: CCB.123',
+        ),
+      ).toBe('Shopping')
+      expect(categorize('cadooz rewards Gutschein')).toBe('Shopping')
+      expect(categorize('BestChoice Gutschein cadooz')).toBe('Shopping')
+    })
+
+    it('categorizes Lothar Braun door installations and carpentry transactions as Shopping', () => {
+      expect(
+        categorize('Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung'),
+      ).toBe('Shopping')
+      expect(categorize('Schreinerei Lothar Braun')).toBe('Shopping')
+      expect(categorize('Schreinerei Braun Türeneinbau')).toBe('Shopping')
+    })
+
+    it('categorizes FA Nidda tax return transactions as Taxes', () => {
+      expect(
+        categorize(
+          'FA NIDDA ERSTATT.00345234717 EST-VERANL. 21 End-to-End-Ref.: 00345234717 EST-VEG0404202',
+        ),
+      ).toBe('Taxes')
+      expect(categorize('FA Nidda Einkommensteuer')).toBe('Taxes')
+      expect(categorize('Finanzamt Nidda Erstattung')).toBe('Taxes')
+      expect(categorize('FA Frankfurt am Main Steuererstattung')).toBe('Taxes')
+    })
+
     it('categorizes fair parken and parking transactions as Transport', () => {
       expect(
         categorize(
@@ -119,6 +158,32 @@ describe('category-utils', () => {
       expect(categorize('fair parken Parkplatz')).toBe('Transport')
       expect(categorize('Parkhaus Hauptbahnhof Parkgebühr')).toBe('Transport')
       expect(categorize('EasyPark Parking Fee')).toBe('Transport')
+    })
+
+    it('categorizes wundertax and tax filing platforms as Taxes', () => {
+      expect(
+        categorize(
+          'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00'
+        )
+      ).toBe('Taxes')
+      expect(categorize('wundertax Steuererklärung 2026')).toBe('Taxes')
+      expect(categorize('Taxfix SE Servicegebühr')).toBe('Taxes')
+      expect(categorize('smartsteuer GmbH Steuererklärung')).toBe('Taxes')
+      expect(categorize('ELSTER Online Steuerübermittlung')).toBe('Taxes')
+      expect(categorize('WISO Steuer Buhl Data Service')).toBe('Taxes')
+    })
+
+    it('categorizes guardarian and cryptocurrency gateways as Crypto', () => {
+      expect(
+        categorize(
+          'GUARDARIAN OÜ CLJUGB21XXX GB33CLJU04130729903054 6154171893446142 End-to-End-Ref.: CCB'
+        )
+      ).toBe('Crypto')
+      expect(categorize('Guardarian Crypto Purchase')).toBe('Crypto')
+      expect(categorize('Coinbase Ireland Limited')).toBe('Crypto')
+      expect(categorize('Binance Card Payment')).toBe('Crypto')
+      expect(categorize('Kraken Payward Ireland')).toBe('Crypto')
+      expect(categorize('Bitpanda GmbH')).toBe('Crypto')
     })
 
     it('categorizes Süwag electricity and utility transactions as Utilities (not Transfers)', () => {
@@ -135,6 +200,23 @@ describe('category-utils', () => {
         'ANEL MEMIC - TOMORROW SOBKDEBBXXX DE58110101002097425357 FÜR DIE ZUKUNFT End-to-End-'
       expect(categorize(desc)).toBe('Transfers')
       expect(categorize('Tomorrow Bank Überweisung')).toBe('Transfers')
+    })
+
+    it('categorizes Revolut and Revolt bank transactions as Transfers', () => {
+      const desc =
+        'Anel Memic REVOLT21XXX LT153250000292115687 End-to-End-Ref.: MOB.147.UE.32306'
+      expect(categorize(desc)).toBe('Transfers')
+      expect(categorize('Revolut Bank Überweisung')).toBe('Transfers')
+      expect(categorize('Revolt Money Transfer')).toBe('Transfers')
+    })
+
+    it('categorizes PAYBACK and Paymorrow transactions as Shopping', () => {
+      const desc =
+        'PAYBACK PAY / PAYMORROW WELADEDDXXX DE85300500000071013312 PAYBACK PAY End-to-En'
+      expect(categorize(desc)).toBe('Shopping')
+      expect(categorize('PAYBACK PAY Rewe')).toBe('Shopping')
+      expect(categorize('PAYBACK GmbH Punkte')).toBe('Shopping')
+      expect(categorize('Paymorrow Rechnung')).toBe('Shopping')
     })
 
     it('falls back to "Other" for unknown descriptions', () => {
@@ -829,6 +911,118 @@ describe('category-utils', () => {
       expect(extractMerchantKeyword(desc)).toBe('FAIR PARKEN')
     })
 
+    it('cleans wundertax transaction repairing broken words and extracting merchant keyword', () => {
+      const desc =
+        'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00'
+      expect(extractCleanDescription(desc)).toBe(
+        'wundertax GmbH Rueckzahlung Lizenzgebuehr Wundertax GmbH'
+      )
+      expect(extractMerchantKeyword(desc)).toBe('wundertax')
+    })
+
+    it('cleans Guardarian crypto transaction stripping BIC, IBAN, and card reference numbers', () => {
+      const desc =
+        'GUARDARIAN OÜ CLJUGB21XXX GB33CLJU04130729903054 6154171893446142 End-to-End-Ref.: CCB'
+      expect(extractCleanDescription(desc)).toBe('GUARDARIAN OÜ')
+      expect(extractMerchantKeyword(desc)).toBe('GUARDARIAN')
+    })
+
+    it('cleans Stadtverwaltung Bad Homburg municipal transfer stripping BIC, IBAN, and numeric references', () => {
+      const desc =
+        'Stadtverwaltung Bad Homburg HELADEF1TSK DE81512500000001085662 0181776005 End-to-End-Ref.'
+      expect(extractCleanDescription(desc)).toBe('Stadtverwaltung Bad Homburg')
+      expect(extractMerchantKeyword(desc)).toBe('Stadtverwaltung Bad Homburg')
+    })
+
+    it('cleans Gemeinde Schmitten municipal transfer stripping BIC, IBAN, and numeric references', () => {
+      const desc =
+        'Gemeinde Schmitten HELADEF1TSK DE58512500000059004000 0561196907 End-to-End-Ref.: CCB.'
+      expect(extractCleanDescription(desc)).toBe('Gemeinde Schmitten')
+      expect(extractMerchantKeyword(desc)).toBe('Gemeinde Schmitten')
+    })
+
+    it('cleans Stadtkasse Kelkheim municipal transfer stripping BIC, IBAN, and AZ reference', () => {
+      const desc =
+        'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836'
+      expect(extractCleanDescription(desc)).toBe('STADTKASSE KELKHEIM TAUNUS')
+      expect(extractMerchantKeyword(desc)).toBe('STADTKASSE KELKHEIM TAUNUS')
+    })
+
+    it('cleans PayPal corporate prefix and extracts Booking.com merchant keyword', () => {
+      const desc =
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. . Booking.com BV, Ihr Einkauf bei B ooking.com BV ABBUCHUNG'
+      expect(extractMerchantKeyword(desc)).toBe('Booking.com')
+      expect(categorize(desc)).toBe('Travel')
+    })
+
+    it('cleans klarmobil telecom transaction stripping customer number, greeting, invoice number, and amounts', () => {
+      const desc =
+        'klarmobil GmbH Kd.1059561719 Wir sagen Danke. RG-N r.F25035684584 15,99 EUR End-to-End-Ref.'
+      expect(extractCleanDescription(desc)).toBe('klarmobil GmbH')
+      expect(extractMerchantKeyword(desc)).toBe('klarmobil')
+      expect(categorize(desc)).toBe('Communication')
+    })
+
+    it('cleans tenancy Kautionsabrechnung rental transaction stripping GbR and memo noise', () => {
+      const desc =
+        'Heinz Otto, Annette, Alexander u. C hrista Christoph GbR Kautionsabrechnung Eschborn / An de r Grue'
+      expect(extractCleanDescription(desc)).toBe(
+        'Heinz Otto Annette Alexander u. Christa Christoph GbR Kautionsabrechnung Eschborn An der Grue',
+      )
+      expect(extractMerchantKeyword(desc)).toBe(
+        'Heinz Otto Annette Alexander u. Christa Christoph',
+      )
+    })
+
+    it('cleans Gerichtkasse court fee transaction description and extracts merchant', () => {
+      const desc =
+        'Gerichtkasse HELADEFFXXX DE73500500000001006030 X046833902021X End-to-End-Ref.: CCB.'
+      expect(extractCleanDescription(desc)).toBe('Gerichtkasse')
+      expect(extractMerchantKeyword(desc)).toBe('Gerichtkasse')
+    })
+
+    it('cleans Färber und Hutzel notary transaction description and extracts merchant', () => {
+      const desc =
+        'Färber und Hutzel HELADEF1TSK DE29512500000001058274 01571/21 End-to-End-Ref.: CCB.269.UE.'
+      expect(extractCleanDescription(desc)).toBe('Färber und Hutzel')
+      expect(extractMerchantKeyword(desc)).toBe('Färber und Hutzel')
+    })
+
+    it('cleans INTRA-TEC retail transaction description and extracts merchant', () => {
+      const desc =
+        'INTRA-TEC GmbH COKSDE33XXX DE32370502990312020901 Order 589490 End-to-End-Ref.: CCB.'
+      expect(extractCleanDescription(desc)).toBe('INTRA-TEC GmbH')
+      expect(extractMerchantKeyword(desc)).toBe('INTRA-TEC')
+    })
+
+    it('cleans FA Nidda tax return transaction description and extracts merchant', () => {
+      const desc =
+        'FA NIDDA ERSTATT.00345234717 EST-VERANL. 21 End-to-End-Ref.: 00345234717 EST-VEG0404202'
+      expect(extractCleanDescription(desc)).toBe('Finanzamt Nidda Erstattung EST-Veranlagung 21')
+      expect(extractMerchantKeyword(desc)).toBe('Finanzamt Nidda')
+    })
+
+    it('cleans cadooz retail transaction description and extracts merchant', () => {
+      const desc =
+        'cadooz GmbH DEUTDEHHXXX DE30200700000070730703 230503-663021 End-to-End-Ref.: CCB.123'
+      expect(extractCleanDescription(desc)).toBe('cadooz GmbH')
+      expect(extractMerchantKeyword(desc)).toBe('cadooz')
+    })
+
+    it('cleans Lothar Braun door installations transaction description and extracts merchant', () => {
+      const desc =
+        'Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung'
+      expect(extractCleanDescription(desc)).toBe('Lothar Braun GmbH')
+      expect(extractMerchantKeyword(desc)).toBe('Lothar Braun')
+    })
+
+    it('cleans Revolut transfer transaction description and extracts recipient', () => {
+      const desc =
+        'Anel Memic REVOLT21XXX LT153250000292115687 End-to-End-Ref.: MOB.147.UE.32306'
+      expect(extractCleanDescription(desc)).toBe('Anel Memic')
+      expect(extractMerchantKeyword(desc)).toBe('Anel Memic')
+    })
+
     it('handles empty and invalid inputs gracefully', () => {
       expect(extractCleanDescription('')).toBe('')
       // @ts-expect-error Testing invalid runtime input
@@ -1295,6 +1489,11 @@ describe('category-utils', () => {
         expect(categorize('PayPal * Ihr E in kauf bei StoreZ')).toBe('Shopping')
         expect(categorize('Klarna * Ihr Einkauf bei Modewelt')).toBe('Shopping')
         expect(categorize('SumUp * Ihr Ein kauf bei Modehaus')).toBe('Shopping')
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. . Booking.com BV, Ihr Einkauf bei B ooking.com BV ABBUCHUNG',
+          ),
+        ).toBe('Travel')
 
         // English purchase phrases and broken words
         expect(categorize('PayPal Pte. Ltd. Your purchase at TechGadgets')).toBe('Shopping')
@@ -1372,6 +1571,9 @@ describe('category-utils', () => {
         expect(repairBrokenWords('Bank gebühren')).toBe('Bankgebühren')
         expect(repairBrokenWords('Serviceg esellschaft')).toBe('Servicegesellschaft')
         expect(repairBrokenWords('Verkehrs verbund')).toBe('Verkehrsverbund')
+        expect(repairBrokenWords('Kautions abrechnung')).toBe('Kautionsabrechnung')
+        expect(repairBrokenWords('Mietkautions abrechnung')).toBe('Mietkautionsabrechnung')
+        expect(repairBrokenWords('C hrista Christoph')).toBe('Christa Christoph')
       })
     })
 
@@ -1691,6 +1893,116 @@ describe('category-utils', () => {
         expect(
           categorize('Zinsgutschrift Sparkonto', undefined, { type: 'income', amount: 50.0 }),
         ).toBe('Savings')
+      })
+    })
+
+    describe('municipal and civic transfers categorization', () => {
+      it('categorizes municipal administration transfers as Transfers', () => {
+        expect(
+          categorize(
+            'Stadtverwaltung Bad Homburg HELADEF1TSK DE81512500000001085662 0181776005 End-to-End-Ref.',
+          ),
+        ).toBe('Transfers')
+        expect(categorize('Stadtverwaltung Bad Homburg')).toBe('Transfers')
+      })
+
+      it('categorizes Gemeinde Schmitten municipal transfers as Transfers', () => {
+        expect(
+          categorize(
+            'Gemeinde Schmitten HELADEF1TSK DE58512500000059004000 0561196907 End-to-End-Ref.: CCB.',
+          ),
+        ).toBe('Transfers')
+        expect(categorize('Gemeinde Schmitten')).toBe('Transfers')
+        expect(categorize('Gemeindeverwaltung Schmitten')).toBe('Transfers')
+      })
+
+      it('categorizes Stadtkasse Kelkheim municipal transfers as Transfers', () => {
+        expect(
+          categorize(
+            'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836',
+          ),
+        ).toBe('Transfers')
+        expect(categorize('Stadtkasse Kelkheim')).toBe('Transfers')
+        expect(categorize('Stadt Kelkheim')).toBe('Transfers')
+        expect(categorize('Stadt Kelkheim (Taunus)')).toBe('Transfers')
+      })
+
+      it('categorizes Hochtaunuskreis school care and childcare transactions as Education', () => {
+        expect(
+          categorize(
+            'Hochtaunuskreis Betreuung fuer Memic, Artur End-to-End-Ref.: 9600074123 Mandatsref',
+          ),
+        ).toBe('Education')
+        expect(categorize('Schulkindbetreuung Hochtaunuskreis')).toBe('Education')
+        expect(categorize('Betreuung Grundschule')).toBe('Education')
+        expect(categorize('Kindergartenbeitrag')).toBe('Education')
+        expect(categorize('Kita Gebühren')).toBe('Education')
+        expect(categorize('University tuition fee')).toBe('Education')
+      })
+    })
+
+    describe('rent and tenancy deposit categorization', () => {
+      it('categorizes Kautionsabrechnung and rental deposit settlements as Rent', () => {
+        expect(
+          categorize(
+            'Heinz Otto, Annette, Alexander u. C hrista Christoph GbR Kautionsabrechnung Eschborn / An de r Grue',
+          ),
+        ).toBe('Rent')
+        expect(categorize('Kautionsabrechnung Eschborn')).toBe('Rent')
+        expect(categorize('Mietkautionsabrechnung')).toBe('Rent')
+        expect(categorize('Mietkautionsrückzahlung')).toBe('Rent')
+        expect(categorize('Kaution Mietwohnung')).toBe('Rent')
+        expect(categorize('Tenancy deposit refund')).toBe('Rent')
+        expect(categorize('Rozliczenie kaucji mieszkaniowej')).toBe('Rent')
+        expect(categorize('Povrat depozita za stan')).toBe('Rent')
+      })
+    })
+
+    describe('judicial treasury and property acquisition tax categorization', () => {
+      it('categorizes Gerichtskasse / Gerichtkasse court and apartment registry fee transfers as Taxes', () => {
+        expect(
+          categorize(
+            'Gerichtkasse HELADEFFXXX DE73500500000001006030 X046833902021X End-to-End-Ref.: CCB.',
+          ),
+        ).toBe('Taxes')
+        expect(categorize('Gerichtskasse Frankfurt am Main')).toBe('Taxes')
+        expect(categorize('Justizkasse Hessen')).toBe('Taxes')
+        expect(categorize('Zentrale Gerichtskasse Grunderwerbsteuer')).toBe('Taxes')
+        expect(categorize('Grundbuchamt Eigentumsumschreibung')).toBe('Taxes')
+      })
+
+      it('categorizes Färber und Hutzel notary fee transactions as Taxes', () => {
+        expect(
+          categorize(
+            'Färber und Hutzel HELADEF1TSK DE29512500000001058274 01571/21 End-to-End-Ref.: CCB.269.UE.',
+          ),
+        ).toBe('Taxes')
+        expect(categorize('Notariat Dr. Hutzel Bad Homburg')).toBe('Taxes')
+        expect(categorize('Notarkosten Kaufvertrag Eigentumswohnung')).toBe('Taxes')
+        expect(categorize('Notargebühren Grundschuldbestellung')).toBe('Taxes')
+      })
+    })
+
+    describe('bank, transfer, and investment platform categorization', () => {
+      it('categorizes Revolut, Sparkasse, 1822direkt, HVB, Santander, Norisbank, GLS, and apoBank as Transfers', () => {
+        expect(
+          categorize(
+            'Anel Memic REVOLT21XXX LT153250000292115687 End-to-End-Ref.: MOB.147.UE.32306',
+          ),
+        ).toBe('Transfers')
+        expect(categorize('Sparkasse KölnBonn Überweisung')).toBe('Transfers')
+        expect(categorize('1822direkt Frankfurter Sparkasse')).toBe('Transfers')
+        expect(categorize('HypoVereinsbank UniCredit Bank AG')).toBe('Transfers')
+        expect(categorize('Santander Consumer Bank AG')).toBe('Transfers')
+        expect(categorize('norisbank GmbH')).toBe('Transfers')
+        expect(categorize('GLS Gemeinschaftsbank')).toBe('Transfers')
+        expect(categorize('apoBank Apotheker- und Ärztebank')).toBe('Transfers')
+        expect(categorize('Vivid Money GmbH')).toBe('Transfers')
+      })
+
+      it('categorizes flatex and DEGIRO as Savings', () => {
+        expect(categorize('flatex Bank Depot')).toBe('Savings')
+        expect(categorize('DEGIRO B.V. Transaktion')).toBe('Savings')
       })
     })
   })

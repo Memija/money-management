@@ -11,6 +11,8 @@ export function isInformativeTransaction(tx?: { amount?: number } | null): boole
 
 const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   // German line-break word splits
+  [/(?:rg|rechnungs?)[-\s]+(?:n\s*r|nr)\.?/iu, 'RG-Nr.'],
+  [/(?:b|bo|boo)[-\s]+(?:ooking|oking|king)/iu, 'Booking'],
   [
     /(?:e|ei|ein|eink|einkau)[-\s]+(?:in[-\s]*kauf|n[-\s]*kauf|k[-\s]*auf|nkauf|kauf|auf|f)/iu,
     'Einkauf',
@@ -86,6 +88,39 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   ],
   [/(?:verkehr|verkehrs|verkehrsve|verkehrsver)[-\s]+(?:verbund|erbund|rbund|bund)/iu, 'Verkehrsverbund'],
   [/(?:reise|reisebu|reisebuch)[-\s]+(?:buchung|chung)/iu, 'Reisebuchung'],
+  [/(?:wunder|wundert|wunderta)[-\s]+(?:tax|ax|x)/iu, 'Wundertax'],
+  [/(?:tax)[-\s]+(?:fix)/iu, 'Taxfix'],
+  [/(?:gericht|gerichts)[-\s]+(?:kasse)/iu, 'Gerichtskasse'],
+  [/(?:justiz|landesjustiz)[-\s]+(?:kasse)/iu, 'Justizkasse'],
+  [/(?:grund|grunderwerb)[-\s]+(?:steuer|erwerbsteuer)/iu, 'Grunderwerbsteuer'],
+  [/(?:grund)[-\s]+(?:buchamt)/iu, 'Grundbuchamt'],
+  [/(?:smart)[-\s]+(?:steuer)/iu, 'Smartsteuer'],
+  [/(?:fa)[-\s]+(?:nidda)/iu, 'Finanzamt Nidda'],
+  [/(?:fa)[-\s]+(?:frankfurt)/iu, 'Finanzamt Frankfurt'],
+  [/(?:fa)[-\s]+(?:wiesbaden)/iu, 'Finanzamt Wiesbaden'],
+  [/(?:fa)[-\s]+(?:darmstadt)/iu, 'Finanzamt Darmstadt'],
+  [/(?:fa)[-\s]+(?:kassel)/iu, 'Finanzamt Kassel'],
+  [/(?:fa)[-\s]+(?:gie(?:ß|ss)en)/iu, 'Finanzamt Gießen'],
+  [/(?:fa)[-\s]+(?:offenbach)/iu, 'Finanzamt Offenbach'],
+  [/(?:fa)[-\s]+(?:m[uü]nchen)/iu, 'Finanzamt München'],
+  [/(?:fa)[-\s]+(?:berlin)/iu, 'Finanzamt Berlin'],
+  [/(?:fa)[-\s]+(?:hamburg)/iu, 'Finanzamt Hamburg'],
+  [/(?:fa)[-\s]+(?:k[oö]ln)/iu, 'Finanzamt Köln'],
+  [/(?:fa)[-\s]+(?:stuttgart)/iu, 'Finanzamt Stuttgart'],
+  [/(?:fa)[-\s]+(?:d[uü]sseldorf)/iu, 'Finanzamt Düsseldorf'],
+  [/(?:fa)[-\s]+(?:leipzig)/iu, 'Finanzamt Leipzig'],
+  [/(?:fa)[-\s]+(?:dresden)/iu, 'Finanzamt Dresden'],
+  [/(?:fa)[-\s]+(?:hannover)/iu, 'Finanzamt Hannover'],
+  [/(?:fa)[-\s]+(?:n[uü]rnberg)/iu, 'Finanzamt Nürnberg'],
+  [/(?:est)[-\s]+(?:veranl|veranlagung)\.?/iu, 'EST-Veranlagung'],
+  [/(?:intra)[-\s]+(?:tec)/iu, 'INTRA-TEC'],
+  [/(?:färber|faerber)[-\s]+(?:und|&)[-\s]+(?:hutzel)/iu, 'Färber und Hutzel'],
+  [/(?:notar|notari)[-\s]+(?:at|atskosten|kosten)/iu, 'Notarkosten'],
+  [/(?:kautions|kaution|kaut|kau)[-\s]+(?:abrechnung|rechnung|nung)/iu, 'Kautionsabrechnung'],
+  [/(?:mietkautions|mietkaution)[-\s]+(?:abrechnung|rechnung|nung)/iu, 'Mietkautionsabrechnung'],
+  [/(?:miet)[-\s]+(?:kaution)/iu, 'Mietkaution'],
+  [/(?:c)[-\s]+(?:hrista)/iu, 'Christa'],
+  [/(?:an\s+de)[-\s]+(?:r)/iu, 'An der'],
   // English line-break word splits
   [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
   [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],
@@ -175,9 +210,15 @@ export function extractCleanDescription(desc: string): string {
   // Kunden-Nr.: ..., Rechnungsnr: ..., Vertrags-Nr.: ..., Zählernummer: ...,
   // Bitte geben Sie bei Bezahlung / Zahlung / Überweisung ...
   cleaned = cleaned.replace(
-    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|Kunden[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Rechnungs[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer))\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
+    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|(?:Kd|Kunden)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|(?:Rg|Rechnungs?)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer)|Az(?:\.|\s*Nr\.?)?)\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
     '',
   )
+
+  // 2b. Separate dot-attached long reference numbers or tax IDs (e.g. "ERSTATT.00345234717" -> "ERSTATT. 00345234717")
+  cleaned = cleaned.replace(/\b([A-Za-z]+)\.(\d{5,})\b/g, '$1. $2')
+
+  // 2c. Expand tax refund abbreviation "ERSTATT." to "Erstattung"
+  cleaned = cleaned.replace(/\bERSTATT\b\.?/gi, 'Erstattung')
 
   // 3. Remove date formats (ISO YYYY-MM-DDTHH:MM:SS, DD.MM.YYYY, DD/MM/YYYY, DD-MM-YY, etc.) and timestamps
   cleaned = cleaned.replace(/\b\d{4}-\d{2}-\d{2}(?:[T\s]\d{2}:\d{2}(?::\d{2})?)?\b/gi, ' ')
@@ -186,7 +227,16 @@ export function extractCleanDescription(desc: string): string {
     ' ',
   )
 
-  // 4. Remove terminal transaction codes and payment method noise (e.g. KFN 0 VJ 2412, Kartenzahlung)
+  // 4. Remove file/case reference numbers (e.g., notary/court Aktenzeichen '01571/21', order/ref '230503-663021')
+  cleaned = cleaned.replace(/\b\d{3,}[/-]\d{2,}\b/g, ' ')
+
+  // 5. Remove order and invoice references (e.g. Order 589490, Bestellung 12345, Auftrag 99281, standalone/trailing Rechnung or Invoice)
+  cleaned = cleaned.replace(
+    /\b(?:Order|Bestellung|Auftrag|Rechnung|Invoice|Rg\.?)\s*(?:[:#.-]?\s*\d[A-Za-z0-9_-]*)?\b/gi,
+    ' ',
+  )
+
+  // 6. Remove terminal transaction codes and payment method noise (e.g. KFN 0 VJ 2412, Kartenzahlung)
   cleaned = cleaned.replace(/\bKFN\s+\d+\s+VJ\s+\d+\b/gi, ' ')
   cleaned = cleaned.replace(/\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz)\b/gi, ' ')
 
@@ -224,12 +274,23 @@ export function extractMerchantKeyword(desc: string): string {
   let merchant = extractCleanDescription(desc)
   if (!merchant) return ''
 
-  // 1. Strip leading payment gateway / aggregator prefixes like "SumUp .", "SumUp *", "PayPal *"
-  merchant = merchant.replace(/^(?:SumUp|PayPal|Stripe)\s*[.*-]\s*/i, '')
+  // 1. Strip leading payment gateway / aggregator prefixes like "SumUp .", "SumUp *", "PayPal *", "PayPal (Europe)..."
+  merchant = merchant.replace(
+    /^(?:PayPal\s*(?:\([^)]+\)|Europe|Pte\.?\s*Ltd\.?)?(?:\s*S\.?a(?:\s*r\.?l\.?)?(?:\s*et\s*Cie)?(?:\s*,?\s*S\.?\s*C\.?A\.?)?)?|SumUp|Stripe|Klarna)\s*[.*-]?\s*/i,
+    '',
+  )
+
+  // 1b. If the description contains a purchase phrase ("Ihr Einkauf bei ...", "Your purchase at ..."), extract the merchant following it
+  const purchaseMatch = merchant.match(
+    /\b(?:Ihr\s+Einkauf\s+bei|Your\s+purchase\s+at|Twój\s+zakup\s+w|Vaša\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\s+(.+)$/i,
+  )
+  if (purchaseMatch && purchaseMatch[1].trim()) {
+    merchant = purchaseMatch[1].trim()
+  }
 
   // 2. Remove corporate legal entity suffixes
   merchant = merchant.replace(
-    /\b(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|se|ltd\.?|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\.?o\.?o\.?|bv|s\.?a\.?r\.?l\.?)\b/gi,
+    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|se|ltd\.?|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\.?o\.?o\.?|bv|s\.?a\.?r\.?l\.?|o[uü]|gbr)(?![\p{L}\p{N}])/giu,
     ' ',
   )
 
@@ -239,6 +300,12 @@ export function extractMerchantKeyword(desc: string): string {
   // 3. Remove trailing city names commonly appended in European card terminals
   merchant = merchant.replace(
     /\s+(?:berlin|m[uü]nchen|hamburg|k[oö]ln|frankfurt|stuttgart|d[uü]sseldorf|dortmund|essen|leipzig|bremen|dresden|hannover|n[uü]rnberg|wien|z[uü]rich|warszawa|krak[oó]w|sarajevo|beograd|zagreb|london|paris)\b.*$/i,
+    ' ',
+  )
+
+  // 4. Remove remittance purpose/reason phrases and banking transaction types commonly appended after merchant name
+  merchant = merchant.replace(
+    /\s+(?:abbuchung|lastschrift|gutschrift|auszahlung|einzahlung|r(?:ü|ue)ckzahlung|erstatt(?:\.|ung)?|est-veranl(?:\.|agung)?|steuererstattung|lizenzgeb(?:ü|ue)hr|kautionsabrechnung|abrechnung|miete|gerichtsgeb(?:ü|ue)hr(?:en)?|grundbuch(?:eintragung)?|geb(?:ü|ue)hr(?:en)?|notarkosten|notargeb(?:ü|ue)hr(?:en)?|order|bestellung|auftrag|rechnung|invoice)\b.*$/i,
     ' ',
   )
 

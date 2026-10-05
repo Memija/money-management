@@ -80,6 +80,79 @@ export const ConsorsbankLogo: IconComponent = ({ size = 16, className }) => (
 )
 ConsorsbankLogo.displayName = 'ConsorsbankLogo'
 
+export const SparkasseLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/sparkasse-other.png" alt="Sparkasse" size={size} className={className} />
+)
+SparkasseLogo.displayName = 'SparkasseLogo'
+
+export const Direkt1822Logo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/1822direkt.png" alt="1822direkt" size={size} className={className} />
+)
+Direkt1822Logo.displayName = 'Direkt1822Logo'
+
+export const HypoVereinsbankLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/hypovereinsbank.png" alt="HypoVereinsbank" size={size} className={className} />
+)
+HypoVereinsbankLogo.displayName = 'HypoVereinsbankLogo'
+
+export const SantanderLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/santander-de.png" alt="Santander" size={size} className={className} />
+)
+SantanderLogo.displayName = 'SantanderLogo'
+
+export const NorisbankLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/norisbank.png" alt="norisbank" size={size} className={className} />
+)
+NorisbankLogo.displayName = 'NorisbankLogo'
+
+export const GlsBankLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/gls-bank.png" alt="GLS Bank" size={size} className={className} />
+)
+GlsBankLogo.displayName = 'GlsBankLogo'
+
+export const FlatexLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/flatex.png" alt="flatex" size={size} className={className} />
+)
+FlatexLogo.displayName = 'FlatexLogo'
+
+export const DegiroLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/degiro-de.png" alt="DEGIRO" size={size} className={className} />
+)
+DegiroLogo.displayName = 'DegiroLogo'
+
+export const VividMoneyLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/vivid-money.png" alt="Vivid Money" size={size} className={className} />
+)
+VividMoneyLogo.displayName = 'VividMoneyLogo'
+
+export const ApoBankLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/apobank.png" alt="apoBank" size={size} className={className} />
+)
+ApoBankLogo.displayName = 'ApoBankLogo'
+
+export const N26Logo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/n26.png" alt="N26" size={size} className={className} />
+)
+N26Logo.displayName = 'N26Logo'
+
+export const WiseLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/wise-de.png" alt="Wise" size={size} className={className} />
+)
+WiseLogo.displayName = 'WiseLogo'
+
+export const BunqLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/bunq-de.png" alt="bunq" size={size} className={className} />
+)
+BunqLogo.displayName = 'BunqLogo'
+
+export {
+  SparkasseLogo as HaspaLogo,
+  HypoVereinsbankLogo as HvbLogo,
+  Direkt1822Logo as Logo1822Direkt,
+  HypoVereinsbankLogo as UniCreditLogo,
+  VividMoneyLogo as VividLogo,
+}
+
 export const TomorrowLogo: IconComponent = ({ size = 16, className }) => (
   <svg
     viewBox="0 0 64 64"
@@ -107,4 +180,49 @@ export const TomorrowLogo: IconComponent = ({ size = 16, className }) => (
 TomorrowLogo.displayName = 'TomorrowLogo'
 
 export { TomorrowLogo as TomorrowBankLogo }
+
+/**
+ * Official logo of Revolut (Revolut Bank UAB / Revolt).
+ * Features Revolut's iconic geometric 'R' cut on a signature sleek dark obsidian card.
+ */
+export const RevolutLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '8px',
+      overflow: 'hidden',
+      flexShrink: 0,
+    }}
+    className={className}
+    aria-label="Revolut"
+    role="img"
+  >
+    <rect width="48" height="48" rx="8" fill="#191C1F" />
+    <rect
+      x="0.5"
+      y="0.5"
+      width="47"
+      height="47"
+      rx="7.5"
+      fill="none"
+      stroke="rgba(255, 255, 255, 0.12)"
+      strokeWidth={1}
+    />
+    <g transform="translate(11, 11) scale(1.08333)">
+      <path
+        d="M20.9133 6.9566C20.9133 3.1208 17.7898 0 13.9503 0H2.424v3.8605h10.9782c1.7376 0 3.177 1.3651 3.2087 3.043.016.84-.2994 1.633-.8878 2.2324-.5886.5998-1.375.9303-2.2144.9303H9.2322a.2756.2756 0 0 0-.2755.2752v3.431c0 .0585.018.1142.052.1612L16.2646 24h5.3114l-7.2727-10.094c3.6625-.1838 6.61-3.2612 6.61-6.9494zM6.8943 5.9229H2.424V24h4.4704z"
+        fill="#FFFFFF"
+      />
+    </g>
+  </svg>
+)
+RevolutLogo.displayName = 'RevolutLogo'
+
+export { RevolutLogo as RevoltLogo, RevolutLogo as RevolutBankLogo }
 

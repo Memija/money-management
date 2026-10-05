@@ -285,3 +285,28 @@ export const HukLogo: IconComponent = ({ size = 16, className }) => (
   </svg>
 )
 HukLogo.displayName = 'HukLogo'
+
+export const KlarmobilLogo: IconComponent = ({ size = 16, className }) => (
+  <img
+    src="/brands/klarmobil.png"
+    alt="klarmobil.de"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '4px',
+      objectFit: 'contain',
+      flexShrink: 0,
+    }}
+    className={className}
+    role="img"
+    aria-label="klarmobil.de"
+  />
+)
+KlarmobilLogo.displayName = 'KlarmobilLogo'
+
+export { KlarmobilLogo as KlarmobilDeLogo }
+

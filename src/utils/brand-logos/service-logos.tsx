@@ -1,4 +1,24 @@
 export {
+  BadHomburgLogo,
+  GemeindeSchmittenLogo,
+  HochtaunuskreisLogo,
+  KelkheimLogo,
+  KreisHochtaunusLogo,
+  LandkreisHochtaunusLogo,
+  SchmittenLogo,
+  StadtBadHomburgLogo,
+  StadtkasseKelkheimLogo,
+  StadtKelkheimLogo,
+} from './civic-logos'
+export {
+  LotharBraunLogo,
+  SchreinereiBraunLogo,
+  SchreinereiLotharBraunLogo,
+} from './craft-logos'
+export {
+  GuardarianLogo,
+} from './crypto-logos'
+export {
   AokLogo,
   BarmerLogo,
   DakLogo,
@@ -11,10 +31,27 @@ export {
   Check24Logo,
   HornbachLogo,
   ObiLogo,
+  PaybackLogo,
   SumupLogo,
 } from './retail-logos'
 export {
+  ElsterLogo,
+  SmartsteuerLogo,
+  TaxfixLogo,
+  WisoSteuerLogo,
+  WundertaxLogo,
+} from './tax-logos'
+export {
+  CanonLogo,
+  HpLogo,
+  LogitechLogo,
+  MicrosoftLogo,
+  PhilipsLogo,
+} from './tech-logos'
+export {
   AlltoursLogo,
+  BookingDotComLogo,
+  BookingLogo,
   CondorLogo,
   DertourLogo,
   EurowingsLogo,
@@ -27,6 +64,8 @@ export {
   EinsUndEinsLogo,
   EonLogo,
   HukLogo,
+  KlarmobilDeLogo,
+  KlarmobilLogo,
   SuewagLogo,
   VattenfallLogo,
 } from './utility-logos'

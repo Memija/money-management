@@ -21,6 +21,7 @@ import {
   Fuel,
   Gamepad2,
   Gift,
+  GraduationCap,
   Headphones,
   Heart,
   HeartPulse,
@@ -77,8 +78,8 @@ export const AVAILABLE_ICONS: Record<string, IconComponent> = {
   ShoppingBag, Gift, Tag, Shirt, Smartphone, Monitor,
   // Health
   HeartPulse, Heart, Stethoscope, Pill, Activity, Syringe,
-  // Entertainment
-  Film, Music, Gamepad2, Tv, Ticket, Headphones, BookOpen, Book,
+  // Entertainment & Education
+  Film, Music, Gamepad2, Tv, Ticket, Headphones, BookOpen, Book, GraduationCap,
   // Miscellaneous
   Package, MapPin, Star, Anchor, Dumbbell, Smile, Trophy, Users,
 }
@@ -110,7 +111,7 @@ export const ICON_GROUPS = [
   },
   {
     name: 'Entertainment',
-    icons: ['Film', 'Music', 'Gamepad2', 'Tv', 'Ticket', 'Headphones', 'BookOpen', 'Book'],
+    icons: ['Film', 'Music', 'Gamepad2', 'Tv', 'Ticket', 'Headphones', 'BookOpen', 'Book', 'GraduationCap'],
   },
   {
     name: 'Miscellaneous',
@@ -137,6 +138,7 @@ export const CANONICAL_CATEGORY_ICONS: Record<string, IconComponent> = {
   DiningOut: Utensils,
   Shopping: ShoppingBag,
   Healthcare: HeartPulse,
+  Education: GraduationCap,
   Transport: Car,
   Entertainment: Film,
   Insurance: Building2,

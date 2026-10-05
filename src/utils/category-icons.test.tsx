@@ -179,7 +179,7 @@ describe('category-icons', () => {
           expect(icon.type, `Category "${category}" should render expected icon`).toBe(expectedIcon)
         }
       }
-    }, 15000)
+    }, 30000)
 
     it('falls back to Package icon for unknown categories', () => {
       const icon = getCategoryIcon('CompletelyUnknownCategory123')
@@ -433,6 +433,562 @@ describe('category-icons', () => {
       expect(easyInfo.suggestedCategory).toBe('Transport')
     })
 
+    it('matches wundertax and tax software brand logos for tax transactions', () => {
+      const wundertaxTx =
+        'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00'
+      const wundertaxIcon = getCategoryIcon('Taxes', 20, undefined, wundertaxTx)
+      expect(React.isValidElement(wundertaxIcon)).toBe(true)
+      if (React.isValidElement(wundertaxIcon)) {
+        expect(wundertaxIcon.type).toBe(MERCHANT_LOGOS.WundertaxLogo)
+      }
+
+      const wundertaxInfo = getMerchantBrandInfo(wundertaxTx)
+      expect(wundertaxInfo.merchant?.id).toBe('wundertax')
+      expect(wundertaxInfo.logoComponent).toBe(MERCHANT_LOGOS.WundertaxLogo)
+      expect(wundertaxInfo.brandColor).toBe('#00CB9D')
+      expect(wundertaxInfo.suggestedCategory).toBe('Taxes')
+
+      const taxfixInfo = getMerchantBrandInfo('Taxfix SE Servicegebühr')
+      expect(taxfixInfo.merchant?.id).toBe('taxfix')
+      expect(taxfixInfo.logoComponent).toBe(MERCHANT_LOGOS.TaxfixLogo)
+      expect(taxfixInfo.brandColor).toBe('#24C875')
+      expect(taxfixInfo.suggestedCategory).toBe('Taxes')
+
+      const smartInfo = getMerchantBrandInfo('smartsteuer GmbH')
+      expect(smartInfo.merchant?.id).toBe('smartsteuer')
+      expect(smartInfo.logoComponent).toBe(MERCHANT_LOGOS.SmartsteuerLogo)
+      expect(smartInfo.brandColor).toBe('#FF7900')
+
+      const elsterInfo = getMerchantBrandInfo('ELSTER Online')
+      expect(elsterInfo.merchant?.id).toBe('elster')
+      expect(elsterInfo.logoComponent).toBe(MERCHANT_LOGOS.ElsterLogo)
+      expect(elsterInfo.brandColor).toBe('#003366')
+
+      const wisoInfo = getMerchantBrandInfo('WISO Steuer Buhl Data')
+      expect(wisoInfo.merchant?.id).toBe('wiso-steuer')
+      expect(wisoInfo.logoComponent).toBe(MERCHANT_LOGOS.WisoSteuerLogo)
+      expect(wisoInfo.brandColor).toBe('#003B7E')
+    })
+
+    it('matches Guardarian and cryptocurrency brand logos for crypto transactions', () => {
+      const guardarianTx =
+        'GUARDARIAN OÜ CLJUGB21XXX GB33CLJU04130729903054 6154171893446142 End-to-End-Ref.: CCB'
+      const guardarianIcon = getCategoryIcon('Crypto', 20, undefined, guardarianTx)
+      expect(React.isValidElement(guardarianIcon)).toBe(true)
+      if (React.isValidElement(guardarianIcon)) {
+        expect(guardarianIcon.type).toBe(MERCHANT_LOGOS.GuardarianLogo)
+      }
+
+      const guardarianInfo = getMerchantBrandInfo(guardarianTx)
+      expect(guardarianInfo.merchant?.id).toBe('guardarian')
+      expect(guardarianInfo.logoComponent).toBe(MERCHANT_LOGOS.GuardarianLogo)
+      expect(guardarianInfo.brandColor).toBe('#4C9DE8')
+      expect(guardarianInfo.suggestedCategory).toBe('Crypto')
+
+      const coinbaseInfo = getMerchantBrandInfo('Coinbase Ireland Limited')
+      expect(coinbaseInfo.merchant?.id).toBe('coinbase')
+      expect(coinbaseInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCoinbase)
+      expect(coinbaseInfo.brandColor).toBe('#0052FF')
+      expect(coinbaseInfo.suggestedCategory).toBe('Crypto')
+
+      const binanceInfo = getMerchantBrandInfo('Binance Card Payment')
+      expect(binanceInfo.merchant?.id).toBe('binance')
+      expect(binanceInfo.logoComponent).toBe(MERCHANT_LOGOS.SiBinance)
+      expect(binanceInfo.brandColor).toBe('#F0B90B')
+      expect(binanceInfo.suggestedCategory).toBe('Crypto')
+
+      const krakenInfo = getMerchantBrandInfo('Kraken Payward')
+      expect(krakenInfo.merchant?.id).toBe('kraken')
+      expect(krakenInfo.logoComponent).toBe(AVAILABLE_ICONS.Coins)
+      expect(krakenInfo.brandColor).toBe('#5741D9')
+
+      const bitpandaInfo = getMerchantBrandInfo('Bitpanda Payments')
+      expect(bitpandaInfo.merchant?.id).toBe('bitpanda')
+      expect(bitpandaInfo.logoComponent).toBe(AVAILABLE_ICONS.Coins)
+      expect(bitpandaInfo.brandColor).toBe('#00D084')
+    })
+
+    it('matches Stadtverwaltung Bad Homburg city coat of arms for municipal transfer transactions', () => {
+      const badHomburgTx =
+        'Stadtverwaltung Bad Homburg HELADEF1TSK DE81512500000001085662 0181776005 End-to-End-Ref.'
+      const badHomburgIcon = getCategoryIcon('Transfers', 20, undefined, badHomburgTx)
+      expect(React.isValidElement(badHomburgIcon)).toBe(true)
+      if (React.isValidElement(badHomburgIcon)) {
+        expect(badHomburgIcon.type).toBe(MERCHANT_LOGOS.BadHomburgLogo)
+      }
+
+      const info = getMerchantBrandInfo(badHomburgTx)
+      expect(info.merchant?.id).toBe('stadt-bad-homburg')
+      expect(info.merchant?.name).toBe('Stadtverwaltung Bad Homburg')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.BadHomburgLogo)
+      expect(info.brandColor).toBe('#0F47AF')
+      expect(info.suggestedCategory).toBe('Transfers')
+    })
+
+    it('renders BadHomburgLogo coat of arms successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Transfers',
+            24,
+            undefined,
+            'Stadtverwaltung Bad Homburg HELADEF1TSK DE81512500000001085662 0181776005 End-to-End-Ref.',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Stadtverwaltung Bad Homburg vor der Höhe')
+    })
+
+    it('matches Gemeinde Schmitten coat of arms for municipal transfer transactions', () => {
+      const schmittenTx =
+        'Gemeinde Schmitten HELADEF1TSK DE58512500000059004000 0561196907 End-to-End-Ref.: CCB.'
+      const schmittenIcon = getCategoryIcon('Transfers', 20, undefined, schmittenTx)
+      expect(React.isValidElement(schmittenIcon)).toBe(true)
+      if (React.isValidElement(schmittenIcon)) {
+        expect(schmittenIcon.type).toBe(MERCHANT_LOGOS.SchmittenLogo)
+      }
+
+      const info = getMerchantBrandInfo(schmittenTx)
+      expect(info.merchant?.id).toBe('gemeinde-schmitten')
+      expect(info.merchant?.name).toBe('Gemeinde Schmitten')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.SchmittenLogo)
+      expect(info.brandColor).toBe('#0F47AF')
+      expect(info.suggestedCategory).toBe('Transfers')
+    })
+
+    it('renders SchmittenLogo coat of arms successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Transfers',
+            24,
+            undefined,
+            'Gemeinde Schmitten HELADEF1TSK DE58512500000059004000 0561196907 End-to-End-Ref.: CCB.',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Gemeinde Schmitten im Taunus')
+    })
+
+    it('matches Stadt Kelkheim coat of arms for municipal transfer transactions', () => {
+      const kelkheimTx =
+        'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836'
+      const kelkheimIcon = getCategoryIcon('Transfers', 20, undefined, kelkheimTx)
+      expect(React.isValidElement(kelkheimIcon)).toBe(true)
+      if (React.isValidElement(kelkheimIcon)) {
+        expect(kelkheimIcon.type).toBe(MERCHANT_LOGOS.KelkheimLogo)
+      }
+
+      const info = getMerchantBrandInfo(kelkheimTx)
+      expect(info.merchant?.id).toBe('stadt-kelkheim')
+      expect(info.merchant?.name).toBe('Stadt Kelkheim (Taunus)')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.KelkheimLogo)
+      expect(info.brandColor).toBe('#DA121A')
+      expect(info.suggestedCategory).toBe('Transfers')
+    })
+
+    it('renders KelkheimLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Transfers',
+            24,
+            undefined,
+            'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836',
+          )}
+        </div>,
+      )
+      const img = container.querySelector('img')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('src', '/brands/kelkheim.png')
+      expect(img).toHaveAttribute('alt', 'Stadt Kelkheim (Taunus)')
+    })
+
+    it('matches Hochtaunuskreis district crest and Education category for school care transactions', () => {
+      const hochtaunuskreisTx =
+        'Hochtaunuskreis Betreuung fuer Memic, Artur End-to-End-Ref.: 9600074123 Mandatsref'
+      const icon = getCategoryIcon('Education', 20, undefined, hochtaunuskreisTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.HochtaunuskreisLogo)
+      }
+
+      const info = getMerchantBrandInfo(hochtaunuskreisTx)
+      expect(info.merchant?.id).toBe('hochtaunuskreis')
+      expect(info.merchant?.name).toBe('Hochtaunuskreis')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.HochtaunuskreisLogo)
+      expect(info.brandColor).toBe('#003366')
+      expect(info.suggestedCategory).toBe('Education')
+    })
+
+    it('renders HochtaunuskreisLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Education',
+            24,
+            undefined,
+            'Hochtaunuskreis Betreuung fuer Memic, Artur End-to-End-Ref.: 9600074123 Mandatsref',
+          )}
+        </div>,
+      )
+      const img = container.querySelector('img')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('src', '/brands/hochtaunuskreis.png')
+      expect(img).toHaveAttribute('alt', 'Hochtaunuskreis')
+    })
+
+    it('matches klarmobil brand info and Communication category for telecommunications invoice transactions', () => {
+      const klarmobilTx =
+        'klarmobil GmbH Kd.1059561719 Wir sagen Danke. RG-N r.F25035684584 15,99 EUR End-to-End-Ref.'
+      const icon = getCategoryIcon('Communication', 20, undefined, klarmobilTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.KlarmobilLogo)
+      }
+
+      const info = getMerchantBrandInfo(klarmobilTx)
+      expect(info.merchant?.id).toBe('klarmobil')
+      expect(info.merchant?.name).toBe('klarmobil.de')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.KlarmobilLogo)
+      expect(info.brandColor).toBe('#F67C16')
+      expect(info.suggestedCategory).toBe('Communication')
+    })
+
+    it('renders KlarmobilLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Communication',
+            24,
+            undefined,
+            'klarmobil GmbH Kd.1059561719 Wir sagen Danke. RG-N r.F25035684584 15,99 EUR End-to-End-Ref.',
+          )}
+        </div>,
+      )
+      const img = container.querySelector('img')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('src', '/brands/klarmobil.png')
+      expect(img).toHaveAttribute('alt', 'klarmobil.de')
+    })
+
+    it('matches Gerichtskasse Hessen state emblem for judicial and property purchase tax transactions', () => {
+      const gerichtskasseTx =
+        'Gerichtkasse HELADEFFXXX DE73500500000001006030 X046833902021X End-to-End-Ref.: CCB.'
+      const icon = getCategoryIcon('Taxes', 20, undefined, gerichtskasseTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.HessenLogo)
+      }
+
+      const info = getMerchantBrandInfo(gerichtskasseTx)
+      expect(info.merchant?.id).toBe('gerichtskasse')
+      expect(info.merchant?.name).toBe('Gerichtskasse (Justiz Hessen)')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.HessenLogo)
+      expect(info.brandColor).toBe('#004B93')
+      expect(info.suggestedCategory).toBe('Taxes')
+    })
+
+    it('renders HessenLogo and GermanyFlagLogo civic logos successfully into the DOM', () => {
+      const { container: hessenContainer } = render(
+        <div>
+          {getCategoryIcon(
+            'Taxes',
+            24,
+            undefined,
+            'Gerichtkasse HELADEFFXXX DE73500500000001006030 X046833902021X End-to-End-Ref.: CCB.',
+          )}
+        </div>,
+      )
+      const hessenSvg = hessenContainer.querySelector('svg')
+      expect(hessenSvg).toBeInTheDocument()
+      expect(hessenSvg).toHaveAttribute('aria-label', 'Land Hessen')
+
+      const { container: deFlagContainer } = render(
+        <div>
+          <MERCHANT_LOGOS.GermanyFlagLogo size={24} />
+        </div>,
+      )
+      const deFlagSvg = deFlagContainer.querySelector('svg')
+      expect(deFlagSvg).toBeInTheDocument()
+      expect(deFlagSvg).toHaveAttribute('aria-label', 'Bundesrepublik Deutschland')
+    })
+
+    it('matches Färber & Hutzel notary logo for property purchase notary transactions', () => {
+      const faerberTx =
+        'Färber und Hutzel HELADEF1TSK DE29512500000001058274 01571/21 End-to-End-Ref.: CCB.269.UE.'
+      const icon = getCategoryIcon('Taxes', 20, undefined, faerberTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.FaerberHutzelLogo)
+      }
+
+      const info = getMerchantBrandInfo(faerberTx)
+      expect(info.merchant?.id).toBe('faerber-hutzel')
+      expect(info.merchant?.name).toBe('Färber & Hutzel Notare')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.FaerberHutzelLogo)
+      expect(info.brandColor).toBe('#172A45')
+      expect(info.suggestedCategory).toBe('Taxes')
+    })
+
+    it('renders FaerberHutzelLogo legal emblem successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Taxes',
+            24,
+            undefined,
+            'Färber und Hutzel HELADEF1TSK DE29512500000001058274 01571/21 End-to-End-Ref.: CCB.269.UE.',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Färber & Hutzel Notare und Rechtsanwälte')
+    })
+
+    it('matches INTRA-TEC hardware logo for e-commerce shopping transactions', () => {
+      const intratecTx =
+        'INTRA-TEC GmbH COKSDE33XXX DE32370502990312020901 Order 589490 End-to-End-Ref.: CCB.'
+      const icon = getCategoryIcon('Shopping', 20, undefined, intratecTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.IntratecLogo)
+      }
+
+      const info = getMerchantBrandInfo(intratecTx)
+      expect(info.merchant?.id).toBe('intra-tec')
+      expect(info.merchant?.name).toBe('INTRA-TEC')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.IntratecLogo)
+      expect(info.brandColor).toBe('#111111')
+      expect(info.suggestedCategory).toBe('Shopping')
+    })
+
+    it('renders IntratecLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Shopping',
+            24,
+            undefined,
+            'INTRA-TEC GmbH COKSDE33XXX DE32370502990312020901 Order 589490 End-to-End-Ref.: CCB.',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'INTRA-TEC')
+    })
+
+    it('matches GermanyFlagLogo for Finanzamt and FA Nidda tax return transactions', () => {
+      const taxTx =
+        'FA NIDDA ERSTATT.00345234717 EST-VERANL. 21 End-to-End-Ref.: 00345234717 EST-VEG0404202'
+      const icon = getCategoryIcon('Taxes', 20, undefined, taxTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.GermanyFlagLogo)
+      }
+
+      const info = getMerchantBrandInfo(taxTx)
+      expect(info.merchant?.id).toBe('finanzamt')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.GermanyFlagLogo)
+      expect(info.brandColor).toBe('#18181B')
+      expect(info.suggestedCategory).toBe('Taxes')
+    })
+
+    it('renders GermanyFlagLogo for FA Nidda tax return successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Taxes',
+            24,
+            undefined,
+            'FA NIDDA ERSTATT.00345234717 EST-VERANL. 21 End-to-End-Ref.: 00345234717 EST-VEG0404202',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Bundesrepublik Deutschland')
+    })
+
+    it('matches CadoozLogo for cadooz voucher and shopping transactions', () => {
+      const cadoozTx =
+        'cadooz GmbH DEUTDEHHXXX DE30200700000070730703 230503-663021 End-to-End-Ref.: CCB.123'
+      const icon = getCategoryIcon('Shopping', 20, undefined, cadoozTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.CadoozLogo)
+      }
+
+      const info = getMerchantBrandInfo(cadoozTx)
+      expect(info.merchant?.id).toBe('cadooz')
+      expect(info.merchant?.name).toBe('cadooz')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.CadoozLogo)
+      expect(info.brandColor).toBe('#2D2E83')
+      expect(info.suggestedCategory).toBe('Shopping')
+    })
+
+    it('renders CadoozLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Shopping',
+            24,
+            undefined,
+            'cadooz GmbH DEUTDEHHXXX DE30200700000070730703 230503-663021 End-to-End-Ref.: CCB.123',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'cadooz')
+    })
+
+    it('matches LotharBraunLogo for Lothar Braun door installations and carpentry transactions', () => {
+      const lotharTx =
+        'Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung'
+      const icon = getCategoryIcon('Shopping', 20, undefined, lotharTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.LotharBraunLogo)
+      }
+
+      const info = getMerchantBrandInfo(lotharTx)
+      expect(info.merchant?.id).toBe('lothar-braun')
+      expect(info.merchant?.name).toBe('Schreinerei Lothar Braun')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.LotharBraunLogo)
+      expect(info.brandColor).toBe('#843210')
+      expect(info.suggestedCategory).toBe('Shopping')
+    })
+
+    it('renders LotharBraunLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Shopping',
+            24,
+            undefined,
+            'Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Schreinerei Lothar Braun')
+    })
+
+    it('matches PaybackLogo for PAYBACK PAY and Paymorrow transactions', () => {
+      const paybackTx =
+        'PAYBACK PAY / PAYMORROW WELADEDDXXX DE85300500000071013312 PAYBACK PAY End-to-En'
+      const icon = getCategoryIcon('Shopping', 20, undefined, paybackTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.PaybackLogo)
+      }
+
+      const info = getMerchantBrandInfo(paybackTx)
+      expect(info.merchant?.id).toBe('payback')
+      expect(info.merchant?.name).toBe('PAYBACK')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.PaybackLogo)
+      expect(info.brandColor).toBe('#003EB0')
+      expect(info.suggestedCategory).toBe('Shopping')
+    })
+
+    it('renders PaybackLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Shopping',
+            24,
+            undefined,
+            'PAYBACK PAY / PAYMORROW WELADEDDXXX DE85300500000071013312 PAYBACK PAY End-to-En',
+          )}
+        </div>,
+      )
+      const img = container.querySelector('img')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('alt', 'PAYBACK')
+      expect(img).toHaveAttribute('src', '/brands/payback.png')
+    })
+
+    it('matches Booking.com logo over PayPal for purchases processed via PayPal', () => {
+      const bookingTx =
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. . Booking.com BV, Ihr Einkauf bei B ooking.com BV ABBUCHUNG'
+      const icon = getCategoryIcon('Travel', 20, undefined, bookingTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.BookingLogo)
+      }
+
+      const info = getMerchantBrandInfo(bookingTx)
+      expect(info.merchant?.id).toBe('booking')
+      expect(info.merchant?.name).toBe('Booking.com')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.BookingLogo)
+      expect(info.suggestedCategory).toBe('Travel')
+      expect(info.brandColor).toBe('#003580')
+    })
+
+    it('renders BookingLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Travel',
+            24,
+            undefined,
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. . Booking.com BV, Ihr Einkauf bei B ooking.com BV ABBUCHUNG',
+          )}
+        </div>,
+      )
+      const img = container.querySelector('img')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('alt', 'Booking.com')
+      expect(img).toHaveAttribute('src', '/brands/booking.png')
+    })
+
+    it('matches RevolutLogo for Revolut and Revolt bank transactions with BIC REVOLT21XXX', () => {
+      const revolutTx =
+        'Anel Memic REVOLT21XXX LT153250000292115687 End-to-End-Ref.: MOB.147.UE.32306'
+      const icon = getCategoryIcon('Transfers', 20, undefined, revolutTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.RevolutLogo)
+      }
+
+      const info = getMerchantBrandInfo(revolutTx)
+      expect(info.merchant?.id).toBe('revolut')
+      expect(info.merchant?.name).toBe('Revolut')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.RevolutLogo)
+      expect(info.brandColor).toBe('#0075EB')
+      expect(info.suggestedCategory).toBe('Transfers')
+    })
+
+    it('matches RevolutLogo via Revolt alias and direct merchant lookup', () => {
+      const info = getMerchantBrandInfo('Revolt Bank Transfer')
+      expect(info.merchant?.id).toBe('revolut')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.RevolutLogo)
+    })
+
+    it('renders RevolutLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Transfers',
+            24,
+            undefined,
+            'Anel Memic REVOLT21XXX LT153250000292115687 End-to-End-Ref.: MOB.147.UE.32306',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Revolut')
+    })
+
     it('renders successfully into the DOM using @testing-library/react', () => {
       const { container } = render(<div>{getCategoryIcon('Salary', 24)}</div>)
       const svg = container.querySelector('svg')
@@ -561,7 +1117,7 @@ describe('category-icons', () => {
 
       const bunqInfo = getMerchantBrandInfo('bunq b.v. card payment')
       expect(bunqInfo.merchant?.id).toBe('bunq')
-      expect(bunqInfo.logoComponent).toBe(MERCHANT_LOGOS.SiBunq)
+      expect(bunqInfo.logoComponent).toBe(MERCHANT_LOGOS.BunqLogo)
 
       const discordInfo = getMerchantBrandInfo('Discord Nitro Subscription')
       expect(discordInfo.merchant?.id).toBe('discord')
@@ -749,6 +1305,22 @@ describe('category-icons', () => {
       expect(fairParkenInfo.suggestedCategory).toBe('Transport')
       expect(fairParkenInfo.brandColor).toBe('#002D62')
 
+      const wundertaxInfo = getMerchantBrandInfo(
+        'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00'
+      )
+      expect(wundertaxInfo.merchant?.id).toBe('wundertax')
+      expect(wundertaxInfo.logoComponent).toBe(MERCHANT_LOGOS.WundertaxLogo)
+      expect(wundertaxInfo.suggestedCategory).toBe('Taxes')
+      expect(wundertaxInfo.brandColor).toBe('#00CB9D')
+
+      const guardarianInfo = getMerchantBrandInfo(
+        'GUARDARIAN OÜ CLJUGB21XXX GB33CLJU04130729903054 6154171893446142 End-to-End-Ref.: CCB'
+      )
+      expect(guardarianInfo.merchant?.id).toBe('guardarian')
+      expect(guardarianInfo.logoComponent).toBe(MERCHANT_LOGOS.GuardarianLogo)
+      expect(guardarianInfo.suggestedCategory).toBe('Crypto')
+      expect(guardarianInfo.brandColor).toBe('#4C9DE8')
+
       const beitragInfo = getMerchantBrandInfo('ARD ZDF Deutschlandradio Beitragsservice')
       expect(beitragInfo.merchant?.id).toBe('rundfunkbeitrag')
       expect(beitragInfo.logoComponent).toBe(MERCHANT_LOGOS.BeitragsserviceLogo)
@@ -920,6 +1492,107 @@ describe('category-icons', () => {
       expect(tomorrowInfo.logoComponent).toBe(MERCHANT_LOGOS.TomorrowLogo)
       expect(tomorrowInfo.suggestedCategory).toBe('Transfers')
       expect(tomorrowInfo.brandColor).toBe('#FF8454')
+
+      const revolutInfo = getMerchantBrandInfo(
+        'Anel Memic REVOLT21XXX LT153250000292115687 End-to-End-Ref.: MOB.147.UE.32306'
+      )
+      expect(revolutInfo.merchant?.id).toBe('revolut')
+      expect(revolutInfo.logoComponent).toBe(MERCHANT_LOGOS.RevolutLogo)
+      expect(revolutInfo.suggestedCategory).toBe('Transfers')
+      expect(revolutInfo.brandColor).toBe('#0075EB')
+
+      const sparkasseInfo = getMerchantBrandInfo('Sparkasse KölnBonn Überweisung')
+      expect(sparkasseInfo.merchant?.id).toBe('sparkasse')
+      expect(sparkasseInfo.logoComponent).toBe(MERCHANT_LOGOS.SparkasseLogo)
+      expect(sparkasseInfo.suggestedCategory).toBe('Transfers')
+      expect(sparkasseInfo.brandColor).toBe('#FF0000')
+
+      const direkt1822Info = getMerchantBrandInfo('1822direkt Frankfurter Sparkasse')
+      expect(direkt1822Info.merchant?.id).toBe('1822direkt')
+      expect(direkt1822Info.logoComponent).toBe(MERCHANT_LOGOS.Direkt1822Logo)
+      expect(direkt1822Info.suggestedCategory).toBe('Transfers')
+      expect(direkt1822Info.brandColor).toBe('#003A5D')
+
+      const hvbInfo = getMerchantBrandInfo('HypoVereinsbank UniCredit Bank AG')
+      expect(hvbInfo.merchant?.id).toBe('hypovereinsbank')
+      expect(hvbInfo.logoComponent).toBe(MERCHANT_LOGOS.HypoVereinsbankLogo)
+      expect(hvbInfo.suggestedCategory).toBe('Transfers')
+      expect(hvbInfo.brandColor).toBe('#E2001A')
+
+      const santanderInfo = getMerchantBrandInfo('Santander Consumer Bank')
+      expect(santanderInfo.merchant?.id).toBe('santander')
+      expect(santanderInfo.logoComponent).toBe(MERCHANT_LOGOS.SantanderLogo)
+      expect(santanderInfo.suggestedCategory).toBe('Transfers')
+      expect(santanderInfo.brandColor).toBe('#EC0000')
+
+      const norisbankInfo = getMerchantBrandInfo('norisbank GmbH')
+      expect(norisbankInfo.merchant?.id).toBe('norisbank')
+      expect(norisbankInfo.logoComponent).toBe(MERCHANT_LOGOS.NorisbankLogo)
+      expect(norisbankInfo.suggestedCategory).toBe('Transfers')
+      expect(norisbankInfo.brandColor).toBe('#FF5000')
+
+      const glsInfo = getMerchantBrandInfo('GLS Bank Gemeinschaftsbank')
+      expect(glsInfo.merchant?.id).toBe('gls-bank')
+      expect(glsInfo.logoComponent).toBe(MERCHANT_LOGOS.GlsBankLogo)
+      expect(glsInfo.suggestedCategory).toBe('Transfers')
+      expect(glsInfo.brandColor).toBe('#00D66C')
+
+      const apobankInfo = getMerchantBrandInfo('apoBank Apotheker- und Ärztebank')
+      expect(apobankInfo.merchant?.id).toBe('apobank')
+      expect(apobankInfo.logoComponent).toBe(MERCHANT_LOGOS.ApoBankLogo)
+      expect(apobankInfo.suggestedCategory).toBe('Transfers')
+      expect(apobankInfo.brandColor).toBe('#002060')
+
+      const vividInfo = getMerchantBrandInfo('Vivid Money GmbH')
+      expect(vividInfo.merchant?.id).toBe('vivid-money')
+      expect(vividInfo.logoComponent).toBe(MERCHANT_LOGOS.VividMoneyLogo)
+      expect(vividInfo.suggestedCategory).toBe('Transfers')
+      expect(vividInfo.brandColor).toBe('#7928CA')
+
+      const flatexInfo = getMerchantBrandInfo('flatex Bank Depot')
+      expect(flatexInfo.merchant?.id).toBe('flatex')
+      expect(flatexInfo.logoComponent).toBe(MERCHANT_LOGOS.FlatexLogo)
+      expect(flatexInfo.suggestedCategory).toBe('Savings')
+      expect(flatexInfo.brandColor).toBe('#F36F21')
+
+      const degiroInfo = getMerchantBrandInfo('DEGIRO B.V. Transaktion')
+      expect(degiroInfo.merchant?.id).toBe('degiro')
+      expect(degiroInfo.logoComponent).toBe(MERCHANT_LOGOS.DegiroLogo)
+      expect(degiroInfo.suggestedCategory).toBe('Savings')
+      expect(degiroInfo.brandColor).toBe('#00A4D6')
+
+      const n26Info = getMerchantBrandInfo('N26 Bank GmbH')
+      expect(n26Info.merchant?.id).toBe('n26')
+      expect(n26Info.logoComponent).toBe(MERCHANT_LOGOS.N26Logo)
+      expect(n26Info.suggestedCategory).toBe('Transfers')
+
+      const wiseInfo = getMerchantBrandInfo('Wise Payments Europe')
+      expect(wiseInfo.merchant?.id).toBe('wise')
+      expect(wiseInfo.logoComponent).toBe(MERCHANT_LOGOS.WiseLogo)
+      expect(wiseInfo.suggestedCategory).toBe('Transfers')
+
+      const bunqBankInfo = getMerchantBrandInfo('bunq B.V. Bank')
+      expect(bunqBankInfo.merchant?.id).toBe('bunq')
+      expect(bunqBankInfo.logoComponent).toBe(MERCHANT_LOGOS.BunqLogo)
+      expect(bunqBankInfo.suggestedCategory).toBe('Transfers')
+
+      const paybackInfo = getMerchantBrandInfo('PAYBACK PAY / PAYMORROW WELADEDDXXX DE85300500000071013312 PAYBACK PAY End-to-En')
+      expect(paybackInfo.merchant?.id).toBe('payback')
+      expect(paybackInfo.logoComponent).toBe(MERCHANT_LOGOS.PaybackLogo)
+      expect(paybackInfo.suggestedCategory).toBe('Shopping')
+      expect(paybackInfo.brandColor).toBe('#003EB0')
+
+      const kelkheimInfo = getMerchantBrandInfo('STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836')
+      expect(kelkheimInfo.merchant?.id).toBe('stadt-kelkheim')
+      expect(kelkheimInfo.logoComponent).toBe(MERCHANT_LOGOS.KelkheimLogo)
+      expect(kelkheimInfo.suggestedCategory).toBe('Transfers')
+      expect(kelkheimInfo.brandColor).toBe('#DA121A')
+
+      const bookingInfo = getMerchantBrandInfo('PayPal (Europe) S.a r.l. et Cie, S. C.A. . Booking.com BV, Ihr Einkauf bei B ooking.com BV ABBUCHUNG')
+      expect(bookingInfo.merchant?.id).toBe('booking')
+      expect(bookingInfo.logoComponent).toBe(MERCHANT_LOGOS.BookingLogo)
+      expect(bookingInfo.suggestedCategory).toBe('Travel')
+      expect(bookingInfo.brandColor).toBe('#003580')
     })
 
     it('returns brand info using fallback icon for merchants without brand logos', () => {

@@ -242,3 +242,27 @@ export const CondorLogo: IconComponent = ({ size = 16, className }) => (
   </svg>
 )
 CondorLogo.displayName = 'CondorLogo'
+
+export const BookingLogo: IconComponent = ({ size = 16, className }) => (
+  <img
+    src="/brands/booking.png"
+    alt="Booking.com"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '4px',
+      objectFit: 'contain',
+      flexShrink: 0,
+    }}
+    className={className}
+    role="img"
+    aria-label="Booking.com"
+  />
+)
+BookingLogo.displayName = 'BookingLogo'
+
+export { BookingLogo as BookingDotComLogo }

@@ -25,6 +25,7 @@ export interface CategoryKeywords {
   Utilities: string[]
   Communication: string[]
   Healthcare: string[]
+  Education: string[]
   Savings: string[]
   Cash: string[]
   Transfers: string[]
@@ -564,6 +565,7 @@ export interface TranslationStrings {
   catUtilities: string
   catCommunication: string
   catHealthcare: string
+  catEducation: string
   catSavings: string
   catCash: string
   catTransfers: string
