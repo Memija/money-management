@@ -43,6 +43,7 @@ export {
 } from './tax-logos'
 export {
   CanonLogo,
+  HerokuLogo,
   HpLogo,
   LogitechLogo,
   MicrosoftLogo,
@@ -59,8 +60,10 @@ export {
   TuiLogo,
 } from './travel-logos'
 export {
+  AldiTalkLogo,
   AllianzLogo,
   BeitragsserviceLogo,
+  CongstarLogo,
   EinsUndEinsLogo,
   EonLogo,
   HukLogo,

@@ -569,7 +569,7 @@ export const pl: TranslationStrings = {
   catCash: 'Gotówka',
   catTransfers: 'Przelewy',
   catTravel: 'Podróże',
-  catTaxes: 'Podatki',
+  catTaxes: 'Podatki i opłaty',
   catCrypto: 'Krypto',
   catBankFees: 'Opłaty bankowe',
   catOther: 'Inne',
@@ -754,7 +754,7 @@ export const pl: TranslationStrings = {
       'opieka',
       'korepetycje',
     ],
-    Savings: ['oszczędności', 'lokata', 'konto oszczędnościowe', 'flatex', 'degiro', 'trade republic', 'scalable capital'],
+    Savings: ['oszczędności', 'lokata', 'konto oszczędnościowe', 'flatex', 'degiro', 'trade republic', 'scalable capital', 'swiss life', 'swiss life se'],
     Cash: ['gotówka', 'gotowka', 'wypłata z bankomatu', 'wyplata z bankomatu', 'bankomat', 'atm'],
     Transfers: ['przelew', 'paypal', 'blik', 'stadtkasse kelkheim', 'stadt kelkheim', 'kelkheim', 'revolut', 'revolt21xxx', 'revolt21', 'revolt', 'sparkasse', 'haspa', '1822direkt', 'hypovereinsbank', 'hvb', 'santander', 'norisbank', 'gls bank', 'apobank', 'vivid'],
     Travel: [

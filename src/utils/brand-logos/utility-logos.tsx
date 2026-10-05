@@ -310,3 +310,93 @@ KlarmobilLogo.displayName = 'KlarmobilLogo'
 
 export { KlarmobilLogo as KlarmobilDeLogo }
 
+export const CongstarLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '3px',
+      flexShrink: 0,
+    }}
+    className={className}
+    aria-label="congstar"
+    role="img"
+  >
+    <rect width="48" height="48" rx="8" fill="#000000" />
+    <circle cx="20" cy="15" r="4.5" fill="#FF5000" />
+    <circle cx="28" cy="15" r="4.5" fill="#00A3E0" />
+    <circle cx="20" cy="23" r="4.5" fill="#E20074" />
+    <circle cx="28" cy="23" r="4.5" fill="#FFCC00" />
+    <text
+      x="24"
+      y="36"
+      dominantBaseline="central"
+      textAnchor="middle"
+      fill="#FFFFFF"
+      fontWeight="900"
+      fontSize="8"
+      letterSpacing="-0.3px"
+      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    >
+      congstar
+    </text>
+  </svg>
+)
+CongstarLogo.displayName = 'CongstarLogo'
+
+export const AldiTalkLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '3px',
+      flexShrink: 0,
+    }}
+    className={className}
+    aria-label="ALDI TALK"
+    role="img"
+  >
+    <rect width="48" height="48" rx="8" fill="#00205B" />
+    <rect x="6" y="6" width="36" height="36" rx="5" fill="none" stroke="#FF8200" strokeWidth="2" />
+    <text
+      x="24"
+      y="19"
+      dominantBaseline="central"
+      textAnchor="middle"
+      fill="#FFFFFF"
+      fontWeight="900"
+      fontSize="10"
+      letterSpacing="0.5px"
+      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    >
+      ALDI
+    </text>
+    <rect x="10" y="27" width="28" height="12" rx="3" fill="#E30613" />
+    <text
+      x="24"
+      y="33"
+      dominantBaseline="central"
+      textAnchor="middle"
+      fill="#FFFFFF"
+      fontWeight="900"
+      fontSize="7.5"
+      letterSpacing="0.8px"
+      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    >
+      TALK
+    </text>
+  </svg>
+)
+AldiTalkLogo.displayName = 'AldiTalkLogo'
+
+

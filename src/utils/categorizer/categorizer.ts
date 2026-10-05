@@ -66,21 +66,65 @@ for (const merchant of POPULAR_MERCHANTS) {
   }
 }
 
-const merchantCategoryRegexes: Partial<Record<keyof CategoryKeywords, RegExp>> = {}
-for (const [cat, words] of Object.entries(merchantCategoryPatterns)) {
-  const uniqueWords = [...new Set(words)]
-  const patterns = uniqueWords.map(keywordToPattern).filter(Boolean)
-  if (patterns.length > 0) {
-    merchantCategoryRegexes[cat as keyof CategoryKeywords] = new RegExp(patterns.join('|'), 'iu')
-  }
-}
-
 let transferMerchantsRegex: RegExp | undefined
 if (transferMerchantPatterns.length > 0) {
   const patterns = [...new Set(transferMerchantPatterns)].map(keywordToPattern).filter(Boolean)
   if (patterns.length > 0) {
     transferMerchantsRegex = new RegExp(patterns.join('|'), 'iu')
   }
+}
+
+function matchesTerm(text: string, term: string): boolean {
+  const pattern = new RegExp(`(^|[^a-z0-9])${escapeRegExp(term)}([^a-z0-9]|$)`, 'i')
+  return pattern.test(text)
+}
+
+const PAYMENT_PROCESSOR_IDS = new Set<string>([
+  'paypal',
+  'klarna',
+  'stripe',
+  'sumup',
+  'payoneer',
+  'payone',
+])
+
+function findPopularMerchantCategory(textLower: string): string | undefined {
+  let bestDirectCategory: string | undefined
+  let bestDirectScore = 0
+  let bestProcessorCategory: string | undefined
+  let bestProcessorScore = 0
+
+  for (const merchant of POPULAR_MERCHANTS) {
+    if (merchant.category === 'Transfers') continue
+    const kw = merchant.keyword.toLowerCase()
+    let score = 0
+    if (matchesTerm(textLower, kw)) {
+      score = kw.length
+    }
+
+    if (merchant.aliases) {
+      for (const alias of merchant.aliases) {
+        const a = alias.toLowerCase()
+        if (matchesTerm(textLower, a)) {
+          score = Math.max(score, a.length)
+        }
+      }
+    }
+
+    if (score > 0) {
+      if (PAYMENT_PROCESSOR_IDS.has(merchant.id)) {
+        if (score > bestProcessorScore) {
+          bestProcessorScore = score
+          bestProcessorCategory = merchant.category
+        }
+      } else if (score > bestDirectScore) {
+        bestDirectScore = score
+        bestDirectCategory = merchant.category
+      }
+    }
+  }
+
+  return bestDirectCategory || bestProcessorCategory
 }
 
 // Also integrate POPULAR_MERCHANTS into aggregatedKeywords as fallback
@@ -133,9 +177,14 @@ const SEPA_TRANSFER_REGEX =
 // Regex to detect explicit tax authority or specific tax duty/assessment context
 // to prevent regular bank transfers with tax-related memos/references from misclassifying as Taxes.
 const EXPLICIT_TAX_AUTHORITY_OR_DUTY_REGEX =
-  /(?:\b(?:finanzamt|finanzkasse|bundeskasse|steuerverwaltung|steuerbeh[oö]rde|irs|hmrc|cra|belastingdienst|dgfip|agenzia\s+delle\s+entrate|agencia\s+tributaria|receita\s+federal|porezn[ae]|poresk[ae]|urzad\s+skarbowy|urząd\s+skarbowy|dirjen\s+pajak|wundertax|taxfix|smartsteuer|elster|wiso\s*steuer|buhl\s*data|gerichtkasse|gerichtskasse|justizkasse|landesjustizkasse|oberlandesgerichtskasse|zentrale\s+gerichtskasse|grundbuchamt|notar|notariat|f[aä]rber\s*(?:und|&)\s*hutzel|fa\s+[a-zäöüß]+)\b|\b(?:einkommensteuer|grundsteuer|gewerbesteuer|umsatzsteuer|kirchensteuer|vorabpauschale|invstg|kapitalertragsteuer|quellensteuer|solidarit[aä]tszuschlag|steuernummer|steuer[- ]?id|steuerbescheid|steuererkl[aä]rung|steuererstattung|est-veranl(?:\.|agung)?|grunderwerbsteuer|grunderwerbssteuer|grundbuchgeb[uü]hr(?:en)?|gerichtsgeb[uü]hr(?:en)?|notarkosten|notargeb[uü]hr(?:en)?|tax\s+payment|tax\s+assessment|tax\s+bill|tax\s+return|tax\s+refund|tax\s+office|tax\s+authority|income\s+tax|property\s+tax|sales\s+tax|corporate\s+tax|capital\s+gains\s+tax|council\s+tax|advance\s+tax)\b)/i
+  /(?:\b(?:finanzamt|finanzkasse|bundeskasse|steuerverwaltung|steuerbeh[oö]rde|irs|hmrc|cra|belastingdienst|dgfip|agenzia\s+delle\s+entrate|agencia\s+tributaria|receita\s+federal|porezn[ae]|poresk[ae]|urzad\s+skarbowy|urząd\s+skarbowy|dirjen\s+pajak|wundertax|taxfix|smartsteuer|elster|wiso\s*steuer|buhl\s*data|gerichtkasse|gerichtskasse|justizkasse|landesjustizkasse|oberlandesgerichtskasse|zentrale\s+gerichtskasse|grundbuchamt|notar|notariat|f[aä]rber\s*(?:und|&)\s*hutzel|fa\s+[a-zäöüß]+|stadtkasse|gemeindekasse|stadtverwaltung|gemeindeverwaltung|standesamt|standesamtskasse|konsulat|generalkonsulat|generalkosulat|botschaft|embassy|consulate)\b|\b(?:einkommensteuer|grundsteuer|gewerbesteuer|umsatzsteuer|kirchensteuer|hundesteuer|zweitwohnungs?steuer|grundbesitzabgaben|vorabpauschale|invstg|kapitalertragsteuer|quellensteuer|solidarit[aä]tszuschlag|steuernummer|steuer[- ]?id|steuerbescheid|steuererkl[aä]rung|steuererstattung|est-veranl(?:\.|agung)?|grunderwerbsteuer|grunderwerbssteuer|grundbuchgeb[uü]hr(?:en)?|gerichtsgeb[uü]hr(?:en)?|notarkosten|notargeb[uü]hr(?:en)?|standesamtsgeb[uü]hr(?:en)?|geburtsurkunde|passgeb[uü]hr(?:en)?|ausweisgeb[uü]hr(?:en)?|visageb[uü]hr(?:en)?|visumgeb[uü]hr(?:en)?|tax\s+payment|tax\s+assessment|tax\s+bill|tax\s+return|tax\s+refund|tax\s+office|tax\s+authority|income\s+tax|property\s+tax|sales\s+tax|corporate\s+tax|capital\s+gains\s+tax|council\s+tax|advance\s+tax)\b)/i
 
 const defaultCategoryCache = new Map<string, string>()
+
+// Regex to detect childcare / school-care fee purposes (e.g. 'KINDERTAGESSTAETTENBEITRAG', 'Kita-Gebuehr', 'Hortbeitrag').
+// Municipalities bill these too, so the purpose must win over the municipal authority's default 'Taxes' category.
+const CHILDCARE_FEE_REGEX =
+  /\b(?:kindertagesst(?:ä|ae|a)tte\w*|kita[- ]?(?:geb(?:ü|ue|u)hr\w*|beitr(?:ä|ae|a)g\w*)|(?:kindergarten|krippen|hort|betreuungs)(?:geb(?:ü|ue|u)hr\w*|beitr(?:ä|ae|a)g\w*)|schulkindbetreuung)/i
 
 /**
  * Infers a category from a transaction description and context.
@@ -218,6 +267,10 @@ export function categorize(
     if (cat === 'Rent' && CAR_OR_EQUIPMENT_RENTAL_REGEX.test(d)) {
       continue
     }
+    if (cat === 'Taxes' && CHILDCARE_FEE_REGEX.test(d)) {
+      if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Education')
+      return 'Education'
+    }
     if (cat === 'Taxes' && SEPA_TRANSFER_REGEX.test(d)) {
       if (!EXPLICIT_TAX_AUTHORITY_OR_DUTY_REGEX.test(d)) {
         continue
@@ -232,15 +285,13 @@ export function categorize(
 
   // 3. Specific brand/merchant matching (airlines, hotel groups, OTAs, supermarkets, mobility)
   // Higher precedence than generic dictionary terms like 'car' or payment processors
-  for (const [cat, rx] of Object.entries(merchantCategoryRegexes)) {
-    if (rx?.test(d)) {
-      if (cat === 'DiningOut' && GERMAN_CITY_ESSEN_REGEX.test(d)) {
-        continue
-      }
-      const result =
-        cat === 'DiningOut' ? 'Dining Out' : cat === 'BankFees' ? 'Bank Fees' : cat
-      if (!customKeywords) defaultCategoryCache.set(cacheKey, result)
-      return result
+  const popularCat = findPopularMerchantCategory(d.toLowerCase())
+  if (popularCat) {
+    if (popularCat === 'Dining Out' && GERMAN_CITY_ESSEN_REGEX.test(d)) {
+      // Ignore false positives from city of Essen
+    } else {
+      if (!customKeywords) defaultCategoryCache.set(cacheKey, popularCat)
+      return popularCat
     }
   }
 

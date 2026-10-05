@@ -105,7 +105,7 @@ describe('Settings Component', () => {
     fireEvent.focus(keywordInput)
 
     expect(screen.getByText("McDonald's")).toBeInTheDocument()
-    expect(screen.getByText('Essen gehen')).toBeInTheDocument()
+    expect(screen.getAllByText('Essen gehen')[0]).toBeInTheDocument()
   })
 
   it('suggests regional merchants like Bingo, Biedronka, and Indomaret with localized categories', () => {

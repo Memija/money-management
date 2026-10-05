@@ -115,6 +115,9 @@ describe('category-icons', () => {
         { category: 'Porezi', expectedIcon: AVAILABLE_ICONS.Receipt },
         { category: 'Podatki', expectedIcon: AVAILABLE_ICONS.Receipt },
         { category: 'Pajak', expectedIcon: AVAILABLE_ICONS.Receipt },
+        { category: 'Taxes & Fees', expectedIcon: AVAILABLE_ICONS.Receipt },
+        { category: 'Steuern & Abgaben', expectedIcon: AVAILABLE_ICONS.Receipt },
+        { category: 'Porezi i takse', expectedIcon: AVAILABLE_ICONS.Receipt },
         { category: 'Utilities', expectedIcon: AVAILABLE_ICONS.Zap },
         { category: 'Electricity', expectedIcon: AVAILABLE_ICONS.Zap },
         { category: 'Water bill', expectedIcon: AVAILABLE_ICONS.Zap },
@@ -499,8 +502,8 @@ describe('category-icons', () => {
 
       const krakenInfo = getMerchantBrandInfo('Kraken Payward')
       expect(krakenInfo.merchant?.id).toBe('kraken')
-      expect(krakenInfo.logoComponent).toBe(AVAILABLE_ICONS.Coins)
-      expect(krakenInfo.brandColor).toBe('#5741D9')
+      expect(krakenInfo.logoComponent).toBe(MERCHANT_LOGOS.KrakenLogo)
+      expect(krakenInfo.brandColor).toBe('#5841D8')
 
       const bitpandaInfo = getMerchantBrandInfo('Bitpanda Payments')
       expect(bitpandaInfo.merchant?.id).toBe('bitpanda')
@@ -508,10 +511,10 @@ describe('category-icons', () => {
       expect(bitpandaInfo.brandColor).toBe('#00D084')
     })
 
-    it('matches Stadtverwaltung Bad Homburg city coat of arms for municipal transfer transactions', () => {
+    it('matches Stadtverwaltung Bad Homburg city coat of arms for municipal payments', () => {
       const badHomburgTx =
         'Stadtverwaltung Bad Homburg HELADEF1TSK DE81512500000001085662 0181776005 End-to-End-Ref.'
-      const badHomburgIcon = getCategoryIcon('Transfers', 20, undefined, badHomburgTx)
+      const badHomburgIcon = getCategoryIcon('Taxes', 20, undefined, badHomburgTx)
       expect(React.isValidElement(badHomburgIcon)).toBe(true)
       if (React.isValidElement(badHomburgIcon)) {
         expect(badHomburgIcon.type).toBe(MERCHANT_LOGOS.BadHomburgLogo)
@@ -522,14 +525,14 @@ describe('category-icons', () => {
       expect(info.merchant?.name).toBe('Stadtverwaltung Bad Homburg')
       expect(info.logoComponent).toBe(MERCHANT_LOGOS.BadHomburgLogo)
       expect(info.brandColor).toBe('#0F47AF')
-      expect(info.suggestedCategory).toBe('Transfers')
+      expect(info.suggestedCategory).toBe('Taxes')
     })
 
     it('renders BadHomburgLogo coat of arms successfully into the DOM', () => {
       const { container } = render(
         <div>
           {getCategoryIcon(
-            'Transfers',
+            'Taxes',
             24,
             undefined,
             'Stadtverwaltung Bad Homburg HELADEF1TSK DE81512500000001085662 0181776005 End-to-End-Ref.',
@@ -541,10 +544,21 @@ describe('category-icons', () => {
       expect(svg).toHaveAttribute('aria-label', 'Stadtverwaltung Bad Homburg vor der Höhe')
     })
 
-    it('matches Gemeinde Schmitten coat of arms for municipal transfer transactions', () => {
+    it('matches Bad Homburg coat of arms for municipal childcare fee transactions', () => {
+      const kitaTx =
+        'Stadt Bad Homburg v.d.H. 506582 KINDERTAGESSTAETTENBEITRAG End-to-End-Ref.: DTA-22-00801'
+      const icon = getCategoryIcon('Education', 20, undefined, kitaTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.BadHomburgLogo)
+      }
+      expect(getMerchantBrandInfo(kitaTx).merchant?.id).toBe('stadt-bad-homburg')
+    })
+
+    it('matches Gemeinde Schmitten coat of arms for municipal payments', () => {
       const schmittenTx =
         'Gemeinde Schmitten HELADEF1TSK DE58512500000059004000 0561196907 End-to-End-Ref.: CCB.'
-      const schmittenIcon = getCategoryIcon('Transfers', 20, undefined, schmittenTx)
+      const schmittenIcon = getCategoryIcon('Taxes', 20, undefined, schmittenTx)
       expect(React.isValidElement(schmittenIcon)).toBe(true)
       if (React.isValidElement(schmittenIcon)) {
         expect(schmittenIcon.type).toBe(MERCHANT_LOGOS.SchmittenLogo)
@@ -555,14 +569,14 @@ describe('category-icons', () => {
       expect(info.merchant?.name).toBe('Gemeinde Schmitten')
       expect(info.logoComponent).toBe(MERCHANT_LOGOS.SchmittenLogo)
       expect(info.brandColor).toBe('#0F47AF')
-      expect(info.suggestedCategory).toBe('Transfers')
+      expect(info.suggestedCategory).toBe('Taxes')
     })
 
     it('renders SchmittenLogo coat of arms successfully into the DOM', () => {
       const { container } = render(
         <div>
           {getCategoryIcon(
-            'Transfers',
+            'Taxes',
             24,
             undefined,
             'Gemeinde Schmitten HELADEF1TSK DE58512500000059004000 0561196907 End-to-End-Ref.: CCB.',
@@ -574,10 +588,10 @@ describe('category-icons', () => {
       expect(svg).toHaveAttribute('aria-label', 'Gemeinde Schmitten im Taunus')
     })
 
-    it('matches Stadt Kelkheim coat of arms for municipal transfer transactions', () => {
+    it('matches Stadt Kelkheim coat of arms for municipal payments', () => {
       const kelkheimTx =
         'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836'
-      const kelkheimIcon = getCategoryIcon('Transfers', 20, undefined, kelkheimTx)
+      const kelkheimIcon = getCategoryIcon('Taxes', 20, undefined, kelkheimTx)
       expect(React.isValidElement(kelkheimIcon)).toBe(true)
       if (React.isValidElement(kelkheimIcon)) {
         expect(kelkheimIcon.type).toBe(MERCHANT_LOGOS.KelkheimLogo)
@@ -588,14 +602,14 @@ describe('category-icons', () => {
       expect(info.merchant?.name).toBe('Stadt Kelkheim (Taunus)')
       expect(info.logoComponent).toBe(MERCHANT_LOGOS.KelkheimLogo)
       expect(info.brandColor).toBe('#DA121A')
-      expect(info.suggestedCategory).toBe('Transfers')
+      expect(info.suggestedCategory).toBe('Taxes')
     })
 
     it('renders KelkheimLogo successfully into the DOM', () => {
       const { container } = render(
         <div>
           {getCategoryIcon(
-            'Transfers',
+            'Taxes',
             24,
             undefined,
             'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836',
@@ -642,6 +656,82 @@ describe('category-icons', () => {
       expect(img).toHaveAttribute('alt', 'Hochtaunuskreis')
     })
 
+    it.each([
+      ['Syna GmbH KUNDENNUMMER 483029022 End-to-End-Ref.: Beleg: 312004778285 Mandatsref: 0085', 'syna', 'SynaLogo', 'Utilities'],
+      ['Westnetz GmbH Netzentgelt', 'westnetz', 'WestnetzLogo', 'Utilities'],
+      ['NRM Netzdienste Rhein-Main GmbH', 'nrm', 'NrmLogo', 'Utilities'],
+      ['Allg.Deutscher Automobil-Club ADAC e.V. ADAC E.V. MEMIC ANEL MEMIC BILJANA BEITRAG: 01.01.22-', 'adac', 'AdacLogo', 'Transport'],
+      ['ACE Auto Club Europa e.V.', 'ace', 'AceLogo', 'Transport'],
+      ['AvD Automobilclub von Deutschland', 'avd', 'AvdLogo', 'Transport'],
+      ['POCO Einrichtungsmarkte GmbH ELV54203406 19.02 13.01 ME0 End-to-End-Ref.: T0220219542034', 'poco', 'PocoLogo', 'Shopping'],
+      ['XXXLutz KG Wiesbaden', 'xxxlutz', 'XxxlutzLogo', 'Shopping'],
+      ['moemax Frankfurt', 'moemax', 'MoemaxLogo', 'Shopping'],
+      ['Möbel Höffner Eschborn', 'hoeffner', 'HoeffnerLogo', 'Shopping'],
+      ['Sconto SB Der Möbelmarkt', 'sconto', 'ScontoLogo', 'Shopping'],
+      ['ROLLER GmbH & Co. KG', 'roller', 'RollerLogo', 'Shopping'],
+      ['Segmüller Weiterstadt', 'segmueller', 'SegmuellerLogo', 'Shopping'],
+      ['porta Möbel Frankfurt', 'porta', 'PortaLogo', 'Shopping'],
+      ['JYSK GmbH', 'jysk', 'JyskLogo', 'Shopping'],
+      ['Turnverein Dornholzhausen 1918 e.V. Sammelbuchung TV Dornholzhausen/Ts. 1918 e.V., Memic Anel', 'tv-dornholzhausen', 'TvDornholzhausenLogo', 'Healthcare'],
+      ['Die Haftpflichtkasse VVaG 60603542 / Unfall Beitrag 23.01.25 - meine-hk.de - Jetzt anmelden und Re', 'haftpflichtkasse', 'HaftpflichtkasseLogo', 'Insurance'],
+      ['Debeka Krankenversicherung', 'debeka', 'DebekaLogo', 'Insurance'],
+      ['ERGO Versicherung', 'ergo', 'ErgoLogo', 'Insurance'],
+      ['AXA Konzern AG', 'axa', 'AxaLogo', 'Insurance'],
+      ['Generali Versicherung', 'generali', 'GeneraliLogo', 'Insurance'],
+      ['R+V Versicherung AG', 'ruv', 'RuvLogo', 'Insurance'],
+      ['Signal Iduna Gruppe', 'signal-iduna', 'SignalIdunaLogo', 'Insurance'],
+      ['HanseMerkur Versicherung', 'hansemerkur', 'HanseMerkurLogo', 'Insurance'],
+      ['Barmenia Versicherungen', 'barmenia', 'BarmeniaLogo', 'Insurance'],
+      ['Gothaer Allgemeine Versicherung', 'gothaer', 'GothaerLogo', 'Insurance'],
+      ['ARAG SE Rechtsschutz', 'arag', 'AragLogo', 'Insurance'],
+      ['DEVK Versicherungen', 'devk', 'DevkLogo', 'Insurance'],
+      ['HDI Versicherung AG', 'hdi', 'HdiLogo', 'Insurance'],
+      ['VHV Versicherungen', 'vhv', 'VhvLogo', 'Insurance'],
+      ['CosmosDirekt Versicherung', 'cosmosdirekt', 'CosmosDirektLogo', 'Insurance'],
+      ['ByeBye PBNKDEFFXXX DE93440100460095667464 2110630491421 End-to-End-Ref.: CCB.109.UE.P', 'byebye', 'ByebyeLogo', 'Travel'],
+      ['Deutsches Jugendherbergswerk Hauptv erband e. V. 22,50 Beitrag-25 31492804 End-to-End-Ref.: N', 'djh', 'DjhLogo', 'Travel'],
+      ['Hostelling International membership', 'hostelling-international', 'HostellingInternationalLogo', 'Travel'],
+      ['a&o Hostels Berlin', 'ao-hostels', 'AoHostelsLogo', 'Travel'],
+      ['MEININGER Hotels Frankfurt', 'meininger', 'MeiningerLogo', 'Travel'],
+      ['Standesamt Bad Soden am Taunus NASSDE55XXX DE84510500150197000325 Internationale Geburts', 'stadt-bad-soden', 'BadSodenLogo', 'Taxes'],
+      ['Main-Taunus-Kreis Kreiskasse', 'main-taunus-kreis', 'MainTaunusKreisLogo', 'Taxes'],
+      ['Muenchener VEREIN Krankenversicheru ng a. Kundennummer S88063 KV1003 17,46 End-to-End-Ref.', 'muenchener-verein', 'MuenchenerVereinLogo', 'Healthcare'],
+      ['WebID Solutions GmbH HYVEDEMM488 DE22100208900035900527 TWMDO WebID Ident 643-572-', 'webid', 'WebIdLogo', 'Bank Fees'],
+      ['IDnow GmbH VideoIdent', 'idnow', 'IdnowLogo', 'Bank Fees'],
+      ['POSTIDENT Verfahren', 'postident', 'PostidentLogo', 'Bank Fees'],
+      ['Verimi GmbH ID', 'verimi', 'VerimiLogo', 'Bank Fees'],
+      ['GENERALKOSULAT VON BOSNIENHERZEGOW. DRESDEFFXXX DE71500800000262721801 Anel Mem', 'konsulat-bosnien', 'BosniaCoatOfArmsLogo', 'Taxes'],
+      ['Swiss Life SE VS 9667224-1/819491326 Beitrag 02/2 026 Ihr Beitrag fur ein selbstbesti mmtes Leben', 'swiss-life', 'SwissLifeLogo', 'Savings'],
+      ['Canada Life Assurance Europe', 'canada-life', 'CanadaLifeLogo', 'Savings'],
+      ['Alte Leipziger Lebensversicherung', 'alte-leipziger', 'AlteLeipzigerLogo', 'Savings'],
+      ['Aeguron Risiko-Lebensversicherung AeguronRisikoLV 02/26 6267061-P End-to-End-Ref.: 89c9c867', 'aeguron', 'AeguronLogo', 'Insurance'],
+      ['iptiQ Life SA AeguronRisikoLV 04/26 6267061-P End-to-End-Ref.: de3e4c7022094659943152a87c2', 'iptiq', 'IptiqLogo', 'Insurance'],
+      ['WGV-Wuertt. Gemeinde-Versicherung MTK-BA 117 V90092776488 01.06.2025- 01.07.2025 End-to-E', 'wgv', 'WgvLogo', 'Insurance'],
+      ['Hannoversche Lebensversicherung AG', 'hannoversche', 'HannoverscheLogo', 'Insurance'],
+      ['Provinzial Versicherung AG', 'provinzial', 'ProvinzialLogo', 'Insurance'],
+      ['SV SparkassenVersicherung Gebäude', 'sv-sparkassenversicherung', 'SvSparkassenVersicherungLogo', 'Insurance'],
+      ['BGV Badische Gemeinde-Versicherung', 'bgv', 'BgvLogo', 'Insurance'],
+      ['Versicherungskammer Bayern', 'vkb', 'VkbLogo', 'Insurance'],
+      ['Swiss Re Reinsurance', 'swiss-re', 'SwissReLogo', 'Insurance'],
+    ])('matches %s to merchant %s with its logo', (tx, merchantId, logoKey, category) => {
+      const info = getMerchantBrandInfo(tx)
+      expect(info.merchant?.id).toBe(merchantId)
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS[logoKey])
+      expect(info.suggestedCategory).toBe(category)
+
+      const { container } = render(<div>{getCategoryIcon(category, 24, undefined, tx)}</div>)
+      expect(container.querySelector('img, svg')).toBeInTheDocument()
+    })
+
+    it('renders the Stones GmbH card payment with a generic shopping icon', () => {
+      const info = getMerchantBrandInfo(
+        'STONES GMBH 260410190023798241253413150 ELV6534 1315 26.04 10.19 ME0 End-to-End-Ref.: 26',
+      )
+      expect(info.merchant?.id).toBe('stones')
+      expect(info.logoComponent).toBe(AVAILABLE_ICONS.ShoppingBag)
+      expect(info.suggestedCategory).toBe('Shopping')
+    })
+
     it('matches klarmobil brand info and Communication category for telecommunications invoice transactions', () => {
       const klarmobilTx =
         'klarmobil GmbH Kd.1059561719 Wir sagen Danke. RG-N r.F25035684584 15,99 EUR End-to-End-Ref.'
@@ -674,6 +764,115 @@ describe('category-icons', () => {
       expect(img).toBeInTheDocument()
       expect(img).toHaveAttribute('src', '/brands/klarmobil.png')
       expect(img).toHaveAttribute('alt', 'klarmobil.de')
+    })
+
+    it('matches Heroku brand info and Utilities category for cloud hosting transactions', () => {
+      const herokuTx = 'HEROKU* JUL-106945945'
+      const icon = getCategoryIcon('Utilities', 20, undefined, herokuTx)
+      expect(React.isValidElement(icon)).toBe(true)
+      if (React.isValidElement(icon)) {
+        expect(icon.type).toBe(MERCHANT_LOGOS.HerokuLogo)
+      }
+
+      const info = getMerchantBrandInfo(herokuTx)
+      expect(info.merchant?.id).toBe('heroku')
+      expect(info.merchant?.name).toBe('Heroku')
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.HerokuLogo)
+      expect(info.brandColor).toBe('#430098')
+      expect(info.suggestedCategory).toBe('Utilities')
+    })
+
+    it('renders HerokuLogo successfully into the DOM', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Utilities',
+            24,
+            undefined,
+            'HEROKU* JUL-106945945',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Heroku')
+    })
+
+    it('matches cloud and hosting providers (AWS, Hetzner, DigitalOcean, Cloudflare, Vercel, IONOS, Netcup, OVHcloud)', () => {
+      const awsInfo = getMerchantBrandInfo('AWS EMEA SARL')
+      expect(awsInfo.merchant?.id).toBe('aws')
+      expect(awsInfo.logoComponent).toBe(MERCHANT_LOGOS.FaAws)
+      expect(awsInfo.suggestedCategory).toBe('Utilities')
+      expect(awsInfo.brandColor).toBe('#FF9900')
+
+      const hetznerInfo = getMerchantBrandInfo('Hetzner Online GmbH')
+      expect(hetznerInfo.merchant?.id).toBe('hetzner')
+      expect(hetznerInfo.logoComponent).toBe(MERCHANT_LOGOS.SiHetzner)
+      expect(hetznerInfo.suggestedCategory).toBe('Utilities')
+      expect(hetznerInfo.brandColor).toBe('#D50C2D')
+
+      const doInfo = getMerchantBrandInfo('DigitalOcean LLC')
+      expect(doInfo.merchant?.id).toBe('digitalocean')
+      expect(doInfo.logoComponent).toBe(MERCHANT_LOGOS.SiDigitalocean)
+      expect(doInfo.suggestedCategory).toBe('Utilities')
+      expect(doInfo.brandColor).toBe('#0080FF')
+
+      const cfInfo = getMerchantBrandInfo('Cloudflare Inc')
+      expect(cfInfo.merchant?.id).toBe('cloudflare')
+      expect(cfInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCloudflare)
+      expect(cfInfo.suggestedCategory).toBe('Utilities')
+      expect(cfInfo.brandColor).toBe('#F38020')
+
+      const vercelInfo = getMerchantBrandInfo('Vercel Inc')
+      expect(vercelInfo.merchant?.id).toBe('vercel')
+      expect(vercelInfo.logoComponent).toBe(MERCHANT_LOGOS.SiVercel)
+      expect(vercelInfo.suggestedCategory).toBe('Utilities')
+
+      const ionosInfo = getMerchantBrandInfo('IONOS SE')
+      expect(ionosInfo.merchant?.id).toBe('ionos')
+      expect(ionosInfo.logoComponent).toBe(MERCHANT_LOGOS.SiIonos)
+      expect(ionosInfo.suggestedCategory).toBe('Utilities')
+      expect(ionosInfo.brandColor).toBe('#003D8F')
+
+      const netcupInfo = getMerchantBrandInfo('netcup GmbH')
+      expect(netcupInfo.merchant?.id).toBe('netcup')
+      expect(netcupInfo.logoComponent).toBe(MERCHANT_LOGOS.SiNetcup)
+      expect(netcupInfo.suggestedCategory).toBe('Utilities')
+      expect(netcupInfo.brandColor).toBe('#1E6888')
+
+      const ovhInfo = getMerchantBrandInfo('OVH SAS')
+      expect(ovhInfo.merchant?.id).toBe('ovhcloud')
+      expect(ovhInfo.logoComponent).toBe(MERCHANT_LOGOS.SiOvh)
+      expect(ovhInfo.suggestedCategory).toBe('Utilities')
+      expect(ovhInfo.brandColor).toBe('#000E9C')
+    })
+
+    it('matches telecom providers (freenet, congstar, ALDI TALK) and renders custom logos', () => {
+      const freenetInfo = getMerchantBrandInfo('freenet AG')
+      expect(freenetInfo.merchant?.id).toBe('freenet')
+      expect(freenetInfo.logoComponent).toBe(MERCHANT_LOGOS.SiFreenet)
+      expect(freenetInfo.suggestedCategory).toBe('Communication')
+      expect(freenetInfo.brandColor).toBe('#00AE65')
+
+      const congstarInfo = getMerchantBrandInfo('congstar GmbH')
+      expect(congstarInfo.merchant?.id).toBe('congstar')
+      expect(congstarInfo.logoComponent).toBe(MERCHANT_LOGOS.CongstarLogo)
+      expect(congstarInfo.suggestedCategory).toBe('Communication')
+
+      const aldiTalkInfo = getMerchantBrandInfo('MEDIONmobile ALDI TALK')
+      expect(aldiTalkInfo.merchant?.id).toBe('aldi-talk')
+      expect(aldiTalkInfo.logoComponent).toBe(MERCHANT_LOGOS.AldiTalkLogo)
+      expect(aldiTalkInfo.suggestedCategory).toBe('Communication')
+      expect(aldiTalkInfo.brandColor).toBe('#00205B')
+
+      const { container } = render(
+        <div>
+          {getCategoryIcon('Communication', 24, undefined, 'congstar Mobilfunk')}
+          {getCategoryIcon('Communication', 24, undefined, 'ALDI TALK Guthaben')}
+        </div>,
+      )
+      expect(container.querySelector('svg[aria-label="congstar"]')).toBeInTheDocument()
+      expect(container.querySelector('svg[aria-label="ALDI TALK"]')).toBeInTheDocument()
     })
 
     it('matches Gerichtskasse Hessen state emblem for judicial and property purchase tax transactions', () => {
@@ -1585,7 +1784,7 @@ describe('category-icons', () => {
       const kelkheimInfo = getMerchantBrandInfo('STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836')
       expect(kelkheimInfo.merchant?.id).toBe('stadt-kelkheim')
       expect(kelkheimInfo.logoComponent).toBe(MERCHANT_LOGOS.KelkheimLogo)
-      expect(kelkheimInfo.suggestedCategory).toBe('Transfers')
+      expect(kelkheimInfo.suggestedCategory).toBe('Taxes')
       expect(kelkheimInfo.brandColor).toBe('#DA121A')
 
       const bookingInfo = getMerchantBrandInfo('PayPal (Europe) S.a r.l. et Cie, S. C.A. . Booking.com BV, Ihr Einkauf bei B ooking.com BV ABBUCHUNG')
@@ -1593,6 +1792,46 @@ describe('category-icons', () => {
       expect(bookingInfo.logoComponent).toBe(MERCHANT_LOGOS.BookingLogo)
       expect(bookingInfo.suggestedCategory).toBe('Travel')
       expect(bookingInfo.brandColor).toBe('#003580')
+
+      const gvgInfo = getMerchantBrandInfo('GVG Glasfaser GmbH RG.23565869/KD.10250177 End-to-End-Ref.: 00000023565869102501774490')
+      expect(gvgInfo.merchant?.id).toBe('gvg-glasfaser')
+      expect(gvgInfo.logoComponent).toBe(MERCHANT_LOGOS.GvgGlasfaserLogo)
+      expect(gvgInfo.suggestedCategory).toBe('Communication')
+
+      const gruenweltInfo = getMerchantBrandInfo('Grünwelt Wärmestrom GmbH ABSCHLAG Strom 08/26 VK: 1210005133 32 Gruenwelt Waermestrom')
+      expect(gruenweltInfo.merchant?.id).toBe('gruenwelt')
+      expect(gruenweltInfo.logoComponent).toBe(MERCHANT_LOGOS.GruenweltLogo)
+      expect(gruenweltInfo.suggestedCategory).toBe('Utilities')
+
+      const disneyInfo = getMerchantBrandInfo('PayPal Europe S.a.r.l. et Cie S.C.A 1052099636248/PP.4585.PP/. DisneyPl us, Ihr Einkauf bei DisneyPl')
+      expect(disneyInfo.merchant?.id).toBe('disney-plus')
+      expect(disneyInfo.logoComponent).toBe(MERCHANT_LOGOS.DisneyPlusLogo)
+      expect(disneyInfo.suggestedCategory).toBe('Entertainment')
+
+      const mossInfo = getMerchantBrandInfo('CAFE RESTAURANT MOSS, ZELL AM SEE AT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual DB')
+      expect(mossInfo.merchant?.id).toBe('cafe-moss')
+      expect(mossInfo.logoComponent).toBe(MERCHANT_LOGOS.CafeMossLogo)
+      expect(mossInfo.suggestedCategory).toBe('Dining Out')
+
+      const billaInfo = getMerchantBrandInfo('BILLA DANKT 0005128, ZELL AM SEE A T Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debi')
+      expect(billaInfo.merchant?.id).toBe('billa')
+      expect(billaInfo.logoComponent).toBe(MERCHANT_LOGOS.BillaLogo)
+      expect(billaInfo.suggestedCategory).toBe('Groceries')
+
+      const jugendherbergeInfo = getMerchantBrandInfo('Salzburger Jugendherbe, Zell am See AT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit')
+      expect(jugendherbergeInfo.merchant?.id).toBe('salzburger-jugendherberge')
+      expect(jugendherbergeInfo.logoComponent).toBe(MERCHANT_LOGOS.SalzburgerJugendherbergeLogo)
+      expect(jugendherbergeInfo.suggestedCategory).toBe('Travel')
+
+      const alpePanonInfo = getMerchantBrandInfo('ALPE PANON PE PTUJ, PTUJ SI Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 20')
+      expect(alpePanonInfo.merchant?.id).toBe('alpe-panon')
+      expect(alpePanonInfo.logoComponent).toBe(MERCHANT_LOGOS.AlpePanonLogo)
+      expect(alpePanonInfo.suggestedCategory).toBe('Dining Out')
+
+      const hallenbadInfo = getMerchantBrandInfo('HALLENBAD ZELL AM SEE, ZELL SEE AT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit')
+      expect(hallenbadInfo.merchant?.id).toBe('hallenbad-zellamsee')
+      expect(hallenbadInfo.logoComponent).toBe(MERCHANT_LOGOS.HallenbadZellLogo)
+      expect(hallenbadInfo.suggestedCategory).toBe('Entertainment')
     })
 
     it('returns brand info using fallback icon for merchants without brand logos', () => {

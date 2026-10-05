@@ -121,6 +121,25 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/(?:miet)[-\s]+(?:kaution)/iu, 'Mietkaution'],
   [/(?:c)[-\s]+(?:hrista)/iu, 'Christa'],
   [/(?:an\s+de)[-\s]+(?:r)/iu, 'An der'],
+  [/(?:hauptv|hauptver|hauptverb)[-\s]+(?:erband|rband|band)/iu, 'Hauptverband'],
+  [/(?:jugendherberg|jugendherbergs)[-\s]+(?:werk)/iu, 'Jugendherbergswerk'],
+  [/(?:krankenversicheru|krankenversicher)[-\s]+(?:ng|ung)/iu, 'Krankenversicherung'],
+  [/(?:haftpflicht)[-\s]+(?:kasse)/iu, 'Haftpflichtkasse'],
+  [/(?:standes)[-\s]+(?:amt)/iu, 'Standesamt'],
+  [/(?:general)[-\s]+(?:konsulat|kosulat)|(?:generalkosulat)/iu, 'Generalkonsulat'],
+  [/(?:bosnienherzegow|bosnienherzegowina|bosnien-herzegowina)\.?/iu, 'Bosnien und Herzegowina'],
+  [/(?:selbstbesti)[-\s]+(?:mmtes|mmte|mmt)/iu, 'selbstbestimmtes'],
+  [/(?:wgv)[-\s]+(?:wuertt|w\u00fcrtt)\.?/iu, 'WGV-Wuertt.'],
+  [/(?:privathaftpflicht)[-\s]+(?:v\s*ersicherungsnummer|versicherungsnummer)/iu, 'Privathaftpflicht-Versicherungsnummer'],
+  [/(?:v)[-\s]+(?:ersicherungsnummer)/iu, 'Versicherungsnummer'],
+  [/(?:sc)[-\s]+(?:huhe|huh)/iu, 'Schuhe'],
+  [/(?:i)[-\s]+(?:hre|hren|hrem|hrer)/iu, 'Ihre'],
+  [/(?:rechnu)[-\s]+(?:ng)/iu, 'Rechnung'],
+  [/(?:vi)[-\s]+(?:ele)/iu, 'Viele'],
+  [/(?:disneypl)[-\s]+(?:us)\b/iu, 'DisneyPlus'],
+  [/\b(?:disneypl)\b/iu, 'DisneyPlus'],
+  [/(?:salzburger)[-\s]+(?:jugendherbe)\b/iu, 'Salzburger Jugendherberge'],
+  [/\bZELL\s+AM\s+SEE\s+A\s+T\b/iu, 'ZELL AM SEE AT'],
   // English line-break word splits
   [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
   [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],
@@ -227,8 +246,8 @@ export function extractCleanDescription(desc: string): string {
     ' ',
   )
 
-  // 4. Remove file/case reference numbers (e.g., notary/court Aktenzeichen '01571/21', order/ref '230503-663021')
-  cleaned = cleaned.replace(/\b\d{3,}[/-]\d{2,}\b/g, ' ')
+  // 4. Remove file/case reference numbers and billing/invoice codes (e.g., notary/court Aktenzeichen '01571/21', order/ref '230503-663021', 'JUL-106945945')
+  cleaned = cleaned.replace(/\b(?:[A-Za-z]{2,5}-\d{4,}|\d{3,}[/-]\d{2,})\b/gi, ' ')
 
   // 5. Remove order and invoice references (e.g. Order 589490, Bestellung 12345, Auftrag 99281, standalone/trailing Rechnung or Invoice)
   cleaned = cleaned.replace(
@@ -236,8 +255,12 @@ export function extractCleanDescription(desc: string): string {
     ' ',
   )
 
-  // 6. Remove terminal transaction codes and payment method noise (e.g. KFN 0 VJ 2412, Kartenzahlung)
+  // 6. Remove terminal transaction codes and payment method noise (e.g. KFN 0 VJ 2412, ELV68423401, ME0, Kartenzahlung, Virtual Debit...)
+  cleaned = cleaned.replace(/\b(?:RG|KD|VK)\s*[:.]?\s*\d+(?:\s*[/:]\s*(?:RG|KD|VK)\s*[:.]?\s*\d+)?\b/gi, ' ')
+  cleaned = cleaned.replace(/\bKarte\s+Nr\.?\s*(?:\d{4}|\d{2,4}[X\d\s]*)\s*(?:Kartenzahlung)?(?:\s*Virtual\s*(?:Debit|Debi|DB))?(?:\s*Card(?:\s*\d+)?)?\b/gi, ' ')
+  cleaned = cleaned.replace(/\b(?:Virtual\s*(?:Debit|Debi|DB))\b/gi, ' ')
   cleaned = cleaned.replace(/\bKFN\s+\d+\s+VJ\s+\d+\b/gi, ' ')
+  cleaned = cleaned.replace(/\b(?:ELV\d*|ME\d+)\b/gi, ' ')
   cleaned = cleaned.replace(/\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz)\b/gi, ' ')
 
   // 5. Remove standalone IBANs (compact or spaced) and SWIFT BICs
@@ -274,11 +297,12 @@ export function extractMerchantKeyword(desc: string): string {
   let merchant = extractCleanDescription(desc)
   if (!merchant) return ''
 
-  // 1. Strip leading payment gateway / aggregator prefixes like "SumUp .", "SumUp *", "PayPal *", "PayPal (Europe)..."
+  // 1. Strip leading payment gateway / aggregator prefixes like "PAYONE GmbH", "SumUp .", "SumUp *", "PayPal *", "PayPal (Europe)..."
   merchant = merchant.replace(
-    /^(?:PayPal\s*(?:\([^)]+\)|Europe|Pte\.?\s*Ltd\.?)?(?:\s*S\.?a(?:\s*r\.?l\.?)?(?:\s*et\s*Cie)?(?:\s*,?\s*S\.?\s*C\.?A\.?)?)?|SumUp|Stripe|Klarna)\s*[.*-]?\s*/i,
+    /^(?:PAYONE\s*(?:GmbH)?|PayPal\s*(?:\([^)]+\)|Europe|Pte\.?\s*Ltd\.?)?(?:\s*S\.?a(?:\s*r\.?l\.?)?(?:\s*et\s*Cie)?(?:\s*,?\s*S\.?\s*C\.?A\.?)?)?|SumUp|Stripe|Klarna)\s*[.*-]?\s*/i,
     '',
   )
+  merchant = merchant.replace(/^(?:ELV\d*|ME\d+)\s*/gi, '')
 
   // 1b. If the description contains a purchase phrase ("Ihr Einkauf bei ...", "Your purchase at ..."), extract the merchant following it
   const purchaseMatch = merchant.match(

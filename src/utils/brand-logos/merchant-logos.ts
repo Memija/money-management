@@ -1,19 +1,21 @@
-import { FaAmazon, FaMicrosoft } from 'react-icons/fa'
+import { FaAmazon, FaAws, FaMicrosoft } from 'react-icons/fa'
 import {
   SiAcer, SiAirbnb, SiAircanada, SiAirfrance, SiAldisud, SiAliexpress, SiAllegro, SiAmd, SiAmericanairlines, SiApple, SiApplepay, SiAral, SiAsda, SiAsus, SiAuchan,
   SiBankofamerica, SiBarclays, SiBinance, SiBose, SiBritishairways, SiBunq, SiBurgerking, SiBvg, SiCarrefour,
-  SiCashapp, SiChase, SiCoinbase, SiCommerzbank, SiCoop, SiCorsair, SiDazn, SiDeliveroo,
-  SiDelta, SiDeutschebahn, SiDeutschebank, SiDeutschepost, SiDeutschetelekom, SiDhl, SiDiscord, SiDm, SiDoordash, SiDuolingo, SiEasyjet, SiEbay, SiEdeka,
-  SiEmirates, SiEpicgames, SiEpson, SiEtihadairways, SiEtsy, SiExpedia, SiFiat, SiFord, SiGithub, SiGlovo, SiGojek, SiGooglepay, SiGrab, SiHellofresh, SiHilton, SiHonda, SiHotelsdotcom, SiHp, SiHsbc, SiHuawei, SiHyundai, SiIkea, SiIntel, SiJusteat, SiKaufland, SiKfc,
+  SiCashapp, SiChase, SiCloudflare, SiCoinbase, SiCommerzbank, SiCoop, SiCorsair, SiDazn, SiDeliveroo,
+  SiDelta, SiDeutschebahn, SiDeutschebank, SiDeutschepost, SiDeutschetelekom, SiDhl, SiDigitalocean, SiDiscord, SiDm, SiDoordash, SiDuolingo, SiEasyjet, SiEbay, SiEdeka,
+  SiEmirates, SiEpicgames, SiEpson, SiEtihadairways, SiEtsy, SiExpedia, SiFiat, SiFord, SiFreenet, SiGithub, SiGlovo, SiGojek, SiGooglepay, SiGrab, SiHellofresh, SiHetzner, SiHilton, SiHonda, SiHotelsdotcom, SiHp, SiHsbc, SiHuawei, SiHyundai, SiIkea, SiIntel, SiIonos, SiJusteat, SiKaufland, SiKfc,
   SiKia, SiKlarna, SiKlm, SiLenovo, SiLg, SiLidl, SiLufthansa, SiLyft, SiMarriott, SiMastercard, SiMazda, SiMcdonalds, SiMediamarkt, SiMoneygram, SiMonzo,
-  SiMorrisons, SiMsi, SiN26, SiNetflix, SiNetto, SiNike, SiNissan, SiNvidia, SiO2, SiOpel, SiOrange, SiPayoneer, SiPaypal, SiPenny,
+  SiMorrisons, SiMsi, SiN26, SiNetcup, SiNetflix, SiNetto, SiNike, SiNissan, SiNvidia, SiO2, SiOpel, SiOrange, SiOvh, SiPayoneer, SiPaypal, SiPenny,
   SiPeugeot, SiPlaystation, SiQantas, SiQatarairways, SiRazer, SiRenault, SiRevolut, SiRewe, SiRossmann, SiRyanair, SiSamsung, SiSeagate, SiSeat, SiSennheiser, SiShell, SiShopee, SiSingaporeairlines, SiSkoda, SiSky, SiSony, SiSouthwestairlines, SiSparkasse,
   SiSpotify, SiStarbucks, SiStarlingbank, SiSteam, SiStrava, SiStripe, SiTarget, SiTesco, SiTesla, SiToyota, SiTripadvisor, SiTrivago, SiTui, SiTurkishairlines, SiTwitch, SiUber,
-  SiUbereats, SiUnitedairlines, SiVenmo, SiVinted, SiVisa, SiVodafone, SiVolvo,
+  SiUbereats, SiUnitedairlines, SiVenmo, SiVercel, SiVinted, SiVisa, SiVodafone, SiVolvo,
   SiWesternunion, SiWise, SiWizzair, SiXiaomi, SiYoutube,
   SiZabka, SiZalando, SiZara
 } from 'react-icons/si'
 
+import { AUSTRIAN_LOGOS } from './austrian-logos'
+import { AUTO_CLUB_LOGOS } from './auto-club-logos'
 import {
   ApoBankLogo,
   BunqLogo,
@@ -57,12 +59,19 @@ import {
   KelkheimLogo,
   SchmittenLogo,
 } from './civic-logos'
+import { CONSULAR_LOGOS } from './consular-logos'
 import {
   LotharBraunLogo,
 } from './craft-logos'
 import {
+  CRYPTO_LOGOS,
   GuardarianLogo,
+  KrakenLogo,
 } from './crypto-logos'
+import { ENERGY_GRID_LOGOS } from './energy-grid-logos'
+import { ENTERTAINMENT_LOGOS } from './entertainment-logos'
+import { FASHION_LOGOS } from './fashion-logos'
+import { FURNITURE_LOGOS } from './furniture-logos'
 import {
   BadenWuerttembergFlagLogo,
   BayernFlagLogo,
@@ -86,12 +95,18 @@ import {
   BarmerLogo,
   DakLogo,
   DocMorrisLogo,
+  MuenchenerVereinLogo,
   ShopApothekeLogo,
   TkLogo,
 } from './health-logos'
+import { HOSTEL_LOGOS } from './hostel-logos'
+import { IDENTITY_LOGOS } from './identity-logos'
+import { INSURANCE_LOGOS } from './insurance-logos'
 import {
   FaerberHutzelLogo,
 } from './legal-logos'
+import { PAYMENT_LOGOS } from './payment-logos'
+import { PENSION_LOGOS } from './pension-logos'
 import {
   BauhausLogo,
   CadoozLogo,
@@ -104,6 +119,7 @@ import {
   SumupLogo,
   TchiboLogo,
 } from './retail-logos'
+import { SPORTS_CLUB_LOGOS } from './sports-club-logos'
 import {
   ElsterLogo,
   SmartsteuerLogo,
@@ -113,11 +129,14 @@ import {
 } from './tax-logos'
 import {
   CanonLogo,
+  HerokuLogo,
   HpLogo,
   LogitechLogo,
   MicrosoftLogo,
   PhilipsLogo,
 } from './tech-logos'
+import { TELECOM_LOGOS } from './telecom-logos'
+import { TOUR_OPERATOR_LOGOS } from './tour-operator-logos'
 import {
   AsfinagLogo,
   AviaLogo,
@@ -149,8 +168,10 @@ import {
 } from './travel-logos'
 import type { IconComponent } from './types'
 import {
+  AldiTalkLogo,
   AllianzLogo,
   BeitragsserviceLogo,
+  CongstarLogo,
   EinsUndEinsLogo,
   EonLogo,
   HukLogo,
@@ -259,6 +280,7 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   ElsterLogo,
   WisoSteuerLogo,
   GuardarianLogo,
+  KrakenLogo,
   BadHomburgLogo,
   BadHomburgWappenLogo: BadHomburgLogo,
   StadtBadHomburgLogo: BadHomburgLogo,
@@ -337,4 +359,47 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   BunqLogo,
   KlarmobilLogo,
   KlarmobilDeLogo: KlarmobilLogo,
+  HerokuLogo,
+  SiHeroku: HerokuLogo,
+  FaAws,
+  AwsLogo: FaAws,
+  SiCloudflare,
+  CloudflareLogo: SiCloudflare,
+  SiDigitalocean,
+  DigitalOceanLogo: SiDigitalocean,
+  SiFreenet,
+  FreenetLogo: SiFreenet,
+  SiHetzner,
+  HetznerLogo: SiHetzner,
+  SiIonos,
+  IonosLogo: SiIonos,
+  SiNetcup,
+  NetcupLogo: SiNetcup,
+  SiOvh,
+  OvhLogo: SiOvh,
+  OVHcloudLogo: SiOvh,
+  SiVercel,
+  VercelLogo: SiVercel,
+  CongstarLogo,
+  congstarLogo: CongstarLogo,
+  AldiTalkLogo,
+  aldiTalkLogo: AldiTalkLogo,
+  MuenchenerVereinLogo,
+  muenchenerVereinLogo: MuenchenerVereinLogo,
+  ...AUSTRIAN_LOGOS,
+  ...AUTO_CLUB_LOGOS,
+  ...CONSULAR_LOGOS,
+  ...CRYPTO_LOGOS,
+  ...ENERGY_GRID_LOGOS,
+  ...ENTERTAINMENT_LOGOS,
+  ...FASHION_LOGOS,
+  ...FURNITURE_LOGOS,
+  ...HOSTEL_LOGOS,
+  ...IDENTITY_LOGOS,
+  ...INSURANCE_LOGOS,
+  ...PAYMENT_LOGOS,
+  ...PENSION_LOGOS,
+  ...SPORTS_CLUB_LOGOS,
+  ...TELECOM_LOGOS,
+  ...TOUR_OPERATOR_LOGOS,
 }

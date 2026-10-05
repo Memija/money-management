@@ -258,3 +258,26 @@ export const DocMorrisLogo: IconComponent = ({ size = 16, className }) => (
   </svg>
 )
 DocMorrisLogo.displayName = 'DocMorrisLogo'
+
+/** Münchener Verein — German insurance group specializing in health and supplementary insurance. */
+export const MuenchenerVereinLogo: IconComponent = ({ size = 16, className }) => (
+  <img
+    src="/brands/muenchener-verein.png"
+    alt="Münchener Verein"
+    role="img"
+    aria-label="Münchener Verein"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    className={className}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '4px',
+      objectFit: 'contain',
+      flexShrink: 0,
+    }}
+  />
+)
+MuenchenerVereinLogo.displayName = 'MuenchenerVereinLogo'

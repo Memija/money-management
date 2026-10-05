@@ -71,6 +71,9 @@ describe('category-utils', () => {
       expect(categorize('Telekom internet flat')).toBe('Communication')
       expect(categorize('O2 mobile data')).toBe('Communication')
       expect(categorize('Internet pretplata')).toBe('Communication')
+      expect(categorize('freenet Funk mobile')).toBe('Communication')
+      expect(categorize('congstar Mobilfunk')).toBe('Communication')
+      expect(categorize('ALDI TALK Aufladung')).toBe('Communication')
     })
 
     it('categorizes SumUp card payments at retail merchants as Shopping', () => {
@@ -193,6 +196,25 @@ describe('category-utils', () => {
       expect(categorize('Süwag Energie AG Strom')).toBe('Utilities')
       expect(categorize('E.ON Energie Deutschland')).toBe('Utilities')
       expect(categorize('Vattenfall Europe Stromrechnung')).toBe('Utilities')
+    })
+
+    it('categorizes Heroku cloud hosting and platform transactions as Utilities', () => {
+      expect(categorize('HEROKU* JUL-106945945')).toBe('Utilities')
+      expect(categorize('Heroku Cloud Hosting')).toBe('Utilities')
+      expect(categorize('Heroku Dynos Subscription')).toBe('Utilities')
+      expect(categorize('Heroku Inc')).toBe('Utilities')
+    })
+
+    it('categorizes major cloud and hosting platforms (AWS, DigitalOcean, Hetzner, Cloudflare, Vercel, IONOS, Netcup, OVHcloud) as Utilities', () => {
+      expect(categorize('AWS EMEA SARL')).toBe('Utilities')
+      expect(categorize('Amazon Web Services Cloud')).toBe('Utilities')
+      expect(categorize('DigitalOcean LLC')).toBe('Utilities')
+      expect(categorize('Hetzner Online GmbH')).toBe('Utilities')
+      expect(categorize('Cloudflare Inc')).toBe('Utilities')
+      expect(categorize('Vercel Inc')).toBe('Utilities')
+      expect(categorize('IONOS SE Webhosting')).toBe('Utilities')
+      expect(categorize('netcup GmbH vServer')).toBe('Utilities')
+      expect(categorize('OVH SAS Cloud')).toBe('Utilities')
     })
 
     it('categorizes Tomorrow bank transactions as Transfers', () => {
@@ -961,6 +983,21 @@ describe('category-utils', () => {
       expect(extractCleanDescription(desc)).toBe('klarmobil GmbH')
       expect(extractMerchantKeyword(desc)).toBe('klarmobil')
       expect(categorize(desc)).toBe('Communication')
+    })
+
+    it('cleans Heroku card hosting transactions stripping billing reference and categorizes as Utilities', () => {
+      const desc = 'HEROKU* JUL-106945945'
+      expect(extractCleanDescription(desc)).toBe('HEROKU')
+      expect(extractMerchantKeyword(desc)).toBe('HEROKU')
+      expect(categorize(desc)).toBe('Utilities')
+    })
+
+    it('cleans freenet, congstar, and ALDI TALK transaction descriptions', () => {
+      expect(extractCleanDescription('freenet DLS GmbH')).toBe('freenet DLS GmbH')
+      expect(extractMerchantKeyword('freenet DLS GmbH')).toBe('freenet DLS')
+      expect(extractCleanDescription('congstar GmbH')).toBe('congstar GmbH')
+      expect(extractMerchantKeyword('congstar GmbH')).toBe('congstar')
+      expect(extractCleanDescription('MEDIONmobile ALDI TALK')).toBe('MEDIONmobile ALDI TALK')
     })
 
     it('cleans tenancy Kautionsabrechnung rental transaction stripping GbR and memo noise', () => {
@@ -1896,35 +1933,60 @@ describe('category-utils', () => {
       })
     })
 
-    describe('municipal and civic transfers categorization', () => {
-      it('categorizes municipal administration transfers as Transfers', () => {
+    describe('municipal and civic payments categorization', () => {
+      it('categorizes municipal administration payments as Taxes', () => {
         expect(
           categorize(
             'Stadtverwaltung Bad Homburg HELADEF1TSK DE81512500000001085662 0181776005 End-to-End-Ref.',
           ),
-        ).toBe('Transfers')
-        expect(categorize('Stadtverwaltung Bad Homburg')).toBe('Transfers')
+        ).toBe('Taxes')
+        expect(categorize('Stadtverwaltung Bad Homburg')).toBe('Taxes')
       })
 
-      it('categorizes Gemeinde Schmitten municipal transfers as Transfers', () => {
+      it('categorizes Gemeinde Schmitten municipal payments as Taxes', () => {
         expect(
           categorize(
             'Gemeinde Schmitten HELADEF1TSK DE58512500000059004000 0561196907 End-to-End-Ref.: CCB.',
           ),
-        ).toBe('Transfers')
-        expect(categorize('Gemeinde Schmitten')).toBe('Transfers')
-        expect(categorize('Gemeindeverwaltung Schmitten')).toBe('Transfers')
+        ).toBe('Taxes')
+        expect(categorize('Gemeinde Schmitten')).toBe('Taxes')
+        expect(categorize('Gemeindeverwaltung Schmitten')).toBe('Taxes')
       })
 
-      it('categorizes Stadtkasse Kelkheim municipal transfers as Transfers', () => {
+      it('categorizes Stadtkasse Kelkheim municipal payments as Taxes', () => {
         expect(
           categorize(
             'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836',
           ),
-        ).toBe('Transfers')
-        expect(categorize('Stadtkasse Kelkheim')).toBe('Transfers')
-        expect(categorize('Stadt Kelkheim')).toBe('Transfers')
-        expect(categorize('Stadt Kelkheim (Taunus)')).toBe('Transfers')
+        ).toBe('Taxes')
+        expect(categorize('Stadtkasse Kelkheim')).toBe('Taxes')
+        expect(categorize('Stadt Kelkheim')).toBe('Taxes')
+        expect(categorize('Stadt Kelkheim (Taunus)')).toBe('Taxes')
+      })
+
+      it('categorizes generic municipal treasuries and levies as Taxes, even via SEPA transfer', () => {
+        expect(categorize('Stadtkasse Frankfurt am Main Grundbesitzabgaben')).toBe('Taxes')
+        expect(categorize('Gemeindekasse Glashütten Hundesteuer 2026')).toBe('Taxes')
+        expect(categorize('Abfallgebühren 1. Quartal')).toBe('Taxes')
+        expect(categorize('Stadtkasse Oberursel End-to-End-Ref.: CCB.321.UE.998877')).toBe('Taxes')
+      })
+
+      it('does not categorize shops located in municipal towns as Taxes', () => {
+        expect(categorize('REWE Markt Kelkheim')).not.toBe('Taxes')
+        expect(categorize('EDEKA Schmitten im Taunus')).not.toBe('Taxes')
+        expect(categorize('Kaufland Bad Homburg vor der Höhe')).not.toBe('Taxes')
+      })
+
+      it('categorizes municipal childcare fees as Education instead of Taxes', () => {
+        expect(
+          categorize(
+            'Stadt Bad Homburg v.d.H. 506582 KINDERTAGESSTAETTENBEITRAG End-to-End-Ref.: DTA-22-00801',
+          ),
+        ).toBe('Education')
+        expect(categorize('Stadtkasse Kelkheim Kita-Gebühr März')).toBe('Education')
+        expect(categorize('Gemeinde Schmitten Hortbeitrag')).toBe('Education')
+        expect(categorize('Gemeindekasse Glashütten Krippenbeitrag')).toBe('Education')
+        expect(categorize('Stadt Bad Homburg Grundsteuer')).toBe('Taxes')
       })
 
       it('categorizes Hochtaunuskreis school care and childcare transactions as Education', () => {
@@ -1938,6 +2000,59 @@ describe('category-utils', () => {
         expect(categorize('Kindergartenbeitrag')).toBe('Education')
         expect(categorize('Kita Gebühren')).toBe('Education')
         expect(categorize('University tuition fee')).toBe('Education')
+      })
+    })
+
+    describe('grid operators, auto clubs, furniture stores and sports clubs', () => {
+      it('categorizes Syna grid operator and sibling grid operators as Utilities', () => {
+        expect(
+          categorize(
+            'Syna GmbH KUNDENNUMMER 483029022 End-to-End-Ref.: Beleg: 312004778285 Mandatsref: 0085',
+          ),
+        ).toBe('Utilities')
+        expect(categorize('Westnetz GmbH Netzentgelt')).toBe('Utilities')
+        expect(categorize('NRM Netzdienste Rhein-Main GmbH')).toBe('Utilities')
+        expect(categorize('Synaptics Treiber Download')).not.toBe('Utilities')
+      })
+
+      it('categorizes ADAC membership and other automobile clubs as Transport', () => {
+        expect(
+          categorize(
+            'Allg.Deutscher Automobil-Club ADAC e.V. ADAC E.V. MEMIC ANEL MEMIC BILJANA BEITRAG: 01.01.22-',
+          ),
+        ).toBe('Transport')
+        expect(categorize('ACE Auto Club Europa e.V. Mitgliedsbeitrag')).toBe('Transport')
+        expect(categorize('AvD Automobilclub von Deutschland Beitrag')).toBe('Transport')
+      })
+
+      it('categorizes POCO and other furniture stores as Shopping', () => {
+        expect(
+          categorize(
+            'POCO Einrichtungsmarkte GmbH ELV54203406 19.02 13.01 ME0 End-to-End-Ref.: T0220219542034',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('XXXLutz KG Wiesbaden')).toBe('Shopping')
+        expect(categorize('moemax Frankfurt')).toBe('Shopping')
+        expect(categorize('Möbel Höffner Eschborn')).toBe('Shopping')
+        expect(categorize('Daenisches Bettenlager GmbH')).toBe('Shopping')
+        expect(categorize('Möbelhaus Schmidt')).toBe('Shopping')
+      })
+
+      it('categorizes the Stones GmbH card payment as Shopping', () => {
+        expect(
+          categorize(
+            'STONES GMBH 260410190023798241253413150 ELV6534 1315 26.04 10.19 ME0 End-to-End-Ref.: 26',
+          ),
+        ).toBe('Shopping')
+      })
+
+      it('categorizes Turnverein Dornholzhausen and other sports clubs as Healthcare', () => {
+        expect(
+          categorize(
+            'Turnverein Dornholzhausen 1918 e.V. Sammelbuchung TV Dornholzhausen/Ts. 1918 e.V., Memic Anel',
+          ),
+        ).toBe('Healthcare')
+        expect(categorize('TSV Sportverein Oberursel Beitrag')).toBe('Healthcare')
       })
     })
 
@@ -2003,6 +2118,196 @@ describe('category-utils', () => {
       it('categorizes flatex and DEGIRO as Savings', () => {
         expect(categorize('flatex Bank Depot')).toBe('Savings')
         expect(categorize('DEGIRO B.V. Transaktion')).toBe('Savings')
+      })
+    })
+
+    describe('insurers, travel portals, hostels, registry offices, identity services, and consulates', () => {
+      it('categorizes Die Haftpflichtkasse and other German insurers as Insurance', () => {
+        expect(
+          categorize(
+            'Die Haftpflichtkasse VVaG 60603542 / Unfall Beitrag 23.01.25 - meine-hk.de - Jetzt anmelden und Re',
+          ),
+        ).toBe('Insurance')
+        expect(categorize('Haftpflichtkasse Darmstadt Beitrag')).toBe('Insurance')
+        expect(categorize('Debeka Krankenversicherung a.G.')).toBe('Insurance')
+        expect(categorize('ERGO Versicherung AG')).toBe('Insurance')
+        expect(categorize('AXA Konzern AG Beitrag')).toBe('Insurance')
+        expect(categorize('Generali Deutschland Versicherung')).toBe('Insurance')
+        expect(categorize('R+V Allgemeine Versicherung AG')).toBe('Insurance')
+        expect(categorize('Signal Iduna Gruppe')).toBe('Insurance')
+        expect(categorize('HanseMerkur Versicherung')).toBe('Insurance')
+        expect(categorize('Barmenia Krankenversicherung')).toBe('Insurance')
+        expect(categorize('Gothaer Allgemeine Versicherung')).toBe('Insurance')
+        expect(categorize('ARAG SE Rechtsschutz')).toBe('Insurance')
+        expect(categorize('DEVK Versicherungen')).toBe('Insurance')
+        expect(categorize('HDI Versicherung AG')).toBe('Insurance')
+        expect(categorize('VHV Versicherungen')).toBe('Insurance')
+        expect(categorize('CosmosDirekt Versicherung')).toBe('Insurance')
+      })
+
+      it('categorizes byebye tour operator and hostels (DJH, a&o, MEININGER) as Travel', () => {
+        expect(
+          categorize(
+            'ByeBye PBNKDEFFXXX DE93440100460095667464 2110630491421 End-to-End-Ref.: CCB.109.UE.P',
+          ),
+        ).toBe('Travel')
+        expect(categorize('BYE.bye GmbH Buchung')).toBe('Travel')
+        expect(
+          categorize(
+            'Deutsches Jugendherbergswerk Hauptv erband e. V. 22,50 Beitrag-25 31492804 End-to-End-Ref.: N',
+          ),
+        ).toBe('Travel')
+        expect(categorize('DJH Jugendherberge Frankfurt')).toBe('Travel')
+        expect(categorize('Hostelling International Membership')).toBe('Travel')
+        expect(categorize('a&o Hostels Berlin')).toBe('Travel')
+        expect(categorize('MEININGER Hotel Frankfurt')).toBe('Travel')
+      })
+
+      it('categorizes Standesamt Bad Soden am Taunus and Main-Taunus-Kreis as Taxes', () => {
+        expect(
+          categorize(
+            'Standesamt Bad Soden am Taunus NASSDE55XXX DE84510500150197000325 Internationale Geburts',
+          ),
+        ).toBe('Taxes')
+        expect(categorize('Stadtkasse Bad Soden am Taunus Grundbesitzabgaben')).toBe('Taxes')
+        expect(categorize('Main-Taunus-Kreis Kreiskasse Gebühren')).toBe('Taxes')
+      })
+
+      it('categorizes Münchener Verein Krankenversicherung as Healthcare', () => {
+        expect(
+          categorize(
+            'Muenchener VEREIN Krankenversicheru ng a. Kundennummer S88063 KV1003 17,46 End-to-End-Ref.',
+          ),
+        ).toBe('Healthcare')
+        expect(categorize('Münchener Verein Krankenversicherung a.G.')).toBe('Healthcare')
+      })
+
+      it('categorizes WebID Solutions, IDnow, POSTIDENT, and Verimi as Bank Fees', () => {
+        expect(
+          categorize(
+            'WebID Solutions GmbH HYVEDEMM488 DE22100208900035900527 TWMDO WebID Ident 643-572-',
+          ),
+        ).toBe('Bank Fees')
+        expect(categorize('WebID Ident Legitimation')).toBe('Bank Fees')
+        expect(categorize('IDnow GmbH VideoIdent')).toBe('Bank Fees')
+        expect(categorize('POSTIDENT Verfahren Deutsche Post')).toBe('Bank Fees')
+        expect(categorize('Verimi ID Prüfung')).toBe('Bank Fees')
+      })
+
+      it('categorizes Generalkonsulat von Bosnien und Herzegowina as Taxes', () => {
+        expect(
+          categorize(
+            'GENERALKOSULAT VON BOSNIENHERZEGOW. DRESDEFFXXX DE71500800000262721801 Anel Mem',
+          ),
+        ).toBe('Taxes')
+        expect(categorize('Generalkonsulat von Bosnien und Herzegowina Frankfurt')).toBe('Taxes')
+        expect(categorize('Konsulat Bosnien Passgebühr')).toBe('Taxes')
+        expect(categorize('Botschaft Visagebühr')).toBe('Taxes')
+      })
+
+      it('categorizes Swiss Life as Savings (ETF-based retirement insurance) and related providers', () => {
+        expect(
+          categorize(
+            'Swiss Life SE VS 9667224-1/819491326 Beitrag 02/2 026 Ihr Beitrag fur ein selbstbesti mmtes Leben',
+          ),
+        ).toBe('Savings')
+        expect(categorize('Swiss Life SE Beitrag')).toBe('Savings')
+        expect(categorize('Swiss Life Select Vorsorge')).toBe('Savings')
+        expect(categorize('Canada Life Generation Private')).toBe('Savings')
+        expect(categorize('Alte Leipziger Lebensversicherung')).toBe('Savings')
+      })
+
+      it('categorizes Aeguron, iptiQ, WGV and related community/term life insurers as Insurance', () => {
+        expect(
+          categorize(
+            'Aeguron Risiko-Lebensversicherung AeguronRisikoLV 02/26 6267061-P End-to-End-Ref.: 89c9c867',
+          ),
+        ).toBe('Insurance')
+        expect(
+          categorize(
+            'iptiQ Life SA AeguronRisikoLV 04/26 6267061-P End-to-End-Ref.: de3e4c7022094659943152a87c2',
+          ),
+        ).toBe('Insurance')
+        expect(
+          categorize(
+            'WGV-Wuertt. Gemeinde-Versicherung MTK-BA 117 V90092776488 01.06.2025- 01.07.2025 End-to-E',
+          ),
+        ).toBe('Insurance')
+        expect(categorize('WGV Versicherung AG')).toBe('Insurance')
+        expect(categorize('Hannoversche Lebensversicherung Direkt')).toBe('Insurance')
+        expect(categorize('Provinzial Versicherung Rheinland')).toBe('Insurance')
+        expect(categorize('SV SparkassenVersicherung Gebäude')).toBe('Insurance')
+        expect(categorize('BGV Badische Gemeinde-Versicherung')).toBe('Insurance')
+        expect(categorize('Versicherungskammer Bayern')).toBe('Insurance')
+        expect(categorize('Swiss Re Reinsurance')).toBe('Insurance')
+      })
+
+      it('categorizes Austrian regional, fiber broadband, green utilities, and streaming transactions correctly', () => {
+        // 1. GVG Glasfaser -> Communication
+        expect(
+          categorize(
+            'GVG Glasfaser GmbH RG.23565869/KD.10250177 End-to-End-Ref.: 00000023565869102501774490',
+          ),
+        ).toBe('Communication')
+        expect(categorize('GVG Glasfaser GmbH')).toBe('Communication')
+        expect(categorize('teranet broadband glasfaser')).toBe('Communication')
+
+        // 2. Grünwelt Wärmestrom -> Utilities
+        expect(
+          categorize(
+            'Grünwelt Wärmestrom GmbH ABSCHLAG Strom 08/26 VK: 1210005133 32 Gruenwelt Waermestrom',
+          ),
+        ).toBe('Utilities')
+        expect(categorize('Gruenwelt Energie Strom')).toBe('Utilities')
+
+        // 3. Disney+ under PayPal -> Entertainment
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1052099636248/PP.4585.PP/. DisneyPl us, Ihr Einkauf bei DisneyPl',
+          ),
+        ).toBe('Entertainment')
+        expect(categorize('Disney+ Abo Monatsbeitrag')).toBe('Entertainment')
+
+        // 4. Café Restaurant Mosshammer Zell am See -> Dining Out
+        expect(
+          categorize(
+            'CAFE RESTAURANT MOSS, ZELL AM SEE AT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual DB',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Café Mosshammer Zell am See')).toBe('Dining Out')
+
+        // 5. BILLA supermarket Zell am See -> Groceries
+        expect(
+          categorize(
+            'BILLA DANKT 0005128, ZELL AM SEE A T Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debi',
+          ),
+        ).toBe('Groceries')
+        expect(categorize('BILLA PLUS Supermarkt')).toBe('Groceries')
+
+        // 6. Salzburger Jugendherbergen (Junge Hotels) -> Travel
+        expect(
+          categorize(
+            'Salzburger Jugendherbe, Zell am See AT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit',
+          ),
+        ).toBe('Travel')
+        expect(categorize('Junge Hotels Salzburg Übernachtung')).toBe('Travel')
+        expect(categorize('ÖJHW Jugendherberge Zell am See')).toBe('Travel')
+
+        // 7. Alpe-Panon (McDonald's Slovenia) -> Dining Out
+        expect(
+          categorize(
+            'ALPE PANON PE PTUJ, PTUJ SI Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 20',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Alpe-Panon McDonald\'s Slovenia')).toBe('Dining Out')
+
+        // 8. Hallenbad & Freizeitzentrum Zell am See -> Entertainment
+        expect(
+          categorize(
+            'HALLENBAD ZELL AM SEE, ZELL SEE AT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit',
+          ),
+        ).toBe('Entertainment')
+        expect(categorize('Freizeitzentrum Zell am See Eintritt')).toBe('Entertainment')
       })
     })
   })

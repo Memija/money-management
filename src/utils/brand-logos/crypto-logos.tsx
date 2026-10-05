@@ -1,3 +1,4 @@
+import { createImageLogo } from './logo-factory'
 import type { IconComponent } from './types'
 
 export const GuardarianLogo: IconComponent = ({ size = 16, className }) => (
@@ -43,3 +44,18 @@ export const GuardarianLogo: IconComponent = ({ size = 16, className }) => (
   </svg>
 )
 GuardarianLogo.displayName = 'GuardarianLogo'
+
+/** Kraken (Payward Ireland / Kraken Exchange) — leading global cryptocurrency exchange. */
+export const KrakenLogo = createImageLogo({
+  src: '/brands/kraken.png',
+  label: 'Kraken',
+  displayName: 'KrakenLogo',
+})
+
+export const CRYPTO_LOGOS: Record<string, IconComponent> = {
+  GuardarianLogo,
+  'guardarian': GuardarianLogo,
+  KrakenLogo,
+  'kraken': KrakenLogo,
+}
+

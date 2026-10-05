@@ -568,7 +568,7 @@ export const id: TranslationStrings = {
   catCash: 'Tarik Tunai',
   catTransfers: 'Transfer',
   catTravel: 'Perjalanan',
-  catTaxes: 'Pajak',
+  catTaxes: 'Pajak & Retribusi',
   catCrypto: 'Kripto',
   catBankFees: 'Biaya Bank',
   catOther: 'Lainnya',
@@ -704,7 +704,7 @@ export const id: TranslationStrings = {
       'les',
       'pelatihan',
     ],
-    Savings: ['tabungan', 'investasi', 'deposito', 'flatex', 'degiro', 'trade republic', 'scalable capital'],
+    Savings: ['tabungan', 'investasi', 'deposito', 'flatex', 'degiro', 'trade republic', 'scalable capital', 'swiss life', 'swiss life se'],
     Cash: ['tarik tunai', 'atm', 'uang tunai', 'kas'],
     Transfers: ['transfer', 'kirim uang', 'gopay', 'ovo', 'dana', 'linkaja', 'stadtkasse kelkheim', 'stadt kelkheim', 'kelkheim', 'revolut', 'revolt21xxx', 'revolt21', 'revolt', 'sparkasse', 'haspa', '1822direkt', 'hypovereinsbank', 'hvb', 'santander', 'norisbank', 'gls bank', 'apobank', 'vivid'],
     Travel: [
