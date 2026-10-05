@@ -25,7 +25,9 @@ import {
   DegiroLogo,
   Direkt1822Logo,
   DkbLogo,
+  EbaseLogo,
   FlatexLogo,
+  FnzBankLogo,
   GlsBankLogo,
   HypoVereinsbankLogo,
   IngLogo,
@@ -68,6 +70,8 @@ import {
   GuardarianLogo,
   KrakenLogo,
 } from './crypto-logos'
+import { DINING_LOGOS } from './dining-logos'
+import { DIY_LOGOS } from './diy-logos'
 import { ENERGY_GRID_LOGOS } from './energy-grid-logos'
 import { ENTERTAINMENT_LOGOS } from './entertainment-logos'
 import { FASHION_LOGOS } from './fashion-logos'
@@ -90,8 +94,10 @@ import {
   SchleswigHolsteinFlagLogo,
   ThueringenFlagLogo,
 } from './german-state-flags'
+import { GROCERY_LOGOS } from './grocery-logos'
 import {
   AokLogo,
+  ApothekeLogo,
   BarmerLogo,
   DakLogo,
   DocMorrisLogo,
@@ -105,8 +111,11 @@ import { INSURANCE_LOGOS } from './insurance-logos'
 import {
   FaerberHutzelLogo,
 } from './legal-logos'
+import { MOTORWAY_LOGOS } from './motorway-logos'
 import { PAYMENT_LOGOS } from './payment-logos'
 import { PENSION_LOGOS } from './pension-logos'
+import { PORTUGUESE_LOGOS } from './portuguese-logos'
+import { PROPERTY_LOGOS } from './property-logos'
 import {
   BauhausLogo,
   CadoozLogo,
@@ -163,6 +172,7 @@ import {
   CondorLogo,
   DertourLogo,
   EurowingsLogo,
+  SanderHotelLogo,
   SchauinslandLogo,
   TuiLogo,
 } from './travel-logos'
@@ -179,6 +189,7 @@ import {
   SuewagLogo,
   VattenfallLogo,
 } from './utility-logos'
+import { VARIETY_STORE_LOGOS } from './variety-store-logos'
 
 export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiNetflix, SiSpotify, SiUber, SiStarbucks, SiSteam, SiMcdonalds,
@@ -386,20 +397,42 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   aldiTalkLogo: AldiTalkLogo,
   MuenchenerVereinLogo,
   muenchenerVereinLogo: MuenchenerVereinLogo,
+  ApothekeLogo,
+  apothekeLogo: ApothekeLogo,
+  'apotheke': ApothekeLogo,
+  'rats-apotheke': ApothekeLogo,
+  'liebig-apotheke': ApothekeLogo,
+  EbaseLogo,
+  ebaseLogo: EbaseLogo,
+  'ebase': EbaseLogo,
+  FnzBankLogo,
+  fnzBankLogo: FnzBankLogo,
+  'fnz-bank': FnzBankLogo,
+  'fnz': FnzBankLogo,
+  SanderHotelLogo,
+  sanderHotelLogo: SanderHotelLogo,
+  'sander-hotel': SanderHotelLogo,
   ...AUSTRIAN_LOGOS,
   ...AUTO_CLUB_LOGOS,
   ...CONSULAR_LOGOS,
   ...CRYPTO_LOGOS,
+  ...DINING_LOGOS,
+  ...DIY_LOGOS,
   ...ENERGY_GRID_LOGOS,
   ...ENTERTAINMENT_LOGOS,
   ...FASHION_LOGOS,
   ...FURNITURE_LOGOS,
+  ...GROCERY_LOGOS,
   ...HOSTEL_LOGOS,
   ...IDENTITY_LOGOS,
   ...INSURANCE_LOGOS,
+  ...MOTORWAY_LOGOS,
   ...PAYMENT_LOGOS,
   ...PENSION_LOGOS,
+  ...PORTUGUESE_LOGOS,
+  ...PROPERTY_LOGOS,
   ...SPORTS_CLUB_LOGOS,
   ...TELECOM_LOGOS,
   ...TOUR_OPERATOR_LOGOS,
+  ...VARIETY_STORE_LOGOS,
 }

@@ -2309,6 +2309,241 @@ describe('category-utils', () => {
         ).toBe('Entertainment')
         expect(categorize('Freizeitzentrum Zell am See Eintritt')).toBe('Entertainment')
       })
+
+      it('correctly categorizes batch 10 real-world transaction statements', () => {
+        // 1. Janitos Versicherung AG -> Insurance
+        expect(
+          categorize(
+            'Janitos Versicherung AG Vertrags-Nr. 6100113945 HR 15.10.20 25-15.10.2026 End-to-End-Ref.: 17602',
+          ),
+        ).toBe('Insurance')
+        expect(categorize('Janitos Versicherung AG')).toBe('Insurance')
+
+        // 2. Raststätte Spessart Nord (Serways / Tank & Rast) -> Dining Out
+        expect(
+          categorize(
+            'Raststaette Spessart N, Rohrbrunn DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit C',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Raststätte Spessart Nord Autobahn')).toBe('Dining Out')
+        expect(categorize('Serways Raststätte')).toBe('Dining Out')
+
+        // 3. toom Baumarkt Oberursel -> Shopping
+        expect(
+          categorize(
+            'toom BM Oberursel, OBERURSEL DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Car',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('toom Baumarkt Baustoffe')).toBe('Shopping')
+
+        // 4. SPAR Supermarket Cabanas de Tavira -> Groceries
+        expect(
+          categorize(
+            'SPAR CABANAS TAVIRA 1, CABANAS TAVI R PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtu',
+          ),
+        ).toBe('Groceries')
+        expect(categorize('SPAR Supermarket Cabanas')).toBe('Groceries')
+
+        // 5. Argumento da Lua, Lda (Algarve Boutique) -> Shopping
+        expect(
+          categorize(
+            'ARGUMENTO DA LUA,LDA, FARO PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('Argumento da Lua Lda Faro')).toBe('Shopping')
+
+        // 6. Delhi's Belly Indian Restaurant -> Dining Out
+        expect(
+          categorize(
+            'DELHIS BELLY, UNIPES, FARO PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 25 ',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize("Delhi's Belly Indian Restaurant")).toBe('Dining Out')
+
+        // 7. Sites Cabanas SA (Golden Club Cabanas Resort) -> Travel
+        expect(
+          categorize(
+            'SITES CABANAS SA, FARO PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 20',
+          ),
+        ).toBe('Travel')
+        expect(categorize('Golden Club Cabanas Resort Faro')).toBe('Travel')
+
+        // 8. Pizza Hut Store #822 Eschborn -> Dining Out
+        expect(
+          categorize(
+            'PH 822 ESCHBORN DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card PH 822 ESCHBORN DEU 20',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Pizza Hut Eschborn')).toBe('Dining Out')
+      })
+
+      it('correctly categorizes batch 11 real-world transaction statements', () => {
+        // 1. rhenag (Rheinische Elektrizitäts- und Gasversorgungsgesellschaft) -> Utilities
+        expect(
+          categorize(
+            'Rheinische Elektrizitäts- und Gasve rsorgungsgesellscha Vertragsnummer 21810010775 1089385- 108',
+          ),
+        ).toBe('Utilities')
+        expect(categorize('rhenag Gasversorgung')).toBe('Utilities')
+
+        // 2. Rats-Apotheke -> Healthcare
+        expect(
+          categorize(
+            'RATS APOTHEKE sagt Danke GIR 799135 2022-03-12T09:28:55 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Healthcare')
+        expect(categorize('Rats-Apotheke Medikamente')).toBe('Healthcare')
+
+        // 3. Thong Thai Thai Restaurant -> Dining Out
+        expect(
+          categorize(
+            'Thong Thai GmbH Co. KG/Rödelheimer 2022-03-26T13:28:44 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Thong Thai Restaurant')).toBe('Dining Out')
+
+        // 4. Reifen-Diehl Eschborn -> Transport
+        expect(
+          categorize(
+            'REIFEN-DIEHL.ESCHBORN//Eschborn/DE 2022-04-30T12:41:00 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Transport')
+        expect(categorize('Reifen Diehl Reifenwechsel')).toBe('Transport')
+
+        // 5. STONES Menswear -> Shopping
+        expect(
+          categorize(
+            'STONES GMBH 120510420024424241253413150 ELV6534 1315 12.05 10.42 ME0 End-to-End-Ref.: 12',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('STONES Menswear Store')).toBe('Shopping')
+
+        // 6. Liebig-Apotheke Bad Homburg -> Healthcare
+        expect(
+          categorize(
+            'LIEBIG-APOTHEKE//BAD HOMBURG/DE 2022-05-24T10:32:50 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Healthcare')
+        expect(categorize('Liebig Apotheke Bad Homburg')).toBe('Healthcare')
+
+        // 7. BabyOne Baby- & Kinderausstattung -> Shopping
+        expect(
+          categorize(
+            'BabyOne B+K Nr.45 GmbH Fil 015 GIR 2022-07-08T12:50:27 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('BabyOne Kinderwagen')).toBe('Shopping')
+
+        // 8. Anadolu Supermarkt -> Groceries
+        expect(
+          categorize(
+            'ANADOLU SUPERMARKT GIR 69287732//BA 2022-07-09T12:24:08 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Groceries')
+        expect(categorize('Anadolu Supermarkt Lebensmittel')).toBe('Groceries')
+
+        // 9. ebase (European Bank for Financial Services) -> Savings
+        expect(
+          categorize(
+            'European Bank for Financial Service s GmbH 9914335757302 Kauf 0,074908 Ant am 06.09.2022 zu 3',
+          ),
+        ).toBe('Savings')
+        expect(categorize('ebase Fondsdepot Kauf')).toBe('Savings')
+
+        // 10. MyShoes SE -> Shopping
+        expect(
+          categorize(
+            'MyShoes SE//Friedrichsdorf/DE 2022-09-03T13:20:44 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('MyShoes Schuhe')).toBe('Shopping')
+
+        // 11. TEDi Filiale -> Shopping
+        expect(
+          categorize(
+            'TEDi Fil. 4912//Bad Homburg/DE 2022-11-08T16:06:57 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('TEDi Haushaltswaren')).toBe('Shopping')
+
+        // 12. Kontoführung Commerzbank -> Bank Fees
+        expect(
+          categorize(
+            'Kontoführung Konto 646293100 EUR BLZ 500 400 00 vom 01.02.2023 bis 28.02.2023 Kontoführung',
+          ),
+        ).toBe('Bank Fees')
+
+        // 13. Commerzbank SEPA transfer (BIC COBADEFFXXX) -> Transfers
+        expect(
+          categorize(
+            'ANEL MEMIC COBADEFFXXX DE13500400000931368501 5232249017507296 End-to-End-Ref.: MO',
+          ),
+        ).toBe('Transfers')
+
+        // 14. KMK Immobilienverwaltung / WEG Landwehrweg -> Rent
+        expect(
+          categorize(
+            'WEG Landwehrweg 1, 61350 z. Hd. KMK Immobilienverw. GmbH 556.101701 Memic Biljana Lastschrif t',
+          ),
+        ).toBe('Rent')
+        expect(categorize('KMK Immobilienverwaltung Hausgeld')).toBe('Rent')
+
+        // 15. FNZ Bank AG (ehemals ebase AG) -> Savings
+        expect(
+          categorize(
+            'FNZ Bank AG (ehemals ebase AG) 9914335757302 Kauf 0,077528 Ant am 05.10.2023 zu 322,465500',
+          ),
+        ).toBe('Savings')
+        expect(categorize('FNZ Bank Wertpapierdepot')).toBe('Savings')
+
+        // 16. Ratsstube Restaurant Rothenburg -> Dining Out
+        expect(
+          categorize(
+            'Ratsstube Restaurant Rothenburg ob DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Ratsstube R',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Ratsstube Rothenburg')).toBe('Dining Out')
+
+        // 17. sander Hotel Koblenz -> Travel
+        expect(
+          categorize(
+            'sander Hotel Koblenz DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card sander Hotel Koblenz DEU 2',
+          ),
+        ).toBe('Travel')
+        expect(categorize('sander Hotel Übernachtung')).toBe('Travel')
+
+        // 18. Smoothie Bar Antalya -> Dining Out
+        expect(
+          categorize(
+            'SMOOTHIE BAR ANTALYA TR Karte Nr. 5355 3100 0931 8380 Virtual Debit Card SMOOTHIE BAR ANTI',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Smoothie Bar Antalya')).toBe('Dining Out')
+
+        // 19. ICTUR Antalya Airport Dining -> Dining Out
+        expect(
+          categorize(
+            'ICTUR YIYECEK VE ICECE ANTALYA TR Karte Nr. 5355 3100 0931 8380 Virtual Debit Card ICTUR YIYE',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('ICTUR Yiyecek ve İçecek')).toBe('Dining Out')
+
+        // 20. Hrvatske autoceste (HAC A3 Velika Kopanica) -> Transport
+        expect(
+          categorize(
+            'AUTOCESTA A3 V.KOPANIC VELIKA KOPA N HR Karte Nr. 5355 3100 0931 8380 Virtual Debit Card AU',
+          ),
+        ).toBe('Transport')
+        expect(categorize('Hrvatske autoceste Maut')).toBe('Transport')
+
+        // 21. Wasserpalast Graz-Liebenau -> Dining Out
+        expect(
+          categorize(
+            'WASSERPALAST GRAZ-LIEBENAU AT Karte Nr. 5355 3100 0931 8380 Virtual Debit Card WASSERPAL',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Wasserpalast Graz')).toBe('Dining Out')
+      })
     })
   })
 })

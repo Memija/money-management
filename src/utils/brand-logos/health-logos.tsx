@@ -281,3 +281,27 @@ export const MuenchenerVereinLogo: IconComponent = ({ size = 16, className }) =>
   />
 )
 MuenchenerVereinLogo.displayName = 'MuenchenerVereinLogo'
+
+/** Apotheke (Deutscher Apothekerverband) — universal German pharmacy symbol. */
+export const ApothekeLogo: IconComponent = ({ size = 16, className }) => (
+  <img
+    src="/brands/apotheke.png"
+    alt="Apotheke"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    className={className}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '4px',
+      objectFit: 'contain',
+      flexShrink: 0,
+    }}
+    role="img"
+    aria-label="Apotheke"
+  />
+)
+ApothekeLogo.displayName = 'ApothekeLogo'
+

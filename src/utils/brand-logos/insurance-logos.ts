@@ -186,7 +186,17 @@ export const OttonovaLogo = createImageLogo({
   displayName: 'OttonovaLogo',
 })
 
+/** Janitos Versicherung AG — specialized non-life insurer (Gothaer / BarmeniaGothaer group). */
+export const JanitosLogo = createImageLogo({
+  src: '/brands/janitos.png',
+  label: 'Janitos Versicherung',
+  displayName: 'JanitosLogo',
+})
+
 export const INSURANCE_LOGOS: Record<string, IconComponent> = {
+  JanitosLogo,
+  janitosLogo: JanitosLogo,
+  'janitos': JanitosLogo,
   HaftpflichtkasseLogo,
   DebekaLogo,
   ErgoLogo,

@@ -29,6 +29,20 @@ export const OttoLogo = createImageLogo({
   displayName: 'OttoLogo',
 })
 
+/** MyShoes (Deichmann Group) — German footwear retail chain. */
+export const MyShoesLogo = createImageLogo({
+  src: '/brands/myshoes.png',
+  label: 'myShoes',
+  displayName: 'MyShoesLogo',
+})
+
+/** STONES — German menswear, tailored suits, and casual fashion brand. */
+export const StonesLogo = createImageLogo({
+  src: '/brands/stones.png',
+  label: 'STONES Menswear',
+  displayName: 'StonesLogo',
+})
+
 export const FASHION_LOGOS: Record<string, IconComponent> = {
   MajoSchuheLogo,
   'majo-schuhe': MajoSchuheLogo,
@@ -38,4 +52,13 @@ export const FASHION_LOGOS: Record<string, IconComponent> = {
   'snipes': SnipesLogo,
   OttoLogo,
   'otto': OttoLogo,
+  MyShoesLogo,
+  myShoesLogo: MyShoesLogo,
+  'myshoes': MyShoesLogo,
+  'my-shoes': MyShoesLogo,
+  StonesLogo,
+  stonesLogo: StonesLogo,
+  'stones': StonesLogo,
+  'stones-gmbh': StonesLogo,
+  'stones-menswear': StonesLogo,
 }

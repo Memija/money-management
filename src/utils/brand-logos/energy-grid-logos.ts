@@ -33,6 +33,13 @@ export const GruenweltLogo = createImageLogo({
   displayName: 'GruenweltLogo',
 })
 
+/** rhenag (Rheinische Elektrizitäts- und Gasversorgungsgesellschaft mbH) — regional electricity and gas utility. */
+export const RhenagLogo = createImageLogo({
+  src: '/brands/rhenag.png',
+  label: 'rhenag',
+  displayName: 'RhenagLogo',
+})
+
 export const ENERGY_GRID_LOGOS: Record<string, IconComponent> = {
   SynaLogo,
   SynaGmbhLogo: SynaLogo,
@@ -42,4 +49,8 @@ export const ENERGY_GRID_LOGOS: Record<string, IconComponent> = {
   GruenweltLogo,
   gruenweltLogo: GruenweltLogo,
   GruenweltEnergieLogo: GruenweltLogo,
+  RhenagLogo,
+  rhenagLogo: RhenagLogo,
+  'rhenag': RhenagLogo,
+  'rheinische-elektrizitaets-und-gasversorgungsgesellschaft': RhenagLogo,
 }

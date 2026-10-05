@@ -226,3 +226,16 @@ RevolutLogo.displayName = 'RevolutLogo'
 
 export { RevolutLogo as RevoltLogo, RevolutLogo as RevolutBankLogo }
 
+/** FNZ Bank AG (formerly ebase AG) — German investment bank and B2B fund custody platform. */
+export const FnzBankLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/brands/fnz-bank.png" alt="FNZ Bank" size={size} className={className} />
+)
+FnzBankLogo.displayName = 'FnzBankLogo'
+
+/** ebase (European Bank for Financial Services GmbH) — fund depot and investment platform. */
+export const EbaseLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/brands/ebase.png" alt="ebase" size={size} className={className} />
+)
+EbaseLogo.displayName = 'EbaseLogo'
+
+

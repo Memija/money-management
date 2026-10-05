@@ -73,6 +73,7 @@ const PAYMENT_PROCESSOR_IDS = new Set<string>([
   'sumup',
   'payoneer',
   'payone',
+  'commerzbank',
 ])
 
 /**

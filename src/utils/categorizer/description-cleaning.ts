@@ -88,6 +88,18 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   ],
   [/(?:verkehr|verkehrs|verkehrsve|verkehrsver)[-\s]+(?:verbund|erbund|rbund|bund)/iu, 'Verkehrsverbund'],
   [/(?:reise|reisebu|reisebuch)[-\s]+(?:buchung|chung)/iu, 'Reisebuchung'],
+  [
+    /(?:rheinische)[-\s]+(?:elektrizit[aä]ts)[-\s]+(?:und)[-\s]+(?:gasve)\s+(?:rsorgungsgesellscha|rsorgungsgesellschaft)/iu,
+    'Rheinische Elektrizitäts- und Gasversorgungsgesellschaft',
+  ],
+  [
+    /(?:gasve)[-\s]+(?:rsorgungsgesellscha|rsorgungsgesellschaft)/iu,
+    'Gasversorgungsgesellschaft',
+  ],
+  [/(?:financial\s+service)\s+(?:s)\s+(?:gmbh)/iu, 'Financial Services GmbH'],
+  [/(?:lastschrif)\s+(?:t)\b/iu, 'Lastschrift'],
+  [/(?:velika\s+kopa)\s+(?:n)\b/iu, 'Velika Kopanica'],
+  [/(?:wasserpal)\b/iu, 'Wasserpalast'],
   [/(?:wunder|wundert|wunderta)[-\s]+(?:tax|ax|x)/iu, 'Wundertax'],
   [/(?:tax)[-\s]+(?:fix)/iu, 'Taxfix'],
   [/(?:gericht|gerichts)[-\s]+(?:kasse)/iu, 'Gerichtskasse'],
@@ -140,6 +152,11 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\b(?:disneypl)\b/iu, 'DisneyPlus'],
   [/(?:salzburger)[-\s]+(?:jugendherbe)\b/iu, 'Salzburger Jugendherberge'],
   [/\bZELL\s+AM\s+SEE\s+A\s+T\b/iu, 'ZELL AM SEE AT'],
+  [/(?:raststaette|raststaett)[-\s]+(?:spessart)/iu, 'Raststätte Spessart'],
+  [/(?:cabanas)[-\s]+(?:tavi)\s+r\b/iu, 'Cabanas Tavira'],
+  [/\bCABANAS\s+TAVI\s+R\b/iu, 'CABANAS TAVIRA'],
+  [/(?:delhis)[-\s]+(?:belly)/iu, 'Delhis Belly'],
+  [/\bUNIPES\b/iu, 'Unipessoal'],
   // English line-break word splits
   [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
   [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],
@@ -257,8 +274,14 @@ export function extractCleanDescription(desc: string): string {
 
   // 6. Remove terminal transaction codes and payment method noise (e.g. KFN 0 VJ 2412, ELV68423401, ME0, Kartenzahlung, Virtual Debit...)
   cleaned = cleaned.replace(/\b(?:RG|KD|VK)\s*[:.]?\s*\d+(?:\s*[/:]\s*(?:RG|KD|VK)\s*[:.]?\s*\d+)?\b/gi, ' ')
-  cleaned = cleaned.replace(/\bKarte\s+Nr\.?\s*(?:\d{4}|\d{2,4}[X\d\s]*)\s*(?:Kartenzahlung)?(?:\s*Virtual\s*(?:Debit|Debi|DB))?(?:\s*Card(?:\s*\d+)?)?\b/gi, ' ')
-  cleaned = cleaned.replace(/\b(?:Virtual\s*(?:Debit|Debi|DB))\b/gi, ' ')
+  cleaned = cleaned.replace(/\bKarte\s+Nr\.?\s*(?:\d{4}|\d{2,4}[X\d\s]*)\s*(?:Kartenzahlung)?\s*(?:Virtual\s*(?:Debit(?:\s*C(?:ard)?)?|Debi|DB|Car|Card|C)?|Virtu\b).*$/gi, ' ')
+  cleaned = cleaned.replace(
+    /\bKarte\s+Nr\.?\s*(?:\d{4}|\d{2,4}[X\d\s]*)\s*(?:Kartenzahlung)?(?:\s*Virtual\s*(?:Debit(?:\s*C(?:ard)?)?|Debi|DB|Car|Card|C)?|\s*Virtu\b)?(?:\s*PH\s*\d+\s+[A-Za-z]+\s+[A-Za-z]+)?(?:\s*\d+)?\b/gi,
+    ' ',
+  )
+  cleaned = cleaned.replace(/\b(?:Virtual\s*(?:Debit(?:\s*C(?:ard)?)?|Debi|DB|Car|Card|C)?|Virtu)\b/gi, ' ')
+  cleaned = cleaned.replace(/\bGIR\s+\d+(?:\/\/[A-Za-z0-9]+)?\b/gi, ' ')
+  cleaned = cleaned.replace(/\bFil\.?\s*\d+\b/gi, ' ')
   cleaned = cleaned.replace(/\bKFN\s+\d+\s+VJ\s+\d+\b/gi, ' ')
   cleaned = cleaned.replace(/\b(?:ELV\d*|ME\d+)\b/gi, ' ')
   cleaned = cleaned.replace(/\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz)\b/gi, ' ')
@@ -314,7 +337,7 @@ export function extractMerchantKeyword(desc: string): string {
 
   // 2. Remove corporate legal entity suffixes
   merchant = merchant.replace(
-    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|se|ltd\.?|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\.?o\.?o\.?|bv|s\.?a\.?r\.?l\.?|o[uü]|gbr)(?![\p{L}\p{N}])/giu,
+    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|se|ltd\.?|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\.?o\.?o\.?|bv|s\.?a\.?r\.?l\.?|o[uü]|gbr|lda|unipessoal|unipes|sa)(?![\p{L}\p{N}])/giu,
     ' ',
   )
 
@@ -323,7 +346,7 @@ export function extractMerchantKeyword(desc: string): string {
 
   // 3. Remove trailing city names commonly appended in European card terminals
   merchant = merchant.replace(
-    /\s+(?:berlin|m[uü]nchen|hamburg|k[oö]ln|frankfurt|stuttgart|d[uü]sseldorf|dortmund|essen|leipzig|bremen|dresden|hannover|n[uü]rnberg|wien|z[uü]rich|warszawa|krak[oó]w|sarajevo|beograd|zagreb|london|paris)\b.*$/i,
+    /\s+(?:berlin|m[uü]nchen|hamburg|k[oö]ln|frankfurt|stuttgart|d[uü]sseldorf|dortmund|essen|leipzig|bremen|dresden|hannover|n[uü]rnberg|wien|z[uü]rich|warszawa|krak[oó]w|sarajevo|beograd|zagreb|london|paris|faro|tavira|oberursel|eschborn)\b.*$/i,
     ' ',
   )
 

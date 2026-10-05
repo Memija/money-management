@@ -266,3 +266,27 @@ export const BookingLogo: IconComponent = ({ size = 16, className }) => (
 BookingLogo.displayName = 'BookingLogo'
 
 export { BookingLogo as BookingDotComLogo }
+
+/** sander Hotel Koblenz — contemporary boutique hotel and gastronomy concept in Koblenz. */
+export const SanderHotelLogo: IconComponent = ({ size = 16, className }) => (
+  <img
+    src="/brands/sander-hotel.png"
+    alt="sander Hotel Koblenz"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '4px',
+      objectFit: 'contain',
+      flexShrink: 0,
+    }}
+    className={className}
+    role="img"
+    aria-label="sander Hotel Koblenz"
+  />
+)
+SanderHotelLogo.displayName = 'SanderHotelLogo'
+

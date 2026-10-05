@@ -723,12 +723,12 @@ describe('category-icons', () => {
       expect(container.querySelector('img, svg')).toBeInTheDocument()
     })
 
-    it('renders the Stones GmbH card payment with a generic shopping icon', () => {
+    it('matches Stones brand info and Shopping category with its brand logo', () => {
       const info = getMerchantBrandInfo(
         'STONES GMBH 260410190023798241253413150 ELV6534 1315 26.04 10.19 ME0 End-to-End-Ref.: 26',
       )
       expect(info.merchant?.id).toBe('stones')
-      expect(info.logoComponent).toBe(AVAILABLE_ICONS.ShoppingBag)
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.StonesLogo)
       expect(info.suggestedCategory).toBe('Shopping')
     })
 
@@ -1832,6 +1832,181 @@ describe('category-icons', () => {
       expect(hallenbadInfo.merchant?.id).toBe('hallenbad-zellamsee')
       expect(hallenbadInfo.logoComponent).toBe(MERCHANT_LOGOS.HallenbadZellLogo)
       expect(hallenbadInfo.suggestedCategory).toBe('Entertainment')
+    })
+
+    it('returns brand info for batch 10 real-world transaction statements', () => {
+      const janitosInfo = getMerchantBrandInfo('Janitos Versicherung AG Vertrags-Nr. 6100113945 HR 15.10.20 25-15.10.2026 End-to-End-Ref.: 17602')
+      expect(janitosInfo.merchant?.id).toBe('janitos')
+      expect(janitosInfo.logoComponent).toBe(MERCHANT_LOGOS.JanitosLogo)
+      expect(janitosInfo.suggestedCategory).toBe('Insurance')
+
+      const serwaysInfo = getMerchantBrandInfo('Raststaette Spessart N, Rohrbrunn DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit C')
+      expect(serwaysInfo.merchant?.id).toBe('serways')
+      expect(serwaysInfo.logoComponent).toBe(MERCHANT_LOGOS.SerwaysLogo)
+      expect(serwaysInfo.suggestedCategory).toBe('Dining Out')
+
+      const toomInfo = getMerchantBrandInfo('toom BM Oberursel, OBERURSEL DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Car')
+      expect(toomInfo.merchant?.id).toBe('toom')
+      expect(toomInfo.logoComponent).toBe(MERCHANT_LOGOS.ToomLogo)
+      expect(toomInfo.suggestedCategory).toBe('Shopping')
+
+      const sparInfo = getMerchantBrandInfo('SPAR CABANAS TAVIRA 1, CABANAS TAVI R PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtu')
+      expect(sparInfo.merchant?.id).toBe('spar')
+      expect(sparInfo.logoComponent).toBe(MERCHANT_LOGOS.SparLogo)
+      expect(sparInfo.suggestedCategory).toBe('Groceries')
+
+      const argumentoInfo = getMerchantBrandInfo('ARGUMENTO DA LUA,LDA, FARO PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card')
+      expect(argumentoInfo.merchant?.id).toBe('argumento-da-lua')
+      expect(argumentoInfo.logoComponent).toBe(MERCHANT_LOGOS.ArgumentoDaLuaLogo)
+      expect(argumentoInfo.suggestedCategory).toBe('Shopping')
+
+      const delhisBellyInfo = getMerchantBrandInfo('DELHIS BELLY, UNIPES, FARO PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 25 ')
+      expect(delhisBellyInfo.merchant?.id).toBe('delhis-belly')
+      expect(delhisBellyInfo.logoComponent).toBe(MERCHANT_LOGOS.DelhisBellyLogo)
+      expect(delhisBellyInfo.suggestedCategory).toBe('Dining Out')
+
+      const goldenClubInfo = getMerchantBrandInfo('SITES CABANAS SA, FARO PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 20')
+      expect(goldenClubInfo.merchant?.id).toBe('golden-club-cabanas')
+      expect(goldenClubInfo.logoComponent).toBe(MERCHANT_LOGOS.GoldenClubCabanasLogo)
+      expect(goldenClubInfo.suggestedCategory).toBe('Travel')
+
+      const pizzaHutInfo = getMerchantBrandInfo('PH 822 ESCHBORN DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card PH 822 ESCHBORN DEU 20')
+      expect(pizzaHutInfo.merchant?.id).toBe('pizza-hut')
+      expect(pizzaHutInfo.logoComponent).toBe(MERCHANT_LOGOS.PizzaHutLogo)
+      expect(pizzaHutInfo.suggestedCategory).toBe('Dining Out')
+    })
+
+    it('returns brand info for batch 11 real-world transaction statements', () => {
+      // 1. rhenag (Rheinische Elektrizitäts- und Gasversorgungsgesellschaft)
+      const rhenagInfo = getMerchantBrandInfo('Rheinische Elektrizitäts- und Gasve rsorgungsgesellscha Vertragsnummer 21810010775 1089385- 108')
+      expect(rhenagInfo.merchant?.id).toBe('rhenag')
+      expect(rhenagInfo.logoComponent).toBe(MERCHANT_LOGOS.RhenagLogo)
+      expect(rhenagInfo.suggestedCategory).toBe('Utilities')
+
+      // 2. Rats-Apotheke
+      const ratsApoInfo = getMerchantBrandInfo('RATS APOTHEKE sagt Danke GIR 799135 2022-03-12T09:28:55 KFN 0 VJ 2412 Kartenzahlung')
+      expect(ratsApoInfo.merchant?.id).toBe('apotheke')
+      expect(ratsApoInfo.logoComponent).toBe(MERCHANT_LOGOS.ApothekeLogo)
+      expect(ratsApoInfo.suggestedCategory).toBe('Healthcare')
+
+      // 3. Thong Thai Thai Restaurant
+      const thongThaiInfo = getMerchantBrandInfo('Thong Thai GmbH Co. KG/Rödelheimer 2022-03-26T13:28:44 KFN 0 VJ 2412 Kartenzahlung')
+      expect(thongThaiInfo.merchant?.id).toBe('thong-thai')
+      expect(thongThaiInfo.logoComponent).toBe(MERCHANT_LOGOS.ThongThaiLogo)
+      expect(thongThaiInfo.suggestedCategory).toBe('Dining Out')
+
+      // 4. Reifen-Diehl Eschborn
+      const reifenDiehlInfo = getMerchantBrandInfo('REIFEN-DIEHL.ESCHBORN//Eschborn/DE 2022-04-30T12:41:00 KFN 0 VJ 2412 Kartenzahlung')
+      expect(reifenDiehlInfo.merchant?.id).toBe('reifen-diehl')
+      expect(reifenDiehlInfo.logoComponent).toBe(MERCHANT_LOGOS.ReifenDiehlLogo)
+      expect(reifenDiehlInfo.suggestedCategory).toBe('Transport')
+
+      // 5. STONES Menswear
+      const stonesInfo = getMerchantBrandInfo('STONES GMBH 120510420024424241253413150 ELV6534 1315 12.05 10.42 ME0 End-to-End-Ref.: 12')
+      expect(stonesInfo.merchant?.id).toBe('stones')
+      expect(stonesInfo.logoComponent).toBe(MERCHANT_LOGOS.StonesLogo)
+      expect(stonesInfo.suggestedCategory).toBe('Shopping')
+
+      // 6. Liebig-Apotheke Bad Homburg
+      const liebigApoInfo = getMerchantBrandInfo('LIEBIG-APOTHEKE//BAD HOMBURG/DE 2022-05-24T10:32:50 KFN 0 VJ 2412 Kartenzahlung')
+      expect(liebigApoInfo.merchant?.id).toBe('apotheke')
+      expect(liebigApoInfo.logoComponent).toBe(MERCHANT_LOGOS.ApothekeLogo)
+      expect(liebigApoInfo.suggestedCategory).toBe('Healthcare')
+
+      // 7. BabyOne Baby- & Kinderausstattung
+      const babyOneInfo = getMerchantBrandInfo('BabyOne B+K Nr.45 GmbH Fil 015 GIR 2022-07-08T12:50:27 KFN 0 VJ 2412 Kartenzahlung')
+      expect(babyOneInfo.merchant?.id).toBe('babyone')
+      expect(babyOneInfo.logoComponent).toBe(MERCHANT_LOGOS.BabyOneLogo)
+      expect(babyOneInfo.suggestedCategory).toBe('Shopping')
+
+      // 8. Anadolu Supermarkt
+      const anadoluInfo = getMerchantBrandInfo('ANADOLU SUPERMARKT GIR 69287732//BA 2022-07-09T12:24:08 KFN 0 VJ 2412 Kartenzahlung')
+      expect(anadoluInfo.merchant?.id).toBe('anadolu-supermarkt')
+      expect(anadoluInfo.logoComponent).toBe(MERCHANT_LOGOS.AnadoluSupermarktLogo)
+      expect(anadoluInfo.suggestedCategory).toBe('Groceries')
+
+      // 9. ebase (European Bank for Financial Services)
+      const ebaseInfo = getMerchantBrandInfo('European Bank for Financial Service s GmbH 9914335757302 Kauf 0,074908 Ant am 06.09.2022 zu 3')
+      expect(ebaseInfo.merchant?.id).toBe('ebase')
+      expect(ebaseInfo.logoComponent).toBe(MERCHANT_LOGOS.EbaseLogo)
+      expect(ebaseInfo.suggestedCategory).toBe('Savings')
+
+      // 10. MyShoes SE
+      const myShoesInfo = getMerchantBrandInfo('MyShoes SE//Friedrichsdorf/DE 2022-09-03T13:20:44 KFN 0 VJ 2412 Kartenzahlung')
+      expect(myShoesInfo.merchant?.id).toBe('myshoes')
+      expect(myShoesInfo.logoComponent).toBe(MERCHANT_LOGOS.MyShoesLogo)
+      expect(myShoesInfo.suggestedCategory).toBe('Shopping')
+
+      // 11. TEDi Filiale 4912 Bad Homburg
+      const tediInfo = getMerchantBrandInfo('TEDi Fil. 4912//Bad Homburg/DE 2022-11-08T16:06:57 KFN 0 VJ 2412 Kartenzahlung')
+      expect(tediInfo.merchant?.id).toBe('tedi')
+      expect(tediInfo.logoComponent).toBe(MERCHANT_LOGOS.TediLogo)
+      expect(tediInfo.suggestedCategory).toBe('Shopping')
+
+      // 12. Kontoführung Commerzbank
+      const kfInfo = getMerchantBrandInfo('Kontoführung Konto 646293100 EUR BLZ 500 400 00 vom 01.02.2023 bis 28.02.2023 Kontoführung')
+      expect(kfInfo.merchant?.id).toBe('commerzbank')
+      expect(kfInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
+
+      // 13. Commerzbank SEPA transfer (BIC COBADEFFXXX)
+      const cobadeffInfo = getMerchantBrandInfo('ANEL MEMIC COBADEFFXXX DE13500400000931368501 5232249017507296 End-to-End-Ref.: MO')
+      expect(cobadeffInfo.merchant?.id).toBe('commerzbank')
+      expect(cobadeffInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
+      expect(cobadeffInfo.suggestedCategory).toBe('Transfers')
+
+      // 14. KMK Immobilienverwaltung / WEG Landwehrweg
+      const kmkInfo = getMerchantBrandInfo('WEG Landwehrweg 1, 61350 z. Hd. KMK Immobilienverw. GmbH 556.101701 Memic Biljana Lastschrif t')
+      expect(kmkInfo.merchant?.id).toBe('kmk-immobilien')
+      expect(kmkInfo.logoComponent).toBe(MERCHANT_LOGOS.KmkImmobilienLogo)
+      expect(kmkInfo.suggestedCategory).toBe('Rent')
+
+      // 15. FNZ Bank AG (formerly ebase)
+      const fnzInfo = getMerchantBrandInfo('FNZ Bank AG (ehemals ebase AG) 9914335757302 Kauf 0,077528 Ant am 05.10.2023 zu 322,465500')
+      expect(fnzInfo.merchant?.id).toBe('fnz-bank')
+      expect(fnzInfo.logoComponent).toBe(MERCHANT_LOGOS.FnzBankLogo)
+      expect(fnzInfo.suggestedCategory).toBe('Savings')
+
+      // 16. Ratsstube Restaurant Rothenburg
+      const ratsstubeInfo = getMerchantBrandInfo('Ratsstube Restaurant Rothenburg ob DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Ratsstube R')
+      expect(ratsstubeInfo.merchant?.id).toBe('ratsstube')
+      expect(ratsstubeInfo.logoComponent).toBe(MERCHANT_LOGOS.RatsstubeLogo)
+      expect(ratsstubeInfo.suggestedCategory).toBe('Dining Out')
+
+      // 17. sander Hotel Koblenz
+      const sanderInfo = getMerchantBrandInfo('sander Hotel Koblenz DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card sander Hotel Koblenz DEU 2')
+      expect(sanderInfo.merchant?.id).toBe('sander-hotel')
+      expect(sanderInfo.logoComponent).toBe(MERCHANT_LOGOS.SanderHotelLogo)
+      expect(sanderInfo.suggestedCategory).toBe('Travel')
+
+      // 18. Smoothie Bar Antalya
+      const smoothieInfo = getMerchantBrandInfo('SMOOTHIE BAR ANTALYA TR Karte Nr. 5355 3100 0931 8380 Virtual Debit Card SMOOTHIE BAR ANTI')
+      expect(smoothieInfo.merchant?.id).toBe('smoothie-bar-antalya')
+      expect(smoothieInfo.logoComponent).toBe(MERCHANT_LOGOS.SmoothieBarAntalyaLogo)
+      expect(smoothieInfo.suggestedCategory).toBe('Dining Out')
+
+      // 19. ICTUR Antalya Airport Dining
+      const icturInfo = getMerchantBrandInfo('ICTUR YIYECEK VE ICECE ANTALYA TR Karte Nr. 5355 3100 0931 8380 Virtual Debit Card ICTUR YIYE')
+      expect(icturInfo.merchant?.id).toBe('ictur')
+      expect(icturInfo.logoComponent).toBe(MERCHANT_LOGOS.IcturLogo)
+      expect(icturInfo.suggestedCategory).toBe('Dining Out')
+
+      // 20. Hrvatske autoceste (HAC A3 Velika Kopanica)
+      const hacInfo = getMerchantBrandInfo('AUTOCESTA A3 V.KOPANIC VELIKA KOPA N HR Karte Nr. 5355 3100 0931 8380 Virtual Debit Card AU')
+      expect(hacInfo.merchant?.id).toBe('hac-autoceste')
+      expect(hacInfo.logoComponent).toBe(MERCHANT_LOGOS.HacAutocesteLogo)
+      expect(hacInfo.suggestedCategory).toBe('Transport')
+
+      // 21. Wasserpalast Graz-Liebenau
+      const wasserpalastInfo = getMerchantBrandInfo('WASSERPALAST GRAZ-LIEBENAU AT Karte Nr. 5355 3100 0931 8380 Virtual Debit Card WASSERPAL')
+      expect(wasserpalastInfo.merchant?.id).toBe('wasserpalast')
+      expect(wasserpalastInfo.logoComponent).toBe(MERCHANT_LOGOS.WasserpalastLogo)
+      expect(wasserpalastInfo.suggestedCategory).toBe('Dining Out')
+
+      // 22. toom Baumarkt
+      const toomInfo = getMerchantBrandInfo('toom BM Oberursel, OBERURSEL DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Car')
+      expect(toomInfo.merchant?.id).toBe('toom')
+      expect(toomInfo.logoComponent).toBe(MERCHANT_LOGOS.ToomLogo)
+      expect(toomInfo.suggestedCategory).toBe('Shopping')
     })
 
     it('returns brand info using fallback icon for merchants without brand logos', () => {
