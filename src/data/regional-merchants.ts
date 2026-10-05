@@ -159,6 +159,7 @@ export const REGIONAL_MERCHANTS: MerchantSuggestion[] = [
   { id: 'vbb', name: 'VBB', keyword: 'vbb', aliases: ['verkehrsverbund berlin-brandenburg', 'vbb ticket', 'vbb bus & bahn', 's-bahn berlin'], category: 'Transport', brandColor: '#E2001A', icon: 'Train' },
   { id: 'oebb', name: 'ÖBB', keyword: 'oebb', aliases: ['oesterreichische bundesbahnen', 'österreichische bundesbahnen', 'oebb ticket', 'öbb ticket', 'nightjet'], category: 'Transport', logo: 'OebbLogo', brandColor: '#D91A15', icon: 'Train' },
   { id: 'sbb', name: 'SBB CFF FFS', keyword: 'sbb', aliases: ['sbb cff ffs', 'schweizerische bundesbahnen', 'sbb ticket', 'sbb mobile'], category: 'Transport', brandColor: '#EB0000', icon: 'Train' },
+  { id: 'cpc-parkhaus', name: 'CPC Parkhaus Nürnberg', keyword: 'cpc parkhaus', aliases: ['cpc parkhaus nuernberg', 'cpc parkhaus nürnberg', 'cpc parkhaus', 'cpc parken'], category: 'Transport', logo: 'CpcParkhausLogo', brandColor: '#004F9E', icon: 'Car' },
 
   // German Telecom & Mobile
   { id: 'telekom', name: 'Telekom', keyword: 'telekom', aliases: ['deutsche telekom', 't-mobile', 'telekom deutschland', 't mobile'], category: 'Communication', logo: 'SiDeutschetelekom', brandColor: '#E20074', icon: 'Wifi' },
@@ -171,6 +172,7 @@ export const REGIONAL_MERCHANTS: MerchantSuggestion[] = [
   { id: 'aldi-talk', name: 'ALDI TALK', keyword: 'aldi talk', aliases: ['medion mobile', 'medionmobile', 'alditalk', 'aldi-talk', 'medion ag aldi talk'], category: 'Communication', logo: 'AldiTalkLogo', brandColor: '#00205B', icon: 'Smartphone' },
   { id: 'gvg-glasfaser', name: 'GVG Glasfaser', keyword: 'gvg glasfaser', aliases: ['gvg glasfaser gmbh', 'teranet', 'nordischnet', 'gvg-glasfaser'], category: 'Communication', logo: 'GvgGlasfaserLogo', brandColor: '#002D5A', icon: 'Wifi' },
   { id: 'teranet', name: 'teranet', keyword: 'teranet', aliases: ['teranet broadband', 'teranet glasfaser', 'teranet.de'], category: 'Communication', logo: 'TeranetLogo', brandColor: '#00A3E0', icon: 'Wifi' },
+  { id: 'mobilezone', name: 'mobilezone', keyword: 'mobilezone', aliases: ['mobilezone gmbh', 'high mobile', 'mandatsref: high', 'high-16540'], category: 'Communication', logo: 'MobilezoneLogo', brandColor: '#00828A', icon: 'Smartphone' },
 
   // Healthcare, Sports & Fitness
   { id: 'gym', name: 'McFIT / FitX', keyword: 'fit', aliases: ['mcfit', 'fitx', 'clever fit', 'fitness'], category: 'Healthcare', icon: 'Dumbbell' },
@@ -273,6 +275,7 @@ export const REGIONAL_MERCHANTS: MerchantSuggestion[] = [
     brandColor: '#18181B',
     icon: 'Receipt',
   },
+  { id: 'stadt-bad-nauheim', name: 'Stadtkasse Bad Nauheim', keyword: 'stadtkasse bad nauheim', aliases: ['stadtkasse bad nauheim', 'bad nauheim stadtkasse', 'stadt bad nauheim', 'bad nauheim'], category: 'Taxes', logo: 'BadNauheimLogo', brandColor: '#004B87', icon: 'Receipt' },
   { id: 'belastingdienst', name: 'Belastingdienst', keyword: 'belastingdienst', aliases: ['belasting'], category: 'Taxes', brandColor: '#154273', icon: 'Receipt' },
   { id: 'dgfip', name: 'DGFiP (Finances Publiques)', keyword: 'dgfip', aliases: ['direction generale des finances publiques', 'finances publiques', 'tresor public'], category: 'Taxes', brandColor: '#000091', icon: 'Receipt' },
   { id: 'agenzia-entrate', name: 'Agenzia delle Entrate', keyword: 'agenzia delle entrate', aliases: ['agenzia entrate', 'fisco'], category: 'Taxes', brandColor: '#003366', icon: 'Receipt' },
@@ -311,4 +314,33 @@ export const REGIONAL_MERCHANTS: MerchantSuggestion[] = [
   { id: 'argumento-da-lua', name: 'Argumento da Lua', keyword: 'argumento da lua', aliases: ['argumento da lua lda', 'argumento da lua,lda', 'argumento da lua, lda', 'argumentodalua'], category: 'Shopping', logo: 'ArgumentoDaLuaLogo', brandColor: '#0B1E36', icon: 'ShoppingBag' },
   { id: 'delhis-belly', name: "Delhi's Belly Indian Restaurant", keyword: 'delhis belly', aliases: ['delhis belly', 'delhi\'s belly', 'delhis belly unipes', 'delhis belly unipessoal'], category: 'Dining Out', logo: 'DelhisBellyLogo', brandColor: '#8B1E0B', icon: 'Utensils' },
   { id: 'golden-club-cabanas', name: 'Golden Club Cabanas (Sites Cabanas)', keyword: 'sites cabanas', aliases: ['sites cabanas sa', 'sites cabanas', '5 sites cabanas', '5 sites cabanas sa', 'golden club cabanas', 'golden club'], category: 'Travel', logo: 'GoldenClubCabanasLogo', brandColor: '#072B4F', icon: 'Plane' },
+
+  // Education & Community Colleges
+  { id: 'vhs-bad-homburg', name: 'vhs Bad Homburg', keyword: 'volkshochschule', aliases: ['volkshochschule bad homburg', 'vhs bad homburg', 'volkshochschule//bad homburg', 'volkshochschule'], category: 'Education', logo: 'VhsBadHomburgLogo', brandColor: '#00386B', icon: 'GraduationCap' },
+
+  // Travel & Accommodations
+  { id: 'hotel-neckarlux', name: 'Hotel Neckarlux', keyword: 'hotel neckarlux', aliases: ['hotel neckarlux', 'hotel neckarlux inh', 'neckarlux heidelberg', 'neckarlux'], category: 'Travel', logo: 'HotelNeckarluxLogo', brandColor: '#0A2540', icon: 'Plane' },
+  { id: 'jugendherberge-nuernberg', name: 'Jugendherberge Nürnberg', keyword: 'jugendherberge nuernbe', aliases: ['jugendherberge nuernbe', 'jugendherberge nuernberg', 'jugendherberge nürnberg', 'djh jugendherberge nuernberg', 'djh jugendherberge nürnberg'], category: 'Travel', logo: 'JugendherbergeNuernbergLogo', brandColor: '#00965E', icon: 'Plane' },
+
+  // Entertainment & Attractions
+  { id: 'kronberg', name: 'Erlebniswelt Kronberg', keyword: 'kronberg', aliases: ['kronberg talstation', 'kronberg talstation, jakobsbad', 'talstation jakobsbad', 'kronberg jakobsbad', 'luftseilbahn kronberg', 'erlebniswelt kronberg'], category: 'Entertainment', logo: 'KronbergLogo', brandColor: '#E30613', icon: 'Tv' },
+  { id: 'sea-life', name: 'SEA LIFE Konstanz', keyword: 'sea life', aliases: ['sea life', 'sea life konstanz', 'sea life konstanz gmbh', 'sealife'], category: 'Entertainment', logo: 'SeaLifeLogo', brandColor: '#003B7A', icon: 'Tv' },
+
+  // Shopping & Retail
+  { id: 'authentic-play', name: 'authentic play', keyword: 'authentic play', aliases: ['authentic play', 'authentic play gmbh', 'authenti c play', 'authenti c play gmbh'], category: 'Shopping', logo: 'AuthenticPlayLogo', brandColor: '#FF6F00', icon: 'ShoppingBag' },
+
+  // Dining & Food Court
+  { id: 'chidoba', name: 'Chidoba Mexican Grill', keyword: 'chidoba', aliases: ['chidoba mexican grill', 'chidoba', 'chidoba sulzbach'], category: 'Dining Out', logo: 'ChidobaLogo', brandColor: '#006837', icon: 'Utensils' },
+  { id: 'eating-point', name: 'FAO Eating Point', keyword: 'eating point', aliases: ['fao eating point', 'eating point faro', 'eating point', 'fao eating point, faro'], category: 'Dining Out', logo: 'EatingPointLogo', brandColor: '#E05A10', icon: 'Utensils' },
+  { id: 'rasthaus-goettingen', name: 'Rasthaus Göttingen Ost', keyword: 'rasthaus goettingen', aliases: ['rasthaus goettingen', 'rasthaus goettingen os', 'rasthaus göttingen', 'rasthaus göttingen ost', 'rasthaus goetti'], category: 'Dining Out', logo: 'RasthausGoettingenLogo', brandColor: '#E30613', icon: 'Utensils' },
+  { id: 'wiener-feinbaeckerei', name: 'Wiener Feinbäckerei Heberer', keyword: 'wiener feinbackerei', aliases: ['wiener feinbackerei', 'wiener feinbäckerei', 'wiener feinbaeckerei', 'wiener feinbackerei 1', 'wiener feinbäckerei heberer'], category: 'Dining Out', logo: 'WienerFeinbaeckereiLogo', brandColor: '#8A1538', icon: 'Utensils' },
+  { id: 'koeschinger-forst', name: 'Köschinger Forst Ost', keyword: 'koeschinger forst', aliases: ['koeschinger forst', 'koeschinger forst ost', 'köschinger forst', 'köschinger forst ost', 'koeschinger for'], category: 'Dining Out', logo: 'KoeschingerForstLogo', brandColor: '#004F9E', icon: 'Utensils' },
+  { id: 'bad-homburg-store', name: 'Store 3798 Bad Homburg', keyword: '3798 bad homburg', aliases: ['3798 bad homburg', '3798 bad homburg von d', 'bad homburg von d', '3798 bad homburg v'], category: 'Dining Out', logo: 'BadHomburgRetailLogo', brandColor: '#003366', icon: 'Utensils' },
+
+  // Online Services, Commerce & Investment (PayPal checkout counterparties)
+  { id: 'etoro', name: 'eToro', keyword: 'etoro', aliases: ['etoro europe', 'etoro (europe)', 'etoro (europe) limited', 'etoro limited', 'etoro eu', 'etoro.com', 'etoro trading'], category: 'Savings', logo: 'EtoroLogo', brandColor: '#13C166', icon: 'PiggyBank' },
+  { id: 'xsolla', name: 'Xsolla', keyword: 'xsolla', aliases: ['xsolla hk', 'xsolla hk limited', 'xsolla hk limite', 'xsolla limited', 'xsolla pay', 'xsolla inc', 'xsolla.com'], category: 'Entertainment', logo: 'XsollaLogo', brandColor: '#FF0036', icon: 'Gamepad2' },
+  { id: 'avaaz', name: 'Avaaz', keyword: 'avaaz', aliases: ['avaaz foundation', 'avaaz foundatio', 'avaaz.org', 'avaaz community', 'avaaz campaign'], category: 'Shopping', logo: 'AvaazLogo', brandColor: '#EC1C24', icon: 'Heart' },
+  { id: 'kalea', name: 'Kalea', keyword: 'kalea', aliases: ['kalea gmbh', 'kalea bier', 'kalea beer', 'kalea.at', 'kalea advent', 'kalea biere'], category: 'Shopping', logo: 'KaleaLogo', brandColor: '#E5A93C', icon: 'Gift' },
+  { id: 'cyberport', name: 'Cyberport', keyword: 'cyberport', aliases: ['cyberport gmbh', 'cyberport se', 'cyberport.de', 'cyberport store', 'cyberport computer'], category: 'Shopping', logo: 'CyberportLogo', brandColor: '#004F9E', icon: 'Monitor' },
 ]

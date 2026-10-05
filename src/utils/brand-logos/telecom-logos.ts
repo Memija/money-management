@@ -15,10 +15,22 @@ export const TeranetLogo = createImageLogo({
   displayName: 'TeranetLogo',
 })
 
+/** mobilezone GmbH / HIGH mobile — leading telecommunications retailer and MVNO provider. */
+export const MobilezoneLogo = createImageLogo({
+  src: '/brands/mobilezone.png',
+  label: 'mobilezone',
+  displayName: 'MobilezoneLogo',
+})
+
 export const TELECOM_LOGOS: Record<string, IconComponent> = {
   GvgGlasfaserLogo,
   gvgGlasfaserLogo: GvgGlasfaserLogo,
   GVGGlasfaserLogo: GvgGlasfaserLogo,
   TeranetLogo,
   teranetLogo: TeranetLogo,
+  MobilezoneLogo,
+  mobilezoneLogo: MobilezoneLogo,
+  'mobilezone': MobilezoneLogo,
+  'high-mobile': MobilezoneLogo,
 }
+

@@ -50,6 +50,20 @@ export const OejhwLogo = createImageLogo({
   displayName: 'OejhwLogo',
 })
 
+/** DJH Jugendherberge Nürnberg — historic youth hostel located at Kaiserburg Nürnberg. */
+export const JugendherbergeNuernbergLogo = createImageLogo({
+  src: '/brands/jugendherberge-nuernberg.png',
+  label: 'Jugendherberge Nürnberg Kaiserburg',
+  displayName: 'JugendherbergeNuernbergLogo',
+})
+
+/** Hotel Neckarlux Heidelberg — riverside boutique hotel and accommodation in Heidelberg. */
+export const HotelNeckarluxLogo = createImageLogo({
+  src: '/brands/hotel-neckarlux.png',
+  label: 'Hotel Neckarlux Heidelberg',
+  displayName: 'HotelNeckarluxLogo',
+})
+
 export const HOSTEL_LOGOS: Record<string, IconComponent> = {
   ByebyeLogo,
   byebyeLogo: ByebyeLogo,
@@ -65,4 +79,13 @@ export const HOSTEL_LOGOS: Record<string, IconComponent> = {
   JungeHotelsSalzburgLogo: SalzburgerJugendherbergeLogo,
   OejhwLogo,
   OEJHWLogo: OejhwLogo,
+  JugendherbergeNuernbergLogo,
+  jugendherbergeNuernbergLogo: JugendherbergeNuernbergLogo,
+  'jugendherberge-nuernberg': JugendherbergeNuernbergLogo,
+  'jugendherberge-nuernbe': JugendherbergeNuernbergLogo,
+  HotelNeckarluxLogo,
+  hotelNeckarluxLogo: HotelNeckarluxLogo,
+  'hotel-neckarlux': HotelNeckarluxLogo,
+  'neckarlux': HotelNeckarluxLogo,
 }
+

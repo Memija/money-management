@@ -228,7 +228,7 @@ const GLOBAL_MERCHANTS: MerchantSuggestion[] = [
   // Dining & Food Delivery
   { id: 'starbucks', name: 'Starbucks', keyword: 'starbucks', aliases: ['starbucks coffee'], category: 'Dining Out', logo: 'SiStarbucks', brandColor: '#00704A', icon: 'Coffee' },
   { id: 'mcdonalds', name: 'McDonald\'s', keyword: 'mcdonald', aliases: ['mcdonalds', 'mcdonald\'s'], category: 'Dining Out', logo: 'SiMcdonalds', brandColor: '#FFC72C', icon: 'Pizza' },
-  { id: 'burgerking', name: 'Burger King', keyword: 'burger king', category: 'Dining Out', logo: 'SiBurgerking', brandColor: '#D62300', icon: 'Pizza' },
+  { id: 'burgerking', name: 'Burger King', keyword: 'burger king', aliases: ['burgerking', 'bk', 'bk 31590', 'bk rosdorf', 'bk 31590 sot', 'sot rosdorf'], category: 'Dining Out', logo: 'BurgerKingLogo', brandColor: '#D62300', icon: 'Pizza' },
   { id: 'pizza-hut', name: 'Pizza Hut', keyword: 'pizza hut', aliases: ['pizzahut', 'ph 822', 'ph 822 eschborn', 'pizza hut eschborn', 'pizzahut.de'], category: 'Dining Out', logo: 'PizzaHutLogo', brandColor: '#EE3124', icon: 'Pizza' },
   { id: 'kfc', name: 'KFC', keyword: 'kfc', category: 'Dining Out', logo: 'SiKfc', brandColor: '#A3080C', icon: 'Utensils' },
   { id: 'ubereats', name: 'Uber Eats', keyword: 'uber eats', aliases: ['ubereats'], category: 'Dining Out', logo: 'SiUbereats', brandColor: '#06C167', icon: 'Utensils' },

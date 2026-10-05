@@ -1210,7 +1210,7 @@ describe('category-icons', () => {
       const info = getMerchantBrandInfo('Burger King')
       expect(info.merchant).toBeDefined()
       expect(info.initials).toBe('BK')
-      expect(info.logoComponent).toBe(MERCHANT_LOGOS.SiBurgerking)
+      expect(info.logoComponent).toBe(MERCHANT_LOGOS.BurgerKingLogo)
     })
 
     it('matches merchant via description or keyword substring', () => {
@@ -2007,6 +2007,221 @@ describe('category-icons', () => {
       expect(toomInfo.merchant?.id).toBe('toom')
       expect(toomInfo.logoComponent).toBe(MERCHANT_LOGOS.ToomLogo)
       expect(toomInfo.suggestedCategory).toBe('Shopping')
+
+      // Batch 12:
+      // 1. mobilezone GmbH / HIGH mobile
+      const mobilezoneInfo = getMerchantBrandInfo('mobilezone GmbH 3243033328 End-to-End-Ref.: 0077110000ZV2612446Z Mandatsref: HIGH-16540')
+      expect(mobilezoneInfo.merchant?.id).toBe('mobilezone')
+      expect(mobilezoneInfo.logoComponent).toBe(MERCHANT_LOGOS.MobilezoneLogo)
+      expect(mobilezoneInfo.suggestedCategory).toBe('Communication')
+
+      // 2. Kontoführung Commerzbank
+      const kf2026Info = getMerchantBrandInfo('Kontoführung Konto 646293100 EUR BLZ 500 400 00 vom 01.06.2026 bis 30.06.2026 Kontoführung')
+      expect(kf2026Info.merchant?.id).toBe('commerzbank')
+      expect(kf2026Info.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
+
+      // 3. Stadtkasse Bad Nauheim
+      const badNauheimInfo = getMerchantBrandInfo('STADTKASSE BAD NAUHEIM PBNKDEFFXXX DE34440100460141202460 0298350131 End-to-End-R')
+      expect(badNauheimInfo.merchant?.id).toBe('stadt-bad-nauheim')
+      expect(badNauheimInfo.logoComponent).toBe(MERCHANT_LOGOS.BadNauheimLogo)
+      expect(badNauheimInfo.suggestedCategory).toBe('Taxes')
+
+      // 4. Kronberg Talstation Jakobsbad CH
+      const kronbergInfo = getMerchantBrandInfo('Kronberg Talstation, Jakobsbad CH Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card')
+      expect(kronbergInfo.merchant?.id).toBe('kronberg')
+      expect(kronbergInfo.logoComponent).toBe(MERCHANT_LOGOS.KronbergLogo)
+      expect(kronbergInfo.suggestedCategory).toBe('Entertainment')
+
+      // 5. SEA LIFE Konstanz GmbH
+      const seaLifeInfo = getMerchantBrandInfo('SEA LIFE Konstanz GmbH, Hamburg DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit')
+      expect(seaLifeInfo.merchant?.id).toBe('sea-life')
+      expect(seaLifeInfo.logoComponent).toBe(MERCHANT_LOGOS.SeaLifeLogo)
+      expect(seaLifeInfo.suggestedCategory).toBe('Entertainment')
+
+      // 6. Hotel Neckarlux Heidelberg
+      const neckarluxInfo = getMerchantBrandInfo('HOTEL NECKARLUX INH. CUENE//HEIDELB 2026-04-18T15:59:01 KFN 0 VJ 2812 Kartenzahlung')
+      expect(neckarluxInfo.merchant?.id).toBe('hotel-neckarlux')
+      expect(neckarluxInfo.logoComponent).toBe(MERCHANT_LOGOS.HotelNeckarluxLogo)
+      expect(neckarluxInfo.suggestedCategory).toBe('Travel')
+
+      // 7. authentic play GmbH (PayPal)
+      const authenticPlayInfo = getMerchantBrandInfo('PayPal Europe S.a.r.l. et Cie S.C.A 1048027847722/PP.4585.PP/. authenti c play GmbH, Ihr Einkauf bei')
+      expect(authenticPlayInfo.merchant?.id).toBe('authentic-play')
+      expect(authenticPlayInfo.logoComponent).toBe(MERCHANT_LOGOS.AuthenticPlayLogo)
+      expect(authenticPlayInfo.suggestedCategory).toBe('Shopping')
+
+      // 8. Chidoba Mexican Grill Sulzbach
+      const chidobaInfo = getMerchantBrandInfo('Chidoba Mexican Grill, Sulzbach DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Car')
+      expect(chidobaInfo.merchant?.id).toBe('chidoba')
+      expect(chidobaInfo.logoComponent).toBe(MERCHANT_LOGOS.ChidobaLogo)
+      expect(chidobaInfo.suggestedCategory).toBe('Dining Out')
+
+      // 9. Store 3798 Bad Homburg
+      const badHomburgStoreInfo = getMerchantBrandInfo('3798 Bad Homburg von d, Bad Homburg v DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual')
+      expect(badHomburgStoreInfo.merchant?.id).toBe('bad-homburg-store')
+      expect(badHomburgStoreInfo.logoComponent).toBe(MERCHANT_LOGOS.BadHomburgRetailLogo)
+      expect(badHomburgStoreInfo.suggestedCategory).toBe('Dining Out')
+
+      // 10. CPC Parkhaus Nürnberg
+      const cpcInfo = getMerchantBrandInfo('CPC Parkhaus Nuernberg, Nuernberg DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debi')
+      expect(cpcInfo.merchant?.id).toBe('cpc-parkhaus')
+      expect(cpcInfo.logoComponent).toBe(MERCHANT_LOGOS.CpcParkhausLogo)
+      expect(cpcInfo.suggestedCategory).toBe('Transport')
+
+      // 11. FAO Eating Point Faro Airport
+      const eatingPointInfo = getMerchantBrandInfo('FAO EATING POINT, FARO PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 2025')
+      expect(eatingPointInfo.merchant?.id).toBe('eating-point')
+      expect(eatingPointInfo.logoComponent).toBe(MERCHANT_LOGOS.EatingPointLogo)
+      expect(eatingPointInfo.suggestedCategory).toBe('Dining Out')
+
+      // 12. DJH Jugendherberge Nürnberg Kaiserburg
+      const jhInfo = getMerchantBrandInfo('Jugendherberge Nuernbe, Nuernberg DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit')
+      expect(jhInfo.merchant?.id).toBe('jugendherberge-nuernberg')
+      expect(jhInfo.logoComponent).toBe(MERCHANT_LOGOS.JugendherbergeNuernbergLogo)
+      expect(jhInfo.suggestedCategory).toBe('Travel')
+
+      // 13. Volkshochschule Bad Homburg
+      const vhsInfo = getMerchantBrandInfo('VOLKSHOCHSCHULE//BAD HOMBURG/DE 2024-11-19T09:28:16 KFN 0 VJ 2412 Kartenzahlung')
+      expect(vhsInfo.merchant?.id).toBe('vhs-bad-homburg')
+      expect(vhsInfo.logoComponent).toBe(MERCHANT_LOGOS.VhsBadHomburgLogo)
+      expect(vhsInfo.suggestedCategory).toBe('Education')
+
+      // 14. Rasthaus Göttingen Ost Rosdorf
+      const rasthausInfo = getMerchantBrandInfo('Rasthaus Goettingen Os Rosdorf DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Rasthaus Goetti')
+      expect(rasthausInfo.merchant?.id).toBe('rasthaus-goettingen')
+      expect(rasthausInfo.logoComponent).toBe(MERCHANT_LOGOS.RasthausGoettingenLogo)
+      expect(rasthausInfo.suggestedCategory).toBe('Dining Out')
+
+      // 15. Burger King Rosdorf (BK 31590 SOT Rosdorf)
+      const bkInfo = getMerchantBrandInfo('BK 31590 SOT ROSDORF DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card BK 31590 SOT ROSDO')
+      expect(bkInfo.merchant?.id).toBe('burgerking')
+      expect(bkInfo.logoComponent).toBe(MERCHANT_LOGOS.BurgerKingLogo)
+      expect(bkInfo.suggestedCategory).toBe('Dining Out')
+
+      // 16. Wiener Feinbäckerei Heberer Mühlheim
+      const wienerInfo = getMerchantBrandInfo('WIENER FEINBACKEREI 1 Muhlheim am M DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card WIENE')
+      expect(wienerInfo.merchant?.id).toBe('wiener-feinbaeckerei')
+      expect(wienerInfo.logoComponent).toBe(MERCHANT_LOGOS.WienerFeinbaeckereiLogo)
+      expect(wienerInfo.suggestedCategory).toBe('Dining Out')
+
+      // 17. Köschinger Forst Ost Hepberg
+      const koeschingerInfo = getMerchantBrandInfo('Koeschinger Forst Ost Hepberg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Koeschinger For')
+      expect(koeschingerInfo.merchant?.id).toBe('koeschinger-forst')
+      expect(koeschingerInfo.logoComponent).toBe(MERCHANT_LOGOS.KoeschingerForstLogo)
+      expect(koeschingerInfo.suggestedCategory).toBe('Dining Out')
+    })
+
+    it('accurately resolves brand logos and categories for PayPal intermediary purchases and direct account debits', () => {
+      // 1. eToro (Europe) Limited -> eToro (Savings, EtoroLogo)
+      const etoroTx =
+        'yPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Etoro (Europe) Limited , Ihr Einkauf bei Etoro (Euro'
+      const etoroInfo = getMerchantBrandInfo(etoroTx)
+      expect(etoroInfo.merchant?.id).toBe('etoro')
+      expect(etoroInfo.merchant?.name).toBe('eToro')
+      expect(etoroInfo.logoComponent).toBe(MERCHANT_LOGOS.EtoroLogo)
+      expect(etoroInfo.suggestedCategory).toBe('Savings')
+      expect(etoroInfo.initials).toBe('ET')
+
+      // 2. Xsolla HK Limited -> Xsolla (Entertainment, XsollaLogo)
+      const xsollaTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Xsolla HK Limited, Ihr Einkauf bei Xsolla HK Limite'
+      const xsollaInfo = getMerchantBrandInfo(xsollaTx)
+      expect(xsollaInfo.merchant?.id).toBe('xsolla')
+      expect(xsollaInfo.merchant?.name).toBe('Xsolla')
+      expect(xsollaInfo.logoComponent).toBe(MERCHANT_LOGOS.XsollaLogo)
+      expect(xsollaInfo.suggestedCategory).toBe('Entertainment')
+      expect(xsollaInfo.initials).toBe('XS')
+
+      // 3. Avaaz Foundation -> Avaaz (Shopping, AvaazLogo)
+      const avaazTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Avaaz Foundation, Ihr Einkauf bei Avaaz Foundatio'
+      const avaazInfo = getMerchantBrandInfo(avaazTx)
+      expect(avaazInfo.merchant?.id).toBe('avaaz')
+      expect(avaazInfo.merchant?.name).toBe('Avaaz')
+      expect(avaazInfo.logoComponent).toBe(MERCHANT_LOGOS.AvaazLogo)
+      expect(avaazInfo.suggestedCategory).toBe('Shopping')
+      expect(avaazInfo.initials).toBe('AV')
+
+      // 4. Direct PayPal account debit (ABBUCHUNG VOM PAYPAL-KO NTO) -> PayPal (Transfers, SiPaypal)
+      const paypalDebitTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP ABBUCHUNG VOM PAYPAL-KO NTO End-to-End-Ref'
+      const paypalDebitInfo = getMerchantBrandInfo(paypalDebitTx)
+      expect(paypalDebitInfo.merchant?.id).toBe('paypal')
+      expect(paypalDebitInfo.merchant?.name).toBe('PayPal')
+      expect(paypalDebitInfo.logoComponent).toBe(MERCHANT_LOGOS.SiPaypal)
+      expect(paypalDebitInfo.suggestedCategory).toBe('Transfers')
+      expect(paypalDebitInfo.initials).toBe('PA')
+
+      // 5. Kalea GmbH -> Kalea (Shopping, KaleaLogo)
+      const kaleaTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Kalea GmbH, Ihr Einkau f bei Kalea GmbH End-to-E'
+      const kaleaInfo = getMerchantBrandInfo(kaleaTx)
+      expect(kaleaInfo.merchant?.id).toBe('kalea')
+      expect(kaleaInfo.merchant?.name).toBe('Kalea')
+      expect(kaleaInfo.logoComponent).toBe(MERCHANT_LOGOS.KaleaLogo)
+      expect(kaleaInfo.suggestedCategory).toBe('Shopping')
+      expect(kaleaInfo.initials).toBe('KA')
+
+      // 6. Cyberport GmbH -> Cyberport (Shopping, CyberportLogo)
+      const cyberportTx =
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1026469639646 . Cyberport GmbH, Ih r Einkauf bei Cyberport GmbH'
+      const cyberportInfo = getMerchantBrandInfo(cyberportTx)
+      expect(cyberportInfo.merchant?.id).toBe('cyberport')
+      expect(cyberportInfo.merchant?.name).toBe('Cyberport')
+      expect(cyberportInfo.logoComponent).toBe(MERCHANT_LOGOS.CyberportLogo)
+      expect(cyberportInfo.suggestedCategory).toBe('Shopping')
+      expect(cyberportInfo.initials).toBe('CY')
+
+      // 7. Unknown online merchant via PayPal -> NOT assigned to PayPal!
+      const unknownShopTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . UnknownShop123, Ihr Einkauf bei UnknownShop123'
+      const unknownInfo = getMerchantBrandInfo(unknownShopTx)
+      expect(unknownInfo.merchant).toBeUndefined()
+      expect(unknownInfo.logoComponent).toBeUndefined()
+      // Initials derived from the actual merchant 'UnknownShop123', NOT 'PayPal' or 'PE'
+      expect(unknownInfo.initials).toBe('UN')
+    })
+
+    it('renders the 5 new brand logos into the DOM via getCategoryIcon', () => {
+      // 1. EtoroLogo
+      const { container: c1 } = render(
+        <div>{getCategoryIcon('Savings', 24, undefined, 'Etoro (Europe) Limited Trading')}</div>,
+      )
+      const img1 = c1.querySelector('img')
+      expect(img1).toBeInTheDocument()
+      expect(img1).toHaveAttribute('aria-label', 'eToro')
+
+      // 2. XsollaLogo
+      const { container: c2 } = render(
+        <div>{getCategoryIcon('Entertainment', 24, undefined, 'Xsolla HK Limited Game Checkout')}</div>,
+      )
+      const img2 = c2.querySelector('img')
+      expect(img2).toBeInTheDocument()
+      expect(img2).toHaveAttribute('aria-label', 'Xsolla')
+
+      // 3. AvaazLogo
+      const { container: c3 } = render(
+        <div>{getCategoryIcon('Shopping', 24, undefined, 'Avaaz Foundation Donation')}</div>,
+      )
+      const img3 = c3.querySelector('img')
+      expect(img3).toBeInTheDocument()
+      expect(img3).toHaveAttribute('aria-label', 'Avaaz')
+
+      // 4. KaleaLogo
+      const { container: c4 } = render(
+        <div>{getCategoryIcon('Shopping', 24, undefined, 'Kalea GmbH Bier-Abo')}</div>,
+      )
+      const img4 = c4.querySelector('img')
+      expect(img4).toBeInTheDocument()
+      expect(img4).toHaveAttribute('aria-label', 'Kalea')
+
+      // 5. CyberportLogo
+      const { container: c5 } = render(
+        <div>{getCategoryIcon('Shopping', 24, undefined, 'Cyberport GmbH Electronics')}</div>,
+      )
+      const img5 = c5.querySelector('img')
+      expect(img5).toBeInTheDocument()
+      expect(img5).toHaveAttribute('aria-label', 'Cyberport')
     })
 
     it('returns brand info using fallback icon for merchants without brand logos', () => {

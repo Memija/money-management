@@ -61,6 +61,7 @@ import {
   KelkheimLogo,
   SchmittenLogo,
 } from './civic-logos'
+import { CIVIC_REGIONAL_LOGOS } from './civic-regional-logos'
 import { CONSULAR_LOGOS } from './consular-logos'
 import {
   LotharBraunLogo,
@@ -138,6 +139,7 @@ import {
 } from './tax-logos'
 import {
   CanonLogo,
+  CyberportLogo,
   HerokuLogo,
   HpLogo,
   LogitechLogo,
@@ -372,6 +374,9 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   KlarmobilDeLogo: KlarmobilLogo,
   HerokuLogo,
   SiHeroku: HerokuLogo,
+  CyberportLogo,
+  cyberportLogo: CyberportLogo,
+  'cyberport': CyberportLogo,
   FaAws,
   AwsLogo: FaAws,
   SiCloudflare,
@@ -414,6 +419,7 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   'sander-hotel': SanderHotelLogo,
   ...AUSTRIAN_LOGOS,
   ...AUTO_CLUB_LOGOS,
+  ...CIVIC_REGIONAL_LOGOS,
   ...CONSULAR_LOGOS,
   ...CRYPTO_LOGOS,
   ...DINING_LOGOS,

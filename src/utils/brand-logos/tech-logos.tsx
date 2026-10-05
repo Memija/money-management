@@ -195,3 +195,26 @@ export const HerokuLogo: IconComponent = ({ size = 16, className, color = '#4300
 )
 HerokuLogo.displayName = 'HerokuLogo'
 
+/** Cyberport (Cyberport GmbH) — major German consumer electronics and IT hardware e-commerce retailer. */
+export const CyberportLogo: IconComponent = ({ size = 16, className }) => (
+  <img
+    src="/brands/cyberport.png"
+    alt="Cyberport"
+    role="img"
+    aria-label="Cyberport"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    className={className}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: '4px',
+      objectFit: 'contain',
+      flexShrink: 0,
+    }}
+  />
+)
+CyberportLogo.displayName = 'CyberportLogo'
+

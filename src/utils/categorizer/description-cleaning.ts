@@ -98,6 +98,13 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   ],
   [/(?:financial\s+service)\s+(?:s)\s+(?:gmbh)/iu, 'Financial Services GmbH'],
   [/(?:lastschrif)\s+(?:t)\b/iu, 'Lastschrift'],
+  [/(?:y)[-\s]*(?:pal)\b/iu, 'PayPal'],
+  [/(?:ih)[-\s]+(?:r)\b/iu, 'Ihr'],
+  [/(?:ko)[-\s]+(?:nto)\b/iu, 'Konto'],
+  [/(?:paypal)[-\s]+(?:konto)\b/iu, 'PayPal-Konto'],
+  [/\b(?:foundatio)\b/iu, 'Foundation'],
+  [/\b(?:limite)\b/iu, 'Limited'],
+  [/\bauthenti\s+c\s+play\b/iu, 'authentic play'],
   [/(?:velika\s+kopa)\s+(?:n)\b/iu, 'Velika Kopanica'],
   [/(?:wasserpal)\b/iu, 'Wasserpalast'],
   [/(?:wunder|wundert|wunderta)[-\s]+(?:tax|ax|x)/iu, 'Wundertax'],
@@ -309,6 +316,41 @@ export function extractCleanDescription(desc: string): string {
 }
 
 /**
+ * Detects whether a transaction description represents an intermediary payment processor transaction
+ * (e.g. PayPal, Klarna, Stripe, SumUp being used as a checkout intermediary for an underlying merchant)
+ * as opposed to a direct balance transfer, account debit, or fee with the processor itself.
+ */
+export function isPaymentProcessorIntermediary(text: string): boolean {
+  if (!text || typeof text !== 'string') return false
+  const t = repairBrokenWords(text)
+
+  // Direct PayPal balance transfer or account debit actions are direct, not intermediary purchases
+  if (
+    /\b(?:abbuchung\s+vom\s+paypal[- ]konto|paypal[- ]konto\s+abbuchung|paypal[- ]guthaben|guthabeneinzahlung)\b/i.test(
+      t,
+    )
+  ) {
+    return false
+  }
+
+  // 1. Purchase phrases in supported languages
+  const purchasePhrase =
+    /\b(?:Ihr\s+E(?:in)?[- ]?kauf\s+bei|Einkauf\s+bei|Your\s+purchase\s+(?:at|from)|Tw[oó]j\s+zakup\s+w|Zakup\s+w|Va[sš]a\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\b/i
+  if (purchasePhrase.test(t)) {
+    return true
+  }
+
+  // 2. Delimiter after processor clearing / merchant ID pointing to an underlying merchant
+  const processorDelimiter =
+    /(?:(?:y?paypal|payone|sumup|stripe|klarna).*?(?:\bpp\.\d+\.pp|\b\d{8,})\s*[./*-]\s*(?!abbuchung\b)(?!paypal\b)[a-z0-9])/i
+  if (processorDelimiter.test(t)) {
+    return true
+  }
+
+  return false
+}
+
+/**
  * Extracts a concise, reusable merchant keyword from a transaction description
  * by stripping banking prefixes, corporate legal forms, branch/terminal codes, and noise.
  * Useful for learning smart category rules that match future transactions from the same merchant.
@@ -320,26 +362,37 @@ export function extractMerchantKeyword(desc: string): string {
   let merchant = extractCleanDescription(desc)
   if (!merchant) return ''
 
+  // Direct PayPal account debit
+  if (/\b(?:abbuchung\s+vom\s+paypal[- ]konto|paypal[- ]konto\s+abbuchung)\b/i.test(merchant)) {
+    return 'PayPal'
+  }
+
   // 1. Strip leading payment gateway / aggregator prefixes like "PAYONE GmbH", "SumUp .", "SumUp *", "PayPal *", "PayPal (Europe)..."
   merchant = merchant.replace(
-    /^(?:PAYONE\s*(?:GmbH)?|PayPal\s*(?:\([^)]+\)|Europe|Pte\.?\s*Ltd\.?)?(?:\s*S\.?a(?:\s*r\.?l\.?)?(?:\s*et\s*Cie)?(?:\s*,?\s*S\.?\s*C\.?A\.?)?)?|SumUp|Stripe|Klarna)\s*[.*-]?\s*/i,
+    /^(?:(?:y?paypal|payone|sumup|stripe|klarna)\s*(?:\([^)]+\)|europe|pte\.?\s*ltd\.?)?(?:\s*,?\s*s\.?\s*a\.?\s*r\.?\s*l\.?)?(?:\s*et\s*cie\.?,?)?(?:\s*,?\s*s\s*\.?\s*c\s*\.?\s*a\.?)?(?:\s*(?:\bpp\.\d+\.pp|\b\d{8,}))?(?:\s*\/[a-z0-9_.-]+)*\s*[./*-]?\s*)+/i,
     '',
   )
   merchant = merchant.replace(/^(?:ELV\d*|ME\d+)\s*/gi, '')
 
   // 1b. If the description contains a purchase phrase ("Ihr Einkauf bei ...", "Your purchase at ..."), extract the merchant following it
   const purchaseMatch = merchant.match(
-    /\b(?:Ihr\s+Einkauf\s+bei|Your\s+purchase\s+at|Twój\s+zakup\s+w|Vaša\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\s+(.+)$/i,
+    /\b(?:Ihr\s+E(?:in)?[- ]?kauf\s+bei|Your\s+purchase\s+(?:at|from)|Tw[oó]j\s+zakup\s+w|Va[sš]a\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\s+(.+)$/i,
   )
   if (purchaseMatch && purchaseMatch[1].trim()) {
     merchant = purchaseMatch[1].trim()
   }
 
+  // Strip trailing currency cutoff like (Euro, (EUR, Euro
+  merchant = merchant.replace(/\s*\(?\s*(?:eur|euro)\b.*$/i, '')
+
   // 2. Remove corporate legal entity suffixes
   merchant = merchant.replace(
-    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|se|ltd\.?|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\.?o\.?o\.?|bv|s\.?a\.?r\.?l\.?|o[uü]|gbr|lda|unipessoal|unipes|sa)(?![\p{L}\p{N}])/giu,
+    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|se|ltd\.?|limited|limite|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\.?o\.?o\.?|bv|s\.?a\.?r\.?l\.?|o[uü]|gbr|lda|unipessoal|unipes|sa|foundation|foundatio)(?![\p{L}\p{N}])/giu,
     ' ',
   )
+
+  // Remove terminal/region abbreviation noise like standalone HK
+  merchant = merchant.replace(/\bhk\b/i, ' ')
 
   // 2. Remove branch / store suffixes and terminal numbers (e.g. 'Filiale 1234', 'Store #5')
   merchant = merchant.replace(/\b(?:filiale|fil\.|store|branch|pos|terminal)\b.*$/i, ' ')

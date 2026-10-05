@@ -15,6 +15,13 @@ export const ReifenDiehlLogo = createImageLogo({
   displayName: 'ReifenDiehlLogo',
 })
 
+/** CPC Parkhaus / Contipark — parking garages and mobility hubs across Germany (including Nürnberg). */
+export const CpcParkhausLogo = createImageLogo({
+  src: '/brands/cpc-parkhaus.png',
+  label: 'CPC Parkhaus',
+  displayName: 'CpcParkhausLogo',
+})
+
 export const MOTORWAY_LOGOS: Record<string, IconComponent> = {
   HacAutocesteLogo,
   hacAutocesteLogo: HacAutocesteLogo,
@@ -25,4 +32,8 @@ export const MOTORWAY_LOGOS: Record<string, IconComponent> = {
   reifenDiehlLogo: ReifenDiehlLogo,
   'reifen-diehl': ReifenDiehlLogo,
   'reifen-diehl-eschborn': ReifenDiehlLogo,
+  CpcParkhausLogo,
+  cpcParkhausLogo: CpcParkhausLogo,
+  'cpc-parkhaus': CpcParkhausLogo,
+  'cpc-parkhaus-nuernberg': CpcParkhausLogo,
 }

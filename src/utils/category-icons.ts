@@ -5,7 +5,11 @@ import { type MerchantSuggestion, POPULAR_MERCHANTS } from '../data/merchants'
 import type { CustomCategory } from '../types'
 import { MERCHANT_LOGOS } from './brand-logos/merchant-logos'
 import type { IconComponent } from './brand-logos/types'
-import { repairBrokenWords } from './categorizer/description-cleaning'
+import {
+  extractMerchantKeyword,
+  isPaymentProcessorIntermediary,
+  repairBrokenWords,
+} from './categorizer/description-cleaning'
 import { getCategoryColor, ICON_COLORS } from './category-colors'
 import {
   AVAILABLE_ICONS,
@@ -98,7 +102,10 @@ export function findMatchingMerchant(text: string): MerchantSuggestion | undefin
         score = nameLower.length
       }
     } else {
-      if (nameLower.includes(textLower) && textLower.length > score) {
+      if (
+        (textLower.length >= 3 ? nameLower.includes(textLower) : matchesTerm(nameLower, textLower)) &&
+        textLower.length > score
+      ) {
         score = textLower.length
       } else if (textLower.includes(nameLower) && nameLower.length > score) {
         score = nameLower.length
@@ -121,7 +128,17 @@ export function findMatchingMerchant(text: string): MerchantSuggestion | undefin
   }
 
   // Prioritize the actual underlying retail / service / travel merchant over payment intermediaries
-  return bestDirectMerchant || bestProcessorMerchant
+  if (bestDirectMerchant) {
+    return bestDirectMerchant
+  }
+
+  // If this is an intermediary payment processor transaction (e.g. PayPal / Klarna purchase for an online merchant)
+  // but the underlying merchant was not recognized above, do NOT fall back to the processor (e.g. PayPal).
+  if (isPaymentProcessorIntermediary(repaired)) {
+    return undefined
+  }
+
+  return bestProcessorMerchant
 }
 
 export function getCategoryIcon(
@@ -174,13 +191,13 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
   const nameTrimmed = name.trim()
   const merchant = findMatchingMerchant(nameTrimmed)
 
-  const words = nameTrimmed.split(/\s+/)
-  const initials =
-    words.length > 1
-      ? `${words[0][0] || ''}${words[1][0] || ''}`.toUpperCase()
-      : (nameTrimmed.slice(0, 2) || 'TX').toUpperCase()
-
   if (merchant) {
+    const mWords = merchant.name.trim().split(/\s+/)
+    const initials =
+      mWords.length > 1
+        ? `${mWords[0][0] || ''}${mWords[1][0] || ''}`.toUpperCase()
+        : (merchant.name.slice(0, 2) || 'TX').toUpperCase()
+
     const logoComponent =
       merchant.logo && MERCHANT_LOGOS[merchant.logo]
         ? MERCHANT_LOGOS[merchant.logo]
@@ -201,6 +218,17 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
     }
   }
 
+  // For unrecognized transactions, derive clean display name if it went through an intermediary processor
+  const displayLabel = isPaymentProcessorIntermediary(nameTrimmed)
+    ? extractMerchantKeyword(nameTrimmed) || nameTrimmed
+    : nameTrimmed
+
+  const words = displayLabel.split(/\s+/)
+  const initials =
+    words.length > 1
+      ? `${words[0][0] || ''}${words[1][0] || ''}`.toUpperCase()
+      : (displayLabel.slice(0, 2) || 'TX').toUpperCase()
+
   // Generate deterministic dynamic brand color from merchant name
   const fallbackPalette = [
     '#6366f1',
@@ -215,8 +243,8 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
     '#a855f7',
   ]
   let hash = 0
-  for (let i = 0; i < nameTrimmed.length; i++) {
-    hash = nameTrimmed.charCodeAt(i) + ((hash << 5) - hash)
+  for (let i = 0; i < displayLabel.length; i++) {
+    hash = displayLabel.charCodeAt(i) + ((hash << 5) - hash)
   }
   const brandColor = fallbackPalette[Math.abs(hash) % fallbackPalette.length]
 

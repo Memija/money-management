@@ -16,6 +16,7 @@ import {
   getTransactionCategory,
   hasExtensiveCategoryData,
   isInformativeTransaction,
+  isPaymentProcessorIntermediary,
   isRelatedTransaction,
   repairBrokenWords,
   resolveCanonicalCategory,
@@ -1058,6 +1059,50 @@ describe('category-utils', () => {
         'Anel Memic REVOLT21XXX LT153250000292115687 End-to-End-Ref.: MOB.147.UE.32306'
       expect(extractCleanDescription(desc)).toBe('Anel Memic')
       expect(extractMerchantKeyword(desc)).toBe('Anel Memic')
+    })
+
+    it('accurately cleans and extracts core merchant from PayPal intermediary transactions and direct account debits', () => {
+      // 1. eToro (Europe) Limited via yPal
+      const etoroTx =
+        'yPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Etoro (Europe) Limited , Ihr Einkauf bei Etoro (Euro'
+      expect(isPaymentProcessorIntermediary(etoroTx)).toBe(true)
+      expect(extractMerchantKeyword(etoroTx)).toBe('Etoro')
+
+      // 2. Xsolla HK Limited
+      const xsollaTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Xsolla HK Limited, Ihr Einkauf bei Xsolla HK Limite'
+      expect(isPaymentProcessorIntermediary(xsollaTx)).toBe(true)
+      expect(extractMerchantKeyword(xsollaTx)).toBe('Xsolla')
+
+      // 3. Avaaz Foundation
+      const avaazTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Avaaz Foundation, Ihr Einkauf bei Avaaz Foundatio'
+      expect(isPaymentProcessorIntermediary(avaazTx)).toBe(true)
+      expect(extractMerchantKeyword(avaazTx)).toBe('Avaaz')
+
+      // 4. Direct PayPal account debit (ABBUCHUNG VOM PAYPAL-KO NTO)
+      const paypalDebitTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP ABBUCHUNG VOM PAYPAL-KO NTO End-to-End-Ref'
+      expect(isPaymentProcessorIntermediary(paypalDebitTx)).toBe(false)
+      expect(extractMerchantKeyword(paypalDebitTx)).toBe('PayPal')
+
+      // 5. Kalea GmbH
+      const kaleaTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Kalea GmbH, Ihr Einkau f bei Kalea GmbH End-to-E'
+      expect(isPaymentProcessorIntermediary(kaleaTx)).toBe(true)
+      expect(extractMerchantKeyword(kaleaTx)).toBe('Kalea')
+
+      // 6. Cyberport GmbH
+      const cyberportTx =
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1026469639646 . Cyberport GmbH, Ih r Einkauf bei Cyberport GmbH'
+      expect(isPaymentProcessorIntermediary(cyberportTx)).toBe(true)
+      expect(extractMerchantKeyword(cyberportTx)).toBe('Cyberport')
+
+      // 7. Unknown online merchant via PayPal
+      const unknownShopTx =
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . UnknownShop123, Ihr Einkauf bei UnknownShop123'
+      expect(isPaymentProcessorIntermediary(unknownShopTx)).toBe(true)
+      expect(extractMerchantKeyword(unknownShopTx)).toBe('UnknownShop123')
     })
 
     it('handles empty and invalid inputs gracefully', () => {
@@ -2543,6 +2588,192 @@ describe('category-utils', () => {
           ),
         ).toBe('Dining Out')
         expect(categorize('Wasserpalast Graz')).toBe('Dining Out')
+
+        // Batch 12:
+        // 1. mobilezone GmbH / HIGH mobile -> Communication
+        expect(
+          categorize(
+            'mobilezone GmbH 3243033328 End-to-End-Ref.: 0077110000ZV2612446Z Mandatsref: HIGH-16540',
+          ),
+        ).toBe('Communication')
+        expect(categorize('mobilezone GmbH HIGH mobile')).toBe('Communication')
+
+        // 2. Kontoführung Commerzbank -> Bank Fees
+        expect(
+          categorize(
+            'Kontoführung Konto 646293100 EUR BLZ 500 400 00 vom 01.06.2026 bis 30.06.2026 Kontoführung',
+          ),
+        ).toBe('Bank Fees')
+
+        // 3. Stadtkasse Bad Nauheim -> Taxes
+        expect(
+          categorize(
+            'STADTKASSE BAD NAUHEIM PBNKDEFFXXX DE34440100460141202460 0298350131 End-to-End-R',
+          ),
+        ).toBe('Taxes')
+        expect(categorize('Stadtkasse Bad Nauheim Grundsteuer')).toBe('Taxes')
+
+        // 4. Kronberg Talstation Jakobsbad CH -> Entertainment
+        expect(
+          categorize(
+            'Kronberg Talstation, Jakobsbad CH Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card',
+          ),
+        ).toBe('Entertainment')
+        expect(categorize('Erlebniswelt Kronberg Talstation')).toBe('Entertainment')
+
+        // 5. SEA LIFE Konstanz GmbH -> Entertainment
+        expect(
+          categorize(
+            'SEA LIFE Konstanz GmbH, Hamburg DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit',
+          ),
+        ).toBe('Entertainment')
+        expect(categorize('SEA LIFE Konstanz')).toBe('Entertainment')
+
+        // 6. Hotel Neckarlux Heidelberg -> Travel
+        expect(
+          categorize(
+            'HOTEL NECKARLUX INH. CUENE//HEIDELB 2026-04-18T15:59:01 KFN 0 VJ 2812 Kartenzahlung',
+          ),
+        ).toBe('Travel')
+        expect(categorize('Hotel Neckarlux Heidelberg')).toBe('Travel')
+
+        // 7. authentic play GmbH -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1048027847722/PP.4585.PP/. authenti c play GmbH, Ihr Einkauf bei',
+          ),
+        ).toBe('Shopping')
+        expect(categorize('authentic play Spielwaren')).toBe('Shopping')
+
+        // 8. Chidoba Mexican Grill -> Dining Out
+        expect(
+          categorize(
+            'Chidoba Mexican Grill, Sulzbach DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Car',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Chidoba Mexican Grill MTZ')).toBe('Dining Out')
+
+        // 9. Store 3798 Bad Homburg -> Dining Out
+        expect(
+          categorize(
+            '3798 Bad Homburg von d, Bad Homburg v DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual',
+          ),
+        ).toBe('Dining Out')
+
+        // 10. CPC Parkhaus Nürnberg -> Transport
+        expect(
+          categorize(
+            'CPC Parkhaus Nuernberg, Nuernberg DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debi',
+          ),
+        ).toBe('Transport')
+        expect(categorize('CPC Parkhaus Nürnberg Contipark')).toBe('Transport')
+
+        // 11. FAO Eating Point Faro Airport -> Dining Out
+        expect(
+          categorize(
+            'FAO EATING POINT, FARO PT Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 2025',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('FAO Eating Point Faro')).toBe('Dining Out')
+
+        // 12. DJH Jugendherberge Nürnberg Kaiserburg -> Travel
+        expect(
+          categorize(
+            'Jugendherberge Nuernbe, Nuernberg DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit',
+          ),
+        ).toBe('Travel')
+        expect(categorize('DJH Jugendherberge Nürnberg')).toBe('Travel')
+
+        // 13. Volkshochschule Bad Homburg -> Education
+        expect(
+          categorize(
+            'VOLKSHOCHSCHULE//BAD HOMBURG/DE 2024-11-19T09:28:16 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Education')
+        expect(categorize('Volkshochschule Bad Homburg Kurs')).toBe('Education')
+
+        // 14. Rasthaus Göttingen Ost Rosdorf -> Dining Out
+        expect(
+          categorize(
+            'Rasthaus Goettingen Os Rosdorf DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Rasthaus Goetti',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Rasthaus Göttingen Ost')).toBe('Dining Out')
+
+        // 15. Burger King Rosdorf (BK 31590 SOT Rosdorf) -> Dining Out
+        expect(
+          categorize(
+            'BK 31590 SOT ROSDORF DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card BK 31590 SOT ROSDO',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Burger King Rosdorf')).toBe('Dining Out')
+
+        // 16. Wiener Feinbäckerei Heberer -> Dining Out
+        expect(
+          categorize(
+            'WIENER FEINBACKEREI 1 Muhlheim am M DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card WIENE',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Wiener Feinbäckerei Heberer')).toBe('Dining Out')
+
+        // 17. Köschinger Forst Ost Hepberg -> Dining Out
+        expect(
+          categorize(
+            'Koeschinger Forst Ost Hepberg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Koeschinger For',
+          ),
+        ).toBe('Dining Out')
+        expect(categorize('Köschinger Forst Ost')).toBe('Dining Out')
+      })
+
+      it('categorizes PayPal transactions correctly: assigns underlying merchants for intermediary checkouts and Transfers only for genuine direct debits', () => {
+        // 1. eToro (Europe) Limited -> Savings
+        expect(
+          categorize(
+            'yPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Etoro (Europe) Limited , Ihr Einkauf bei Etoro (Euro',
+          ),
+        ).toBe('Savings')
+
+        // 2. Xsolla HK Limited -> Entertainment
+        expect(
+          categorize(
+            'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Xsolla HK Limited, Ihr Einkauf bei Xsolla HK Limite',
+          ),
+        ).toBe('Entertainment')
+
+        // 3. Avaaz Foundation -> Shopping
+        expect(
+          categorize(
+            'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Avaaz Foundation, Ihr Einkauf bei Avaaz Foundatio',
+          ),
+        ).toBe('Shopping')
+
+        // 4. Direct PayPal account debit (ABBUCHUNG VOM PAYPAL-KO NTO) -> Transfers
+        expect(
+          categorize(
+            'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP ABBUCHUNG VOM PAYPAL-KO NTO End-to-End-Ref',
+          ),
+        ).toBe('Transfers')
+
+        // 5. Kalea GmbH -> Shopping
+        expect(
+          categorize(
+            'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Kalea GmbH, Ihr Einkau f bei Kalea GmbH End-to-E',
+          ),
+        ).toBe('Shopping')
+
+        // 6. Cyberport GmbH -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1026469639646 . Cyberport GmbH, Ih r Einkauf bei Cyberport GmbH',
+          ),
+        ).toBe('Shopping')
+
+        // 7. Unknown online merchant via PayPal -> Shopping (NOT Transfers!)
+        expect(
+          categorize(
+            'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . UnknownShop123, Ihr Einkauf bei UnknownShop123',
+          ),
+        ).toBe('Shopping')
       })
     })
   })

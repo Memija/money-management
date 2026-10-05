@@ -1,6 +1,6 @@
 import { POPULAR_MERCHANTS } from '../../data/merchants'
 import { type CategoryKeywords, translations } from '../../i18n/translations'
-import { repairBrokenWords } from './description-cleaning'
+import { isPaymentProcessorIntermediary, repairBrokenWords } from './description-cleaning'
 
 export interface CategorizeOptions {
   customKeywords?: Record<string, string[]>
@@ -352,6 +352,11 @@ export function categorize(
   }
 
   // 5. Transfers & Payment processor fallback (e.g. direct PayPal/Klarna without specific retail merchant)
+  if (isPaymentProcessorIntermediary(d)) {
+    if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Shopping')
+    return 'Shopping'
+  }
+
   if (
     transferMerchantsRegex?.test(d) ||
     categoryRegexes.Transfers?.test(d) ||

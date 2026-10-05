@@ -64,7 +64,66 @@ export const WasserpalastLogo = createImageLogo({
   displayName: 'WasserpalastLogo',
 })
 
+/** Burger King — global fast-food restaurant chain. */
+export const BurgerKingLogo = createImageLogo({
+  src: '/brands/burger-king.png',
+  label: 'Burger King',
+  displayName: 'BurgerKingLogo',
+})
+
+/** Chidoba Mexican Grill — fresh fast-casual Mexican food restaurant in MTZ Sulzbach. */
+export const ChidobaLogo = createImageLogo({
+  src: '/brands/chidoba.png',
+  label: 'Chidoba Mexican Grill',
+  displayName: 'ChidobaLogo',
+})
+
+/** Eating Point — restaurant and casual dining venue at Faro Airport, Portugal. */
+export const EatingPointLogo = createImageLogo({
+  src: '/brands/eating-point.png',
+  label: 'Eating Point Faro',
+  displayName: 'EatingPointLogo',
+})
+
+/** Rasthaus Göttingen Ost — motorway service area and restaurant in Rosdorf (Tank & Rast / Serways). */
+export const RasthausGoettingenLogo = createImageLogo({
+  src: '/brands/rasthaus-goettingen.png',
+  label: 'Rasthaus Göttingen Ost',
+  displayName: 'RasthausGoettingenLogo',
+})
+
+/** Wiener Feinbäckerei Heberer — traditional artisanal bakery chain and café. */
+export const WienerFeinbaeckereiLogo = createImageLogo({
+  src: '/brands/wiener-feinbaeckerei.png',
+  label: 'Wiener Feinbäckerei Heberer',
+  displayName: 'WienerFeinbaeckereiLogo',
+})
+
+/** Köschinger Forst Ost — motorway service station and restaurant near Hepberg (Tank & Rast / Serways). */
+export const KoeschingerForstLogo = createImageLogo({
+  src: '/brands/koeschinger-forst.png',
+  label: 'Köschinger Forst Ost',
+  displayName: 'KoeschingerForstLogo',
+})
+
+/** Bad Homburg Retail / Store 3798 — local shop and food store in Bad Homburg vor der Höhe. */
+export const BadHomburgRetailLogo = createImageLogo({
+  src: '/brands/bad-homburg-retail.png',
+  label: 'Bad Homburg Retail',
+  displayName: 'BadHomburgRetailLogo',
+})
+
+/** Kalea (Kalea GmbH) — craft beer discovery boxes, advent calendars, and beer tasting community. */
+export const KaleaLogo = createImageLogo({
+  src: '/brands/kalea.png',
+  label: 'Kalea',
+  displayName: 'KaleaLogo',
+})
+
 export const DINING_LOGOS: Record<string, IconComponent> = {
+  KaleaLogo,
+  kaleaLogo: KaleaLogo,
+  'kalea': KaleaLogo,
   PizzaHutLogo,
   pizzaHutLogo: PizzaHutLogo,
   'pizza-hut': PizzaHutLogo,
@@ -97,4 +156,33 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   wasserpalastLogo: WasserpalastLogo,
   'wasserpalast': WasserpalastLogo,
   'wasserpalast-graz': WasserpalastLogo,
+  BurgerKingLogo,
+  burgerKingLogo: BurgerKingLogo,
+  'burgerking': BurgerKingLogo,
+  'burger-king': BurgerKingLogo,
+  ChidobaLogo,
+  chidobaLogo: ChidobaLogo,
+  'chidoba': ChidobaLogo,
+  'chidoba-mexican-grill': ChidobaLogo,
+  EatingPointLogo,
+  eatingPointLogo: EatingPointLogo,
+  'eating-point': EatingPointLogo,
+  'fao-eating-point': EatingPointLogo,
+  RasthausGoettingenLogo,
+  rasthausGoettingenLogo: RasthausGoettingenLogo,
+  'rasthaus-goettingen': RasthausGoettingenLogo,
+  'rasthaus-goettingen-ost': RasthausGoettingenLogo,
+  WienerFeinbaeckereiLogo,
+  wienerFeinbaeckereiLogo: WienerFeinbaeckereiLogo,
+  'wiener-feinbaeckerei': WienerFeinbaeckereiLogo,
+  'wiener-feinbackerei': WienerFeinbaeckereiLogo,
+  KoeschingerForstLogo,
+  koeschingerForstLogo: KoeschingerForstLogo,
+  'koeschinger-forst': KoeschingerForstLogo,
+  'koeschinger-forst-ost': KoeschingerForstLogo,
+  BadHomburgRetailLogo,
+  badHomburgRetailLogo: BadHomburgRetailLogo,
+  'bad-homburg-store': BadHomburgRetailLogo,
+  'bad-homburg-retail': BadHomburgRetailLogo,
 }
+

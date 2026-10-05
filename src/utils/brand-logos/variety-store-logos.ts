@@ -15,6 +15,20 @@ export const BabyOneLogo = createImageLogo({
   displayName: 'BabyOneLogo',
 })
 
+/** authentic play GmbH — specialist supplier of children's play, toys, and educational products. */
+export const AuthenticPlayLogo = createImageLogo({
+  src: '/brands/authentic-play.png',
+  label: 'authentic play',
+  displayName: 'AuthenticPlayLogo',
+})
+
+/** Avaaz (Avaaz Foundation) — global civic campaigning organization and grassroots advocacy movement. */
+export const AvaazLogo = createImageLogo({
+  src: '/brands/avaaz.png',
+  label: 'Avaaz',
+  displayName: 'AvaazLogo',
+})
+
 export const VARIETY_STORE_LOGOS: Record<string, IconComponent> = {
   TediLogo,
   tediLogo: TediLogo,
@@ -24,4 +38,11 @@ export const VARIETY_STORE_LOGOS: Record<string, IconComponent> = {
   babyOneLogo: BabyOneLogo,
   'babyone': BabyOneLogo,
   'baby-one': BabyOneLogo,
+  AuthenticPlayLogo,
+  authenticPlayLogo: AuthenticPlayLogo,
+  'authentic-play': AuthenticPlayLogo,
+  AvaazLogo,
+  avaazLogo: AvaazLogo,
+  'avaaz': AvaazLogo,
+  'avaaz-foundation': AvaazLogo,
 }
