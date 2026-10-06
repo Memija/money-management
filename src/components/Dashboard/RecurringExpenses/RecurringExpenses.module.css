@@ -95,7 +95,10 @@
   border-radius: 12px;
   min-width: 140px;
   border: 1px solid;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
   box-sizing: border-box;
 }
 
@@ -254,7 +257,11 @@
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   position: relative;
   overflow: visible !important;
   z-index: 1;
@@ -314,6 +321,86 @@
   border: 1px solid rgba(125, 125, 125, 0.2);
   background: rgba(125, 125, 125, 0.1);
   transition: transform 0.2s ease;
+  overflow: hidden;
+  padding: 0;
+}
+
+.brandIconBox img,
+.brandIconBox svg[data-brand-logo="true"],
+.brandIconBox :global(.brand-logo-full),
+.brandIconBox svg[aria-label="Tomorrow Bank"],
+.brandIconBox svg[aria-label="Revolut"],
+.brandIconBox svg[aria-label*="Commerzbank" i],
+.brandIconBox svg[aria-label*="Mercedes" i],
+.brandIconBox svg[aria-label*="ADAC" i],
+.brandIconBox svg[aria-label*="RMV" i],
+.brandIconBox svg[aria-label*="Aral" i],
+.brandIconBox svg[aria-label*="BMW" i],
+.brandIconBox svg[aria-label*="Audi" i],
+.brandIconBox svg[aria-label*="Volkswagen" i],
+.brandIconBox svg[aria-label*="Porsche" i],
+.brandIconBox svg[aria-label*="Tesla" i],
+.brandIconBox svg[aria-label*="Deutsche Bahn" i],
+.brandIconBox svg[aria-label*="BVG" i],
+.brandIconBox svg[aria-label*="HVV" i],
+.brandIconBox svg[aria-label*="VRR" i],
+.brandIconBox svg[aria-label*="ÖBB" i],
+.brandIconBox svg[aria-label*="Flix" i],
+.brandIconBox svg[aria-label*="SIXT" i],
+.brandIconBox svg[aria-label*="EasyPark" i],
+.brandIconBox svg[aria-label*="fair parken" i],
+.brandIconBox svg[aria-label*="ASFINAG" i],
+.brandIconBox svg[aria-label*="JET" i],
+.brandIconBox svg[aria-label*="Esso" i],
+.brandIconBox svg[aria-label*="AVIA" i],
+.brandIconBox svg[aria-label*="Eni" i],
+.brandIconBox svg[aria-label*="BP" i],
+.brandIconBox svg[aria-label*="Shell" i],
+.brandIconBox svg[aria-label*="Turmöl" i],
+.brandIconBox svg[aria-label*="Ionity" i],
+.brandIconBox svg[aria-label*="EnBW" i],
+.brandIconBox svg[aria-label*="Fastned" i],
+.brandIconBox svg[aria-label="TUI"],
+.brandIconBox svg[aria-label*="TUI" i],
+.brandIconBox svg[aria-label="Eurowings"],
+.brandIconBox svg[aria-label*="Eurowings" i],
+.brandIconBox svg[aria-label*="Holidays" i],
+.brandIconBox svg[aria-label="DERTOUR"],
+.brandIconBox svg[aria-label="alltours"],
+.brandIconBox svg[aria-label="Schauinsland-Reisen"],
+.brandIconBox svg[aria-label="Condor"],
+.brandIconBox svg[aria-label="wundertax"],
+.brandIconBox svg[aria-label*="wundertax" i],
+.brandIconBox svg[aria-label="Taxfix"],
+.brandIconBox svg[aria-label*="Taxfix" i],
+.brandIconBox svg[aria-label="smartsteuer"],
+.brandIconBox svg[aria-label*="smartsteuer" i],
+.brandIconBox svg[aria-label="ELSTER"],
+.brandIconBox svg[aria-label*="ELSTER" i],
+.brandIconBox svg[aria-label="WISO Steuer"],
+.brandIconBox svg[aria-label*="WISO Steuer" i],
+.brandIconBox svg[aria-label="Bundesrepublik Deutschland"],
+.brandIconBox svg[aria-label*="Finanzamt" i],
+.brandIconBox svg[aria-label*="Bad Homburg" i],
+.brandIconBox svg[aria-label*="Schmitten" i],
+.brandIconBox svg[aria-label*="Land Hessen" i],
+.brandIconBox svg[aria-label*="Gerichtskasse" i],
+.brandIconBox svg[aria-label*="Gerichtkasse" i],
+.brandIconBox svg[aria-label*="Justiz Hessen" i],
+.brandIconBox svg[aria-label*="Färber & Hutzel" i],
+.brandIconBox svg[aria-label*="Faerber" i],
+.brandIconBox svg[aria-label*="Kelkheim" i],
+.brandIconBox svg[aria-label*="Bad Nauheim" i],
+.brandIconBox svg[aria-label*="Hochtaunuskreis" i],
+.brandIconBox svg[aria-label*="Edukativni Centar" i],
+.brandIconBox svg[aria-label*="Rani Razvoj" i] {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+  display: block !important;
 }
 
 @supports (color: color-mix(in srgb, red, blue)) {
@@ -468,7 +555,10 @@
   border-radius: 99px;
   overflow: hidden;
   position: relative;
-  transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.25s ease;
+  transition:
+    height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease,
+    box-shadow 0.25s ease;
 }
 
 [data-theme='light'] .weightBarBg {
@@ -479,7 +569,10 @@
   height: 100%;
   border-radius: 99px;
   background: var(--card-accent-color, var(--primary));
-  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, filter 0.25s ease;
+  transition:
+    width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
 }
 
 @supports (color: color-mix(in srgb, red, blue)) {
@@ -509,7 +602,9 @@
 .card:hover .weightBarFill,
 .weightBarContainer:hover .weightBarFill {
   filter: brightness(1.25);
-  box-shadow: 0 0 12px var(--card-accent-color, var(--primary)), 0 0 4px var(--card-accent-color, var(--primary));
+  box-shadow:
+    0 0 12px var(--card-accent-color, var(--primary)),
+    0 0 4px var(--card-accent-color, var(--primary));
 }
 
 .weightPctText {
@@ -518,7 +613,10 @@
   color: var(--text-dim);
   min-width: 32px;
   text-align: right;
-  transition: color 0.2s ease, transform 0.2s ease, font-weight 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease,
+    font-weight 0.2s ease;
 }
 
 .card:hover .weightPctText,

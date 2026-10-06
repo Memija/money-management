@@ -121,18 +121,19 @@ export const sr: TranslationStrings = {
   duplicateImportProceed: 'Настави са {newCount} трансакција',
   duplicateImportOk: 'OK',
   duplicateImportCancel: 'Откажи',
-  duplicateTransactionsDetectedSingular:
-    'Откривена је 1 дупликатна трансакција и биће прескочена.',
-  duplicateTransactionsDetected:
-    'Откривено је {count} дупликатних трансакција и биће прескочене.',
-  duplicateImportAllBannerSingular: 'Откривена је 1 дуплирана трансакција. Ова трансакција је већ увезена.',
+  duplicateTransactionsDetectedSingular: 'Откривена је 1 дупликатна трансакција и биће прескочена.',
+  duplicateTransactionsDetected: 'Откривено је {count} дупликатних трансакција и биће прескочене.',
+  duplicateImportAllBannerSingular:
+    'Откривена је 1 дуплирана трансакција. Ова трансакција је већ увезена.',
   duplicateImportAllBanner: 'Свих {count} трансакција у овој датотеци је већ увезено (дупликати).',
-  duplicateImportPartialBanner: 'Откривено је {duplicateCount} дупликата који ће бити прескочени. {newCount} нових трансакција ће бити увезено.',
+  duplicateImportPartialBanner:
+    'Откривено је {duplicateCount} дупликата који ће бити прескочени. {newCount} нових трансакција ће бити увезено.',
   allTransactionsAlreadyImported: 'Све трансакције су већ увезене',
   importNewTransactions: 'Увези {count} нових трансакција',
   filterDuplicates: 'Дупликати',
   filterModified: 'Модификовано',
-  duplicatesSkippedNotice: 'Ове трансакције већ постоје у Вашој евиденцији и биће прескочене како би се спречило двоструко рачунање.',
+  duplicatesSkippedNotice:
+    'Ове трансакције већ постоје у Вашој евиденцији и биће прескочене како би се спречило двоструко рачунање.',
   viewDuplicates: 'Прегледај дупликате',
   unlockDuplicate: 'Откључај',
   unlockDuplicateTitle: 'Откључај дупликатну трансакцију',
@@ -145,7 +146,8 @@ export const sr: TranslationStrings = {
   filterAlreadyDuplicated: 'Већ дуплирано',
   alreadyDuplicatedFilterNotice:
     'Ове дуплиране трансакције су већ раније увезене и не могу се више мењати нити откључавати.',
-  cannotRelockModified: 'Није могуће поново закључати измењену трансакцију. Вратите на оригиналне вредности за закључавање.',
+  cannotRelockModified:
+    'Није могуће поново закључати измењену трансакцију. Вратите на оригиналне вредности за закључавање.',
   resetToOriginal: 'Врати на оригиналне вредности',
   resetTransactionModalTitle: 'Врати трансакције на изворно',
   resetBulkPrompt:
@@ -165,7 +167,8 @@ export const sr: TranslationStrings = {
   applyToAll: 'Примени на све',
   dismiss: 'Одбаци',
   batchCategoryTitle: 'Ажурирај повезане трансакције',
-  batchCategoryPrompt: 'Пронађено је {count} повезаних трансакција. Желите ли да промените категорију за све на {category}?',
+  batchCategoryPrompt:
+    'Пронађено је {count} повезаних трансакција. Желите ли да промените категорију за све на {category}?',
   batchCategoryOnlyThis: 'Само ова трансакција',
   batchCategoryUpdateAll: 'Ажурирај све ({count})',
   batchCategoryRememberRule: 'Запамти ово правило за будуће увозе',
@@ -175,7 +178,8 @@ export const sr: TranslationStrings = {
   applyToAllUnlocked: 'Примени на све откључане',
   adjustUnlockedOptions: 'Прилагоди групно...',
   adjustUnlockedModalTitle: 'Групно прилагођавање откључаних трансакција',
-  adjustUnlockedModalSubtitle: 'Одаберите измене које желите применити и циљане откључане трансакције.',
+  adjustUnlockedModalSubtitle:
+    'Одаберите измене које желите применити и циљане откључане трансакције.',
   applyFieldsLabel: 'Измене за примену',
   targetTransactionsLabel: 'Циљане трансакције',
   applyToSelectedCount: 'Примени на {count} одабраних',
@@ -224,8 +228,7 @@ export const sr: TranslationStrings = {
   duplicateTransactionsDetectedDesc:
     'Пронађено {count} дуплих трансакција на вашим рачунима. Ресетовањем ћете уклонити дупликате и прерачунати салдо на контролној табли.',
   resetDuplicateCalculations: 'Ресетуј прорачуне и уклони дупликате',
-  duplicatesResetSuccess:
-    'Прорачуни успешно ресетовани. Уклоњено {count} дуплих трансакција.',
+  duplicatesResetSuccess: 'Прорачуни успешно ресетовани. Уклоњено {count} дуплих трансакција.',
 
   spaceTransfersExcluded:
     '{count} интерних преноса на подрачуне је аутоматски искључено ради избегавања двоструког рачунања.',
@@ -353,6 +356,8 @@ export const sr: TranslationStrings = {
   hideInternalTransfers: 'Сакриј интерне преносе',
   transfersTabNotice:
     'Интерни преноси између ваших рачуна су искључени из прихода и расхода (само за читање).',
+  copyTransactionText: 'Копирај текст трансакције',
+  copied: 'Копирано!',
 
   insightTransactions: 'Трансакције',
   insightAvgTransaction: 'Просечна трансакција',
@@ -477,11 +482,14 @@ export const sr: TranslationStrings = {
 
   // Data Management
   dataManagementTitle: 'Управљање подацима',
-  dataManagementDesc: 'Управљајте локално сачуваним финансијским подацима, сигурносним копијама и подешавањима приватности.',
+  dataManagementDesc:
+    'Управљајте локално сачуваним финансијским подацима, сигурносним копијама и подешавањима приватности.',
   backupRestoreTitle: 'Сигурносна копија и враћање',
-  backupRestoreDesc: 'Сачувајте сигурносну копију својих финансијских података или вратите претходно сачувану датотеку.',
+  backupRestoreDesc:
+    'Сачувајте сигурносну копију својих финансијских података или вратите претходно сачувану датотеку.',
   exportBackup: 'Извези сигурносну копију',
-  exportBackupDesc: 'Преузмите све своје рачуне, трансакције, категорије и прилагођена правила као JSON датотеку.',
+  exportBackupDesc:
+    'Преузмите све своје рачуне, трансакције, категорије и прилагођена правила као JSON датотеку.',
   exportBackupButton: 'Извези копију (.json)',
   exportBackupSuccess: 'Сигурносна копија успешно преузета.',
   restoreBackup: 'Врати податке из копије',
@@ -490,7 +498,8 @@ export const sr: TranslationStrings = {
   restoreBackupSuccess: 'Подаци успешно враћени из сигурносне копије.',
   restoreBackupInvalidFile: 'Одабрана датотека није важећа Saldio сигурносна копија.',
   restoreBackupErrorInvalidJson: 'Датотека резервне копије се не може прочитати као исправан JSON.',
-  restoreBackupErrorRootObject: 'Неисправна структура резервне копије (коренски елемент мора бити JSON објекат).',
+  restoreBackupErrorRootObject:
+    'Неисправна структура резервне копије (коренски елемент мора бити JSON објекат).',
   restoreBackupErrorMissingAccounts: 'Датотека резервне копије не садржи листу рачуна.',
   restoreBackupErrorAccountInvalid: 'Рачун #{index} је неважећи.',
   restoreBackupErrorAccountMissingId: 'Рачун „{account}“ нема ID институције.',
@@ -501,13 +510,17 @@ export const sr: TranslationStrings = {
   restoreBackupErrorTxMissingId: 'Трансакција #{index} на рачуну „{account}“ нема важећи ID.',
   restoreBackupErrorTxMissingDate: 'Трансакција „{id}“ на рачуну „{account}“ нема важећи датум.',
   restoreBackupErrorTxInvalidAmount: 'Трансакција „{id}“ на рачуну „{account}“ има неважећи износ.',
-  restoreBackupErrorTxInvalidDescription: 'Трансакција „{id}“ на рачуну „{account}“ има неважећи опис.',
-  restoreBackupErrorTxMissingCurrency: 'Трансакција „{id}“ на рачуну „{account}“ нема наведену валуту.',
-  restoreBackupErrorTxInvalidType: 'Трансакција „{id}“ на рачуну „{account}“ има неважећи тип (мора бити приход или расход).',
+  restoreBackupErrorTxInvalidDescription:
+    'Трансакција „{id}“ на рачуну „{account}“ има неважећи опис.',
+  restoreBackupErrorTxMissingCurrency:
+    'Трансакција „{id}“ на рачуну „{account}“ нема наведену валуту.',
+  restoreBackupErrorTxInvalidType:
+    'Трансакција „{id}“ на рачуну „{account}“ има неважећи тип (мора бити приход или расход).',
   restoreBackupErrorCustomCategories: 'Подаци о прилагођеним категоријама нису ваљани.',
   restoreBackupErrorDuplicateRules: 'Правила за премошћавање дупликата нису ваљана.',
   restoreBackupConfirmTitle: 'Враћање података',
-  restoreBackupConfirmMessage: 'Ова сигурносна копија садржи {accounts} и {transactions}. Враћањем ће се заменити ваши тренутни подаци. Желите ли да наставите?',
+  restoreBackupConfirmMessage:
+    'Ова сигурносна копија садржи {accounts} и {transactions}. Враћањем ће се заменити ваши тренутни подаци. Желите ли да наставите?',
   restoreBackupConfirmButton: 'Врати податке',
   restoreFromBackup: 'Врати из резервне копије',
   restoreBackupPrompt: 'Већ имате резервну копију? Вратите своје податке',
@@ -539,8 +552,10 @@ export const sr: TranslationStrings = {
   privateFinanceWatermark: '100% Приватно и локално • saldio.app',
   dangerZone: 'Опасна зона',
   deleteAllDataTitle: 'Обриши све податке',
-  deleteAllDataDesc: 'Трајно брише све увезене рачуне, трансакције, правила категоризације и прилагођене категорије. Ова радња се не може поништити.',
-  deleteAllDataConfirmMessage: 'Да ли сте сигурни да желите у потпуности да обришете све своје податке? Сви увезени рачуни, трансакције, прилагођене категорије и правила биће трајно уклоњени.',
+  deleteAllDataDesc:
+    'Трајно брише све увезене рачуне, трансакције, правила категоризације и прилагођене категорије. Ова радња се не може поништити.',
+  deleteAllDataConfirmMessage:
+    'Да ли сте сигурни да желите у потпуности да обришете све своје податке? Сви увезени рачуни, трансакције, прилагођене категорије и правила биће трајно уклоњени.',
   deleteAllDataButton: 'Обриши све податке',
   resetPreferencesOption: 'Такође ресетуј подешавања теме и језика',
   resetPreferencesDesc: 'Врати подешавања језика и теме на подразумеване вредности',
@@ -553,7 +568,8 @@ export const sr: TranslationStrings = {
   noConnectedBanks: 'Нема увезених рачуна',
   deleteBankTransactions: 'Обриши трансакције',
   deleteBankTransactionsTitle: 'Брисање трансакција за {bank}',
-  deleteBankTransactionsConfirm: 'Да ли сте сигурни да желите да обришете све трансакције и податке за {bank}? Ова радња се не може поништити.',
+  deleteBankTransactionsConfirm:
+    'Да ли сте сигурни да желите да обришете све трансакције и податке за {bank}? Ова радња се не може поништити.',
 
   catSalary: 'Плата',
   catRent: 'Станарина',
@@ -633,8 +649,16 @@ export const sr: TranslationStrings = {
     whitMonday: 'Духовски понедељак',
   },
   categoryKeywords: {
-    Salary: ['\\bплата\\b', 'зарада', 'приход', '\\bplata\\b', 'zarada', 'prihod'],
-    Rent: ['станарина', 'кирија', 'депозит', 'stanarina', 'kirija', 'depozit', 'kautionsabrechnung'],
+    Salary: ['\\bплата\\b', 'зарада', 'приход', '\\bplata\\b', 'zarada', 'prihod', 'reisesp', 'reisespesen', 'dnevnice', 'дневнице', 'rücküberweisung', 'rueckueberweisung'],
+    Rent: [
+      'станарина',
+      'кирија',
+      'депозит',
+      'stanarina',
+      'kirija',
+      'depozit',
+      'kautionsabrechnung',
+    ],
     Loans: [
       'кредит',
       'кредити',
@@ -720,16 +744,7 @@ export const sr: TranslationStrings = {
     Transport: ['гориво', 'пумпа', 'аутобус', 'превоз', 'gorivo', 'pumpa', 'autobus', 'prevoz'],
     Entertainment: ['биоскоп', 'позориште', 'забава', 'bioskop', 'pozoriste', 'zabava'],
     Insurance: ['осигурање', 'osiguranje'],
-    Utilities: [
-      'струја',
-      'вода',
-      'рачун',
-      'комуналне',
-      'struja',
-      'voda',
-      'racun',
-      'komunalne',
-    ],
+    Utilities: ['струја', 'вода', 'рачун', 'комуналне', 'struja', 'voda', 'racun', 'komunalne'],
     Communication: [
       'интернет',
       'телефон',
@@ -771,6 +786,10 @@ export const sr: TranslationStrings = {
       'факултет',
       'универзитет',
       'курс',
+      'едукативни',
+      'едукација',
+      'едукативни центар',
+      'рани развој',
       'obrazovanje',
       'skola',
       'škola',
@@ -782,8 +801,24 @@ export const sr: TranslationStrings = {
       'fakultet',
       'univerzitet',
       'kurs',
+      'edukativni',
+      'edukacija',
+      'edukativni centar',
+      'rani razvoj',
+      'edukativno',
+      'edukativna',
+      'edukativne',
     ],
-    Savings: ['штедња', 'stednja', 'flatex', 'degiro', 'trade republic', 'scalable capital', 'swiss life', 'swiss life se'],
+    Savings: [
+      'штедња',
+      'stednja',
+      'flatex',
+      'degiro',
+      'trade republic',
+      'scalable capital',
+      'swiss life',
+      'swiss life se',
+    ],
     Cash: [
       'gotovina',
       'bankomat',
@@ -795,7 +830,29 @@ export const sr: TranslationStrings = {
       'исплата на банкомату',
       'atm',
     ],
-    Transfers: ['трансфер', 'уплата', 'transfer', 'uplata', 'stadtkasse kelkheim', 'stadt kelkheim', 'kelkheim', 'revolut', 'revolt21xxx', 'revolt21', 'revolt', 'sparkasse', 'haspa', '1822direkt', 'hypovereinsbank', 'hvb', 'santander', 'norisbank', 'gls bank', 'apobank', 'vivid'],
+    Transfers: [
+      'трансфер',
+      'уплата',
+      'transfer',
+      'uplata',
+      'stadtkasse kelkheim',
+      'stadt kelkheim',
+      'kelkheim',
+      'revolut',
+      'revolt21xxx',
+      'revolt21',
+      'revolt',
+      'sparkasse',
+      'haspa',
+      '1822direkt',
+      'hypovereinsbank',
+      'hvb',
+      'santander',
+      'norisbank',
+      'gls bank',
+      'apobank',
+      'vivid',
+    ],
     Travel: [
       'хотел',
       '\\bлет\\b',
@@ -926,6 +983,12 @@ export const sr: TranslationStrings = {
       'trezor',
     ],
     BankFees: [
+      'поврат накнаде',
+      'рефундација накнаде',
+      'rückvergütung',
+      'rueckverguetung',
+      'gebührenerstattung',
+      'gebuehrenerstattung',
       'банкарска провизија',
       'банкарске накнаде',
       'банкарска накнада',

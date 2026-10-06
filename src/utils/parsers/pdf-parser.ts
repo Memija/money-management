@@ -1,7 +1,7 @@
 import type { Transaction } from '../../types'
 import { extractIbans } from '../account-transfers'
 import { repairBrokenWords } from '../categorizer/description-cleaning'
-import { generateId, inferType, parseAmount, parseCurrency, parseDate } from './helpers'
+import { EXPLICIT_INCOME_KEYWORDS_REGEX,generateId, inferType, parseAmount, parseCurrency, parseDate } from './helpers'
 import { ALL_SUMMARY_KEYWORDS } from './parser-i18n'
 
 export function extractAccountIbansFromPdf(fullText: string, fileName?: string): string[] {
@@ -39,8 +39,11 @@ function parseDoubleDateStrategy(
   let m
   while ((m = deRegex.exec(remainingText)) !== null) {
     const amountStr = m[3].replace(/\s/g, '')
-    const amount = parseAmount(amountStr)
+    let amount = parseAmount(amountStr)
     const desc = repairBrokenWords(m[2].replace(/\s+/g, ' ').trim())
+    if (EXPLICIT_INCOME_KEYWORDS_REGEX.test(desc) && amount < 0) {
+      amount = Math.abs(amount)
+    }
     // Blank out the matched text so it doesn't match the fallback regexes
     remainingText =
       remainingText.slice(0, m.index) +
@@ -59,7 +62,7 @@ function parseDoubleDateStrategy(
       description: desc || 'PDF Transaction',
       amount,
       currency: curr,
-      type: inferType(amount),
+      type: inferType(amount, desc),
       institution,
       counterpartyIban,
     })
@@ -82,8 +85,11 @@ function parseSingleDateStrategy(
   let m
   while ((m = deRegexSingleDate.exec(remainingText)) !== null) {
     const amountStr = m[3].replace(/\s/g, '')
-    const amount = parseAmount(amountStr)
+    let amount = parseAmount(amountStr)
     const desc = repairBrokenWords(m[2].replace(/\s+/g, ' ').trim())
+    if (EXPLICIT_INCOME_KEYWORDS_REGEX.test(desc) && amount < 0) {
+      amount = Math.abs(amount)
+    }
     remainingText =
       remainingText.slice(0, m.index) +
       ' '.repeat(m[0].length) +
@@ -101,7 +107,7 @@ function parseSingleDateStrategy(
       description: desc || 'PDF Transaction',
       amount,
       currency: curr,
-      type: inferType(amount),
+      type: inferType(amount, desc),
       institution,
       counterpartyIban,
     })
@@ -127,8 +133,11 @@ function parseFallbackStrategy(text: string, institution: string): Transaction[]
     const aMatch = line.match(amtRe)
     if (dMatch && aMatch) {
       const amountStr = aMatch[1].replace(/\s/g, '')
-      const amount = parseAmount(amountStr)
+      let amount = parseAmount(amountStr)
       const desc = repairBrokenWords(line.replace(dMatch[0], '').replace(aMatch[0], '').replace(/\s+/g, ' ').trim())
+      if (EXPLICIT_INCOME_KEYWORDS_REGEX.test(desc) && amount < 0) {
+        amount = Math.abs(amount)
+      }
       if (isSummaryLine(desc)) {
         continue
       }
@@ -142,7 +151,7 @@ function parseFallbackStrategy(text: string, institution: string): Transaction[]
         description: desc || 'PDF Transaction',
         amount,
         currency: curr,
-        type: inferType(amount),
+        type: inferType(amount, desc),
         institution,
         counterpartyIban,
       })

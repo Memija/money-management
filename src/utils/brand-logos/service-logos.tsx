@@ -1,10 +1,13 @@
 export {
   BadHomburgLogo,
+  EdukativniCentarLogo,
+  EdukativniCentarRaniRazvojLogo,
   GemeindeSchmittenLogo,
   HochtaunuskreisLogo,
   KelkheimLogo,
   KreisHochtaunusLogo,
   LandkreisHochtaunusLogo,
+  RaniRazvojLogo,
   SchmittenLogo,
   StadtBadHomburgLogo,
   StadtkasseKelkheimLogo,

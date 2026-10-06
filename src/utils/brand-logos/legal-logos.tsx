@@ -15,16 +15,17 @@ export const FaerberHutzelLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '8px',
+      borderRadius: 'inherit',
       overflow: 'hidden',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="Färber & Hutzel Notare und Rechtsanwälte"
     role="img"
   >
     {/* Dark navy background circular card */}
-    <rect width="48" height="48" rx="8" fill="#172A45" />
+    <rect width="48" height="48" fill="#172A45" />
 
     {/* Elegant 'HF' monogram ligature vector path */}
     <path

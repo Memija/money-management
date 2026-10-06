@@ -8,6 +8,7 @@ import type { Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel } from '../../../utils/category-utils'
+import { CopyButton } from '../CopyButton'
 import { Modal } from '../Modal'
 
 import styles from './BatchCategoryModal.module.css'
@@ -132,12 +133,21 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
         {/* Target Transaction Card showing Transition */}
         <div className={styles.targetCard}>
           <div className={styles.targetCardHeader}>
-            <span
-              className={`${styles.targetDesc} ${isPrivacyMode ? 'privacy-blur' : ''}`}
-              title={isPrivacyMode ? undefined : targetTransaction.description}
-            >
-              {targetTransaction.description}
-            </span>
+            <div className={styles.targetDescRow}>
+              <span
+                className={`${styles.targetDesc} ${isPrivacyMode ? 'privacy-blur' : ''}`}
+                title={isPrivacyMode ? undefined : targetTransaction.description}
+              >
+                {targetTransaction.description}
+              </span>
+              <CopyButton
+                text={targetTransaction.description}
+                title={t.copyTransactionText || 'Copy transaction text'}
+                copiedTitle={t.copied || 'Copied!'}
+                variant="inline"
+                testId={`copy-batch-target-text-${targetTransaction.id}`}
+              />
+            </div>
             <span
               className={`${styles.targetAmount} ${
                 targetTransaction.type === 'income' ? styles.positiveAmount : styles.negativeAmount
@@ -188,12 +198,21 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
               return (
                 <div key={tx.id} className={styles.relatedItem} data-testid={`related-tx-${tx.id}`}>
                   <div className={styles.relatedItemLeft}>
-                    <p
-                      className={`${styles.relatedDesc} ${isPrivacyMode ? 'privacy-blur' : ''}`}
-                      title={isPrivacyMode ? undefined : tx.description}
-                    >
-                      {tx.description}
-                    </p>
+                    <div className={styles.relatedDescRow}>
+                      <p
+                        className={`${styles.relatedDesc} ${isPrivacyMode ? 'privacy-blur' : ''}`}
+                        title={isPrivacyMode ? undefined : tx.description}
+                      >
+                        {tx.description}
+                      </p>
+                      <CopyButton
+                        text={tx.description}
+                        title={t.copyTransactionText || 'Copy transaction text'}
+                        copiedTitle={t.copied || 'Copied!'}
+                        className={styles.copyBtn}
+                        testId={`copy-batch-related-text-${tx.id}`}
+                      />
+                    </div>
                     <span className={styles.relatedDate}>{formatDate(tx.date)}</span>
                   </div>
 

@@ -313,6 +313,36 @@ describe('csv-parser', () => {
       expect(meta.transactions[0].ownIban).toBe('DE92500400000646293100')
       expect(meta.transactions[0].counterpartyIban).toBe('DE35100110012621828092')
     })
+
+    it('parses Commerzbank Reisespesen reimbursement with type income', () => {
+      const rows = [
+        ['Buchungstag', 'Buchungstext', 'Betrag'],
+        [
+          '15.05.2023',
+          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317',
+          '150,00',
+        ],
+      ]
+      const result = rowsToTransactions(rows, 'Commerzbank')
+      expect(result).toHaveLength(1)
+      expect(result[0].type).toBe('income')
+      expect(result[0].amount).toBe(150)
+    })
+
+    it('parses Commerzbank Rueckverguetung fee refund with type income', () => {
+      const rows = [
+        ['Buchungstag', 'Buchungstext', 'Betrag'],
+        [
+          '15.05.2024',
+          'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 400 6462931/PERSNR: 6832901 End-to-End-Ref.: 2024-1-0035357 Kundenreferenz: 2024-1',
+          '25,00',
+        ],
+      ]
+      const result = rowsToTransactions(rows, 'Commerzbank')
+      expect(result).toHaveLength(1)
+      expect(result[0].type).toBe('income')
+      expect(result[0].amount).toBe(25)
+    })
   })
 })
 

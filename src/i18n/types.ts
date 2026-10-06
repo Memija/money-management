@@ -351,6 +351,8 @@ export interface TranslationStrings {
   showInternalTransfers: string
   hideInternalTransfers: string
   transfersTabNotice: string
+  copyTransactionText: string
+  copied: string
 
   // Dashboard — Analytics enhancements
   insightTransactions: string

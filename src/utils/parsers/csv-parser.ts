@@ -1,7 +1,7 @@
 import type { TranslationStrings } from '../../i18n/types'
 import type { Transaction } from '../../types'
 import { extractIbans, filterInternalSpaceTransfers } from '../account-transfers'
-import { generateId, inferType, isValidDateRaw, parseAmount, parseDate } from './helpers'
+import { EXPLICIT_INCOME_KEYWORDS_REGEX,generateId, inferType, isValidDateRaw, parseAmount, parseDate } from './helpers'
 
 /**
  * Known preamble-row detection: some banks (ING, comdirect) emit metadata
@@ -302,13 +302,22 @@ function parseRow(row: string[], indices: ColumnIndices, institution: string): T
     }
   }
 
+  if (
+    (desc && EXPLICIT_INCOME_KEYWORDS_REGEX.test(desc)) ||
+    (partner && EXPLICIT_INCOME_KEYWORDS_REGEX.test(partner))
+  ) {
+    if (amount < 0) {
+      amount = Math.abs(amount)
+    }
+  }
+
   return {
     id: generateId(),
     date: parseDate(rawDate),
     description: desc,
     amount,
     currency: 'EUR',
-    type: inferType(amount),
+    type: inferType(amount, desc),
     institution,
     counterpartyIban,
     ownIban,

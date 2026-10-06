@@ -10,14 +10,15 @@ export const WundertaxLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="wundertax"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#001233" />
+    <rect width="48" height="48" fill="#001233" />
     <g transform="translate(7.01, 10.30) scale(0.47)">
       <path
         fillRule="evenodd"
@@ -40,14 +41,15 @@ export const TaxfixLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="Taxfix"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#24C875" />
+    <rect width="48" height="48" fill="#24C875" />
     <circle cx="17.5" cy="17.5" r="4.5" fill="#FFFFFF" />
     <line x1="33" y1="15" x2="15" y2="33" stroke="#FFFFFF" strokeWidth="4.5" strokeLinecap="round" />
     <circle cx="30.5" cy="30.5" r="4.5" fill="#FFFFFF" />
@@ -65,14 +67,15 @@ export const SmartsteuerLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="smartsteuer"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#FF7900" />
+    <rect width="48" height="48" fill="#FF7900" />
     <text
       x="24"
       y="18"
@@ -113,14 +116,15 @@ export const ElsterLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="ELSTER"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#003366" />
+    <rect width="48" height="48" fill="#003366" />
     <path
       d="M14 14h18v5H20v4h10v5H20v6h12v5H14V14z"
       fill="#FFCC00"
@@ -143,14 +147,15 @@ export const WisoSteuerLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="WISO Steuer"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#003B7E" />
+    <rect width="48" height="48" fill="#003B7E" />
     <text
       x="24"
       y="18"
@@ -182,3 +187,4 @@ export const WisoSteuerLogo: IconComponent = ({ size = 16, className }) => (
 WisoSteuerLogo.displayName = 'WisoSteuerLogo'
 
 export { GermanyFlagLogo as FinanzamtLogo } from './civic-logos'
+

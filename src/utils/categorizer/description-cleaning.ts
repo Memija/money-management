@@ -82,6 +82,8 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/(?:konto)[-\s]+(?:führung|fuehrung)/iu, 'Kontoführung'],
   [/(?:kontoführungs?|kontofuehrungs?)[-\s]+(?:gebühr|gebuehr)/iu, 'Kontoführungsgebühr'],
   [/(?:bank)[-\s]+(?:gebühren|gebuehren|gebühr|gebuehr)/iu, 'Bankgebühren'],
+  [/(?:r(?:ü|ue)ck)[-\s]+(?:verg(?:ü|ue)tung)/iu, 'Rückvergütung'],
+  [/(?:geb(?:ü|ue)hren)[-\s]+(?:erstattung)/iu, 'Gebührenerstattung'],
   [
     /(?:service|serviceg|servicege|serviceges)[-\s]+(?:gesellschaft|esellschaft|sellschaft|ellschaft)/iu,
     'Servicegesellschaft',
@@ -124,7 +126,13 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\bme\s+dien\b/iu, 'Medien'],
   [/\braj\s+toy\b(?!\s*s)/iu, 'Raj Toys'],
   [/\bstadt\s+bad\s+hombg\b/iu, 'Stadt Bad Homburg'],
+  [/\b(?:bad\s+)?hombur\s+g\b/iu, 'Bad Homburg'],
   [/\bfahrerlaubnisbehoerde\b/iu, 'Fahrerlaubnisbehörde'],
+  [/\bgermany\s+rel\b/iu, 'Dell Germany'],
+  [/\breisesp\.(?=\d)/iu, 'Reisespesen '],
+  [/\breisesp\b\.?/iu, 'Reisespesen'],
+  [/\breisespesen\.(?=\d)/iu, 'Reisespesen '],
+  [/\breisekosten\.(?=\d)/iu, 'Reisekosten '],
   [/(?:velika\s+kopa)\s+(?:n)\b/iu, 'Velika Kopanica'],
   [/(?:wasserpal)\b/iu, 'Wasserpalast'],
   [/(?:wunder|wundert|wunderta)[-\s]+(?:tax|ax|x)/iu, 'Wundertax'],
@@ -275,7 +283,7 @@ export function extractCleanDescription(desc: string): string {
   // Kunden-Nr.: ..., Rechnungsnr: ..., Vertrags-Nr.: ..., Zählernummer: ...,
   // Bitte geben Sie bei Bezahlung / Zahlung / Überweisung ...
   cleaned = cleaned.replace(
-    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|(?:Kd|Kunden)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|(?:Rg|Rechnungs?)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer)|\bAz(?:\.|\s*Nr\.?)?\b)\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
+    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|(?:von\s+)?(?:Karte|Card)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Card[-\s]?ID|(?:Kd|Kunden|Pers|Personen|Personal)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|(?:Rg|Rechnungs?)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer)|\bAz(?:\.|\s*Nr\.?)?\b)\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
     '',
   )
 
@@ -339,8 +347,9 @@ export function extractCleanDescription(desc: string): string {
   // 6. Remove standalone long numeric or alphanumeric reference codes (8+ chars with digits, e.g. terminal/auth IDs)
   cleaned = cleaned.replace(/\b[A-Za-z0-9]*\d[A-Za-z0-9]{7,}\b/g, ' ')
 
-  // 7. Remove standalone numbers with 4+ digits (e.g. postal codes, terminal codes, internal IDs)
-  cleaned = cleaned.replace(/\b\d{4,}\b/g, ' ')
+  // 7. Remove standalone numbers with 4+ digits (e.g. postal codes, terminal codes, internal IDs),
+  // but preserve 4-digit calendar years (1900-2099)
+  cleaned = cleaned.replace(/\b(?!(?:19|20)\d{2}\b)\d{4,}\b/g, ' ')
 
   // 7. Clean up extraneous punctuation while preserving periods, ampersands, and hyphens in brand names
   cleaned = cleaned
@@ -501,11 +510,11 @@ export function extractMerchantKeyword(desc: string): string {
     /\s+(?:berlin|m[uü]nchen|hamburg|k[oö]ln|frankfurt|stuttgart|d[uü]sseldorf|dortmund|essen|leipzig|bremen|dresden|hannover|n[uü]rnberg|wien|z[uü]rich|warszawa|krak[oó]w|sarajevo|beograd|zagreb|london|paris|faro|tavira|oberursel|eschborn|heidelberg)\b.*$/i,
     ' ',
   )
-  merchant = merchant.replace(/\s+(?:de|at|ch|hr|si|ba)\b.*$/i, '')
+  merchant = merchant.replace(/\s+(?:de|at|ch|hr|si|ba|germany|deutschland)\b.*$/i, '')
 
   // 5. Remove remittance purpose/reason phrases and banking transaction types commonly appended after merchant name
   merchant = merchant.replace(
-    /\s+(?:abbuchung|lastschrift|gutschrift|auszahlung|einzahlung|r(?:ü|ue)ckzahlung|erstatt(?:\.|ung)?|est-veranl(?:\.|agung)?|steuererstattung|lizenzgeb(?:ü|ue)hr|kautionsabrechnung|abrechnung|miete|gerichtsgeb(?:ü|ue)hr(?:en)?|grundbuch(?:eintragung)?|geb(?:ü|ue)hr(?:en)?|notarkosten|notargeb(?:ü|ue)hr(?:en)?|order|bestellung|auftrag|rechnung|invoice)\b.*$/i,
+    /\s+(?:abbuchung|lastschrift|gutschrift|auszahlung|einzahlung|r(?:ü|ue)ckzahlung|r(?:ü|ue)ckverg(?:ü|ue)tung\w*|r(?:ü|ue)ck[uü]berweisung\w*|geb(?:ü|ue)hrenerstattung\w*|entgelterstattung\w*|erstatt(?:\.|ung)?|est-veranl(?:\.|agung)?|steuererstattung|lizenzgeb(?:ü|ue)hr|kautionsabrechnung|abrechnung|miete|(?:monatliches\s+)?hausgeld|gerichtsgeb(?:ü|ue)hr(?:en)?|grundbuch(?:eintragung)?|geb(?:ü|ue)hr(?:en)?|notarkosten|notargeb(?:ü|ue)hr(?:en)?|reisespesen|reisekosten|spesen|order|bestellung|auftrag|rechnung|invoice)\b.*$/i,
     ' ',
   )
 
@@ -518,6 +527,14 @@ export function extractMerchantKeyword(desc: string): string {
 
   if (/^mc$/i.test(merchant.trim())) {
     return 'Uber'
+  }
+
+  if (/\b(?:z\.?\s*hd\.?\s*kmk|kmk\s+immobilien(?:verw\w*|verwaltung)?)\b/i.test(merchant)) {
+    return 'KMK Immobilienverwaltung'
+  }
+
+  if (/\bweg\s+landwehrweg\b/i.test(merchant)) {
+    return 'WEG Landwehrweg 1'
   }
 
   return merchant.length >= 2

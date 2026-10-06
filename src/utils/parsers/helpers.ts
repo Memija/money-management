@@ -2,7 +2,13 @@ export function generateId(): string {
   return Math.random().toString(36).substring(2, 11)
 }
 
-export function inferType(amount: number): 'income' | 'expense' {
+export const EXPLICIT_INCOME_KEYWORDS_REGEX =
+  /(?:\b(?:r[uü]ckverg[uü]tung\w*|rueckverguetung\w*|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*|geb[uü]hrenerstattung\w*|gebuehrenerstattung\w*|entgelterstattung\w*|reisesp\w*|reisekosten\w*|spesen\w*|auslagenerstattung|gehalt\w*|lohn\w*|bez[uü]ge|entgelt\w*|salary\w*|payroll\w*)\b)/i
+
+export function inferType(amount: number, description?: string): 'income' | 'expense' {
+  if (description && EXPLICIT_INCOME_KEYWORDS_REGEX.test(description)) {
+    return 'income'
+  }
   return amount >= 0 ? 'income' : 'expense'
 }
 

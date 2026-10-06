@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { Transaction } from '../../../types'
+import * as clipboardModule from '../../../utils/clipboard'
 import { TransactionPreviewRow } from './TransactionPreviewRow'
 
 describe('TransactionPreviewRow', () => {
@@ -39,11 +40,7 @@ describe('TransactionPreviewRow', () => {
 
   it('renders duplicate pill when isDuplicate is true and hideDuplicateBadge is false', () => {
     render(
-      <TransactionPreviewRow
-        {...defaultProps}
-        isDuplicate={true}
-        hideDuplicateBadge={false}
-      />,
+      <TransactionPreviewRow {...defaultProps} isDuplicate={true} hideDuplicateBadge={false} />,
     )
     expect(screen.getByText('Duplicate')).toBeInTheDocument()
   })
@@ -63,24 +60,14 @@ describe('TransactionPreviewRow', () => {
   })
 
   it('does NOT render duplicate pill when hideDuplicateBadge is true (e.g. in duplicates view)', () => {
-    render(
-      <TransactionPreviewRow
-        {...defaultProps}
-        isDuplicate={true}
-        hideDuplicateBadge={true}
-      />,
-    )
+    render(<TransactionPreviewRow {...defaultProps} isDuplicate={true} hideDuplicateBadge={true} />)
     expect(screen.queryByText('Duplicate')).not.toBeInTheDocument()
   })
 
   it('renders unlock button and triggers onUnlockDuplicate when clicked', () => {
     const onUnlock = vi.fn()
     render(
-      <TransactionPreviewRow
-        {...defaultProps}
-        isDuplicate={true}
-        onUnlockDuplicate={onUnlock}
-      />,
+      <TransactionPreviewRow {...defaultProps} isDuplicate={true} onUnlockDuplicate={onUnlock} />,
     )
 
     const unlockBtn = screen.getByTestId('unlock-duplicate-btn-tx-1')
@@ -134,11 +121,14 @@ describe('TransactionPreviewRow', () => {
         isModified={true}
         onRelockDuplicate={onRelock}
         onResetTransaction={onReset}
-        t={{
-          ...defaultProps.t,
-          cannotRelockModified: 'Cannot relock modified transaction. Reset to original values to relock.',
-          resetToOriginal: 'Reset to original values',
-        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+        t={
+          {
+            ...defaultProps.t,
+            cannotRelockModified:
+              'Cannot relock modified transaction. Reset to original values to relock.',
+            resetToOriginal: 'Reset to original values',
+          } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']
+        }
       />,
     )
 
@@ -198,22 +188,30 @@ describe('TransactionPreviewRow', () => {
         onUpdateTransaction={onUpdate}
         onResetTransaction={onReset}
         onRelockDuplicate={onRelock}
-        t={{
-          ...defaultProps.t,
-          alreadyDuplicated: 'Already Duplicated',
-          alreadyDuplicatedNotice: 'This duplicate was already imported and cannot be unlocked again.',
-        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+        t={
+          {
+            ...defaultProps.t,
+            alreadyDuplicated: 'Already Duplicated',
+            alreadyDuplicatedNotice:
+              'This duplicate was already imported and cannot be unlocked again.',
+          } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']
+        }
       />,
     )
 
     // Displays Already Duplicated pill
-    expect(screen.getByTestId('preview-duplicate-badge-tx-1')).toHaveTextContent('Already Duplicated')
+    expect(screen.getByTestId('preview-duplicate-badge-tx-1')).toHaveTextContent(
+      'Already Duplicated',
+    )
 
     // Lock button is disabled with notice tooltip and cannot be clicked
     const lockBtn = screen.getByTestId('already-duplicated-lock-tx-1')
     expect(lockBtn).toBeInTheDocument()
     expect(lockBtn).toBeDisabled()
-    expect(lockBtn).toHaveAttribute('title', 'This duplicate was already imported and cannot be unlocked again.')
+    expect(lockBtn).toHaveAttribute(
+      'title',
+      'This duplicate was already imported and cannot be unlocked again.',
+    )
 
     // Does not render unlock button, reset button, or relock button
     expect(screen.queryByTestId('unlock-duplicate-btn-tx-1')).not.toBeInTheDocument()
@@ -235,10 +233,12 @@ describe('TransactionPreviewRow', () => {
         isSpaceTransfer={true}
         onUpdateTransaction={onUpdate}
         onRemoveTransaction={onRemove}
-        t={{
-          ...defaultProps.t,
-          spaceTransfer: 'Sub-account',
-        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+        t={
+          {
+            ...defaultProps.t,
+            spaceTransfer: 'Sub-account',
+          } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']
+        }
       />,
     )
 
@@ -269,11 +269,13 @@ describe('TransactionPreviewRow', () => {
         showInstitution={false}
         onUpdateTransaction={onUpdate}
         onRemoveTransaction={onRemove}
-        t={{
-          ...defaultProps.t,
-          internalTransfer: 'Internal Transfer',
-          alreadyImported: 'Already Imported',
-        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+        t={
+          {
+            ...defaultProps.t,
+            internalTransfer: 'Internal Transfer',
+            alreadyImported: 'Already Imported',
+          } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']
+        }
       />,
     )
 
@@ -305,10 +307,12 @@ describe('TransactionPreviewRow', () => {
       <TransactionPreviewRow
         {...defaultProps}
         tx={zeroTx}
-        t={{
-          ...defaultProps.t,
-          informative: 'Informative',
-        } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']}
+        t={
+          {
+            ...defaultProps.t,
+            informative: 'Informative',
+          } as unknown as Parameters<typeof TransactionPreviewRow>[0]['t']
+        }
       />,
     )
 
@@ -316,5 +320,36 @@ describe('TransactionPreviewRow', () => {
     expect(badge).toBeInTheDocument()
     expect(badge).toHaveTextContent('Informative')
     expect(screen.queryByText('Groceries')).not.toBeInTheDocument()
+  })
+
+  it('renders copy button and copies transaction description in read-only mode', async () => {
+    const copySpy = vi.spyOn(clipboardModule, 'copyToClipboard').mockResolvedValue(true)
+
+    render(<TransactionPreviewRow {...defaultProps} />)
+
+    const copyBtn = screen.getByTestId('copy-preview-tx-text-tx-1')
+    expect(copyBtn).toBeInTheDocument()
+
+    await act(async () => {
+      fireEvent.click(copyBtn)
+    })
+
+    expect(copySpy).toHaveBeenCalledWith('Bakery Purchase')
+  })
+
+  it('renders copy button and copies transaction description in editable mode', async () => {
+    const copySpy = vi.spyOn(clipboardModule, 'copyToClipboard').mockResolvedValue(true)
+    const onUpdate = vi.fn()
+
+    render(<TransactionPreviewRow {...defaultProps} onUpdateTransaction={onUpdate} />)
+
+    const copyBtn = screen.getByTestId('copy-preview-tx-text-tx-1')
+    expect(copyBtn).toBeInTheDocument()
+
+    await act(async () => {
+      fireEvent.click(copyBtn)
+    })
+
+    expect(copySpy).toHaveBeenCalledWith('Bakery Purchase')
   })
 })

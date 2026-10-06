@@ -7,6 +7,7 @@ import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel, isInformativeTransaction } from '../../../utils/category-utils'
+import { CopyButton } from '../CopyButton'
 import { DatePicker } from '../DatePicker'
 
 import styles from './TransactionPreviewModal.module.css'
@@ -59,10 +60,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   onUnlockDuplicate,
   onRelockDuplicate,
   hasActions = Boolean(
-    onRemoveTransaction ||
-      onUnlockDuplicate ||
-      onRelockDuplicate ||
-      onResetTransaction,
+    onRemoveTransaction || onUnlockDuplicate || onRelockDuplicate || onResetTransaction,
   ),
 }) => {
   // When a transaction is marked as a duplicate, do not mark it as anything else
@@ -86,8 +84,9 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
 
   return (
     <div
-      className={`${styles['tx-row']} ${index % 2 === 0 ? styles['tx-row-even'] : ''
-        } ${effectiveIsSpaceTransfer ? styles['tx-row-space-transfer'] : ''}`}
+      className={`${styles['tx-row']} ${
+        index % 2 === 0 ? styles['tx-row-even'] : ''
+      } ${effectiveIsSpaceTransfer ? styles['tx-row-space-transfer'] : ''}`}
       data-testid={`preview-tx-row-${tx.id}`}
     >
       <div className={styles['row-main']}>
@@ -105,20 +104,38 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
 
         <div className={styles['row-text']}>
           {isEditable ? (
-            <input
-              id={`tx-desc-${tx.id}`}
-              name={`tx-desc-${tx.id}`}
-              type="text"
-              aria-label={t.description || 'Description'}
-              className={styles['inline-input-desc']}
-              value={tx.description}
-              onChange={(e) => onUpdateTransaction?.(tx.id, { description: e.target.value })}
-              title={tx.description}
-            />
+            <div className={styles['row-desc-container']}>
+              <input
+                id={`tx-desc-${tx.id}`}
+                name={`tx-desc-${tx.id}`}
+                type="text"
+                aria-label={t.description || 'Description'}
+                className={styles['inline-input-desc']}
+                value={tx.description}
+                onChange={(e) => onUpdateTransaction?.(tx.id, { description: e.target.value })}
+                title={tx.description}
+              />
+              <CopyButton
+                text={tx.description}
+                title={t?.copyTransactionText || 'Copy transaction text'}
+                copiedTitle={t?.copied || 'Copied!'}
+                className={styles['copy-btn']}
+                testId={`copy-preview-tx-text-${tx.id}`}
+              />
+            </div>
           ) : (
-            <p className={`${styles['row-description']} privacy-blur`} title={tx.description}>
-              {tx.description}
-            </p>
+            <div className={styles['row-desc-container']}>
+              <p className={`${styles['row-description']} privacy-blur`} title={tx.description}>
+                {tx.description}
+              </p>
+              <CopyButton
+                text={tx.description}
+                title={t?.copyTransactionText || 'Copy transaction text'}
+                copiedTitle={t?.copied || 'Copied!'}
+                className={styles['copy-btn']}
+                testId={`copy-preview-tx-text-${tx.id}`}
+              />
+            </div>
           )}
 
           <div className={styles['row-meta']}>
@@ -152,8 +169,9 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
                 {t.informative || 'Informative'}
               </span>
             )}
-            {effectiveIsDuplicate && !hideDuplicateBadge && (
-              isAlreadyDuplicated ? (
+            {effectiveIsDuplicate &&
+              !hideDuplicateBadge &&
+              (isAlreadyDuplicated ? (
                 <span
                   className={`${styles['duplicate-pill']} ${styles['already-duplicated-pill']}`}
                   data-testid={`preview-duplicate-badge-${tx.id}`}
@@ -161,15 +179,20 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
                   {t.alreadyDuplicated || t.duplicate || 'Duplicate'}
                 </span>
               ) : isModified ? (
-                <span className={styles['modified-pill']} data-testid={`preview-modified-badge-${tx.id}`}>
+                <span
+                  className={styles['modified-pill']}
+                  data-testid={`preview-modified-badge-${tx.id}`}
+                >
                   {t.modified || 'Modified'}
                 </span>
               ) : (
-                <span className={styles['duplicate-pill']} data-testid={`preview-duplicate-badge-${tx.id}`}>
+                <span
+                  className={styles['duplicate-pill']}
+                  data-testid={`preview-duplicate-badge-${tx.id}`}
+                >
                   {t.duplicate || 'Duplicate'}
                 </span>
-              )
-            )}
+              ))}
             {effectiveIsInternalTransfer && (
               <span className={styles['internal-transfer-pill']}>
                 <Ghost size={11} aria-hidden="true" />
@@ -240,7 +263,10 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
             title={formatCurrency(tx.amount)}
           />
         ) : (
-          <span className="privacy-blur" title={`${!isZeroAmount && isTxIncome ? '+' : ''}${formatCurrency(tx.amount)}`}>
+          <span
+            className="privacy-blur"
+            title={`${!isZeroAmount && isTxIncome ? '+' : ''}${formatCurrency(tx.amount)}`}
+          >
             {!isZeroAmount && isTxIncome ? '+' : ''}
             {formatCurrency(tx.amount)}
           </span>
@@ -249,89 +275,93 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
 
       {hasActions && (
         <div className={styles['row-actions']}>
-            {effectiveIsDuplicate && (onUnlockDuplicate || isAlreadyDuplicated) && (
-              isAlreadyDuplicated ? (
-                <button
-                  type="button"
-                  className={`${styles['unlock-duplicate-btn']} ${styles['unlock-duplicate-btn-disabled']}`}
-                  disabled={true}
-                  aria-disabled="true"
-                  aria-label={t.alreadyDuplicatedNotice || 'This duplicate was already imported and cannot be unlocked again.'}
-                  title={t.alreadyDuplicatedNotice || 'This duplicate was already imported and cannot be unlocked again.'}
-                  data-testid={`already-duplicated-lock-${tx.id}`}
-                >
-                  <Lock size={15} aria-hidden="true" />
-                </button>
-              ) : onUnlockDuplicate ? (
-                <button
-                  type="button"
-                  className={styles['unlock-duplicate-btn']}
-                  onClick={() => onUnlockDuplicate(tx)}
-                  aria-label={t.unlockDuplicate || 'Unlock'}
-                  title={t.unlockDuplicate || 'Unlock'}
-                  data-testid={`unlock-duplicate-btn-${tx.id}`}
-                >
-                  <Lock size={15} aria-hidden="true" />
-                </button>
-              ) : null
-            )}
-
-            {!isAlreadyDuplicated && isModified && onResetTransaction ? (
+          {effectiveIsDuplicate &&
+            (onUnlockDuplicate || isAlreadyDuplicated) &&
+            (isAlreadyDuplicated ? (
               <button
                 type="button"
-                className={styles['reset-tx-btn']}
-                onClick={() => onResetTransaction(tx.id)}
-                aria-label={t.resetToOriginal || 'Reset to original values'}
-                title={t.resetToOriginal || 'Reset to original values'}
-                data-testid={`reset-tx-btn-${tx.id}`}
-              >
-                <RotateCcw size={14} aria-hidden="true" />
-              </button>
-            ) : !isAlreadyDuplicated && isUnlockedDuplicate && onRelockDuplicate ? (
-              <button
-                type="button"
-                className={`${styles['relock-duplicate-btn']} ${
-                  isModified ? styles['relock-duplicate-btn-disabled'] : ''
-                }`}
-                onClick={isModified ? undefined : () => onRelockDuplicate(tx)}
-                disabled={isModified}
-                aria-disabled={isModified}
+                className={`${styles['unlock-duplicate-btn']} ${styles['unlock-duplicate-btn-disabled']}`}
+                disabled={true}
+                aria-disabled="true"
                 aria-label={
-                  isModified
-                    ? t.cannotRelockModified ||
-                      'Cannot relock modified transaction. Reset to original values to relock.'
-                    : t.relockDuplicate || 'Lock'
+                  t.alreadyDuplicatedNotice ||
+                  'This duplicate was already imported and cannot be unlocked again.'
                 }
                 title={
-                  isModified
-                    ? t.cannotRelockModified ||
-                      'Cannot relock modified transaction. Reset to original values to relock.'
-                    : t.relockDuplicate || 'Lock'
+                  t.alreadyDuplicatedNotice ||
+                  'This duplicate was already imported and cannot be unlocked again.'
                 }
-                data-testid={`relock-duplicate-btn-${tx.id}`}
+                data-testid={`already-duplicated-lock-${tx.id}`}
               >
-                <Unlock size={15} aria-hidden="true" />
+                <Lock size={15} aria-hidden="true" />
               </button>
-            ) : null}
+            ) : onUnlockDuplicate ? (
+              <button
+                type="button"
+                className={styles['unlock-duplicate-btn']}
+                onClick={() => onUnlockDuplicate(tx)}
+                aria-label={t.unlockDuplicate || 'Unlock'}
+                title={t.unlockDuplicate || 'Unlock'}
+                data-testid={`unlock-duplicate-btn-${tx.id}`}
+              >
+                <Lock size={15} aria-hidden="true" />
+              </button>
+            ) : null)}
 
+          {!isAlreadyDuplicated && isModified && onResetTransaction ? (
+            <button
+              type="button"
+              className={styles['reset-tx-btn']}
+              onClick={() => onResetTransaction(tx.id)}
+              aria-label={t.resetToOriginal || 'Reset to original values'}
+              title={t.resetToOriginal || 'Reset to original values'}
+              data-testid={`reset-tx-btn-${tx.id}`}
+            >
+              <RotateCcw size={14} aria-hidden="true" />
+            </button>
+          ) : !isAlreadyDuplicated && isUnlockedDuplicate && onRelockDuplicate ? (
+            <button
+              type="button"
+              className={`${styles['relock-duplicate-btn']} ${
+                isModified ? styles['relock-duplicate-btn-disabled'] : ''
+              }`}
+              onClick={isModified ? undefined : () => onRelockDuplicate(tx)}
+              disabled={isModified}
+              aria-disabled={isModified}
+              aria-label={
+                isModified
+                  ? t.cannotRelockModified ||
+                    'Cannot relock modified transaction. Reset to original values to relock.'
+                  : t.relockDuplicate || 'Lock'
+              }
+              title={
+                isModified
+                  ? t.cannotRelockModified ||
+                    'Cannot relock modified transaction. Reset to original values to relock.'
+                  : t.relockDuplicate || 'Lock'
+              }
+              data-testid={`relock-duplicate-btn-${tx.id}`}
+            >
+              <Unlock size={15} aria-hidden="true" />
+            </button>
+          ) : null}
 
-
-            {onRemoveTransaction &&
-              !isDuplicate &&
-              !effectiveIsInternalTransfer &&
-              !effectiveIsSpaceTransfer &&
-              !isExistingAccountTransfer && (
-                <button
-                  className={styles['remove-button']}
-                  onClick={() => onRemoveTransaction(tx.id)}
-                  aria-label={t.removeTransaction}
-                  title={t.removeTransaction}
-                >
-                  <Trash2 size={15} />
-                </button>
-              )}
-          </div>
-        )}
+          {onRemoveTransaction &&
+            !isDuplicate &&
+            !effectiveIsInternalTransfer &&
+            !effectiveIsSpaceTransfer &&
+            !isExistingAccountTransfer && (
+              <button
+                className={styles['remove-button']}
+                onClick={() => onRemoveTransaction(tx.id)}
+                aria-label={t.removeTransaction}
+                title={t.removeTransaction}
+              >
+                <Trash2 size={15} />
+              </button>
+            )}
+        </div>
+      )}
     </div>
   )
 }

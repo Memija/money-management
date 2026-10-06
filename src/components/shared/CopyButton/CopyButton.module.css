@@ -1,0 +1,96 @@
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  outline: none;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+  position: relative;
+}
+
+/* Subtle variant: hidden on desktop until parent is hovered or button is focused */
+.subtle {
+  opacity: 0;
+}
+
+/* Reveal when parent is hovered or button is focused or copied */
+:global(.transactionItem):hover .subtle,
+:global(.tx-row):hover .subtle,
+:global(.txRow):hover .subtle,
+:global([data-copy-hover]):hover .subtle,
+.subtle:focus-visible,
+.subtle.copied {
+  opacity: 0.7;
+}
+
+/* Inline variant: slightly muted by default, highlights on hover */
+.inline {
+  opacity: 0.65;
+}
+
+/* Ghost variant: compact */
+.ghost {
+  opacity: 0.8;
+  width: 20px;
+  height: 20px;
+}
+
+.copyBtn:hover {
+  opacity: 1 !important;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: scale(1.05);
+}
+
+.copyBtn:active {
+  transform: scale(0.95);
+}
+
+.copyBtn:focus-visible {
+  opacity: 1 !important;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* Copied state */
+.copied {
+  opacity: 1 !important;
+  color: var(--primary) !important;
+  background: rgba(16, 185, 129, 0.14) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.checkIcon {
+  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Touch devices: always visible so mobile users can tap it without hover */
+@media (hover: none) {
+  .subtle {
+    opacity: 0.65;
+  }
+}

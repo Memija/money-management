@@ -41,10 +41,11 @@ export const createImageLogo = ({ src, label, displayName }: ImageLogoOptions): 
       alt: label,
       role: 'img',
       'aria-label': label,
+      'data-brand-logo': 'true',
       width: toAttrSize(size),
       height: toAttrSize(size),
-      className,
-      style: { ...getTileStyle(size, '4px'), objectFit: 'contain' },
+      className: ['brand-logo-full', className].filter(Boolean).join(' '),
+      style: { ...getTileStyle(size, 'inherit'), objectFit: 'cover' },
     })
   ImageLogo.displayName = displayName
   return ImageLogo
@@ -82,15 +83,15 @@ export const createWordmarkLogo = ({
         viewBox: `0 0 ${LOGO_VIEWBOX_SIZE} ${LOGO_VIEWBOX_SIZE}`,
         width: toAttrSize(size),
         height: toAttrSize(size),
-        style: getTileStyle(size, '3px'),
-        className,
+        style: getTileStyle(size, 'inherit'),
+        className: ['brand-logo-full', className].filter(Boolean).join(' '),
+        'data-brand-logo': 'true',
         role: 'img',
         'aria-label': label,
       },
       createElement('rect', {
         width: LOGO_VIEWBOX_SIZE,
         height: LOGO_VIEWBOX_SIZE,
-        rx: 8,
         fill: background,
       }),
       accentColor &&

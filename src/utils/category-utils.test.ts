@@ -28,6 +28,36 @@ describe('category-utils', () => {
     it('categorizes salary-related descriptions correctly', () => {
       expect(categorize('Monthly salary payment')).toBe('Salary')
       expect(categorize('Lohn')).toBe('Salary') // German
+      expect(
+        categorize(
+          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317',
+        ),
+      ).toBe('Salary')
+      expect(
+        categorize(
+          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317',
+          { type: 'expense', amount: -150 },
+        ),
+      ).toBe('Salary')
+      expect(categorize('Reisespesen Abrechnung')).toBe('Salary')
+      expect(categorize('Reisekostenvergütung Geschäftsreise')).toBe('Salary')
+      expect(categorize('Spesenabrechnung Mai')).toBe('Salary')
+      expect(
+        categorize(
+          'Commerzbank AG Rücküberweisung von Karte Nr.   5232 2XXXXXX07296   Anel Memic Card-ID:  5520009001872996 End-to-End-Ref.: null Kundenreferenz: a9d752972a1043a18e7805b6647ed5fa',
+        ),
+      ).toBe('Salary')
+      expect(
+        categorize(
+          'Commerzbank AG Rücküberweisung von Karte Nr.   5232 2XXXXXX07296   Anel Memic Card-ID:  5520009001872996 End-to-End-Ref.: null Kundenreferenz: a9d752972a1043a18e7805b6647ed5fa',
+          { type: 'expense', amount: -150 },
+        ),
+      ).toBe('Salary')
+      expect(
+        categorize(
+          'Commerzbank AG Rueckueberweisung von Karte Nr. 5232 2XXXXXX07296 Anel Memic Card-ID: 5520009001872996',
+        ),
+      ).toBe('Salary')
     })
 
     it('categorizes dining out descriptions correctly', () => {
@@ -125,6 +155,11 @@ describe('category-utils', () => {
           'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421'
         )
       ).toBe('Shopping')
+      expect(
+        categorize(
+          'GERMANY rel CITIDEFFXXX DE11502109000209865084 40233251 End-to-End-Ref.: CCB.119.UE.569708'
+        )
+      ).toBe('Shopping')
       expect(categorize('Dell Technologies Online Store')).toBe('Shopping')
       expect(categorize('Dell.com Hardware Purchase')).toBe('Shopping')
     })
@@ -163,6 +198,15 @@ describe('category-utils', () => {
       ).toBe('Shopping')
       expect(categorize('Schreinerei Lothar Braun')).toBe('Shopping')
       expect(categorize('Schreinerei Braun Türeneinbau')).toBe('Shopping')
+    })
+
+    it('categorizes Commerzbank Rueckverguetung fee refund transaction as Bank Fees with type income', () => {
+      const desc =
+        'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 400 6462931/PERSNR: 6832901 End-to-End-Ref.: 2024-1-0035357 Kundenreferenz: 2024-1'
+      expect(categorize(desc, { type: 'income', amount: 25 })).toBe('Bank Fees')
+      expect(categorize(desc)).toBe('Bank Fees')
+      expect(categorize('Rückvergütung von Entgelten')).toBe('Bank Fees')
+      expect(categorize('Gebührenerstattung')).toBe('Bank Fees')
     })
 
     it('categorizes FA Nidda tax return transactions as Taxes', () => {
@@ -948,6 +992,32 @@ describe('category-utils', () => {
         'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421'
       expect(extractCleanDescription(desc)).toBe('Dell GmbH')
       expect(extractMerchantKeyword(desc)).toBe('Dell')
+
+      const truncatedDesc =
+        'GERMANY rel CITIDEFFXXX DE11502109000209865084 40233251 End-to-End-Ref.: CCB.119.UE.569708'
+      expect(extractCleanDescription(truncatedDesc)).toBe('Dell Germany')
+      expect(extractMerchantKeyword(truncatedDesc)).toBe('Dell')
+    })
+
+    it('cleans Commerzbank Reisespesen business trip reimbursement transaction', () => {
+      const desc =
+        'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317'
+      expect(extractCleanDescription(desc)).toBe('COMMERZBANK AG ZENTRALE FRANKFURT Reisespesen')
+      expect(extractMerchantKeyword(desc)).toBe('COMMERZBANK ZENTRALE')
+    })
+
+    it('cleans Commerzbank Rueckverguetung fee refund transaction', () => {
+      const desc =
+        'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 400 6462931/PERSNR: 6832901 End-to-End-Ref.: 2024-1-0035357 Kundenreferenz: 2024-1'
+      expect(extractCleanDescription(desc)).toBe('Commerzbank AG Rueckverguetung fuer 2024')
+      expect(extractMerchantKeyword(desc)).toBe('Commerzbank')
+    })
+
+    it('cleans Commerzbank Rueckueberweisung card reversal transaction and extracts Commerzbank keyword', () => {
+      const desc =
+        'Commerzbank AG Rücküberweisung von Karte Nr.   5232 2XXXXXX07296   Anel Memic Card-ID:  5520009001872996 End-to-End-Ref.: null Kundenreferenz: a9d752972a1043a18e7805b6647ed5fa'
+      expect(extractCleanDescription(desc)).toBe('Commerzbank AG Rücküberweisung')
+      expect(extractMerchantKeyword(desc)).toBe('Commerzbank')
     })
 
     it('cleans fair parken transaction stripping BIC, IBAN, Aktenzeichen, and End-to- reference', () => {
@@ -1561,12 +1631,52 @@ describe('category-utils', () => {
             'BILJANA JOSIC End-to-End-Ref.: CCB.321.UE.328580 Kundenreferenz: CCB.321.UE.328580',
           ),
         ).toBe('Transfers')
+        expect(
+          categorize(
+            'BILJANA MEMIC COBADEHD001 DE49200411330781112800 End-to-End-Ref.: MOB.210.EE.POS00026333 Kundenreferenz: 0bfc47b3f3b04db2a3c8afbfc142e184',
+          ),
+        ).toBe('Transfers')
+        expect(
+          categorize(
+            'BILJANA MEMIC DE49200411330781112800 End-to-End-Ref.: MOB.210.EE.POS00026333',
+          ),
+        ).toBe('Transfers')
+        expect(
+          categorize(
+            'ANEL MEMIC COBADEHD001 DE12345678901234567890 End-to-End-Ref.: MOB.123.EE.POS00012345',
+          ),
+        ).toBe('Transfers')
+        expect(
+          categorize(
+            'Anel Memic Money back End-to-End-Ref.: 20250627-YVZ9IU-OP Kundenreferenz: SI25062724092194',
+          ),
+        ).toBe('Transfers')
+        expect(
+          categorize(
+            'Anel Memic End-to-End-Ref.: 20250627-YVZ9IU-OP Kundenreferenz: SI25062724092194',
+          ),
+        ).toBe('Transfers')
+        expect(
+          categorize('Anel Memic Money back Kundenreferenz: SI25062724092194'),
+        ).toBe('Transfers')
+        expect(categorize('Anel Memic Money back')).toBe('Transfers')
+        expect(categorize('Anel Memic Geld zurück')).toBe('Transfers')
         expect(categorize('CD-SCT-20260401-12345 Max Mustermann')).toBe('Transfers')
         expect(categorize('SEPA-Überweisung an Max Mustermann')).toBe('Transfers')
         expect(
           categorize('Finanzamt Frankfurt am Main End-to-End-Ref.: CCB.321.UE.998877'),
         ).toBe('Taxes')
         expect(categorize('Einkommensteuer Vorauszahlung CCB.321.UE.112233')).toBe('Taxes')
+
+        // Edukativni Centar Rani Razvoj foreign payment
+        expect(
+          categorize(
+            'ZAHLUNG IN DAS AUSLAND UNS. REF:  AZNA3191009197 00 IHRE REF:  NONREF RS35200354683010198808 AUFTRAGGEBER LT. AUFTRAG: ANEL MEMIC BANK DES BEGUENSTIGTEN: BEGUENSTIGTER: EDUKATIVNI CENTAR RANI RAZVOJ CRKVENA 70G 11400 MLADENOVAC RS RS35200354683010198808 ZAHLUNGSGRUND: ARTUR MEMIC',
+          ),
+        ).toBe('Education')
+        expect(categorize('Edukativni centar radionica za decu')).toBe('Education')
+        expect(categorize('Edukativni program')).toBe('Education')
+        expect(categorize('Rani razvoj dece')).toBe('Education')
       })
 
       it('categorizes payment processor transactions with purchase phrases as Shopping across all languages', () => {
@@ -2551,10 +2661,15 @@ describe('category-utils', () => {
         // 14. KMK Immobilienverwaltung / WEG Landwehrweg -> Rent
         expect(
           categorize(
-            'WEG Landwehrweg 1, 61350 z. Hd. KMK Immobilienverw. GmbH 556.101701 Memic Biljana Lastschrif t',
+            'WEG Landwehrweg 1, 61350 z. Hd. KMK   Immobilienverw. GmbH 556.101701 Memic Biljana Lastschrif t 12/2024 End-to-End-Ref.: 556/101701 Mandatsref: cc8047803f024820a564798436fd3d31 Gläubiger-ID: DE13ZZZ00000579310 SEPA-BASISLASTSCHRIFT wiederholend',
           ),
         ).toBe('Rent')
         expect(categorize('KMK Immobilienverwaltung Hausgeld')).toBe('Rent')
+        expect(
+          categorize(
+            'WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld Landwehrweg End-to-End-Ref.: NOTPROVIDED Mandatsref: LANDWEHRCC25 Gläubiger-ID: DE85ZZZ00002471357 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Rent')
 
         // 15. FNZ Bank AG (ehemals ebase AG) -> Savings
         expect(

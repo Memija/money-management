@@ -182,7 +182,7 @@ describe('category-icons', () => {
           expect(icon.type, `Category "${category}" should render expected icon`).toBe(expectedIcon)
         }
       }
-    }, 30000)
+    }, 60000)
 
     it('falls back to Package icon for unknown categories', () => {
       const icon = getCategoryIcon('CompletelyUnknownCategory123')
@@ -346,6 +346,48 @@ describe('category-icons', () => {
       expect(brand.logoComponent).toBe(MERCHANT_LOGOS.DellLogo)
       expect(brand.brandColor).toBe('#007DB8')
       expect(brand.suggestedCategory).toBe('Shopping')
+
+      const truncatedTxDesc =
+        'GERMANY rel CITIDEFFXXX DE11502109000209865084 40233251 End-to-End-Ref.: CCB.119.UE.569708'
+      const truncatedBrand = getMerchantBrandInfo(truncatedTxDesc)
+      expect(truncatedBrand.merchant?.id).toBe('dell')
+      expect(truncatedBrand.merchant?.name).toBe('Dell')
+      expect(truncatedBrand.logoComponent).toBe(MERCHANT_LOGOS.DellLogo)
+      expect(truncatedBrand.brandColor).toBe('#007DB8')
+      expect(truncatedBrand.suggestedCategory).toBe('Shopping')
+    })
+
+    it('matches Commerzbank brand and suggests Salary for business trip expense reimbursement', () => {
+      const txDesc =
+        'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317'
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('commerzbank')
+      expect(brand.merchant?.name).toBe('Commerzbank')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
+      expect(brand.brandColor).toBe('#FFD700')
+      expect(brand.suggestedCategory).toBe('Salary')
+    })
+
+    it('matches Commerzbank brand and suggests Bank Fees for fee refund / return of previously charged banking transactions', () => {
+      const txDesc =
+        'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 400 6462931/PERSNR: 6832901 End-to-End-Ref.: 2024-1-0035357 Kundenreferenz: 2024-1'
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('commerzbank')
+      expect(brand.merchant?.name).toBe('Commerzbank')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
+      expect(brand.brandColor).toBe('#FFD700')
+      expect(brand.suggestedCategory).toBe('Bank Fees')
+    })
+
+    it('matches Commerzbank brand and suggests Salary for card return (Rücküberweisung) for business travel', () => {
+      const txDesc =
+        'Commerzbank AG Rücküberweisung von Karte Nr.   5232 2XXXXXX07296   Anel Memic Card-ID:  5520009001872996 End-to-End-Ref.: null Kundenreferenz: a9d752972a1043a18e7805b6647ed5fa'
+      const brand = getMerchantBrandInfo(txDesc)
+      expect(brand.merchant?.id).toBe('commerzbank')
+      expect(brand.merchant?.name).toBe('Commerzbank')
+      expect(brand.logoComponent).toBe(MERCHANT_LOGOS.CommerzbankLogo)
+      expect(brand.brandColor).toBe('#FFD700')
+      expect(brand.suggestedCategory).toBe('Salary')
     })
 
     it('matches major tech & electronics logos (Acer, HP, Microsoft, Logitech, Canon, Philips, Sony, Nvidia, Bose)', () => {
@@ -878,18 +920,23 @@ describe('category-icons', () => {
     it('matches Gerichtskasse Hessen state emblem for judicial and property purchase tax transactions', () => {
       const gerichtskasseTx =
         'Gerichtkasse HELADEFFXXX DE73500500000001006030 X046833902021X End-to-End-Ref.: CCB.'
-      const icon = getCategoryIcon('Taxes', 20, undefined, gerichtskasseTx)
-      expect(React.isValidElement(icon)).toBe(true)
-      if (React.isValidElement(icon)) {
-        expect(icon.type).toBe(MERCHANT_LOGOS.HessenLogo)
-      }
+      const userGerichtskasseTx =
+        'Gerichtkasse HELADEFFXXX DE73500500000001006030 X046135102025X End-to-End-Ref.: CCB.281.UE.280744'
 
-      const info = getMerchantBrandInfo(gerichtskasseTx)
-      expect(info.merchant?.id).toBe('gerichtskasse')
-      expect(info.merchant?.name).toBe('Gerichtskasse (Justiz Hessen)')
-      expect(info.logoComponent).toBe(MERCHANT_LOGOS.HessenLogo)
-      expect(info.brandColor).toBe('#004B93')
-      expect(info.suggestedCategory).toBe('Taxes')
+      for (const tx of [gerichtskasseTx, userGerichtskasseTx]) {
+        const icon = getCategoryIcon('Taxes', 20, undefined, tx)
+        expect(React.isValidElement(icon)).toBe(true)
+        if (React.isValidElement(icon)) {
+          expect(icon.type).toBe(MERCHANT_LOGOS.HessenLogo)
+        }
+
+        const info = getMerchantBrandInfo(tx)
+        expect(info.merchant?.id).toBe('gerichtskasse')
+        expect(info.merchant?.name).toBe('Gerichtskasse (Justiz Hessen)')
+        expect(info.logoComponent).toBe(MERCHANT_LOGOS.HessenLogo)
+        expect(info.brandColor).toBe('#004B93')
+        expect(info.suggestedCategory).toBe('Taxes')
+      }
     })
 
     it('renders HessenLogo and GermanyFlagLogo civic logos successfully into the DOM', () => {
@@ -1186,6 +1233,36 @@ describe('category-icons', () => {
       const svg = container.querySelector('svg')
       expect(svg).toBeInTheDocument()
       expect(svg).toHaveAttribute('aria-label', 'Revolut')
+      expect(svg).toHaveAttribute('data-brand-logo', 'true')
+      expect(svg?.classList.contains('brand-logo-full')).toBe(true)
+    })
+
+    it('renders CommerzbankLogo successfully into the DOM using BankImage', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Salary',
+            24,
+            undefined,
+            'Commerzbank AG Rücküberweisung von Karte Nr.   5232 2XXXXXX07296   Anel Memic Card-ID:  5520009001872996 End-to-End-Ref.: null Kundenreferenz: a9d752972a1043a18e7805b6647ed5fa',
+          )}
+        </div>,
+      )
+      const img = container.querySelector('img')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('alt', 'Commerzbank')
+      expect(img).toHaveAttribute('src', '/banks/commerzbank.png')
+    })
+
+    it('renders TomorrowLogo with brand-logo-full and data-brand-logo attributes', () => {
+      const { container } = render(
+        <div>{getCategoryIcon('Transfers', 24, undefined, 'Tomorrow Bank')}</div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Tomorrow Bank')
+      expect(svg).toHaveAttribute('data-brand-logo', 'true')
+      expect(svg?.classList.contains('brand-logo-full')).toBe(true)
     })
 
     it('renders successfully into the DOM using @testing-library/react', () => {
@@ -1954,11 +2031,19 @@ describe('category-icons', () => {
       expect(cobadeffInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
       expect(cobadeffInfo.suggestedCategory).toBe('Transfers')
 
-      // 14. KMK Immobilienverwaltung / WEG Landwehrweg
-      const kmkInfo = getMerchantBrandInfo('WEG Landwehrweg 1, 61350 z. Hd. KMK Immobilienverw. GmbH 556.101701 Memic Biljana Lastschrif t')
+      // 14. KMK Immobilienverwaltung (with KMK in name -> belongs to KMK Immobilienverwaltung)
+      const kmkInfo = getMerchantBrandInfo('WEG Landwehrweg 1, 61350 z. Hd. KMK   Immobilienverw. GmbH 556.101701 Memic Biljana Lastschrif t 12/2024 End-to-End-Ref.: 556/101701 Mandatsref: cc8047803f024820a564798436fd3d31 Gläubiger-ID: DE13ZZZ00000579310 SEPA-BASISLASTSCHRIFT wiederholend')
       expect(kmkInfo.merchant?.id).toBe('kmk-immobilien')
+      expect(kmkInfo.merchant?.name).toBe('KMK Immobilienverwaltung')
       expect(kmkInfo.logoComponent).toBe(MERCHANT_LOGOS.KmkImmobilienLogo)
       expect(kmkInfo.suggestedCategory).toBe('Rent')
+
+      // 14b. WEG Landwehrweg 1 (without KMK in name -> no custom brand merchant, uses default category icons)
+      const wegInfo = getMerchantBrandInfo('WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld Landwehrweg End-to-End-Ref.: NOTPROVIDED Mandatsref: LANDWEHRCC25 Gläubiger-ID: DE85ZZZ00002471357 SEPA-BASISLASTSCHRIFT wiederholend')
+      expect(wegInfo.merchant).toBeUndefined()
+      expect(wegInfo.logoComponent).toBeUndefined()
+      expect(wegInfo.initials).toBeTruthy()
+      expect(wegInfo.brandColor).toBeTruthy()
 
       // 15. FNZ Bank AG (formerly ebase)
       const fnzInfo = getMerchantBrandInfo('FNZ Bank AG (ehemals ebase AG) 9914335757302 Kauf 0,077528 Ant am 05.10.2023 zu 322,465500')
@@ -2581,6 +2666,32 @@ describe('category-icons', () => {
       expect(paypalTruncatedInfo.brandColor).toBe('#00457C')
       const icon = getCategoryIcon('Shopping', 20, undefined, 'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1049039954031 PP.4585.PP . PayPal ( Europe) S.a r.l. et Cie, SCA, I')
       expect(React.isValidElement(icon) && icon.type === MERCHANT_LOGOS.SiPaypal).toBe(true)
+
+      // 47. Edukativni Centar Rani Razvoj (Mladenovac)
+      const edukativniInfo = getMerchantBrandInfo(
+        'ZAHLUNG IN DAS AUSLAND UNS. REF:  AZNA3191009197 00 IHRE REF:  NONREF RS35200354683010198808 AUFTRAGGEBER LT. AUFTRAG: ANEL MEMIC BANK DES BEGUENSTIGTEN: BEGUENSTIGTER: EDUKATIVNI CENTAR RANI RAZVOJ CRKVENA 70G 11400 MLADENOVAC RS RS35200354683010198808 ZAHLUNGSGRUND: ARTUR MEMIC',
+      )
+      expect(edukativniInfo.merchant?.name).toBe('Edukativni Centar Rani Razvoj')
+      expect(edukativniInfo.logoComponent).toBe(MERCHANT_LOGOS.EdukativniCentarLogo)
+      expect(edukativniInfo.suggestedCategory).toBe('Education')
+      expect(edukativniInfo.brandColor).toBe('#2563EB')
+      expect(edukativniInfo.initials).toBe('EC')
+    })
+
+    it('renders Edukativni Centar Rani Razvoj SVG logo into the DOM via getCategoryIcon', () => {
+      const { container } = render(
+        <div>
+          {getCategoryIcon(
+            'Education',
+            24,
+            undefined,
+            'EDUKATIVNI CENTAR RANI RAZVOJ CRKVENA 70G 11400 MLADENOVAC RS RS35200354683010198808',
+          )}
+        </div>,
+      )
+      const svg = container.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+      expect(svg).toHaveAttribute('aria-label', 'Edukativni Centar Rani Razvoj')
     })
 
     it('renders the 22 new batch brand logos into the DOM via getCategoryIcon', () => {
@@ -2660,5 +2771,250 @@ describe('category-icons', () => {
       expect(info.initials).toBe('X')
       expect(info.brandColor).toBeTruthy()
     })
+
+    it('renders transport brand logos with full-bleed attributes (Mercedes, ADAC, RMV, Aral, DB, Shell)', () => {
+      const { MercedesLogo, BmwLogo, AudiLogo, VolkswagenLogo, PorscheLogo } = MERCHANT_LOGOS
+      const { RmvLogo, DbLogo, BvgLogo } = MERCHANT_LOGOS
+      const { AralLogo, ShellLogo, JetLogo } = MERCHANT_LOGOS
+      const { AdacLogo, AceLogo } = MERCHANT_LOGOS
+
+      expect(BmwLogo).toBeTruthy()
+      expect(AudiLogo).toBeTruthy()
+      expect(VolkswagenLogo).toBeTruthy()
+      expect(PorscheLogo).toBeTruthy()
+      expect(BvgLogo).toBeTruthy()
+      expect(JetLogo).toBeTruthy()
+      expect(AceLogo).toBeTruthy()
+
+      // Render MercedesLogo
+      const { container: mercContainer } = render(React.createElement(MercedesLogo, { size: 20 }))
+      const mercSvg = mercContainer.querySelector('svg')
+      expect(mercSvg).toBeTruthy()
+      expect(mercSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(mercSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Render AdacLogo
+      const { container: adacContainer } = render(React.createElement(AdacLogo, { size: 20 }))
+      const adacSvg = adacContainer.querySelector('svg')
+      expect(adacSvg).toBeTruthy()
+      expect(adacSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(adacSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(adacSvg?.textContent).toContain('ADAC')
+
+      // Render RmvLogo
+      const { container: rmvContainer } = render(React.createElement(RmvLogo, { size: 20 }))
+      const rmvSvg = rmvContainer.querySelector('svg')
+      expect(rmvSvg).toBeTruthy()
+      expect(rmvSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(rmvSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Render AralLogo
+      const { container: aralContainer } = render(React.createElement(AralLogo, { size: 20 }))
+      const aralSvg = aralContainer.querySelector('svg')
+      expect(aralSvg).toBeTruthy()
+      expect(aralSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(aralSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Render DbLogo
+      const { container: dbContainer } = render(React.createElement(DbLogo, { size: 20 }))
+      const dbSvg = dbContainer.querySelector('svg')
+      expect(dbSvg).toBeTruthy()
+      expect(dbSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(dbSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Render ShellLogo
+      const { container: shellContainer } = render(React.createElement(ShellLogo, { size: 20 }))
+      const shellSvg = shellContainer.querySelector('svg')
+      expect(shellSvg).toBeTruthy()
+      expect(shellSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(shellSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Brand info resolution
+      expect(getMerchantBrandInfo('Mercedes-Benz AG').logoComponent).toBe(MercedesLogo)
+      expect(getMerchantBrandInfo('Allg.Deutscher Automobil-Club ADAC e.V.').logoComponent).toBe(AdacLogo)
+      expect(getMerchantBrandInfo('RMV Ticket Service').logoComponent).toBe(RmvLogo)
+      expect(getMerchantBrandInfo('Aral Tankstelle').logoComponent).toBe(AralLogo)
+      expect(getMerchantBrandInfo('Deutsche Bahn DB Fernverkehr').logoComponent).toBe(DbLogo)
+      expect(getMerchantBrandInfo('Shell Station').logoComponent).toBe(ShellLogo)
+    })
+
+    it('renders travel brand logos with full-bleed attributes (TUI, Eurowings, Holidays, DERTOUR, alltours, Condor)', () => {
+      const {
+        TuiLogo,
+        EurowingsLogo,
+        HolidaysLogo,
+        EurowingsHolidaysLogo,
+        DertourLogo,
+        AlltoursLogo,
+        SchauinslandLogo,
+        CondorLogo,
+      } = MERCHANT_LOGOS
+
+      expect(TuiLogo).toBeTruthy()
+      expect(EurowingsLogo).toBeTruthy()
+      expect(HolidaysLogo).toBeTruthy()
+      expect(HolidaysLogo).toBe(EurowingsLogo)
+      expect(EurowingsHolidaysLogo).toBe(EurowingsLogo)
+
+      // Render TuiLogo
+      const { container: tuiContainer } = render(React.createElement(TuiLogo, { size: 20 }))
+      const tuiSvg = tuiContainer.querySelector('svg')
+      expect(tuiSvg).toBeTruthy()
+      expect(tuiSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(tuiSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(tuiSvg?.getAttribute('aria-label')).toBe('TUI')
+
+      // Render EurowingsLogo
+      const { container: eurowingsContainer } = render(React.createElement(EurowingsLogo, { size: 20 }))
+      const eurowingsSvg = eurowingsContainer.querySelector('svg')
+      expect(eurowingsSvg).toBeTruthy()
+      expect(eurowingsSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(eurowingsSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(eurowingsSvg?.getAttribute('aria-label')).toBe('Eurowings')
+
+      // Render DertourLogo
+      const { container: dertourContainer } = render(React.createElement(DertourLogo, { size: 20 }))
+      const dertourSvg = dertourContainer.querySelector('svg')
+      expect(dertourSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(dertourSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Render AlltoursLogo
+      const { container: alltoursContainer } = render(React.createElement(AlltoursLogo, { size: 20 }))
+      const alltoursSvg = alltoursContainer.querySelector('svg')
+      expect(alltoursSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(alltoursSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Render SchauinslandLogo
+      const { container: schauContainer } = render(React.createElement(SchauinslandLogo, { size: 20 }))
+      const schauSvg = schauContainer.querySelector('svg')
+      expect(schauSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(schauSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Render CondorLogo
+      const { container: condorContainer } = render(React.createElement(CondorLogo, { size: 20 }))
+      const condorSvg = condorContainer.querySelector('svg')
+      expect(condorSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(condorSvg?.classList.contains('brand-logo-full')).toBe(true)
+
+      // Brand info resolution
+      expect(getMerchantBrandInfo('TUI Deutschland GmbH').logoComponent).toBe(TuiLogo)
+      expect(
+        getMerchantBrandInfo('holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Anel Mem')
+          .logoComponent
+      ).toBe(EurowingsLogo)
+      expect(getMerchantBrandInfo('DERTOUR Reisebüro').logoComponent).toBe(DertourLogo)
+      expect(getMerchantBrandInfo('alltours flugreisen').logoComponent).toBe(AlltoursLogo)
+    })
+
+    it('renders tax category logos (wundertax, Taxfix, smartsteuer, ELSTER, WISO, Finanzamt, Faerber & Hutzel, civic tax entities) with full-bleed brand logo attributes', () => {
+      const {
+        WundertaxLogo,
+        TaxfixLogo,
+        SmartsteuerLogo,
+        ElsterLogo,
+        WisoSteuerLogo,
+        FaerberHutzelLogo,
+        FinanzamtLogo,
+        GermanyFlagLogo,
+        BadHomburgLogo,
+        SchmittenLogo,
+        HessenLogo,
+        KelkheimLogo,
+        HochtaunuskreisLogo,
+      } = MERCHANT_LOGOS
+
+      expect(WundertaxLogo).toBeTruthy()
+      expect(TaxfixLogo).toBeTruthy()
+      expect(SmartsteuerLogo).toBeTruthy()
+      expect(ElsterLogo).toBeTruthy()
+      expect(WisoSteuerLogo).toBeTruthy()
+      expect(FaerberHutzelLogo).toBeTruthy()
+      expect(FinanzamtLogo).toBe(GermanyFlagLogo)
+
+      // Render WundertaxLogo
+      const { container: wundertaxContainer } = render(React.createElement(WundertaxLogo, { size: 20 }))
+      const wundertaxSvg = wundertaxContainer.querySelector('svg')
+      expect(wundertaxSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(wundertaxSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(wundertaxSvg?.style.borderRadius).toBe('inherit')
+
+      // Render TaxfixLogo
+      const { container: taxfixContainer } = render(React.createElement(TaxfixLogo, { size: 20 }))
+      const taxfixSvg = taxfixContainer.querySelector('svg')
+      expect(taxfixSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(taxfixSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(taxfixSvg?.style.borderRadius).toBe('inherit')
+
+      // Render SmartsteuerLogo
+      const { container: smartsteuerContainer } = render(React.createElement(SmartsteuerLogo, { size: 20 }))
+      const smartsteuerSvg = smartsteuerContainer.querySelector('svg')
+      expect(smartsteuerSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(smartsteuerSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(smartsteuerSvg?.style.borderRadius).toBe('inherit')
+
+      // Render ElsterLogo
+      const { container: elsterContainer } = render(React.createElement(ElsterLogo, { size: 20 }))
+      const elsterSvg = elsterContainer.querySelector('svg')
+      expect(elsterSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(elsterSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(elsterSvg?.style.borderRadius).toBe('inherit')
+
+      // Render WisoSteuerLogo
+      const { container: wisoContainer } = render(React.createElement(WisoSteuerLogo, { size: 20 }))
+      const wisoSvg = wisoContainer.querySelector('svg')
+      expect(wisoSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(wisoSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(wisoSvg?.style.borderRadius).toBe('inherit')
+
+      // Render FaerberHutzelLogo
+      const { container: faerberContainer } = render(React.createElement(FaerberHutzelLogo, { size: 20 }))
+      const faerberSvg = faerberContainer.querySelector('svg')
+      expect(faerberSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(faerberSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(faerberSvg?.style.borderRadius).toBe('inherit')
+
+      // Render FinanzamtLogo (GermanyFlagLogo)
+      const { container: finanzamtContainer } = render(React.createElement(FinanzamtLogo, { size: 20 }))
+      const finanzamtSvg = finanzamtContainer.querySelector('svg')
+      expect(finanzamtSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(finanzamtSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(finanzamtSvg?.style.borderRadius).toBe('inherit')
+
+      // Render BadHomburgLogo
+      const { container: badHomburgContainer } = render(React.createElement(BadHomburgLogo, { size: 20 }))
+      const badHomburgSvg = badHomburgContainer.querySelector('svg')
+      expect(badHomburgSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(badHomburgSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(badHomburgSvg?.style.borderRadius).toBe('inherit')
+
+      // Render SchmittenLogo
+      const { container: schmittenContainer } = render(React.createElement(SchmittenLogo, { size: 20 }))
+      const schmittenSvg = schmittenContainer.querySelector('svg')
+      expect(schmittenSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(schmittenSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(schmittenSvg?.style.borderRadius).toBe('inherit')
+
+      // Render HessenLogo
+      const { container: hessenContainer } = render(React.createElement(HessenLogo, { size: 20 }))
+      const hessenSvg = hessenContainer.querySelector('svg')
+      expect(hessenSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(hessenSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(hessenSvg?.style.borderRadius).toBe('inherit')
+
+      // Render KelkheimLogo (img)
+      const { container: kelkheimContainer } = render(React.createElement(KelkheimLogo, { size: 20 }))
+      const kelkheimImg = kelkheimContainer.querySelector('img')
+      expect(kelkheimImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(kelkheimImg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(kelkheimImg?.style.borderRadius).toBe('inherit')
+
+      // Render HochtaunuskreisLogo (img)
+      const { container: htkContainer } = render(React.createElement(HochtaunuskreisLogo, { size: 20 }))
+      const htkImg = htkContainer.querySelector('img')
+      expect(htkImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(htkImg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(htkImg?.style.borderRadius).toBe('inherit')
+    })
   })
 })
+

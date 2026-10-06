@@ -92,6 +92,13 @@
   min-width: 0;
 }
 
+.txDescRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
 .txDescription {
   font-weight: 600;
   color: var(--text-main);
@@ -132,7 +139,9 @@
   background: var(--dropdown-item-hover);
   border: 1px solid var(--card-border);
   user-select: none;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .rememberCheckboxLabel:hover {

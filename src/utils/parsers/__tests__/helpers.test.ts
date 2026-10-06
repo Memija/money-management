@@ -35,6 +35,43 @@ describe('helpers', () => {
       expect(inferType(-100)).toBe('expense')
       expect(inferType(-0.01)).toBe('expense')
     })
+
+    it('returns income when description contains explicit reimbursement keywords like REISESP', () => {
+      expect(
+        inferType(
+          -150,
+          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317',
+        ),
+      ).toBe('income')
+      expect(inferType(-250, 'Reisekostenvergütung Geschäftsreise')).toBe('income')
+      expect(inferType(-50, 'Spesenabrechnung')).toBe('income')
+      expect(inferType(150, 'COMMERZBANK AG ZENTRALE FRANKFURT REISESP')).toBe('income')
+    })
+
+    it('returns income when description contains explicit fee refund keywords like Rueckverguetung', () => {
+      expect(
+        inferType(
+          -25,
+          'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 400 6462931/PERSNR: 6832901 End-to-End-Ref.: 2024-1-0035357 Kundenreferenz: 2024-1',
+        ),
+      ).toBe('income')
+      expect(inferType(-10, 'Rückvergütung von Entgelten')).toBe('income')
+      expect(inferType(-15, 'Gebührenerstattung')).toBe('income')
+      expect(inferType(25, 'Commerzbank AG Rueckverguetung fuer 2024')).toBe('income')
+    })
+
+    it('returns income when description contains Rücküberweisung / Rueckueberweisung', () => {
+      const desc =
+        'Commerzbank AG Rücküberweisung von Karte Nr.   5232 2XXXXXX07296   Anel Memic Card-ID:  5520009001872996 End-to-End-Ref.: null Kundenreferenz: a9d752972a1043a18e7805b6647ed5fa'
+      expect(inferType(150, desc)).toBe('income')
+      expect(inferType(-150, desc)).toBe('income')
+      expect(
+        inferType(
+          -250,
+          'Commerzbank AG Rueckueberweisung von Karte Nr. 5232 2XXXXXX07296 Anel Memic Card-ID: 5520009001872996',
+        ),
+      ).toBe('income')
+    })
   })
 
   describe('parseAmount', () => {

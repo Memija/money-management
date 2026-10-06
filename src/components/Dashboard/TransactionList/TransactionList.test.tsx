@@ -1,9 +1,10 @@
 import type { HTMLAttributes } from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { type LanguageState, useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
+import * as clipboardModule from '../../../utils/clipboard'
 import { TransactionList } from './TransactionList'
 
 // Mock the framer-motion module
@@ -117,7 +118,7 @@ const mockTransactions: Transaction[] = [
 
 describe('TransactionList Component', () => {
   beforeEach(() => {
-    (useLanguageStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector) => {
+    ;(useLanguageStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector) => {
       const state = { t: mockTranslations, locale: 'en' } as unknown as LanguageState
       return typeof selector === 'function' ? selector(state) : state
     })
@@ -138,7 +139,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={setSelectedInstitution}
         sortOrder="newest"
         setSortOrder={setSortOrder}
-      />
+      />,
     )
 
     // Check title and subtitle
@@ -176,7 +177,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     expect(screen.getByText('No transactions match')).toBeInTheDocument()
@@ -194,7 +195,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const searchInput = screen.getByPlaceholderText('Search')
@@ -213,7 +214,7 @@ describe('TransactionList Component', () => {
         selectedInstitution="all"
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     expect(screen.queryByLabelText('All Institutions')).not.toBeInTheDocument()
@@ -232,7 +233,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={setSortOrder}
-      />
+      />,
     )
 
     const select = screen.getByLabelText('Sort order')
@@ -251,7 +252,7 @@ describe('TransactionList Component', () => {
         selectedInstitution="all"
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // Should not find the institution select
@@ -269,7 +270,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // With 1 bank, meta should only show the date without the bullet and bank name
@@ -290,7 +291,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     expect(screen.getByText('Date: 2023-01-01 • Bank A')).toBeInTheDocument()
@@ -309,7 +310,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // With a specific institution selected (Bank A), bank name is not shown as the user already knows that
@@ -328,7 +329,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // Initially both Groceries and Salary are displayed
@@ -372,7 +373,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const clearButton = screen.getByRole('button', { name: 'Clear search' })
@@ -395,7 +396,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={setSelectedInstitution}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const resetBtn = screen.getByRole('button', { name: 'Reset all filters' })
@@ -417,7 +418,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     expect(screen.getByText('Total Balance')).toBeInTheDocument()
@@ -448,7 +449,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // By default pageSize is 10, so 10 items shown
@@ -493,7 +494,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // On page 1: should show 1, 2, 3, 4, 5, ellipsis, 14
@@ -533,7 +534,7 @@ describe('TransactionList Component', () => {
         showGhost={false}
         setShowGhost={setShowGhost}
         ghostCount={5}
-      />
+      />,
     )
 
     const transfersTab = screen.getByRole('tab', { name: /Transfers/i })
@@ -572,7 +573,7 @@ describe('TransactionList Component', () => {
         showGhost={true}
         setShowGhost={vi.fn()}
         ghostCount={1}
-      />
+      />,
     )
 
     // Transfers tab should be visible
@@ -593,8 +594,8 @@ describe('TransactionList Component', () => {
     expect(screen.getByTestId('transfers-read-only-notice')).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Internal transfers between your accounts are excluded from income and expenses (read-only).'
-      )
+        'Internal transfers between your accounts are excluded from income and expenses (read-only).',
+      ),
     ).toBeInTheDocument()
 
     // In Transfers view, calculation impact is €0.00 / 0 impact
@@ -639,7 +640,7 @@ describe('TransactionList Component', () => {
         showGhost={true}
         setShowGhost={vi.fn()}
         ghostCount={2}
-      />
+      />,
     )
 
     // Check Income tab
@@ -651,6 +652,123 @@ describe('TransactionList Component', () => {
     const expenseTab = screen.getByRole('tab', { name: /Expenses/i })
     fireEvent.click(expenseTab)
     expect(screen.queryByText('Internal Transfer Expense')).not.toBeInTheDocument()
+  })
+
+  it('shows zero internal transfers when a specific category is selected', () => {
+    const transactionsWithGhostAndCategory: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'tx-ghost-1',
+        date: '2023-01-03',
+        description: 'Internal Transfer to Savings',
+        amount: -200,
+        currency: 'USD',
+        type: 'expense',
+        category: 'Food',
+        institution: 'Bank A',
+        isGhost: true,
+      },
+      {
+        id: 'tx-ghost-2',
+        date: '2023-01-04',
+        description: 'Internal Transfer from Checking',
+        amount: 200,
+        currency: 'USD',
+        type: 'income',
+        institution: 'Bank B',
+        isGhost: true,
+      },
+    ]
+
+    const { rerender } = render(
+      <TransactionList
+        filteredTx={transactionsWithGhostAndCategory}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+        showGhost={true}
+        setShowGhost={vi.fn()}
+        ghostCount={2}
+        selectedCategory="all"
+      />,
+    )
+
+    // With "all" categories, transfers tab shows count of 2
+    const transfersTab = screen.getByRole('tab', { name: /Transfers/i })
+    expect(transfersTab).toHaveTextContent('2')
+
+    // Rerender with a specific category selected (e.g., Food)
+    rerender(
+      <TransactionList
+        filteredTx={transactionsWithGhostAndCategory}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+        showGhost={true}
+        setShowGhost={vi.fn()}
+        ghostCount={2}
+        selectedCategory="Food"
+      />,
+    )
+
+    // With a certain category selected, transfers tab badge must show 0
+    expect(transfersTab).toHaveTextContent('0')
+
+    // Clicking Transfers tab shows 0 items and stat pill value is 0
+    fireEvent.click(transfersTab)
+    expect(screen.queryByText('Internal Transfer to Savings')).not.toBeInTheDocument()
+    expect(screen.queryByText('Internal Transfer from Checking')).not.toBeInTheDocument()
+    const zeroElements = screen.getAllByText('0')
+    expect(zeroElements.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('updates internal transfers count to zero when selecting a category via the dropdown', () => {
+    const transactionsWithGhost: Transaction[] = [
+      ...mockTransactions,
+      {
+        id: 'tx-ghost-1',
+        date: '2023-01-03',
+        description: 'Internal Transfer',
+        amount: -100,
+        currency: 'USD',
+        type: 'expense',
+        institution: 'Bank A',
+        isGhost: true,
+      },
+    ]
+
+    render(
+      <TransactionList
+        filteredTx={transactionsWithGhost}
+        institutionNames={['Bank A', 'Bank B']}
+        searchTerm=""
+        setSearchTerm={vi.fn()}
+        selectedInstitution="all"
+        setSelectedInstitution={vi.fn()}
+        sortOrder="newest"
+        setSortOrder={vi.fn()}
+        showGhost={true}
+        setShowGhost={vi.fn()}
+        ghostCount={1}
+      />,
+    )
+
+    const transfersTab = screen.getByRole('tab', { name: /Transfers/i })
+    expect(transfersTab).toHaveTextContent('1')
+
+    const categorySelect = screen.getByLabelText('Filter by category')
+    fireEvent.change(categorySelect, { target: { value: 'Food' } })
+
+    // Once a category is selected, internal transfers should show 0
+    expect(transfersTab).toHaveTextContent('0')
   })
 
   it('marks duplicated transactions with a duplicate badge and icon', () => {
@@ -678,7 +796,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const badge = screen.getByTestId('tx-duplicate-badge-tx-dup-1')
@@ -712,7 +830,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const badge = screen.getByTestId('tx-duplicate-badge-tx-force-1')
@@ -746,7 +864,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const badge = screen.getByTestId('tx-modified-badge-tx-mod-1')
@@ -780,7 +898,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const dupTab = screen.getByTestId('filter-duplicates-tab')
@@ -813,7 +931,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     expect(screen.queryByTestId('filter-duplicates-tab')).not.toBeInTheDocument()
@@ -846,7 +964,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const modTab = screen.getByTestId('filter-modified-tab')
@@ -873,7 +991,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const categorySelect = screen.getByLabelText('Filter by category')
@@ -895,7 +1013,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // Initially both Groceries and Salary are displayed
@@ -933,7 +1051,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     const categorySelect = screen.getByLabelText('Filter by category')
@@ -961,7 +1079,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // Select Food category
@@ -997,7 +1115,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={vi.fn()}
-      />
+      />,
     )
 
     // Salary is visible, Groceries is hidden because selectedCategory is controlled as Salary
@@ -1022,7 +1140,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="newest"
         setSortOrder={setSortOrder}
-      />
+      />,
     )
 
     // Reset button should not be present when sortOrder is default and no filters active
@@ -1039,7 +1157,7 @@ describe('TransactionList Component', () => {
         setSelectedInstitution={vi.fn()}
         sortOrder="highest"
         setSortOrder={setSortOrder}
-      />
+      />,
     )
 
     // Reset button should now be visible
@@ -1303,7 +1421,31 @@ describe('TransactionList Component', () => {
       expect(screen.getByTestId('tx-informative-readonly-tx-zero')).toBeInTheDocument()
       expect(screen.getByText('Informative')).toBeInTheDocument()
     })
+
+    it('renders copy button and copies transaction description when clicked', async () => {
+      const copySpy = vi.spyOn(clipboardModule, 'copyToClipboard').mockResolvedValue(true)
+
+      render(
+        <TransactionList
+          filteredTx={mockTransactions}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          selectedInstitution="all"
+          setSelectedInstitution={vi.fn()}
+          sortOrder="newest"
+          setSortOrder={vi.fn()}
+        />,
+      )
+
+      const copyBtn = screen.getByTestId(`copy-tx-text-${mockTransactions[0].id}`)
+      expect(copyBtn).toBeInTheDocument()
+
+      await act(async () => {
+        fireEvent.click(copyBtn)
+      })
+
+      expect(copySpy).toHaveBeenCalledWith(mockTransactions[0].description)
+    })
   })
 })
-
-

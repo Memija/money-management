@@ -174,9 +174,14 @@ const POLISH_ATM_WITHDRAWAL_REGEX =
   /(?:\b(?:wyp[lł]ata|wyplata)\s+(?:z\s+bankomatu|got[oó]wki|w\s+bankomacie)\b)/i
 
 // Regex to detect SEPA and credit transfer / standing order reference patterns
-// (e.g. 'CCB.321.UE.328580', 'CD-SCT-12345', 'SEPA-Überweisung', 'Dauerauftrag', 'Umbuchung')
+// (e.g. 'CCB.321.UE.328580', 'MOB.210.EE.POS00026333', 'CD-SCT-12345', 'SEPA-Überweisung', 'Dauerauftrag', 'Umbuchung', 'End-to-End-Ref ... Kundenreferenz ...')
 const SEPA_TRANSFER_REGEX =
-  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da)\.\d+\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*[a-z0-9_.-]*(?:ue|da|sct)[a-z0-9_.-]*\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?transfer)\b)/i
+  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da|ee|ta|sct|inst)(?:\.[a-z0-9_-]+)?\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref\b.*\bkundenreferenz\b|\bkundenreferenz\b.*\bend-to-end-ref\b)|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*(?:notprovided|null|\d{8}-[a-z0-9_-]+|[a-z0-9_.-]*(?:ue|da|ee|ta|sct|inst|mob|si)[a-z0-9_.-]*)\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?(?:transfer|back)|geld[- ]?zur[uü]ck|sent\s+from|echtzeit[uü]berweisung|echtzeit[- ]?[uü]berweisung|instant[- ]?transfer|instant[- ]?payment)\b|(?:\b[a-z]{4}[a-z]{2}[a-z0-9]{2}(?:[a-z0-9]{3})?\s+[a-z]{2}\d{2}[a-z0-9]{11,30}\b|\b[a-z]{2}\d{2}[a-z0-9]{11,30}\b).*\b(?:end-to-end-ref|kundenreferenz)\b|\b(?:anel\s*(?:o\.?|oder|u\.?|und|\/|&)\s*biljana\s*memic|biljana\s*(?:o\.?|oder|u\.?|und|\/|&)\s*anel\s*memic)\b)/i
+
+// Regex to detect commercial purchase / order indicators in SEPA payments
+// to prevent business invoices, orders, and corporate collections with End-to-End-Ref from falling into Transfers.
+const COMMERCIAL_SEPA_REGEX =
+  /(?:\b(?:order|bestellung|auftrag|rechnung|invoice|rg\.?)\s*[:#.-]?\s*\d|\b(?:citideffxxx)\b|\bde\d{2}50210900\d{10}\b|\b(?:mandatsref|mandatsreferenz|gl[aä]ubiger[- ]?id|sepa[- ]?(?:basis|firmen)?[- ]?lastschrift|lastschrift\b))/i
 
 // Regex to detect explicit tax authority or specific tax duty/assessment context
 // to prevent regular bank transfers with tax-related memos/references from misclassifying as Taxes.
@@ -264,7 +269,7 @@ export function categorize(
       if (POLISH_ATM_WITHDRAWAL_REGEX.test(d)) continue
       if (isExpense) {
         const isExplicitSalaryPayment =
-          /\b(?:salary\s+payment|monthly\s+salary|gehaltszahlung|lohnauszahlung)\b/i.test(d)
+          /\b(?:salary\s+payment|monthly\s+salary|gehaltszahlung|lohnauszahlung|reisespesen|reisesp|reisekosten|spesenabrechnung|spesenerstattung|auslagenerstattung|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*)\b/i.test(d)
         if (!isExplicitSalaryPayment) continue
       }
     }
@@ -321,6 +326,7 @@ export function categorize(
   if (isIncome) {
     order = [
       'Savings',
+      'BankFees',
       'Crypto',
       'Cash',
       'Groceries',
@@ -334,7 +340,6 @@ export function categorize(
       'Utilities',
       'Healthcare',
       'Education',
-      'BankFees',
     ]
   }
 
@@ -364,7 +369,7 @@ export function categorize(
   if (
     transferMerchantsRegex?.test(d) ||
     categoryRegexes.Transfers?.test(d) ||
-    SEPA_TRANSFER_REGEX.test(d)
+    (SEPA_TRANSFER_REGEX.test(d) && !COMMERCIAL_SEPA_REGEX.test(d))
   ) {
     if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Transfers')
     return 'Transfers'

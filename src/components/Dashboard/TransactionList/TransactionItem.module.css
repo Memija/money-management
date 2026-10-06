@@ -8,10 +8,11 @@
   border: 1px solid var(--card-border);
   min-height: 68px;
   box-sizing: border-box;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              background-color 0.2s ease,
-              border-color 0.2s ease;
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease;
   position: relative;
   gap: 1rem;
   min-width: 0;
@@ -67,6 +68,86 @@
   border: 1px solid rgba(125, 125, 125, 0.2);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease;
+  overflow: hidden;
+  padding: 0;
+}
+
+.iconBox img,
+.iconBox svg[data-brand-logo="true"],
+.iconBox :global(.brand-logo-full),
+.iconBox svg[aria-label="Tomorrow Bank"],
+.iconBox svg[aria-label="Revolut"],
+.iconBox svg[aria-label*="Commerzbank" i],
+.iconBox svg[aria-label*="Mercedes" i],
+.iconBox svg[aria-label*="ADAC" i],
+.iconBox svg[aria-label*="RMV" i],
+.iconBox svg[aria-label*="Aral" i],
+.iconBox svg[aria-label*="BMW" i],
+.iconBox svg[aria-label*="Audi" i],
+.iconBox svg[aria-label*="Volkswagen" i],
+.iconBox svg[aria-label*="Porsche" i],
+.iconBox svg[aria-label*="Tesla" i],
+.iconBox svg[aria-label*="Deutsche Bahn" i],
+.iconBox svg[aria-label*="BVG" i],
+.iconBox svg[aria-label*="HVV" i],
+.iconBox svg[aria-label*="VRR" i],
+.iconBox svg[aria-label*="ÖBB" i],
+.iconBox svg[aria-label*="Flix" i],
+.iconBox svg[aria-label*="SIXT" i],
+.iconBox svg[aria-label*="EasyPark" i],
+.iconBox svg[aria-label*="fair parken" i],
+.iconBox svg[aria-label*="ASFINAG" i],
+.iconBox svg[aria-label*="JET" i],
+.iconBox svg[aria-label*="Esso" i],
+.iconBox svg[aria-label*="AVIA" i],
+.iconBox svg[aria-label*="Eni" i],
+.iconBox svg[aria-label*="BP" i],
+.iconBox svg[aria-label*="Shell" i],
+.iconBox svg[aria-label*="Turmöl" i],
+.iconBox svg[aria-label*="Ionity" i],
+.iconBox svg[aria-label*="EnBW" i],
+.iconBox svg[aria-label*="Fastned" i],
+.iconBox svg[aria-label="TUI"],
+.iconBox svg[aria-label*="TUI" i],
+.iconBox svg[aria-label="Eurowings"],
+.iconBox svg[aria-label*="Eurowings" i],
+.iconBox svg[aria-label*="Holidays" i],
+.iconBox svg[aria-label="DERTOUR"],
+.iconBox svg[aria-label="alltours"],
+.iconBox svg[aria-label="Schauinsland-Reisen"],
+.iconBox svg[aria-label="Condor"],
+.iconBox svg[aria-label="wundertax"],
+.iconBox svg[aria-label*="wundertax" i],
+.iconBox svg[aria-label="Taxfix"],
+.iconBox svg[aria-label*="Taxfix" i],
+.iconBox svg[aria-label="smartsteuer"],
+.iconBox svg[aria-label*="smartsteuer" i],
+.iconBox svg[aria-label="ELSTER"],
+.iconBox svg[aria-label*="ELSTER" i],
+.iconBox svg[aria-label="WISO Steuer"],
+.iconBox svg[aria-label*="WISO Steuer" i],
+.iconBox svg[aria-label="Bundesrepublik Deutschland"],
+.iconBox svg[aria-label*="Finanzamt" i],
+.iconBox svg[aria-label*="Bad Homburg" i],
+.iconBox svg[aria-label*="Schmitten" i],
+.iconBox svg[aria-label*="Land Hessen" i],
+.iconBox svg[aria-label*="Gerichtskasse" i],
+.iconBox svg[aria-label*="Gerichtkasse" i],
+.iconBox svg[aria-label*="Justiz Hessen" i],
+.iconBox svg[aria-label*="Färber & Hutzel" i],
+.iconBox svg[aria-label*="Faerber" i],
+.iconBox svg[aria-label*="Kelkheim" i],
+.iconBox svg[aria-label*="Bad Nauheim" i],
+.iconBox svg[aria-label*="Hochtaunuskreis" i],
+.iconBox svg[aria-label*="Edukativni Centar" i],
+.iconBox svg[aria-label*="Rani Razvoj" i] {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+  display: block !important;
 }
 
 @supports (color: color-mix(in srgb, red, blue)) {
@@ -87,6 +168,17 @@
   gap: 0.2rem;
   min-width: 0;
   flex: 1;
+}
+
+.txDescRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.transactionItem:hover .copyBtn {
+  opacity: 0.75;
 }
 
 .txDesc {

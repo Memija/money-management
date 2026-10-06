@@ -1,6 +1,6 @@
 import type { Transaction } from '../../types'
 import { extractIbans } from '../account-transfers'
-import { generateId, inferType, parseAmount, parseDate } from './helpers'
+import { EXPLICIT_INCOME_KEYWORDS_REGEX,generateId, inferType, parseAmount, parseDate } from './helpers'
 
 export function extractAccountIbansFromPaste(rawText: string): string[] {
   const result = new Set<string>()
@@ -156,13 +156,18 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
   return rawTxs.map((r) => {
     const fullText = [r.partner, r.desc].filter(Boolean).join(' ')
     const ibans = extractIbans(fullText)
+    let amount = r.amount
+    if (EXPLICIT_INCOME_KEYWORDS_REGEX.test(fullText) && amount < 0) {
+      amount = Math.abs(amount)
+    }
+    const desc = [r.partner, r.desc].filter(Boolean).join(' – ') || r.type || 'Unknown'
     return {
       id: generateId(),
       date: r.date,
-      description: [r.partner, r.desc].filter(Boolean).join(' – ') || r.type || 'Unknown',
-      amount: r.amount,
+      description: desc,
+      amount,
       currency: r.currency,
-      type: inferType(r.amount),
+      type: inferType(amount, fullText || desc),
       institution,
       counterpartyIban: ibans.length > 0 ? ibans[0] : undefined,
     }

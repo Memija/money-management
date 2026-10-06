@@ -3,6 +3,7 @@ import { AlertTriangle, Unlock } from 'lucide-react'
 
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
+import { CopyButton } from '../CopyButton'
 import { Modal } from '../Modal'
 
 import styles from './UnlockDuplicateModal.module.css'
@@ -83,21 +84,18 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
                 onClick={() => handleConfirm(true)}
                 id="confirm-unlock-all-btn"
                 data-testid="confirm-unlock-all-btn"
-                title={(t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions').replace(
-                  '{count}',
-                  String(sameDuplicateCount),
-                )}
-                aria-label={(t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions').replace(
-                  '{count}',
-                  String(sameDuplicateCount),
-                )}
+                title={(
+                  t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions'
+                ).replace('{count}', String(sameDuplicateCount))}
+                aria-label={(
+                  t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions'
+                ).replace('{count}', String(sameDuplicateCount))}
               >
                 <Unlock size={15} aria-hidden="true" />
                 <span>
-                  {(t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions').replace(
-                    '{count}',
-                    String(sameDuplicateCount),
-                  )}
+                  {(
+                    t.unlockAllIdenticalCount || 'Unlock all {count} identical transactions'
+                  ).replace('{count}', String(sameDuplicateCount))}
                 </span>
               </button>
             </>
@@ -122,10 +120,9 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
         {hasMultipleIdentical && (
           <div className={styles.identicalNotice} data-testid="identical-duplicates-notice">
             <span>
-              {(t.identicalDuplicatesDetected || 'Found {count} identical duplicate transactions.').replace(
-                '{count}',
-                String(sameDuplicateCount),
-              )}
+              {(
+                t.identicalDuplicatesDetected || 'Found {count} identical duplicate transactions.'
+              ).replace('{count}', String(sameDuplicateCount))}
             </span>
           </div>
         )}
@@ -141,9 +138,18 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
 
         <div className={styles.txDetailsCard} data-testid="unlock-tx-details">
           <div className={styles.txLeft}>
-            <span className={styles.txDescription} title={transaction.description}>
-              {transaction.description}
-            </span>
+            <div className={styles.txDescRow}>
+              <span className={styles.txDescription} title={transaction.description}>
+                {transaction.description}
+              </span>
+              <CopyButton
+                text={transaction.description}
+                title={t.copyTransactionText || 'Copy transaction text'}
+                copiedTitle={t.copied || 'Copied!'}
+                variant="inline"
+                testId={`copy-unlock-tx-text-${transaction.id}`}
+              />
+            </div>
             <span className={styles.txDate}>{formatDate(transaction.date)}</span>
           </div>
           <div

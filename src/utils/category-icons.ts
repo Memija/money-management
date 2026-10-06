@@ -88,7 +88,7 @@ const PAYMENT_PROCESSOR_IDS = new Set<string>([
 export function findMatchingMerchant(text: string): MerchantSuggestion | undefined {
   if (!text) return undefined
   const repaired = repairBrokenWords(text)
-  const textLower = repaired.trim().toLowerCase()
+  const textLower = repaired.replace(/\s+/g, ' ').trim().toLowerCase()
   let bestDirectMerchant: MerchantSuggestion | undefined
   let bestDirectScore = 0
   let bestProcessorMerchant: MerchantSuggestion | undefined
@@ -223,11 +223,25 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
       (merchant.icon ? ICON_COLORS[merchant.icon] : undefined) ||
       '#6366f1'
 
+    const isSalaryOrSpesen =
+      /(?:\b(?:reisesp(?:esen)?|reisekosten(?:erstattung|abrechnung)?|spesen(?:erstattung|abrechnung)?|auslagenerstattung|gehalt(?:szahlung)?|lohn(?:auszahlung)?|r[üu]ck[üu]berweisung\w*|rueckueberweisung\w*)\b)/i.test(
+        nameTrimmed,
+      )
+
+    const isBankFeeOrRefund =
+      /(?:\b(?:r[üu]ckverg[üu]tung\w*|rueckverguetung\w*|geb[üu]hrenerstattung\w*|gebuehrenerstattung\w*|entgelterstattung\w*|rechnungsabschluss\w*|kontoabschluss\w*|kontof[üu]hrung\w*)\b)/i.test(
+        nameTrimmed,
+      )
+
     return {
       merchant,
       logoComponent,
       brandColor,
-      suggestedCategory: merchant.category,
+      suggestedCategory: isSalaryOrSpesen
+        ? 'Salary'
+        : isBankFeeOrRefund
+          ? 'Bank Fees'
+          : merchant.category,
       initials,
     }
   }

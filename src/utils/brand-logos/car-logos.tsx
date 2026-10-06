@@ -10,14 +10,15 @@ export const MercedesLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="Mercedes-Benz"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#0A0D12" />
+    <rect width="48" height="48" fill="#0A0D12" />
     {/* Outer chrome ring */}
     <circle cx="24" cy="19.5" r="13.5" fill="none" stroke="#D1D5DB" strokeWidth="1.8" />
     <circle cx="24" cy="19.5" r="12.3" fill="none" stroke="#4B5563" strokeWidth="0.6" />
@@ -60,14 +61,15 @@ export const BmwLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="BMW"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#0A0D12" />
+    <rect width="48" height="48" fill="#0A0D12" />
     {/* Outer silver rim & black ring */}
     <circle cx="24" cy="24" r="20" fill="#000000" stroke="#D1D5DB" strokeWidth="1.5" />
     {/* BMW letters around the top */}
@@ -109,14 +111,15 @@ export const AudiLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="Audi"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#0B0E14" />
+    <rect width="48" height="48" fill="#0B0E14" />
     {/* 4 Interlocking Rings */}
     <g fill="none" stroke="#E5E7EB" strokeWidth="2.2">
       <circle cx="12" cy="20.5" r="7.5" />
@@ -151,14 +154,15 @@ export const VolkswagenLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="Volkswagen"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#001E50" />
+    <rect width="48" height="48" fill="#001E50" />
     {/* Outer ring */}
     <circle cx="24" cy="24" r="18" fill="none" stroke="#FFFFFF" strokeWidth="2.2" />
     {/* V and W inner glyphs */}
@@ -194,14 +198,15 @@ export const PorscheLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="Porsche"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#0A0D12" />
+    <rect width="48" height="48" fill="#0A0D12" />
     {/* Crest outline */}
     <path
       d="M 13 8 L 35 8 C 35 15 36 29 24 40 C 12 29 13 15 13 8 Z"
@@ -234,10 +239,37 @@ export const PorscheLogo: IconComponent = ({ size = 16, className }) => (
 )
 PorscheLogo.displayName = 'PorscheLogo'
 
+export const TeslaLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: 'inherit',
+      flexShrink: 0,
+    }}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
+    aria-label="Tesla"
+    role="img"
+  >
+    <rect width="48" height="48" fill="#E82127" />
+    <g transform="translate(7.2, 7.2) scale(1.4)" fill="#FFFFFF">
+      <path d="M12 5.362l2.475-3.026s4.245.09 8.471 2.054c-1.082 1.636-3.231 2.438-3.231 2.438-.146-1.439-1.154-1.79-4.354-1.79L12 24 8.619 5.034c-3.18 0-4.188.354-4.335 1.792 0 0-2.146-.795-3.229-2.43C5.28 2.431 9.525 2.34 9.525 2.34L12 5.362l-.004.002H12v-.002zm0-3.899c3.415-.03 7.326.528 11.328 2.28.535-.968.672-1.395.672-1.395C19.625.612 15.528.015 12 0 8.472.015 4.375.61 0 2.349c0 0 .195.525.672 1.396C4.674 1.989 8.585 1.435 12 1.46v.003z" />
+    </g>
+  </svg>
+)
+TeslaLogo.displayName = 'TeslaLogo'
+
 export {
   AudiLogo as AudiCarLogo,
   BmwLogo as BmwCarLogo,
   MercedesLogo as MercedesBenzLogo,
   PorscheLogo as PorscheCarLogo,
+  TeslaLogo as TeslaCarLogo,
   VolkswagenLogo as VwLogo,
 }

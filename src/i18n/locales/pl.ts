@@ -104,7 +104,8 @@ export const pl: TranslationStrings = {
   clearFilters: 'Wyczyść filtry',
   duplicate: 'Duplikat',
   alreadyDuplicated: 'Już zduplikowane',
-  alreadyDuplicatedNotice: 'Ten duplikat został już zaimportowany i nie można go ponownie odblokować.',
+  alreadyDuplicatedNotice:
+    'Ten duplikat został już zaimportowany i nie można go ponownie odblokować.',
   modified: 'Zmodyfikowane',
   allDates: 'Wszystkie daty',
   fromDate: 'Od daty',
@@ -121,16 +122,22 @@ export const pl: TranslationStrings = {
   duplicateImportProceed: 'Kontynuuj z {newCount} transakcjami',
   duplicateImportOk: 'OK',
   duplicateImportCancel: 'Anuluj',
-  duplicateTransactionsDetectedSingular: 'Wykryto 1 zduplikowaną transakcję, która zostanie pominięta.',
-  duplicateTransactionsDetected: 'Wykryto {count} zduplikowane transakcje, które zostaną pominięte.',
-  duplicateImportAllBannerSingular: 'Wykryto 1 zduplikowaną transakcję. Ta transakcja została już zaimportowana.',
-  duplicateImportAllBanner: 'Wszystkie {count} transakcje w tym pliku zostały już zaimportowane (duplikaty).',
-  duplicateImportPartialBanner: 'Wykryto {duplicateCount} duplikatów, które zostaną pominięte. {newCount} nowych transakcji zostanie zaimportowanych.',
+  duplicateTransactionsDetectedSingular:
+    'Wykryto 1 zduplikowaną transakcję, która zostanie pominięta.',
+  duplicateTransactionsDetected:
+    'Wykryto {count} zduplikowane transakcje, które zostaną pominięte.',
+  duplicateImportAllBannerSingular:
+    'Wykryto 1 zduplikowaną transakcję. Ta transakcja została już zaimportowana.',
+  duplicateImportAllBanner:
+    'Wszystkie {count} transakcje w tym pliku zostały już zaimportowane (duplikaty).',
+  duplicateImportPartialBanner:
+    'Wykryto {duplicateCount} duplikatów, które zostaną pominięte. {newCount} nowych transakcji zostanie zaimportowanych.',
   allTransactionsAlreadyImported: 'Wszystkie transakcje zostały już zaimportowane',
   importNewTransactions: 'Zaimportuj {count} nowych transakcji',
   filterDuplicates: 'Duplikaty',
   filterModified: 'Zmodyfikowane',
-  duplicatesSkippedNotice: 'Te transakcje już istnieją w Twoich zapisach i zostaną pominięte, aby zapobiec podwójnemu liczeniu.',
+  duplicatesSkippedNotice:
+    'Te transakcje już istnieją w Twoich zapisach i zostaną pominięte, aby zapobiec podwójnemu liczeniu.',
   viewDuplicates: 'Zobacz duplikaty',
   unlockDuplicate: 'Odblokuj',
   unlockDuplicateTitle: 'Odblokuj zduplikowaną transakcję',
@@ -143,7 +150,8 @@ export const pl: TranslationStrings = {
   filterAlreadyDuplicated: 'Już zduplikowane',
   alreadyDuplicatedFilterNotice:
     'Te zduplikowane transakcje zostały już wcześniej zaimportowane i nie można ich modyfikować ani odblokowywać.',
-  cannotRelockModified: 'Nie można zablokować zmodyfikowanej transakcji. Przywróć wartości początkowe, aby zablokować.',
+  cannotRelockModified:
+    'Nie można zablokować zmodyfikowanej transakcji. Przywróć wartości początkowe, aby zablokować.',
   resetToOriginal: 'Przywróć wartości początkowe',
   resetTransactionModalTitle: 'Przywróć transakcje',
   resetBulkPrompt:
@@ -163,7 +171,8 @@ export const pl: TranslationStrings = {
   applyToAll: 'Zastosuj do wszystkich',
   dismiss: 'Odrzuć',
   batchCategoryTitle: 'Zaktualizuj powiązane transakcje',
-  batchCategoryPrompt: 'Znaleziono {count} powiązanych transakcji. Czy chcesz zmienić kategorię dla wszystkich na {category}?',
+  batchCategoryPrompt:
+    'Znaleziono {count} powiązanych transakcji. Czy chcesz zmienić kategorię dla wszystkich na {category}?',
   batchCategoryOnlyThis: 'Tylko ta transakcja',
   batchCategoryUpdateAll: 'Zaktualizuj wszystkie ({count})',
   batchCategoryRememberRule: 'Zapamiętaj tę regułę dla przyszłych importów',
@@ -173,7 +182,8 @@ export const pl: TranslationStrings = {
   applyToAllUnlocked: 'Zastosuj do wszystkich odblokowanych',
   adjustUnlockedOptions: 'Dostosuj zbiorczo...',
   adjustUnlockedModalTitle: 'Zbiorcze dostosowywanie odblokowanych transakcji',
-  adjustUnlockedModalSubtitle: 'Wybierz modyfikacje do zastosowania oraz docelowe odblokowane transakcje.',
+  adjustUnlockedModalSubtitle:
+    'Wybierz modyfikacje do zastosowania oraz docelowe odblokowane transakcje.',
   applyFieldsLabel: 'Modyfikacje do zastosowania',
   targetTransactionsLabel: 'Docelowe transakcje',
   applyToSelectedCount: 'Zastosuj do {count} wybranych',
@@ -351,6 +361,8 @@ export const pl: TranslationStrings = {
   hideInternalTransfers: 'Ukryj przelewy własne',
   transfersTabNotice:
     'Przelewy własne między Twoimi kontami są wyłączone z przychodów i wydatków (tylko do odczytu).',
+  copyTransactionText: 'Kopiuj treść transakcji',
+  copied: 'Skopiowano!',
 
   insightTransactions: 'Transakcje',
   insightAvgTransaction: 'Średnia transakcja',
@@ -474,20 +486,25 @@ export const pl: TranslationStrings = {
 
   // Data Management
   dataManagementTitle: 'Zarządzanie danymi',
-  dataManagementDesc: 'Zarządzaj lokalnie zapisanymi danymi finansowymi, kopiami zapasowymi i ustawieniami prywatności.',
+  dataManagementDesc:
+    'Zarządzaj lokalnie zapisanymi danymi finansowymi, kopiami zapasowymi i ustawieniami prywatności.',
   backupRestoreTitle: 'Kopia zapasowa i przywracanie',
-  backupRestoreDesc: 'Zapisz bezpieczną kopię zapasową swoich danych finansowych lub przywróć wcześniej zapisany plik.',
+  backupRestoreDesc:
+    'Zapisz bezpieczną kopię zapasową swoich danych finansowych lub przywróć wcześniej zapisany plik.',
   exportBackup: 'Eksportuj kopię zapasową',
   exportBackupDesc: 'Pobierz wszystkie swoje konta, transakcje, kategorie i reguły jako plik JSON.',
   exportBackupButton: 'Eksportuj kopię (.json)',
   exportBackupSuccess: 'Kopia zapasowa została pomyślnie pobrana.',
   restoreBackup: 'Przywróć kopię zapasową',
-  restoreBackupDesc: 'Wczytaj wcześniej zapisany plik kopii zapasowej Saldio (JSON) do tej przeglądarki.',
+  restoreBackupDesc:
+    'Wczytaj wcześniej zapisany plik kopii zapasowej Saldio (JSON) do tej przeglądarki.',
   restoreBackupButton: 'Przywróć kopię',
   restoreBackupSuccess: 'Dane z kopii zapasowej zostały pomyślnie przywrócone.',
   restoreBackupInvalidFile: 'Wybrany plik nie jest prawidłową kopią zapasową Saldio.',
-  restoreBackupErrorInvalidJson: 'Plik kopii zapasowej nie mógł zostać odczytany jako poprawny JSON.',
-  restoreBackupErrorRootObject: 'Nieprawidłowa struktura pliku kopii zapasowej (główny element musi być obiektem JSON).',
+  restoreBackupErrorInvalidJson:
+    'Plik kopii zapasowej nie mógł zostać odczytany jako poprawny JSON.',
+  restoreBackupErrorRootObject:
+    'Nieprawidłowa struktura pliku kopii zapasowej (główny element musi być obiektem JSON).',
   restoreBackupErrorMissingAccounts: 'Plik kopii zapasowej nie zawiera listy kont.',
   restoreBackupErrorAccountInvalid: 'Konto #{index} jest nieprawidłowe.',
   restoreBackupErrorAccountMissingId: 'Konto „{account}“ nie posiada identyfikatora instytucji.',
@@ -495,16 +512,23 @@ export const pl: TranslationStrings = {
   restoreBackupErrorAccountMissingTransactions: 'Konto „{account}“ nie posiada listy transakcji.',
   restoreBackupErrorAccountInvalidList: 'Konto „{account}“ zawiera nieprawidłową listę ({list}).',
   restoreBackupErrorTxInvalid: 'Transakcja #{index} na koncie „{account}“ jest nieprawidłowa.',
-  restoreBackupErrorTxMissingId: 'Transakcja #{index} na koncie „{account}“ nie posiada prawidłowego identyfikatora (ID).',
-  restoreBackupErrorTxMissingDate: 'Transakcja „{id}“ na koncie „{account}“ nie posiada prawidłowej daty.',
-  restoreBackupErrorTxInvalidAmount: 'Transakcja „{id}“ na koncie „{account}“ zawiera nieprawidłową kwotę.',
-  restoreBackupErrorTxInvalidDescription: 'Transakcja „{id}“ na koncie „{account}“ zawiera nieprawidłowy opis.',
-  restoreBackupErrorTxMissingCurrency: 'Transakcja „{id}“ na koncie „{account}“ nie posiada waluty.',
-  restoreBackupErrorTxInvalidType: 'Transakcja „{id}“ na koncie „{account}“ ma nieprawidłowy typ (musi być przychód lub wydatek).',
+  restoreBackupErrorTxMissingId:
+    'Transakcja #{index} na koncie „{account}“ nie posiada prawidłowego identyfikatora (ID).',
+  restoreBackupErrorTxMissingDate:
+    'Transakcja „{id}“ na koncie „{account}“ nie posiada prawidłowej daty.',
+  restoreBackupErrorTxInvalidAmount:
+    'Transakcja „{id}“ na koncie „{account}“ zawiera nieprawidłową kwotę.',
+  restoreBackupErrorTxInvalidDescription:
+    'Transakcja „{id}“ na koncie „{account}“ zawiera nieprawidłowy opis.',
+  restoreBackupErrorTxMissingCurrency:
+    'Transakcja „{id}“ na koncie „{account}“ nie posiada waluty.',
+  restoreBackupErrorTxInvalidType:
+    'Transakcja „{id}“ na koncie „{account}“ ma nieprawidłowy typ (musi być przychód lub wydatek).',
   restoreBackupErrorCustomCategories: 'Dane kategorii niestandardowych są nieprawidłowe.',
   restoreBackupErrorDuplicateRules: 'Reguły zastępowania duplikatów są nieprawidłowe.',
   restoreBackupConfirmTitle: 'Przywracanie kopii zapasowej',
-  restoreBackupConfirmMessage: 'Ta kopia zawiera {accounts} oraz {transactions}. Przywrócenie zastąpi Twoje bieżące dane. Czy chcesz kontynuować?',
+  restoreBackupConfirmMessage:
+    'Ta kopia zawiera {accounts} oraz {transactions}. Przywrócenie zastąpi Twoje bieżące dane. Czy chcesz kontynuować?',
   restoreBackupConfirmButton: 'Przywróć dane',
   restoreFromBackup: 'Przywróć z kopii zapasowej',
   restoreBackupPrompt: 'Masz już kopię zapasową? Przywróć swoje dane',
@@ -518,7 +542,8 @@ export const pl: TranslationStrings = {
   // Share Snapshot Modal
   shareSnapshot: 'Udostępnij podsumowanie',
   shareSnapshotTitle: 'Udostępnij migawkę finansową',
-  shareSnapshotDesc: 'Stwórz estetyczną i prywatną kartę podsumowania swoich finansów do udostępnienia.',
+  shareSnapshotDesc:
+    'Stwórz estetyczną i prywatną kartę podsumowania swoich finansów do udostępnienia.',
   shareCardTheme: 'Akcent kolorystyczny',
   shareMaskAmounts: 'Ukryj dokładne kwoty (tylko wartości procentowe)',
   shareIncludeAmounts: 'Pokaż dokładne kwoty',
@@ -536,8 +561,10 @@ export const pl: TranslationStrings = {
   privateFinanceWatermark: '100% Prywatnie i lokalnie • saldio.app',
   dangerZone: 'Strefa niebezpieczna',
   deleteAllDataTitle: 'Usuń wszystkie dane',
-  deleteAllDataDesc: 'Trwale usuwa wszystkie zaimportowane konta, transakcje, reguły kategoryzacji i kategorie niestandardowe. Tej operacji nie można cofnąć.',
-  deleteAllDataConfirmMessage: 'Czy na pewno chcesz całkowicie usunąć wszystkie swoje dane? Wszystkie konta, transakcje, kategorie i reguły zostaną bezpowrotnie usunięte.',
+  deleteAllDataDesc:
+    'Trwale usuwa wszystkie zaimportowane konta, transakcje, reguły kategoryzacji i kategorie niestandardowe. Tej operacji nie można cofnąć.',
+  deleteAllDataConfirmMessage:
+    'Czy na pewno chcesz całkowicie usunąć wszystkie swoje dane? Wszystkie konta, transakcje, kategorie i reguły zostaną bezpowrotnie usunięte.',
   deleteAllDataButton: 'Usuń wszystkie dane',
   resetPreferencesOption: 'Zresetuj także preferencje motywu i języka',
   resetPreferencesDesc: 'Przywróć język i motyw do ustawień domyślnych',
@@ -550,7 +577,8 @@ export const pl: TranslationStrings = {
   noConnectedBanks: 'Brak zaimportowanych kont',
   deleteBankTransactions: 'Usuń transakcje',
   deleteBankTransactionsTitle: 'Usuń transakcje dla {bank}',
-  deleteBankTransactionsConfirm: 'Czy na pewno chcesz usunąć wszystkie transakcje i dane dla {bank}? Tej operacji nie można cofnąć.',
+  deleteBankTransactionsConfirm:
+    'Czy na pewno chcesz usunąć wszystkie transakcje i dane dla {bank}? Tej operacji nie można cofnąć.',
 
   catSalary: 'Wynagrodzenie',
   catRent: 'Czynsz',
@@ -630,8 +658,17 @@ export const pl: TranslationStrings = {
     whitMonday: 'Zesłanie Ducha Świętego',
   },
   categoryKeywords: {
-    Salary: ['pensja', 'wynagrodzenie', 'wypłata', 'dochód'],
-    Rent: ['czynsz', 'wynajem', 'mieszkanie', 'kautionsabrechnung', 'kaucja', 'kaucja mieszkaniowa', 'rozliczenie kaucji', 'zwrot kaucji'],
+    Salary: ['pensja', 'wynagrodzenie', 'wypłata', 'dochód', 'reisesp', 'reisespesen', 'dieta', 'zwrot kosztów podróży', 'rücküberweisung', 'rueckueberweisung'],
+    Rent: [
+      'czynsz',
+      'wynajem',
+      'mieszkanie',
+      'kautionsabrechnung',
+      'kaucja',
+      'kaucja mieszkaniowa',
+      'rozliczenie kaucji',
+      'zwrot kaucji',
+    ],
     Loans: [
       'kredyt',
       'kredyty',
@@ -753,10 +790,44 @@ export const pl: TranslationStrings = {
       'kurs',
       'opieka',
       'korepetycje',
+      'edukacyjny',
+      'centrum edukacyjne',
+      'edukativni',
     ],
-    Savings: ['oszczędności', 'lokata', 'konto oszczędnościowe', 'flatex', 'degiro', 'trade republic', 'scalable capital', 'swiss life', 'swiss life se'],
+    Savings: [
+      'oszczędności',
+      'lokata',
+      'konto oszczędnościowe',
+      'flatex',
+      'degiro',
+      'trade republic',
+      'scalable capital',
+      'swiss life',
+      'swiss life se',
+    ],
     Cash: ['gotówka', 'gotowka', 'wypłata z bankomatu', 'wyplata z bankomatu', 'bankomat', 'atm'],
-    Transfers: ['przelew', 'paypal', 'blik', 'stadtkasse kelkheim', 'stadt kelkheim', 'kelkheim', 'revolut', 'revolt21xxx', 'revolt21', 'revolt', 'sparkasse', 'haspa', '1822direkt', 'hypovereinsbank', 'hvb', 'santander', 'norisbank', 'gls bank', 'apobank', 'vivid'],
+    Transfers: [
+      'przelew',
+      'paypal',
+      'blik',
+      'stadtkasse kelkheim',
+      'stadt kelkheim',
+      'kelkheim',
+      'revolut',
+      'revolt21xxx',
+      'revolt21',
+      'revolt',
+      'sparkasse',
+      'haspa',
+      '1822direkt',
+      'hypovereinsbank',
+      'hvb',
+      'santander',
+      'norisbank',
+      'gls bank',
+      'apobank',
+      'vivid',
+    ],
     Travel: [
       'hotel',
       '\\blot\\b',
@@ -849,6 +920,12 @@ export const pl: TranslationStrings = {
       'trezor',
     ],
     BankFees: [
+      'zwrot opłat',
+      'zwrot prowizji',
+      'rückvergütung',
+      'rueckverguetung',
+      'gebührenerstattung',
+      'gebuehrenerstattung',
       'opłata bankowa',
       'opłaty bankowe',
       'opłata za prowadzenie konta',

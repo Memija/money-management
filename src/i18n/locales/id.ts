@@ -104,7 +104,8 @@ export const id: TranslationStrings = {
   clearFilters: 'Hapus filter',
   duplicate: 'Duplikat',
   alreadyDuplicated: 'Sudah Diduplikasi',
-  alreadyDuplicatedNotice: 'Duplikat ini sudah pernah diimpor dan tidak dapat dibuka kuncinya lagi.',
+  alreadyDuplicatedNotice:
+    'Duplikat ini sudah pernah diimpor dan tidak dapat dibuka kuncinya lagi.',
   modified: 'Dimodifikasi',
   allDates: 'Semua tanggal',
   fromDate: 'Dari tanggal',
@@ -122,14 +123,18 @@ export const id: TranslationStrings = {
   duplicateImportCancel: 'Batal',
   duplicateTransactionsDetectedSingular: 'Terdeteksi 1 transaksi duplikat dan akan dilewati.',
   duplicateTransactionsDetected: 'Terdeteksi {count} transaksi duplikat dan akan dilewati.',
-  duplicateImportAllBannerSingular: 'Terdeteksi 1 transaksi duplikat. Transaksi ini sudah pernah diimpor.',
-  duplicateImportAllBanner: 'Semua {count} transaksi dalam file ini sudah pernah diimpor (duplikat).',
-  duplicateImportPartialBanner: 'Terdeteksi {duplicateCount} transaksi duplikat dan akan dilewati. {newCount} transaksi baru akan diimpor.',
+  duplicateImportAllBannerSingular:
+    'Terdeteksi 1 transaksi duplikat. Transaksi ini sudah pernah diimpor.',
+  duplicateImportAllBanner:
+    'Semua {count} transaksi dalam file ini sudah pernah diimpor (duplikat).',
+  duplicateImportPartialBanner:
+    'Terdeteksi {duplicateCount} transaksi duplikat dan akan dilewati. {newCount} transaksi baru akan diimpor.',
   allTransactionsAlreadyImported: 'Semua transaksi sudah pernah diimpor',
   importNewTransactions: 'Impor {count} transaksi baru',
   filterDuplicates: 'Duplikat',
   filterModified: 'Dimodifikasi',
-  duplicatesSkippedNotice: 'Transaksi ini sudah ada dalam catatan Anda dan akan dilewati untuk mencegah penghitungan ganda.',
+  duplicatesSkippedNotice:
+    'Transaksi ini sudah ada dalam catatan Anda dan akan dilewati untuk mencegah penghitungan ganda.',
   viewDuplicates: 'Lihat duplikat',
   unlockDuplicate: 'Buka Kunci',
   unlockDuplicateTitle: 'Buka Kunci Transaksi Duplikat',
@@ -142,7 +147,8 @@ export const id: TranslationStrings = {
   filterAlreadyDuplicated: 'Sudah Diduplikasi',
   alreadyDuplicatedFilterNotice:
     'Transaksi duplikat ini sudah diimpor sebelumnya dan tidak dapat diubah atau dibuka kuncinya lagi.',
-  cannotRelockModified: 'Tidak dapat mengunci kembali transaksi yang dimodifikasi. Kembalikan ke nilai asli untuk mengunci.',
+  cannotRelockModified:
+    'Tidak dapat mengunci kembali transaksi yang dimodifikasi. Kembalikan ke nilai asli untuk mengunci.',
   resetToOriginal: 'Kembalikan ke nilai asli',
   resetTransactionModalTitle: 'Atur Ulang Transaksi',
   resetBulkPrompt:
@@ -162,7 +168,8 @@ export const id: TranslationStrings = {
   applyToAll: 'Terapkan ke semua',
   dismiss: 'Abaikan',
   batchCategoryTitle: 'Perbarui Transaksi Terkait',
-  batchCategoryPrompt: 'Ditemukan {count} transaksi terkait. Perbarui kategori untuk semuanya ke {category}?',
+  batchCategoryPrompt:
+    'Ditemukan {count} transaksi terkait. Perbarui kategori untuk semuanya ke {category}?',
   batchCategoryOnlyThis: 'Hanya transaksi ini',
   batchCategoryUpdateAll: 'Perbarui semua ({count})',
   batchCategoryRememberRule: 'Ingat aturan ini untuk impor mendatang',
@@ -172,7 +179,8 @@ export const id: TranslationStrings = {
   applyToAllUnlocked: 'Terapkan ke semua yang tidak terkunci',
   adjustUnlockedOptions: 'Sesuaikan massal...',
   adjustUnlockedModalTitle: 'Sesuaikan Transaksi Tidak Terkunci Secara Massal',
-  adjustUnlockedModalSubtitle: 'Pilih modifikasi yang akan diterapkan dan transaksi target yang tidak terkunci.',
+  adjustUnlockedModalSubtitle:
+    'Pilih modifikasi yang akan diterapkan dan transaksi target yang tidak terkunci.',
   applyFieldsLabel: 'Modifikasi untuk diterapkan',
   targetTransactionsLabel: 'Transaksi target',
   applyToSelectedCount: 'Terapkan ke {count} yang dipilih',
@@ -221,8 +229,7 @@ export const id: TranslationStrings = {
   duplicateTransactionsDetectedDesc:
     'Ditemukan {count} transaksi duplikat di akun Anda. Mengatur ulang akan menghapus duplikat dan menghitung ulang saldo Dashboard Anda.',
   resetDuplicateCalculations: 'Atur Ulang Perhitungan dan Hapus Duplikat',
-  duplicatesResetSuccess:
-    'Perhitungan berhasil diatur ulang. {count} transaksi duplikat dihapus.',
+  duplicatesResetSuccess: 'Perhitungan berhasil diatur ulang. {count} transaksi duplikat dihapus.',
 
   spaceTransfersExcluded:
     '{count} transfer sub-akun otomatis dikecualikan untuk mencegah perhitungan ganda.',
@@ -350,6 +357,8 @@ export const id: TranslationStrings = {
   hideInternalTransfers: 'Sembunyikan transfer internal',
   transfersTabNotice:
     'Transfer internal antar-akun Anda dikecualikan dari pemasukan dan pengeluaran (hanya baca).',
+  copyTransactionText: 'Salin teks transaksi',
+  copied: 'Tersalin!',
 
   insightTransactions: 'Transaksi',
   insightAvgTransaction: 'Rata-rata Transaksi',
@@ -473,11 +482,14 @@ export const id: TranslationStrings = {
 
   // Data Management
   dataManagementTitle: 'Manajemen Data',
-  dataManagementDesc: 'Kelola data keuangan yang tersimpan secara lokal, cadangan, dan pengaturan privasi Anda.',
+  dataManagementDesc:
+    'Kelola data keuangan yang tersimpan secara lokal, cadangan, dan pengaturan privasi Anda.',
   backupRestoreTitle: 'Cadangan & Pemulihan',
-  backupRestoreDesc: 'Simpan salinan cadangan data keuangan Anda dengan aman atau pulihkan file cadangan sebelumnya.',
+  backupRestoreDesc:
+    'Simpan salinan cadangan data keuangan Anda dengan aman atau pulihkan file cadangan sebelumnya.',
   exportBackup: 'Ekspor Cadangan',
-  exportBackupDesc: 'Unduh semua akun, transaksi, kategori, dan aturan kustom Anda sebagai file JSON.',
+  exportBackupDesc:
+    'Unduh semua akun, transaksi, kategori, dan aturan kustom Anda sebagai file JSON.',
   exportBackupButton: 'Ekspor Cadangan (.json)',
   exportBackupSuccess: 'File cadangan berhasil diunduh.',
   restoreBackup: 'Pulihkan Cadangan',
@@ -486,24 +498,33 @@ export const id: TranslationStrings = {
   restoreBackupSuccess: 'Data cadangan berhasil dipulihkan.',
   restoreBackupInvalidFile: 'File yang dipilih bukan cadangan Saldio yang valid.',
   restoreBackupErrorInvalidJson: 'File cadangan tidak dapat dibaca sebagai format JSON yang valid.',
-  restoreBackupErrorRootObject: 'Struktur file cadangan tidak valid (elemen utama harus berupa objek JSON).',
+  restoreBackupErrorRootObject:
+    'Struktur file cadangan tidak valid (elemen utama harus berupa objek JSON).',
   restoreBackupErrorMissingAccounts: 'File cadangan tidak memiliki daftar akun.',
   restoreBackupErrorAccountInvalid: 'Akun #{index} tidak valid.',
   restoreBackupErrorAccountMissingId: 'Akun "{account}" tidak memiliki ID institusi.',
   restoreBackupErrorAccountMissingName: 'Akun #{index} tidak memiliki nama institusi.',
   restoreBackupErrorAccountMissingTransactions: 'Akun "{account}" tidak memiliki daftar transaksi.',
-  restoreBackupErrorAccountInvalidList: 'Akun "{account}" memiliki daftar ({list}) yang tidak valid.',
+  restoreBackupErrorAccountInvalidList:
+    'Akun "{account}" memiliki daftar ({list}) yang tidak valid.',
   restoreBackupErrorTxInvalid: 'Transaksi #{index} pada akun "{account}" tidak valid.',
-  restoreBackupErrorTxMissingId: 'Transaksi #{index} pada akun "{account}" tidak memiliki ID yang valid.',
-  restoreBackupErrorTxMissingDate: 'Transaksi "{id}" pada akun "{account}" tidak memiliki tanggal yang valid.',
-  restoreBackupErrorTxInvalidAmount: 'Transaksi "{id}" pada akun "{account}" memiliki jumlah yang tidak valid.',
-  restoreBackupErrorTxInvalidDescription: 'Transaksi "{id}" pada akun "{account}" memiliki deskripsi yang tidak valid.',
-  restoreBackupErrorTxMissingCurrency: 'Transaksi "{id}" pada akun "{account}" tidak memiliki mata uang.',
-  restoreBackupErrorTxInvalidType: 'Transaksi "{id}" pada akun "{account}" memiliki jenis yang tidak valid (harus pemasukan atau pengeluaran).',
+  restoreBackupErrorTxMissingId:
+    'Transaksi #{index} pada akun "{account}" tidak memiliki ID yang valid.',
+  restoreBackupErrorTxMissingDate:
+    'Transaksi "{id}" pada akun "{account}" tidak memiliki tanggal yang valid.',
+  restoreBackupErrorTxInvalidAmount:
+    'Transaksi "{id}" pada akun "{account}" memiliki jumlah yang tidak valid.',
+  restoreBackupErrorTxInvalidDescription:
+    'Transaksi "{id}" pada akun "{account}" memiliki deskripsi yang tidak valid.',
+  restoreBackupErrorTxMissingCurrency:
+    'Transaksi "{id}" pada akun "{account}" tidak memiliki mata uang.',
+  restoreBackupErrorTxInvalidType:
+    'Transaksi "{id}" pada akun "{account}" memiliki jenis yang tidak valid (harus pemasukan atau pengeluaran).',
   restoreBackupErrorCustomCategories: 'Data kategori kustom tidak valid.',
   restoreBackupErrorDuplicateRules: 'Aturan penimpaan duplikat tidak valid.',
   restoreBackupConfirmTitle: 'Pulihkan Cadangan',
-  restoreBackupConfirmMessage: 'Cadangan ini berisi {accounts} dan {transactions}. Memulihkannya akan menggantikan data Anda saat ini. Apakah Anda ingin melanjutkan?',
+  restoreBackupConfirmMessage:
+    'Cadangan ini berisi {accounts} dan {transactions}. Memulihkannya akan menggantikan data Anda saat ini. Apakah Anda ingin melanjutkan?',
   restoreBackupConfirmButton: 'Pulihkan Data',
   restoreFromBackup: 'Pulihkan dari cadangan',
   restoreBackupPrompt: 'Sudah punya cadangan? Pulihkan data Anda',
@@ -517,7 +538,8 @@ export const id: TranslationStrings = {
   // Share Snapshot Modal
   shareSnapshot: 'Bagikan Ringkasan',
   shareSnapshotTitle: 'Bagikan Ringkasan Keuangan',
-  shareSnapshotDesc: 'Buat kartu ringkasan keuangan yang estetis dan privat untuk dibagikan atau disimpan.',
+  shareSnapshotDesc:
+    'Buat kartu ringkasan keuangan yang estetis dan privat untuk dibagikan atau disimpan.',
   shareCardTheme: 'Aksen Warna',
   shareMaskAmounts: 'Sembunyikan jumlah pasti (hanya persentase)',
   shareIncludeAmounts: 'Tampilkan jumlah pasti',
@@ -535,8 +557,10 @@ export const id: TranslationStrings = {
   privateFinanceWatermark: '100% Privat & Lokal • saldio.app',
   dangerZone: 'Zona Bahaya',
   deleteAllDataTitle: 'Hapus Semua Data',
-  deleteAllDataDesc: 'Hapus secara permanen semua akun yang diimpor, transaksi, aturan kategorisasi, dan kategori kustom. Tindakan ini tidak dapat dibatalkan.',
-  deleteAllDataConfirmMessage: 'Apakah Anda yakin ingin menghapus semua data Anda secara menyeluruh? Semua akun yang diimpor, transaksi, kategori kustom, dan aturan akan dihapus secara permanen.',
+  deleteAllDataDesc:
+    'Hapus secara permanen semua akun yang diimpor, transaksi, aturan kategorisasi, dan kategori kustom. Tindakan ini tidak dapat dibatalkan.',
+  deleteAllDataConfirmMessage:
+    'Apakah Anda yakin ingin menghapus semua data Anda secara menyeluruh? Semua akun yang diimpor, transaksi, kategori kustom, dan aturan akan dihapus secara permanen.',
   deleteAllDataButton: 'Hapus Semua Data',
   resetPreferencesOption: 'Juga atur ulang preferensi tema dan bahasa',
   resetPreferencesDesc: 'Kembalikan pengaturan bahasa dan tema ke nilai default',
@@ -549,7 +573,8 @@ export const id: TranslationStrings = {
   noConnectedBanks: 'Belum ada akun yang diimpor',
   deleteBankTransactions: 'Hapus Transaksi',
   deleteBankTransactionsTitle: 'Hapus Transaksi {bank}',
-  deleteBankTransactionsConfirm: 'Apakah Anda yakin ingin menghapus semua transaksi dan data untuk {bank}? Tindakan ini tidak dapat dibatalkan.',
+  deleteBankTransactionsConfirm:
+    'Apakah Anda yakin ingin menghapus semua transaksi dan data untuk {bank}? Tindakan ini tidak dapat dibatalkan.',
 
   catSalary: 'Gaji',
   catRent: 'Sewa',
@@ -629,7 +654,7 @@ export const id: TranslationStrings = {
     whitMonday: 'Senin Pentakosta',
   },
   categoryKeywords: {
-    Salary: ['gaji', 'pendapatan', 'upah'],
+    Salary: ['gaji', 'pendapatan', 'upah', 'reisesp', 'reisespesen', 'uang jalan', 'reimbursement', 'rücküberweisung', 'rueckueberweisung'],
     Rent: ['sewa', 'kos', 'kontrakan', 'kautionsabrechnung', 'deposit sewa', 'uang jaminan'],
     Loans: ['pinjaman', 'kredit', 'cicilan', 'angsuran', 'pelunasan pinjaman', 'kreditrate'],
     Groceries: ['indomaret', 'alfamart', 'supermarket', 'pasar', 'belanjaan'],
@@ -703,10 +728,47 @@ export const id: TranslationStrings = {
       'penitipan',
       'les',
       'pelatihan',
+      'edukasi',
+      'edukatif',
+      'edukativni',
     ],
-    Savings: ['tabungan', 'investasi', 'deposito', 'flatex', 'degiro', 'trade republic', 'scalable capital', 'swiss life', 'swiss life se'],
+    Savings: [
+      'tabungan',
+      'investasi',
+      'deposito',
+      'flatex',
+      'degiro',
+      'trade republic',
+      'scalable capital',
+      'swiss life',
+      'swiss life se',
+    ],
     Cash: ['tarik tunai', 'atm', 'uang tunai', 'kas'],
-    Transfers: ['transfer', 'kirim uang', 'gopay', 'ovo', 'dana', 'linkaja', 'stadtkasse kelkheim', 'stadt kelkheim', 'kelkheim', 'revolut', 'revolt21xxx', 'revolt21', 'revolt', 'sparkasse', 'haspa', '1822direkt', 'hypovereinsbank', 'hvb', 'santander', 'norisbank', 'gls bank', 'apobank', 'vivid'],
+    Transfers: [
+      'transfer',
+      'kirim uang',
+      'gopay',
+      'ovo',
+      'dana',
+      'linkaja',
+      'stadtkasse kelkheim',
+      'stadt kelkheim',
+      'kelkheim',
+      'revolut',
+      'revolt21xxx',
+      'revolt21',
+      'revolt',
+      'sparkasse',
+      'haspa',
+      '1822direkt',
+      'hypovereinsbank',
+      'hvb',
+      'santander',
+      'norisbank',
+      'gls bank',
+      'apobank',
+      'vivid',
+    ],
     Travel: [
       'hotel',
       'tiket pesawat',
@@ -783,6 +845,11 @@ export const id: TranslationStrings = {
       'usdc',
     ],
     BankFees: [
+      'pengembalian biaya',
+      'rückvergütung',
+      'rueckverguetung',
+      'gebührenerstattung',
+      'gebuehrenerstattung',
       'biaya bank',
       'biaya admin',
       'biaya administrasi',
