@@ -64,6 +64,13 @@ export const EtoroLogo = createImageLogo({
   displayName: 'EtoroLogo',
 })
 
+/** NAGA (NAGA Markets Europe Ltd / The NAGA Group AG) — social investing, stock, and crypto broker platform. */
+export const NagaLogo = createImageLogo({
+  src: '/brands/naga.png',
+  label: 'NAGA',
+  displayName: 'NagaLogo',
+})
+
 export const CRYPTO_LOGOS: Record<string, IconComponent> = {
   GuardarianLogo,
   'guardarian': GuardarianLogo,
@@ -71,4 +78,8 @@ export const CRYPTO_LOGOS: Record<string, IconComponent> = {
   'kraken': KrakenLogo,
   EtoroLogo,
   'etoro': EtoroLogo,
+  NagaLogo,
+  nagaLogo: NagaLogo,
+  'naga': NagaLogo,
+  'naga-markets': NagaLogo,
 }

@@ -111,6 +111,10 @@ function findPopularMerchantCategory(textLower: string): string | undefined {
       }
     }
 
+    if (score > 0 && (kw === textLower || merchant.name.toLowerCase() === textLower)) {
+      score += 1000
+    }
+
     if (score > 0) {
       if (PAYMENT_PROCESSOR_IDS.has(merchant.id)) {
         if (score > bestProcessorScore) {
@@ -157,7 +161,7 @@ const GERMAN_CITY_ESSEN_REGEX =
 // Regex to detect car or equipment rental context (e.g. 'Sixt Rent a Car', 'Car Rental', 'Autovermietung')
 // to prevent vehicle and equipment rentals from misclassifying as apartment/housing Rent.
 const CAR_OR_EQUIPMENT_RENTAL_REGEX =
-  /(?:\b(?:car[- ]?rent(?:al)?|rent[- ]?a[- ]?car|rental[- ]?car|autovermietung|auto[- ]?miete|fahrzeug(?:ver)?miete|equipment[- ]?rent(?:al)?|tool[- ]?rent(?:al)?)\b)/i
+  /(?:\b(?:car[- ]?rent(?:al)?|rent[- ]?a[- ]?car|rental[- ]?car|autovermietung|auto[- ]?miete|fahrzeug(?:ver)?miete|equipment[- ]?rent(?:al)?|tool[- ]?rent(?:al)?|uber[- ]?rent)\b)/i
 
 // Regex to detect income tax context (e.g. 'Income Tax', 'Einkommensteuer')
 // to prevent tax payments/refunds from misclassifying as personal Salary.

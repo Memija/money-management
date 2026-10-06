@@ -15,6 +15,20 @@ export const VhsBadHomburgLogo = createImageLogo({
   displayName: 'VhsBadHomburgLogo',
 })
 
+/** Udemy — leading global open online learning and skills platform. */
+export const UdemyLogo = createImageLogo({
+  src: '/brands/udemy.png',
+  label: 'Udemy',
+  displayName: 'UdemyLogo',
+})
+
+/** Škola Studium — specialized educational, tutoring, and course instruction provider. */
+export const SkolaStudiumLogo = createImageLogo({
+  src: '/brands/skola-studium.png',
+  label: 'Škola Studium',
+  displayName: 'SkolaStudiumLogo',
+})
+
 export const CIVIC_REGIONAL_LOGOS: Record<string, IconComponent> = {
   BadNauheimLogo,
   badNauheimLogo: BadNauheimLogo,
@@ -26,4 +40,12 @@ export const CIVIC_REGIONAL_LOGOS: Record<string, IconComponent> = {
   'vhs-bad-homburg': VhsBadHomburgLogo,
   'volkshochschule-bad-homburg': VhsBadHomburgLogo,
   'volkshochschule': VhsBadHomburgLogo,
+  UdemyLogo,
+  udemyLogo: UdemyLogo,
+  'udemy': UdemyLogo,
+  'udemy-courses': UdemyLogo,
+  SkolaStudiumLogo,
+  skolaStudiumLogo: SkolaStudiumLogo,
+  'skola-studium': SkolaStudiumLogo,
+  'skola': SkolaStudiumLogo,
 }

@@ -120,7 +120,62 @@ export const KaleaLogo = createImageLogo({
   displayName: 'KaleaLogo',
 })
 
+/** BrotHaus (BrotHaus GmbH & Co. KG) — Franconian artisanal bakery and cafe chain based in Rothenburg. */
+export const BrotHausLogo = createImageLogo({
+  src: '/brands/brothaus.png',
+  label: 'BrotHaus',
+  displayName: 'BrotHausLogo',
+})
+
+/** Transgourmet Deutschland — leading B2B wholesale food and catering supplies distributor. */
+export const TransgourmetLogo = createImageLogo({
+  src: '/brands/transgourmet.png',
+  label: 'Transgourmet',
+  displayName: 'TransgourmetLogo',
+})
+
+/** Früchte und Feinkost — fresh fruit, vegetable, and delicatessen market in Rothenburg ob der Tauber. */
+export const FruechteFeinkostLogo = createImageLogo({
+  src: '/brands/fruechte-und-feinkost.png',
+  label: 'Früchte und Feinkost',
+  displayName: 'FruechteFeinkostLogo',
+})
+
+/** Bäckerei Moos — traditional artisan bakery & cafe chain across Central Hesse and Bad Homburg. */
+export const BaeckereiMoosLogo = createImageLogo({
+  src: '/brands/baeckerei-moos.png',
+  label: 'Bäckerei Moos',
+  displayName: 'BaeckereiMoosLogo',
+})
+
+/** Okka Turkish Bakery — authentic Turkish bakery, pastry, and cafe specialist in Frankfurt am Main. */
+export const OkkaBakeryLogo = createImageLogo({
+  src: '/brands/okka-bakery.png',
+  label: 'Okka Turkish Bakery',
+  displayName: 'OkkaBakeryLogo',
+})
+
 export const DINING_LOGOS: Record<string, IconComponent> = {
+  BaeckereiMoosLogo,
+  baeckereiMoosLogo: BaeckereiMoosLogo,
+  'baeckerei-moos': BaeckereiMoosLogo,
+  'baeckerei-moos-bad-homburg': BaeckereiMoosLogo,
+  OkkaBakeryLogo,
+  okkaBakeryLogo: OkkaBakeryLogo,
+  'okka-bakery': OkkaBakeryLogo,
+  'okka-turkish-bakery': OkkaBakeryLogo,
+  BrotHausLogo,
+  brotHausLogo: BrotHausLogo,
+  'brothaus': BrotHausLogo,
+  'brothaus-gmbh': BrotHausLogo,
+  TransgourmetLogo,
+  transgourmetLogo: TransgourmetLogo,
+  'transgourmet': TransgourmetLogo,
+  'transgourmet-deutschland': TransgourmetLogo,
+  FruechteFeinkostLogo,
+  fruechteFeinkostLogo: FruechteFeinkostLogo,
+  'fruechte-und-feinkost': FruechteFeinkostLogo,
+  'feinkost-rothenburg': FruechteFeinkostLogo,
   KaleaLogo,
   kaleaLogo: KaleaLogo,
   'kalea': KaleaLogo,
@@ -185,4 +240,5 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   'bad-homburg-store': BadHomburgRetailLogo,
   'bad-homburg-retail': BadHomburgRetailLogo,
 }
+
 

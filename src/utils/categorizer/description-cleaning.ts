@@ -104,7 +104,27 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/(?:paypal)[-\s]+(?:konto)\b/iu, 'PayPal-Konto'],
   [/\b(?:foundatio)\b/iu, 'Foundation'],
   [/\b(?:limite)\b/iu, 'Limited'],
+  [/\beinkau\s+f\b/iu, 'Einkauf'],
+  [/\bdeut\s+schland\b/iu, 'Deutschland'],
+  [/\brothenburg\s+o\s+b\b/iu, 'Rothenburg ob'],
+  [/\bc\s+o\.\s*ltd\b/iu, 'Co. Ltd'],
+  [/\bautobahn\s+en\b/iu, 'Autobahnen'],
+  [/\bschnellstrasen[-\s]*fina\b/iu, 'Schnellstraßen-Finanzierungs'],
+  [/\bst\s+udium\b/iu, 'Studium'],
+  [/\bdeutsche\s+r\b/iu, 'Deutscher'],
+  [/\bmar\s+kets\b/iu, 'Markets'],
+  [/\bmega[-\s]*hol\s+z\b/iu, 'Mega-Holz'],
+  [/\bthalia\s+bucher\b/iu, 'Thalia Bücher'],
+  [/\bs\s*\.\s*a\s*r\s*\.\s*l\b/iu, 'S.a.r.l'],
   [/\bauthenti\s+c\s+play\b/iu, 'authentic play'],
+  [/\bube\s+r\b/iu, 'Uber'],
+  [/\bpdf\s+conv\s+erter\b/iu, 'PDF Converter'],
+  [/\bconv\s+erter\b/iu, 'Converter'],
+  [/\bheise\s+me\s+dien\b/iu, 'Heise Medien'],
+  [/\bme\s+dien\b/iu, 'Medien'],
+  [/\braj\s+toy\b(?!\s*s)/iu, 'Raj Toys'],
+  [/\bstadt\s+bad\s+hombg\b/iu, 'Stadt Bad Homburg'],
+  [/\bfahrerlaubnisbehoerde\b/iu, 'Fahrerlaubnisbehörde'],
   [/(?:velika\s+kopa)\s+(?:n)\b/iu, 'Velika Kopanica'],
   [/(?:wasserpal)\b/iu, 'Wasserpalast'],
   [/(?:wunder|wundert|wunderta)[-\s]+(?:tax|ax|x)/iu, 'Wundertax'],
@@ -164,6 +184,8 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\bCABANAS\s+TAVI\s+R\b/iu, 'CABANAS TAVIRA'],
   [/(?:delhis)[-\s]+(?:belly)/iu, 'Delhis Belly'],
   [/\bUNIPES\b/iu, 'Unipessoal'],
+  [/(?:ros|ross)[-\s]+(?:smann|mann)\b/iu, 'Rossmann'],
+  [/\b(?:u|ub|ube)[-\s]+(?:ber|er|r)\b/iu, 'Uber'],
   // English line-break word splits
   [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
   [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],
@@ -253,14 +275,27 @@ export function extractCleanDescription(desc: string): string {
   // Kunden-Nr.: ..., Rechnungsnr: ..., Vertrags-Nr.: ..., Zählernummer: ...,
   // Bitte geben Sie bei Bezahlung / Zahlung / Überweisung ...
   cleaned = cleaned.replace(
-    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|(?:Kd|Kunden)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|(?:Rg|Rechnungs?)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer)|Az(?:\.|\s*Nr\.?)?)\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
+    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|(?:Kd|Kunden)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|(?:Rg|Rechnungs?)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer)|\bAz(?:\.|\s*Nr\.?)?\b)\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
     '',
   )
 
-  // 2b. Separate dot-attached long reference numbers or tax IDs (e.g. "ERSTATT.00345234717" -> "ERSTATT. 00345234717")
+  // 2b. Strip truncated End-to-End-Ref tags (e.g. "End-t", "End-to-E", "End-to")
+  cleaned = cleaned.replace(/\bEnd-t(?:o(?:-End)?)?.*$/i, ' ')
+
+  // 2c. Strip trailing truncated purchase phrases (e.g. ", Ihr Einkauf bei", ", Ihr Einkauf", ", Ihr", ", Ih", ", I")
+  cleaned = cleaned.replace(
+    /(?:[,.]\s*(?:(?:I\s*hr|Ihr)\s*(?:E(?:in)?[- ]?kauf(?:\s+bei)?|E(?:in)?k(?:auf|au|a|f)?(?:\s+bei)?|Ein(?:\s+bei)?|E(?:in)?k?|Ei?|be?i?)?|Ih?r?\b)|\s+Ihr\s+E(?:in)?kauf(?:\s+bei)?).*$/i,
+    ' ',
+  )
+
+  // 2c. Remove German Girocard / POS terminal location and station prefixes (e.g. //BAD HOMBURG/DE, //ESCHBORN/DE)
+  cleaned = cleaned.replace(/\/\/[A-Za-z\s.-]+\/[A-Za-z]{2}\b/gi, ' ')
+  cleaned = cleaned.replace(/\b[A-Z]:\d+\b/gi, ' ')
+
+  // 2d. Separate dot-attached long reference numbers or tax IDs (e.g. "ERSTATT.00345234717" -> "ERSTATT. 00345234717")
   cleaned = cleaned.replace(/\b([A-Za-z]+)\.(\d{5,})\b/g, '$1. $2')
 
-  // 2c. Expand tax refund abbreviation "ERSTATT." to "Erstattung"
+  // 2e. Expand tax refund abbreviation "ERSTATT." to "Erstattung"
   cleaned = cleaned.replace(/\bERSTATT\b\.?/gi, 'Erstattung')
 
   // 3. Remove date formats (ISO YYYY-MM-DDTHH:MM:SS, DD.MM.YYYY, DD/MM/YYYY, DD-MM-YY, etc.) and timestamps
@@ -291,7 +326,9 @@ export function extractCleanDescription(desc: string): string {
   cleaned = cleaned.replace(/\bFil\.?\s*\d+\b/gi, ' ')
   cleaned = cleaned.replace(/\bKFN\s+\d+\s+VJ\s+\d+\b/gi, ' ')
   cleaned = cleaned.replace(/\b(?:ELV\d*|ME\d+)\b/gi, ' ')
-  cleaned = cleaned.replace(/\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz)\b/gi, ' ')
+  cleaned = cleaned.replace(/\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz|KARTENZAHL\.?)\b/gi, ' ')
+  cleaned = cleaned.replace(/\b(?:NYA|NNT)\*\s*/gi, ' ')
+  cleaned = cleaned.replace(/\bsagt\s+danke\b/gi, ' ')
 
   // 5. Remove standalone IBANs (compact or spaced) and SWIFT BICs
   cleaned = cleaned.replace(/\b[A-Za-z]{2}\d{2}(?:\s*[A-Za-z0-9]{4}){2,7}(?:\s*[A-Za-z0-9]{1,4})?\b/g, ' ')
@@ -333,16 +370,27 @@ export function isPaymentProcessorIntermediary(text: string): boolean {
     return false
   }
 
-  // 1. Purchase phrases in supported languages
+  // Transactions containing only PayPal corporate/clearing references without any underlying third-party merchant
+  const withoutPayPalMetadata = t
+    .replace(
+      /(?:\by?paypal(?:\s*\([^)]*\))?|\bpp\.\d+\.pp\b|\b\d+\b|s\.?\s*a\.?\s*r\.?\s*l\.?|et\s*cie|s\.?\s*c\.?\s*a\.?|\bsc\b|\beurope\b|\beuropa\b|[.,/:-])/giu,
+      ' ',
+    )
+    .trim()
+  if (!withoutPayPalMetadata) {
+    return false
+  }
+
+  // 1. Purchase phrases in supported languages (including truncated forms on bank statements)
   const purchasePhrase =
-    /\b(?:Ihr\s+E(?:in)?[- ]?kauf\s+bei|Einkauf\s+bei|Your\s+purchase\s+(?:at|from)|Tw[oó]j\s+zakup\s+w|Zakup\s+w|Va[sš]a\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\b/i
+    /\b(?:Ihr\s+E(?:in)?[- ]?kauf(?:\s+bei)?|Ihr\s+E(?:in)?k(?:auf|au|a|f)?(?:\s+bei)?|Ihr\s+Ein(?:\s+bei)?|I\s*hr\s+E(?:in)?k(?:auf|au|a|f)?(?:\s+bei)?|Einkauf\s+bei|Your\s+purchase\s+(?:at|from)|Tw[oó]j\s+zakup\s+w|Zakup\s+w|Va[sš]a\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\b/i
   if (purchasePhrase.test(t)) {
     return true
   }
 
   // 2. Delimiter after processor clearing / merchant ID pointing to an underlying merchant
   const processorDelimiter =
-    /(?:(?:y?paypal|payone|sumup|stripe|klarna).*?(?:\bpp\.\d+\.pp|\b\d{8,})\s*[./*-]\s*(?!abbuchung\b)(?!paypal\b)[a-z0-9])/i
+    /(?:(?:y?paypal|payone|sumup|stripe|klarna).*?(?:\bpp\.\d+\.pp|\b\d{8,}|(?:\/\s*pp\.\d+\.pp\s*\/[.]?))\s*(?:\/\s*pp\.\d+\.pp\s*\/?[.]?\s*)?[./*-]?\s*(?!abbuchung\b)(?!paypal\b)(?!pp\.\d)[a-z0-9])/i
   if (processorDelimiter.test(t)) {
     return true
   }
@@ -362,61 +410,121 @@ export function extractMerchantKeyword(desc: string): string {
   let merchant = extractCleanDescription(desc)
   if (!merchant) return ''
 
-  // Direct PayPal account debit
-  if (/\b(?:abbuchung\s+vom\s+paypal[- ]konto|paypal[- ]konto\s+abbuchung)\b/i.test(merchant)) {
+  // Direct PayPal account debit or direct transaction with PayPal itself
+  if (
+    /\b(?:abbuchung\s+vom\s+paypal[- ]konto|paypal[- ]konto\s+abbuchung)\b/i.test(merchant) ||
+    !merchant
+      .replace(
+        /(?:\by?paypal(?:\s*\([^)]*\))?|\bpp\.\d+\.pp\b|\b\d+\b|s\.?\s*a\.?\s*r\.?\s*l\.?|et\s*cie|s\.?\s*c\.?\s*a\.?|\bsc\b|\beurope\b|\beuropa\b|[.,/:-])/giu,
+        ' ',
+      )
+      .trim()
+  ) {
     return 'PayPal'
   }
 
   // 1. Strip leading payment gateway / aggregator prefixes like "PAYONE GmbH", "SumUp .", "SumUp *", "PayPal *", "PayPal (Europe)..."
+  merchant = merchant.replace(/^(?:(?:NYA|NNT)\*|KARTENZAHL\.?\s*)+/gi, '')
   merchant = merchant.replace(
-    /^(?:(?:y?paypal|payone|sumup|stripe|klarna)\s*(?:\([^)]+\)|europe|pte\.?\s*ltd\.?)?(?:\s*,?\s*s\.?\s*a\.?\s*r\.?\s*l\.?)?(?:\s*et\s*cie\.?,?)?(?:\s*,?\s*s\s*\.?\s*c\s*\.?\s*a\.?)?(?:\s*(?:\bpp\.\d+\.pp|\b\d{8,}))?(?:\s*\/[a-z0-9_.-]+)*\s*[./*-]?\s*)+/i,
+    /^(?:y?paypal\s*(?:\([^)]*\)|europe)?\s*(?:s\.?\s*a\.?\s*r\.?\s*l\.?|et\s*cie\.?|s\s*\.?\s*c\s*\.?\s*a\.?|[0-9\s]|pp\.?[0-9\s]*\.?pp|[/.,:;*-])+\s*)+/i,
+    '',
+  )
+  merchant = merchant.replace(
+    /^(?:(?:y?paypal|payone|sumup|stripe|klarna)\s*(?:\([^)]+\)|europe|pte\.?\s*ltd\.?)?(?:\s*,?\s*s\.?\s*a\.?\s*r\.?\s*l\.?)?(?:\s*et\s*cie\.?,?)?(?:\s*,?\s*s\s*\.?\s*c\s*\.?\s*a\.?)?(?:\s*(?:\bpp\.\d+\.pp|\b\d{8,}))?(?:\s*\/\s*(?:pp\.\d+\.pp|\d{8,}|[a-z0-9_.-]+)\s*\/?[.]?)*\s*[./*-]?\s*)+/i,
     '',
   )
   merchant = merchant.replace(/^(?:ELV\d*|ME\d+)\s*/gi, '')
-
-  // 1b. If the description contains a purchase phrase ("Ihr Einkauf bei ...", "Your purchase at ..."), extract the merchant following it
-  const purchaseMatch = merchant.match(
-    /\b(?:Ihr\s+E(?:in)?[- ]?kauf\s+bei|Your\s+purchase\s+(?:at|from)|Tw[oó]j\s+zakup\s+w|Va[sš]a\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\s+(.+)$/i,
+  merchant = merchant.replace(
+    /^(?:(?:y?paypal\s*(?:[- ]?zahlung)?|lastschrift|zahlung)\s*(?:[uü]ber|ube\s+r)?\s*(?:lastschrift)?(?:\s+an)?\s*)+/i,
+    '',
   )
-  if (purchaseMatch && purchaseMatch[1].trim()) {
-    merchant = purchaseMatch[1].trim()
+  merchant = merchant.replace(/^(?:lastschrift\s+an|zahlung\s+an|zahlung)\s+/i, '')
+
+  // 1b. If the description contains a purchase phrase ("Ihr Einkauf bei ...", "Your purchase at ..."), extract the merchant
+  const purchaseMatch = merchant.match(
+    /\b(?:Ihr\s+E(?:in)?[- ]?kauf(?:\s+bei)?|Ihr\s+E(?:in)?k(?:auf|au|a|f)?(?:\s+bei)?|Ihr\s+Ein(?:\s+bei)?|I\s*hr\s+E(?:in)?k(?:auf|au|a|f)?(?:\s+bei)?|Your\s+purchase\s+(?:at|from)|Tw[oó]j\s+zakup\s+w|Va[sš]a\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\s*(.*)$/i,
+  )
+  if (purchaseMatch) {
+    const beforePurchase = merchant.slice(0, purchaseMatch.index).replace(/[,.:;/-]+\s*$/, '').trim()
+    const rawAfter = purchaseMatch[1].trim()
+    const cleanAfter = rawAfter
+      .replace(/\s+(?:en|end|end-t|end-to)\b.*$/i, '')
+      .replace(/\s+(?:cari)\b.*$/i, '')
+      .trim()
+
+    // Determine the most complete merchant name (avoid taking truncated merchant after purchase phrase)
+    if (beforePurchase && (!cleanAfter || beforePurchase.length >= cleanAfter.length || cleanAfter.length <= 4)) {
+      merchant = beforePurchase
+    } else if (cleanAfter) {
+      merchant = cleanAfter
+    } else {
+      merchant = beforePurchase
+    }
   }
+
+  // Strip trailing truncated purchase phrases (e.g. ", Ihr Einkauf", ", Ihr Einkau", ", Ihr Eink", ", Ihr Einka", ", Ihr Ein", ", Ihr", ", Ih", ", I")
+  merchant = merchant.replace(
+    /(?:[,.]\s*(?:(?:I\s*hr|Ihr)\s*(?:E(?:in)?[- ]?kauf(?:\s+bei)?|E(?:in)?k(?:auf|au|a|f)?(?:\s+bei)?|Ein(?:\s+bei)?|E(?:in)?k?|Ei?|be?i?)?|Ih?r?\b)|\s+Ihr\s+E(?:in)?kauf(?:\s+bei)?)\s*$/i,
+    '',
+  )
+  merchant = merchant.replace(/\s+bei\s*$/i, '')
+
+  // Strip trailing slash noise like "/ Cari" or "/ PP" or trailing "End", "En"
+  merchant = merchant.replace(/\s*\/\s*(?:cari|pp|\d+).*$/i, '')
+  merchant = merchant.replace(/\s+(?:cari|end|en)\b.*$/i, '')
 
   // Strip trailing currency cutoff like (Euro, (EUR, Euro
   merchant = merchant.replace(/\s*\(?\s*(?:eur|euro)\b.*$/i, '')
 
+  // If the extracted text is just processor remnants or purchase phrases, clear it
+  if (/^(?:pp\b|sc\b|i\b|ih\b|ihr\b|ihr\s+e\b|ihr\s+ei\b|ihr\s+ein\b|ihr\s+eink\b|ihr\s+einkauf\b|be\b|bei\b|einkauf\b)/i.test(merchant.trim())) {
+    merchant = ''
+  }
+
   // 2. Remove corporate legal entity suffixes
   merchant = merchant.replace(
-    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|se|ltd\.?|limited|limite|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\.?o\.?o\.?|bv|s\.?a\.?r\.?l\.?|o[uü]|gbr|lda|unipessoal|unipes|sa|foundation|foundatio)(?![\p{L}\p{N}])/giu,
+    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|s\s*\.?\s*e\.?|ltd\.?|limited|limite|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\s*\.?\s*o\s*\.?\s*o\.?|d\s*\.?\s*d\.?|bv|s\.?a\.?r\.?l\.?|o[uü]|gbr|lda|unipessoal|unipes|sa|foundation|foundatio)(?![\p{L}\p{N}])/giu,
     ' ',
   )
 
-  // Remove terminal/region abbreviation noise like standalone HK
-  merchant = merchant.replace(/\bhk\b/i, ' ')
+  // Remove terminal/region abbreviation noise like standalone HK, Europe, Europa
+  merchant = merchant.replace(/\b(?:hk|europe|europa)\b/i, ' ')
 
   // 2. Remove branch / store suffixes and terminal numbers (e.g. 'Filiale 1234', 'Store #5')
   merchant = merchant.replace(/\b(?:filiale|fil\.|store|branch|pos|terminal)\b.*$/i, ' ')
 
-  // 3. Remove trailing city names commonly appended in European card terminals
+  // 3. Remove courtesy phrases like "sagt Danke"
+  merchant = merchant.replace(/\bsagt\s+danke\b/gi, ' ')
+
+  // 4. Remove trailing city names and country codes commonly appended in European card terminals
   merchant = merchant.replace(
-    /\s+(?:berlin|m[uü]nchen|hamburg|k[oö]ln|frankfurt|stuttgart|d[uü]sseldorf|dortmund|essen|leipzig|bremen|dresden|hannover|n[uü]rnberg|wien|z[uü]rich|warszawa|krak[oó]w|sarajevo|beograd|zagreb|london|paris|faro|tavira|oberursel|eschborn)\b.*$/i,
+    /\s+(?:berlin|m[uü]nchen|hamburg|k[oö]ln|frankfurt|stuttgart|d[uü]sseldorf|dortmund|essen|leipzig|bremen|dresden|hannover|n[uü]rnberg|wien|z[uü]rich|warszawa|krak[oó]w|sarajevo|beograd|zagreb|london|paris|faro|tavira|oberursel|eschborn|heidelberg)\b.*$/i,
     ' ',
   )
+  merchant = merchant.replace(/\s+(?:de|at|ch|hr|si|ba)\b.*$/i, '')
 
-  // 4. Remove remittance purpose/reason phrases and banking transaction types commonly appended after merchant name
+  // 5. Remove remittance purpose/reason phrases and banking transaction types commonly appended after merchant name
   merchant = merchant.replace(
     /\s+(?:abbuchung|lastschrift|gutschrift|auszahlung|einzahlung|r(?:ü|ue)ckzahlung|erstatt(?:\.|ung)?|est-veranl(?:\.|agung)?|steuererstattung|lizenzgeb(?:ü|ue)hr|kautionsabrechnung|abrechnung|miete|gerichtsgeb(?:ü|ue)hr(?:en)?|grundbuch(?:eintragung)?|geb(?:ü|ue)hr(?:en)?|notarkosten|notargeb(?:ü|ue)hr(?:en)?|order|bestellung|auftrag|rechnung|invoice)\b.*$/i,
     ' ',
   )
 
-  // 4. Clean up spaces and punctuation
+  // 6. Clean up spaces and punctuation
   merchant = merchant
     .replace(/[^\w\s\u00C0-\u024F\u0400-\u04FF.&-]/g, ' ')
     .replace(/\s+/g, ' ')
     .replace(/^[\s,.:;/-]+|[\s,.:;/-]+$/g, '')
     .trim()
 
-  return merchant.length >= 2 ? merchant : extractCleanDescription(desc)
+  if (/^mc$/i.test(merchant.trim())) {
+    return 'Uber'
+  }
+
+  return merchant.length >= 2
+    ? merchant
+    : isPaymentProcessorIntermediary(desc)
+      ? ''
+      : extractCleanDescription(desc)
 }
 
 /**

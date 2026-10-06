@@ -2159,6 +2159,7 @@ describe('category-icons', () => {
       expect(kaleaInfo.merchant?.id).toBe('kalea')
       expect(kaleaInfo.merchant?.name).toBe('Kalea')
       expect(kaleaInfo.logoComponent).toBe(MERCHANT_LOGOS.KaleaLogo)
+      expect(kaleaInfo.brandColor).toBe('#1C2536')
       expect(kaleaInfo.suggestedCategory).toBe('Shopping')
       expect(kaleaInfo.initials).toBe('KA')
 
@@ -2222,6 +2223,403 @@ describe('category-icons', () => {
       const img5 = c5.querySelector('img')
       expect(img5).toBeInTheDocument()
       expect(img5).toHaveAttribute('aria-label', 'Cyberport')
+    })
+
+    it('correctly resolves merchant brand info and logos for the 25 European transactions', () => {
+      // 1. Anonymous PayPal checkout -> merchant cannot be discovered, falls back to PayPal logo
+      const anonInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . , Ihr Einkauf bei End-to-End-Ref.: 1016591806959',
+      )
+      expect(anonInfo.merchant?.id).toBe('paypal')
+      expect(anonInfo.logoComponent).toBe(MERCHANT_LOGOS.SiPaypal)
+      expect(anonInfo.initials).toBe('PA')
+
+      // 2. RDPTS GmbH
+      const rdptsInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . RDPTS GmbH, Ihr Einkau f bei RDPTS GmbH End-t',
+      )
+      expect(rdptsInfo.merchant?.name).toBe('RDPTS')
+      expect(rdptsInfo.logoComponent).toBe(MERCHANT_LOGOS.RdptsLogo)
+      expect(rdptsInfo.suggestedCategory).toBe('Shopping')
+      expect(rdptsInfo.initials).toBe('RD')
+
+      // 3. DM Bad Homburg
+      const dmInfo = getMerchantBrandInfo(
+        'DM FIL.2146 H:65251//BAD HOMBURG/DE 2022-05-23T10:55:48 KFN 0 VJ 2412 Kartenzahlung',
+      )
+      expect(dmInfo.merchant?.name).toBe('dm-drogerie markt')
+      expect(dmInfo.logoComponent).toBe(MERCHANT_LOGOS.SiDm)
+      expect(dmInfo.suggestedCategory).toBe('Shopping')
+
+      // 5. Thalia
+      const thaliaInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1025047888741 . Thalia Bucher GmbH , Ihr Einkauf bei Thalia Buc',
+      )
+      expect(thaliaInfo.merchant?.name).toBe('Thalia')
+      expect(thaliaInfo.logoComponent).toBe(MERCHANT_LOGOS.ThaliaLogo)
+      expect(thaliaInfo.suggestedCategory).toBe('Shopping')
+
+      // 6. Housses Auto DBS
+      const houssesInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1026468143168 PP.4585.PP . Housses Auto DBS, Ihr Einkauf bei Hou',
+      )
+      expect(houssesInfo.merchant?.name).toBe('Housses Auto DBS')
+      expect(houssesInfo.logoComponent).toBe(MERCHANT_LOGOS.HoussesAutoDbsLogo)
+      expect(houssesInfo.suggestedCategory).toBe('Transport')
+
+      // 7. ManoMano
+      const manoInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1026451079456 PP.4585.PP . MANOMANO , Ihr Einkauf bei MAN',
+      )
+      expect(manoInfo.merchant?.name).toBe('ManoMano')
+      expect(manoInfo.logoComponent).toBe(MERCHANT_LOGOS.ManoManoLogo)
+      expect(manoInfo.suggestedCategory).toBe('Shopping')
+
+      // 8. DPD
+      const dpdInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1026474255469 PP.4585.PP . DPD Deut schland GmbH, Ihr Eink',
+      )
+      expect(dpdInfo.merchant?.name).toBe('DPD')
+      expect(dpdInfo.logoComponent).toBe(MERCHANT_LOGOS.DpdLogo)
+      expect(dpdInfo.suggestedCategory).toBe('Shopping')
+
+      // 9. Schiller Onlinehandel
+      const schillerInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1029282103452 PP.4585.PP . Schiller Onlinehandel GbR, Ihr Einkauf ',
+      )
+      expect(schillerInfo.merchant?.name).toBe('Schiller Onlinehandel')
+      expect(schillerInfo.logoComponent).toBe(MERCHANT_LOGOS.SchillerOnlinehandelLogo)
+      expect(schillerInfo.suggestedCategory).toBe('Shopping')
+
+      // 11. Früchte und Feinkost
+      const ffInfo = getMerchantBrandInfo(
+        'Fruechte und Feinkost Rothenburg o b DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Fruechte u',
+      )
+      expect(ffInfo.merchant?.name).toBe('Früchte und Feinkost')
+      expect(ffInfo.logoComponent).toBe(MERCHANT_LOGOS.FruechteFeinkostLogo)
+      expect(ffInfo.suggestedCategory).toBe('Groceries')
+
+      // 12. BrotHaus
+      const brotInfo = getMerchantBrandInfo(
+        'BROTHAUS GMBH - CO. KG Rothenburg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card BROTHA',
+      )
+      expect(brotInfo.merchant?.name).toBe('BrotHaus')
+      expect(brotInfo.logoComponent).toBe(MERCHANT_LOGOS.BrotHausLogo)
+      expect(brotInfo.suggestedCategory).toBe('Dining Out')
+
+      // 13. bella me
+      const bellaInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1034830377254/PP.4585.PP/. bella me , Ihr Einkauf bei bella me En',
+      )
+      expect(bellaInfo.merchant?.name).toBe('bella me')
+      expect(bellaInfo.logoComponent).toBe(MERCHANT_LOGOS.BellaMeLogo)
+      expect(bellaInfo.suggestedCategory).toBe('Shopping')
+
+      // 14. Tipico
+      const tipicoInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1035468977249/PP.4585.PP/. Tipico C o. Ltd., Ihr Einkauf bei Tipic',
+      )
+      expect(tipicoInfo.merchant?.name).toBe('Tipico')
+      expect(tipicoInfo.logoComponent).toBe(MERCHANT_LOGOS.TipicoLogo)
+      expect(tipicoInfo.suggestedCategory).toBe('Entertainment')
+
+      // 15. AZM
+      const azmInfo = getMerchantBrandInfo(
+        'AZM ZAPRESIC ZAPRESIC HR Karte Nr. 5355 3100 0931 8380 Virtual Debit Card AZM ZAPRESIC ZAPRE',
+      )
+      expect(azmInfo.merchant?.name).toBe('AZM (Autocesta Zagreb-Macelj)')
+      expect(azmInfo.logoComponent).toBe(MERCHANT_LOGOS.AzmLogo)
+      expect(azmInfo.suggestedCategory).toBe('Transport')
+      expect(azmInfo.initials).toBe('AZ')
+
+      // 16. ASFINAG
+      const asfinagInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1036302132232/PP.4585.PP/. Autobahn en und Schnellstrasen-Fina',
+      )
+      expect(asfinagInfo.merchant?.name).toBe('ASFINAG')
+      expect(asfinagInfo.logoComponent).toBe(MERCHANT_LOGOS.AsfinagLogo)
+      expect(asfinagInfo.suggestedCategory).toBe('Transport')
+      expect(asfinagInfo.initials).toBe('AS')
+
+      // 17. Škola Studium
+      const skolaInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1038367465824/PP.4585.PP/. Skola St udium, Ihr Einkauf bei Skola S',
+      )
+      expect(skolaInfo.merchant?.name).toBe('Škola Studium')
+      expect(skolaInfo.logoComponent).toBe(MERCHANT_LOGOS.SkolaStudiumLogo)
+      expect(skolaInfo.suggestedCategory).toBe('Education')
+      expect(skolaInfo.initials).toBe('ŠS')
+
+      // 18. Caritas
+      const caritasInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1038041208163/PP.4585.PP/. Deutsche r Caritasverband e. V. / Cari',
+      )
+      expect(caritasInfo.merchant?.name).toBe('Caritas')
+      expect(caritasInfo.logoComponent).toBe(MERCHANT_LOGOS.CaritasLogo)
+      expect(caritasInfo.suggestedCategory).toBe('Shopping')
+
+      // 19. NAGA
+      const nagaInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1040254264400/PP.4585.PP/. NAGA Mar kets Europe Ltd, Ihr Einkau',
+      )
+      expect(nagaInfo.merchant?.name).toBe('NAGA')
+      expect(nagaInfo.logoComponent).toBe(MERCHANT_LOGOS.NagaLogo)
+      expect(nagaInfo.suggestedCategory).toBe('Savings')
+
+      // 20. Mega-Holz
+      const megaInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1041226383723/PP.4585.PP/. Mega-Hol z GmbH + Co. KG, Ihr Einka',
+      )
+      expect(megaInfo.merchant?.name).toBe('Mega-Holz')
+      expect(megaInfo.logoComponent).toBe(MERCHANT_LOGOS.MegaHolzLogo)
+      expect(megaInfo.suggestedCategory).toBe('Shopping')
+
+      // 22. eXaring
+      const exaringInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1043655690631/PP.4585.PP/. eXaring AG, Ihr Einkauf bei eXaring AG',
+      )
+      expect(exaringInfo.merchant?.name).toBe('eXaring (waipu.tv)')
+      expect(exaringInfo.logoComponent).toBe(MERCHANT_LOGOS.ExaringLogo)
+      expect(exaringInfo.suggestedCategory).toBe('Entertainment')
+      expect(exaringInfo.initials).toBe('EW')
+
+      // 23. ZET Zagreb
+      const zetInfo = getMerchantBrandInfo(
+        'MOJ.ZET.HR, ZAGREB HR Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 2025-08-0',
+      )
+      expect(zetInfo.merchant?.name).toBe('ZET Zagreb')
+      expect(zetInfo.logoComponent).toBe(MERCHANT_LOGOS.ZetLogo)
+      expect(zetInfo.suggestedCategory).toBe('Transport')
+      expect(zetInfo.initials).toBe('ZZ')
+
+      // 24. Udemy
+      const udemyInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1045442438693 PP.4585.PP . Udemy, I hr Einkauf bei Udemy End',
+      )
+      expect(udemyInfo.merchant?.name).toBe('Udemy')
+      expect(udemyInfo.logoComponent).toBe(MERCHANT_LOGOS.UdemyLogo)
+      expect(udemyInfo.suggestedCategory).toBe('Education')
+
+      // 25. Transgourmet
+      const transInfo = getMerchantBrandInfo(
+        'TRANSGOURMET DEUTSC//ESCHBORN/DE 2022-07-30T12:53:26 KFN 0 VJ 2412 Kartenzahlung',
+      )
+      expect(transInfo.merchant?.name).toBe('Transgourmet')
+      expect(transInfo.logoComponent).toBe(MERCHANT_LOGOS.TransgourmetLogo)
+      expect(transInfo.suggestedCategory).toBe('Groceries')
+
+      // 26. PDF Converter Guru
+      const pdfInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1045487095428/PP.4585.PP/. PDF Conv erter Guru, Ihr Einkauf bei ',
+      )
+      expect(pdfInfo.merchant?.name).toBe('PDF Converter Guru')
+      expect(pdfInfo.logoComponent).toBe(MERCHANT_LOGOS.PdfGuruLogo)
+      expect(pdfInfo.suggestedCategory).toBe('Utilities')
+
+      // 27. Cerebrum IQ
+      const cerebrumInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1046113189247/. Cerebrum IQ, Ihr Ei nkauf bei Cerebrum IQ End-to-',
+      )
+      expect(cerebrumInfo.merchant?.name).toBe('Cerebrum IQ')
+      expect(cerebrumInfo.logoComponent).toBe(AVAILABLE_ICONS.GraduationCap)
+      expect(cerebrumInfo.suggestedCategory).toBe('Education')
+
+      // 28. Heise Medien
+      const heiseInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1047663016839/PP.4585.PP/. Heise Me dien GmbH + Co. KG, Ihr Ein',
+      )
+      expect(heiseInfo.merchant?.name).toBe('Heise Medien')
+      expect(heiseInfo.logoComponent).toBe(MERCHANT_LOGOS.HeiseMedienLogo)
+      expect(heiseInfo.suggestedCategory).toBe('Entertainment')
+
+      // 29. Raj Toys
+      const rajInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1048027734591/PP.4585.PP/. Raj Toys s.r.o., Ihr Einkauf bei Raj Toy',
+      )
+      expect(rajInfo.merchant?.name).toBe('Raj Toys')
+      expect(rajInfo.logoComponent).toBe(AVAILABLE_ICONS.Gamepad2)
+      expect(rajInfo.suggestedCategory).toBe('Shopping')
+
+      // 30. Fahrerlaubnisbehörde Bad Homburg
+      const fahrerInfo = getMerchantBrandInfo(
+        'FAHRERLAUBNISBEHOERDE//Bad Homburg 2026-03-27T09:57:32 KFN 0 VJ 2812 Kartenzahlung',
+      )
+      expect(fahrerInfo.merchant?.name).toBe('Fahrerlaubnisbehörde Bad Homburg')
+      expect(fahrerInfo.logoComponent).toBe(MERCHANT_LOGOS.BadHomburgLogo)
+      expect(fahrerInfo.suggestedCategory).toBe('Taxes')
+
+      // 31. Kinderplanet GmbH
+      const kinderInfo = getMerchantBrandInfo(
+        'NYA*Kinderplanet GmbH, Berlin DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 20',
+      )
+      expect(kinderInfo.merchant?.name).toBe('Kinderplanet')
+      expect(kinderInfo.logoComponent).toBe(AVAILABLE_ICONS.Gamepad2)
+      expect(kinderInfo.suggestedCategory).toBe('Entertainment')
+
+      // 32. VSPO Bern
+      const vspoInfo = getMerchantBrandInfo(
+        'VSPO 0FF06d850afAbFc, Bern CH Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card ',
+      )
+      expect(vspoInfo.merchant?.name).toBe('VSPO')
+      expect(vspoInfo.logoComponent).toBe(AVAILABLE_ICONS.ShoppingBag)
+      expect(vspoInfo.suggestedCategory).toBe('Shopping')
+
+      // 33. Stadt Bad Homburg / Rathaus
+      const rathausInfo = getMerchantBrandInfo(
+        'KARTENZAHL. STADT BAD HOMBG/Rathaus 2026-06-24T09:14:25 KFN 0 VJ 2812 Kartenzahlung',
+      )
+      expect(rathausInfo.merchant?.name).toBe('Stadtverwaltung Bad Homburg')
+      expect(rathausInfo.logoComponent).toBe(MERCHANT_LOGOS.BadHomburgLogo)
+      expect(rathausInfo.suggestedCategory).toBe('Taxes')
+
+      // 34. shop portraitnet
+      const portraitInfo = getMerchantBrandInfo(
+        'NNT*shop portraitnet o, 490203 3150 95 DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual ',
+      )
+      expect(portraitInfo.merchant?.name).toBe('shop portraitnet')
+      expect(portraitInfo.logoComponent).toBe(AVAILABLE_ICONS.ShoppingBag)
+      expect(portraitInfo.suggestedCategory).toBe('Shopping')
+
+      // 35. dedicom GmbH
+      const dedicomInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1045440836467/PP.4585.PP/. dedicom GmbH, Ihr Einkauf bei dedic',
+      )
+      expect(dedicomInfo.merchant?.name).toBe('dedicom')
+      expect(dedicomInfo.logoComponent).toBe(MERCHANT_LOGOS.DedicomLogo)
+      expect(dedicomInfo.suggestedCategory).toBe('Shopping')
+
+      // 36. PayPal with omitted merchant name -> falls back to PayPal logo
+      const omittedInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1047407084871/PP.4585.PP/. , Ihr Ei nkauf bei End-to-End-Ref.: 10',
+      )
+      expect(omittedInfo.merchant?.id).toBe('paypal')
+      expect(omittedInfo.logoComponent).toBe(MERCHANT_LOGOS.SiPaypal)
+      expect(omittedInfo.initials).toBe('PA')
+
+      // 37. Direct transaction with PayPal itself
+      const paypalDirectInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1049039954031 PP.4585.PP . PayPal ( Europe) S.a r.l. et Cie, SC',
+      )
+      expect(paypalDirectInfo.merchant?.id).toBe('paypal')
+      expect(paypalDirectInfo.merchant?.name).toBe('PayPal')
+      expect(paypalDirectInfo.logoComponent).toBe(MERCHANT_LOGOS.SiPaypal)
+      expect(paypalDirectInfo.suggestedCategory).toBe('Transfers')
+
+      // 38. Uber via PayPal direct debit
+      const uberInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1052983422516 . PAYPAL-ZAHLUNG UBE R LASTSCHRIFT an mc',
+      )
+      expect(uberInfo.merchant?.name).toBe('Uber')
+      expect(uberInfo.logoComponent).toBe(MERCHANT_LOGOS.SiUber)
+      expect(uberInfo.suggestedCategory).toBe('Transport')
+
+      // 39. home24 SE via PayPal
+      const home24Info = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1053020146591/PP.4585.PP/. home24 S E, Ihr Einkauf bei home24',
+      )
+      expect(home24Info.merchant?.name).toBe('home24')
+      expect(home24Info.logoComponent).toBe(MERCHANT_LOGOS.Home24Logo)
+      expect(home24Info.suggestedCategory).toBe('Shopping')
+
+      // 40. SSG BW (Staatliche Schlösser und Gärten Baden-Württemberg)
+      const ssgInfo = getMerchantBrandInfo(
+        'SSG BW sagt Danke, Heidelberg DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card',
+      )
+      expect(ssgInfo.merchant?.name).toBe('SSG BW')
+      expect(ssgInfo.logoComponent).toBe(MERCHANT_LOGOS.SsgBwLogo)
+      expect(ssgInfo.suggestedCategory).toBe('Entertainment')
+
+      // 41. DARS d.d. via PayPal
+      const darsInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1043667601270/PP.4585.PP/. DARS, d. d., Ihr Einkauf bei DARS, d.d.',
+      )
+      expect(darsInfo.merchant?.name).toBe('DARS')
+      expect(darsInfo.logoComponent).toBe(MERCHANT_LOGOS.DarsLogo)
+      expect(darsInfo.suggestedCategory).toBe('Transport')
+
+      // 42. Okka Turkish Bakery
+      const okkaInfo = getMerchantBrandInfo(
+        'Okka Turkish Bakery, Frankfurt am DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Ca',
+      )
+      expect(okkaInfo.merchant?.name).toBe('Okka Turkish Bakery')
+      expect(okkaInfo.logoComponent).toBe(MERCHANT_LOGOS.OkkaBakeryLogo)
+      expect(okkaInfo.suggestedCategory).toBe('Dining Out')
+
+      // 43. Bäckerei Moos
+      const moosInfo = getMerchantBrandInfo(
+        'Baeckerei Moos Bad Homburg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Baeckerei Moos',
+      )
+      expect(moosInfo.merchant?.name).toBe('Bäckerei Moos')
+      expect(moosInfo.logoComponent).toBe(MERCHANT_LOGOS.BaeckereiMoosLogo)
+      expect(moosInfo.suggestedCategory).toBe('Dining Out')
+
+      // 44. Rossmann via PayPal with line-wrap broken word Ros smann
+      const rossmannBrokenInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1035399972253/PP.4585.PP/. Dirk Ros smann GmbH, Ihr Einkauf b',
+      )
+      expect(rossmannBrokenInfo.merchant?.name).toBe('Rossmann')
+      expect(rossmannBrokenInfo.logoComponent).toBe(MERCHANT_LOGOS.SiRossmann)
+      expect(rossmannBrokenInfo.suggestedCategory).toBe('Shopping')
+
+      // 45. PayPal transaction without discoverable merchant (falls back to PayPal logo)
+      const paypalUndiscoveredInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1021831388305 PP.4585.PP End-to-End-Ref.: 1021831388305 PP',
+      )
+      expect(paypalUndiscoveredInfo.merchant?.id).toBe('paypal')
+      expect(paypalUndiscoveredInfo.merchant?.name).toBe('PayPal')
+      expect(paypalUndiscoveredInfo.logoComponent).toBe(MERCHANT_LOGOS.SiPaypal)
+      expect(paypalUndiscoveredInfo.brandColor).toBe('#00457C')
+      expect(paypalUndiscoveredInfo.initials).toBe('PA')
+
+      // 46. PayPal transaction ending with truncated purchase phrase fragment (e.g. ", I")
+      const paypalTruncatedInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1049039954031 PP.4585.PP . PayPal ( Europe) S.a r.l. et Cie, SCA, I',
+      )
+      expect(paypalTruncatedInfo.merchant?.id).toBe('paypal')
+      expect(paypalTruncatedInfo.merchant?.name).toBe('PayPal')
+      expect(paypalTruncatedInfo.logoComponent).toBe(MERCHANT_LOGOS.SiPaypal)
+      expect(paypalTruncatedInfo.brandColor).toBe('#00457C')
+      const icon = getCategoryIcon('Shopping', 20, undefined, 'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1049039954031 PP.4585.PP . PayPal ( Europe) S.a r.l. et Cie, SCA, I')
+      expect(React.isValidElement(icon) && icon.type === MERCHANT_LOGOS.SiPaypal).toBe(true)
+    })
+
+    it('renders the 22 new batch brand logos into the DOM via getCategoryIcon', () => {
+      const logos = [
+        { desc: 'Thalia Bucher', label: 'Thalia' },
+        { desc: 'DPD Deutschland', label: 'DPD' },
+        { desc: 'Tipico Co. Ltd.', label: 'Tipico' },
+        { desc: 'Udemy Online Learning', label: 'Udemy' },
+        { desc: 'NAGA Markets Europe', label: 'NAGA' },
+        { desc: 'Deutscher Caritasverband', label: 'Caritas' },
+        { desc: 'BROTHAUS GMBH', label: 'BrotHaus' },
+        { desc: 'MANOMANO Shopping', label: 'ManoMano' },
+        { desc: 'eXaring AG waipu.tv', label: 'eXaring (waipu.tv)' },
+        { desc: 'AZM ZAPRESIC', label: 'AZM Zaprešić' },
+        { desc: 'MOJ.ZET.HR Zagreb', label: 'ZET Zagreb' },
+        { desc: 'TRANSGOURMET DEUTSCHLAND', label: 'Transgourmet' },
+        { desc: 'Fruechte und Feinkost Rothenburg', label: 'Früchte und Feinkost' },
+        { desc: 'RDPTS GmbH', label: 'RDPTS' },
+        { desc: 'Schiller Onlinehandel GbR', label: 'Schiller Onlinehandel' },
+        { desc: 'bella me Kosmetik', label: 'bella me' },
+        { desc: 'Mega-Holz GmbH', label: 'Mega-Holz' },
+        { desc: 'Housses Auto DBS', label: 'Housses Auto DBS' },
+        { desc: 'Skola Studium Online', label: 'Škola Studium' },
+        { desc: 'PDF Converter Guru', label: 'PDF Converter Guru' },
+        { desc: 'Heise Medien GmbH', label: 'Heise Medien' },
+        { desc: 'dedicom GmbH', label: 'dedicom' },
+        { desc: 'home24 SE Möbel', label: 'home24' },
+        { desc: 'DARS d.d. e-vinjeta', label: 'DARS d.d.' },
+        { desc: 'SSG BW sagt Danke', label: 'SSG BW' },
+        { desc: 'Okka Turkish Bakery Frankfurt', label: 'Okka Turkish Bakery' },
+        { desc: 'Baeckerei Moos Bad Homburg', label: 'Bäckerei Moos' },
+      ]
+
+      for (const item of logos) {
+        const { container } = render(<div>{getCategoryIcon('Shopping', 24, undefined, item.desc)}</div>)
+        const img = container.querySelector('img')
+        expect(img, `Logo image for ${item.label} should render`).toBeInTheDocument()
+        expect(img).toHaveAttribute('aria-label', item.label)
+      }
     })
 
     it('returns brand info using fallback icon for merchants without brand logos', () => {

@@ -22,6 +22,27 @@ export const CpcParkhausLogo = createImageLogo({
   displayName: 'CpcParkhausLogo',
 })
 
+/** AZM (Autocesta Zagreb-Macelj) — Croatian motorway and toll concessionaire. */
+export const AzmLogo = createImageLogo({
+  src: '/brands/azm.png',
+  label: 'AZM Zaprešić',
+  displayName: 'AzmLogo',
+})
+
+/** ZET (Zagrebački električni tramvaj) — Zagreb public transit operator (trams, buses, ticketing). */
+export const ZetLogo = createImageLogo({
+  src: '/brands/zet.png',
+  label: 'ZET Zagreb',
+  displayName: 'ZetLogo',
+})
+
+/** DARS (Družba za avtoceste v Republiki Sloveniji d.d.) — Slovenian motorway operator and vignette toll authority. */
+export const DarsLogo = createImageLogo({
+  src: '/brands/dars.png',
+  label: 'DARS d.d.',
+  displayName: 'DarsLogo',
+})
+
 export const MOTORWAY_LOGOS: Record<string, IconComponent> = {
   HacAutocesteLogo,
   hacAutocesteLogo: HacAutocesteLogo,
@@ -36,4 +57,22 @@ export const MOTORWAY_LOGOS: Record<string, IconComponent> = {
   cpcParkhausLogo: CpcParkhausLogo,
   'cpc-parkhaus': CpcParkhausLogo,
   'cpc-parkhaus-nuernberg': CpcParkhausLogo,
+  AzmLogo,
+  azmLogo: AzmLogo,
+  'azm': AzmLogo,
+  'azm-zapresic': AzmLogo,
+  'autocesta-zagreb-macelj': AzmLogo,
+  ZetLogo,
+  zetLogo: ZetLogo,
+  'zet': ZetLogo,
+  'zet-zagreb': ZetLogo,
+  'moj-zet': ZetLogo,
+  'moj.zet.hr': ZetLogo,
+  DarsLogo,
+  darsLogo: DarsLogo,
+  'dars': DarsLogo,
+  'dars-dd': DarsLogo,
+  'dars-d-d': DarsLogo,
+  'dars-e-vinjeta': DarsLogo,
 }
+

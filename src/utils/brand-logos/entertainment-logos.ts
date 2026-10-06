@@ -29,6 +29,34 @@ export const XsollaLogo = createImageLogo({
   displayName: 'XsollaLogo',
 })
 
+/** Tipico (Tipico Co. Ltd.) — leading sports betting and gaming operator. */
+export const TipicoLogo = createImageLogo({
+  src: '/brands/tipico.png',
+  label: 'Tipico',
+  displayName: 'TipicoLogo',
+})
+
+/** eXaring AG (waipu.tv) — German IP television and digital entertainment platform. */
+export const ExaringLogo = createImageLogo({
+  src: '/brands/exaring.png',
+  label: 'eXaring (waipu.tv)',
+  displayName: 'ExaringLogo',
+})
+
+/** Heise Medien (Heise Medien GmbH + Co. KG) — German tech media publisher (c't, iX, heise online). */
+export const HeiseMedienLogo = createImageLogo({
+  src: '/brands/heise.png',
+  label: 'Heise Medien',
+  displayName: 'HeiseMedienLogo',
+})
+
+/** SSG BW (Staatliche Schlösser und Gärten Baden-Württemberg) — state heritage, castles, and historic monuments authority (e.g. Schloss Heidelberg). */
+export const SsgBwLogo = createImageLogo({
+  src: '/brands/ssg-bw.png',
+  label: 'SSG BW',
+  displayName: 'SsgBwLogo',
+})
+
 export const ENTERTAINMENT_LOGOS: Record<string, IconComponent> = {
   DisneyPlusLogo,
   disneyPlusLogo: DisneyPlusLogo,
@@ -45,5 +73,23 @@ export const ENTERTAINMENT_LOGOS: Record<string, IconComponent> = {
   XsollaLogo,
   xsollaLogo: XsollaLogo,
   'xsolla': XsollaLogo,
+  TipicoLogo,
+  tipicoLogo: TipicoLogo,
+  'tipico': TipicoLogo,
+  'tipico-sportwetten': TipicoLogo,
+  ExaringLogo,
+  exaringLogo: ExaringLogo,
+  'exaring': ExaringLogo,
+  'waipu': ExaringLogo,
+  'waipu.tv': ExaringLogo,
+  HeiseMedienLogo,
+  heiseMedienLogo: HeiseMedienLogo,
+  'heise-medien': HeiseMedienLogo,
+  'heise': HeiseMedienLogo,
+  SsgBwLogo,
+  ssgBwLogo: SsgBwLogo,
+  'ssg-bw': SsgBwLogo,
+  'ssg': SsgBwLogo,
 }
+
 

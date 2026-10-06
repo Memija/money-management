@@ -33,9 +33,32 @@ describe('category-utils', () => {
     it('categorizes dining out descriptions correctly', () => {
       expect(categorize('McDonalds')).toBe('Dining Out')
       expect(categorize('Starbucks')).toBe('Dining Out')
+      expect(
+        categorize(
+          'Okka Turkish Bakery, Frankfurt am DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Ca'
+        )
+      ).toBe('Dining Out')
+      expect(
+        categorize(
+          'Baeckerei Moos Bad Homburg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Baeckerei Moos'
+        )
+      ).toBe('Dining Out')
     })
 
     it('categorizes transport descriptions correctly', () => {
+      expect(categorize('Uber')).toBe('Transport')
+      expect(categorize('Uber BV')).toBe('Transport')
+      expect(categorize('UBER * TRIP 1234 HELP.UBER.COM')).toBe('Transport')
+      expect(
+        categorize(
+          'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1052983422516 . PAYPAL-ZAHLUNG UBE R LASTSCHRIFT an mc'
+        )
+      ).toBe('Transport')
+      expect(
+        categorize(
+          'PayPal Europe S.a.r.l. et Cie S.C.A 1052983422516/PP.4585.PP/. Uber BV, Ihr Einkauf bei Uber'
+        )
+      ).toBe('Transport')
       expect(categorize('Uber trip')).toBe('Transport')
       expect(categorize('bolt receipt')).toBe('Transport')
       expect(categorize('HVV Ticket Hamburg')).toBe('Transport')
@@ -2775,6 +2798,289 @@ describe('category-utils', () => {
           ),
         ).toBe('Shopping')
       })
+
+      it('categorizes the 25 real European PayPal and debit card transactions accurately', () => {
+        // 1. Anonymous PayPal checkout with no merchant name -> falls back to Shopping (NOT Transfers)
+        expect(
+          categorize(
+            'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . , Ihr Einkauf bei End-to-End-Ref.: 1016591806959',
+          ),
+        ).toBe('Shopping')
+
+        // 2. RDPTS GmbH -> Shopping
+        expect(
+          categorize(
+            'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . RDPTS GmbH, Ihr Einkau f bei RDPTS GmbH End-t',
+          ),
+        ).toBe('Shopping')
+
+        // 3. DM Bad Homburg -> Shopping
+        expect(
+          categorize(
+            'DM FIL.2146 H:65251//BAD HOMBURG/DE 2022-05-23T10:55:48 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Shopping')
+
+        // 4. DM Eschborn -> Shopping
+        expect(
+          categorize(
+            'DM FIL.1434 H:65371//ESCHBORN/DE 2022-10-05T14:20:43 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Shopping')
+
+        // 5. Thalia Bücher GmbH -> Shopping
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1025047888741 . Thalia Bucher GmbH , Ihr Einkauf bei Thalia Buc',
+          ),
+        ).toBe('Shopping')
+
+        // 6. Housses Auto DBS -> Transport
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1026468143168 PP.4585.PP . Housses Auto DBS, Ihr Einkauf bei Hou',
+          ),
+        ).toBe('Transport')
+
+        // 7. MANOMANO -> Shopping
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1026451079456 PP.4585.PP . MANOMANO , Ihr Einkauf bei MAN',
+          ),
+        ).toBe('Shopping')
+
+        // 8. DPD Deutschland GmbH -> Shopping
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1026474255469 PP.4585.PP . DPD Deut schland GmbH, Ihr Eink',
+          ),
+        ).toBe('Shopping')
+
+        // 9 & 10. Schiller Onlinehandel GbR -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1029282103452 PP.4585.PP . Schiller Onlinehandel GbR, Ihr Einkauf ',
+          ),
+        ).toBe('Shopping')
+
+        // 11. Früchte und Feinkost Rothenburg -> Groceries
+        expect(
+          categorize(
+            'Fruechte und Feinkost Rothenburg o b DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Fruechte u',
+          ),
+        ).toBe('Groceries')
+
+        // 12. BrotHaus GmbH Rothenburg -> Dining Out
+        expect(
+          categorize(
+            'BROTHAUS GMBH - CO. KG Rothenburg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card BROTHA',
+          ),
+        ).toBe('Dining Out')
+
+        // 13. bella me -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1034830377254/PP.4585.PP/. bella me , Ihr Einkauf bei bella me En',
+          ),
+        ).toBe('Shopping')
+
+        // 14. Tipico Co. Ltd. -> Entertainment
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1035468977249/PP.4585.PP/. Tipico C o. Ltd., Ihr Einkauf bei Tipic',
+          ),
+        ).toBe('Entertainment')
+
+        // 15. AZM Zaprešić -> Transport
+        expect(
+          categorize(
+            'AZM ZAPRESIC ZAPRESIC HR Karte Nr. 5355 3100 0931 8380 Virtual Debit Card AZM ZAPRESIC ZAPRE',
+          ),
+        ).toBe('Transport')
+
+        // 16. ASFINAG (Autobahnen und Schnellstraßen-Finanzierungs-AG) -> Transport
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1036302132232/PP.4585.PP/. Autobahn en und Schnellstrasen-Fina',
+          ),
+        ).toBe('Transport')
+
+        // 17. Škola Studium -> Education
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1038367465824/PP.4585.PP/. Skola St udium, Ihr Einkauf bei Skola S',
+          ),
+        ).toBe('Education')
+
+        // 18. Deutscher Caritasverband e. V. -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1038041208163/PP.4585.PP/. Deutsche r Caritasverband e. V. / Cari',
+          ),
+        ).toBe('Shopping')
+
+        // 19. NAGA Markets Europe Ltd -> Savings
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1040254264400/PP.4585.PP/. NAGA Mar kets Europe Ltd, Ihr Einkau',
+          ),
+        ).toBe('Savings')
+
+        // 20. Mega-Holz GmbH -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1041226383723/PP.4585.PP/. Mega-Hol z GmbH + Co. KG, Ihr Einka',
+          ),
+        ).toBe('Shopping')
+
+        // 21. Thalia Buchhandlung Sulzbach -> Shopping
+        expect(
+          categorize(
+            'THALIA BUCHHANDLUNG N Sulzbach DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card THALIA B',
+          ),
+        ).toBe('Shopping')
+
+        // 22. eXaring AG (waipu.tv) -> Entertainment
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1043655690631/PP.4585.PP/. eXaring AG, Ihr Einkauf bei eXaring AG',
+          ),
+        ).toBe('Entertainment')
+
+        // 23. ZET Zagreb (MOJ.ZET.HR) -> Transport
+        expect(
+          categorize(
+            'MOJ.ZET.HR, ZAGREB HR Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 2025-08-0',
+          ),
+        ).toBe('Transport')
+
+        // 24. Udemy -> Education
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1045442438693 PP.4585.PP . Udemy, I hr Einkauf bei Udemy End',
+          ),
+        ).toBe('Education')
+
+        // 25. Transgourmet Eschborn -> Groceries
+        expect(
+          categorize(
+            'TRANSGOURMET DEUTSC//ESCHBORN/DE 2022-07-30T12:53:26 KFN 0 VJ 2412 Kartenzahlung',
+          ),
+        ).toBe('Groceries')
+
+        // 26. PDF Converter Guru -> Utilities
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1045487095428/PP.4585.PP/. PDF Conv erter Guru, Ihr Einkauf bei ',
+          ),
+        ).toBe('Utilities')
+
+        // 27. Cerebrum IQ -> Education
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1046113189247/. Cerebrum IQ, Ihr Ei nkauf bei Cerebrum IQ End-to-',
+          ),
+        ).toBe('Education')
+
+        // 28. Heise Medien -> Entertainment
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1047663016839/PP.4585.PP/. Heise Me dien GmbH + Co. KG, Ihr Ein',
+          ),
+        ).toBe('Entertainment')
+
+        // 29. Raj Toys -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1048027734591/PP.4585.PP/. Raj Toys s.r.o., Ihr Einkauf bei Raj Toy',
+          ),
+        ).toBe('Shopping')
+
+        // 30. Fahrerlaubnisbehörde Bad Homburg -> Taxes
+        expect(
+          categorize(
+            'FAHRERLAUBNISBEHOERDE//Bad Homburg 2026-03-27T09:57:32 KFN 0 VJ 2812 Kartenzahlung',
+          ),
+        ).toBe('Taxes')
+
+        // 31. Kinderplanet GmbH -> Entertainment
+        expect(
+          categorize(
+            'NYA*Kinderplanet GmbH, Berlin DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 20',
+          ),
+        ).toBe('Entertainment')
+
+        // 32. VSPO Bern -> Shopping
+        expect(
+          categorize(
+            'VSPO 0FF06d850afAbFc, Bern CH Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card ',
+          ),
+        ).toBe('Shopping')
+
+        // 33. Stadt Bad Homburg / Rathaus -> Taxes
+        expect(
+          categorize(
+            'KARTENZAHL. STADT BAD HOMBG/Rathaus 2026-06-24T09:14:25 KFN 0 VJ 2812 Kartenzahlung',
+          ),
+        ).toBe('Taxes')
+
+        // 34. shop portraitnet -> Shopping
+        expect(
+          categorize(
+            'NNT*shop portraitnet o, 490203 3150 95 DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual ',
+          ),
+        ).toBe('Shopping')
+
+        // 35. dedicom GmbH -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1045440836467/PP.4585.PP/. dedicom GmbH, Ihr Einkauf bei dedic',
+          ),
+        ).toBe('Shopping')
+
+        // 36. PayPal with omitted merchant name -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1047407084871/PP.4585.PP/. , Ihr Ei nkauf bei End-to-End-Ref.: 10',
+          ),
+        ).toBe('Shopping')
+
+        // 37. Direct transaction with PayPal itself -> Transfers
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1049039954031 PP.4585.PP . PayPal ( Europe) S.a r.l. et Cie, SC',
+          ),
+        ).toBe('Transfers')
+
+        // 38. Uber via PayPal direct debit -> Transport
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1052983422516 . PAYPAL-ZAHLUNG UBE R LASTSCHRIFT an mc',
+          ),
+        ).toBe('Transport')
+
+        // 39. home24 SE -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1053020146591/PP.4585.PP/. home24 S E, Ihr Einkauf bei home24',
+          ),
+        ).toBe('Shopping')
+
+        // 40. SSG BW (Staatliche Schlösser und Gärten Baden-Württemberg) -> Entertainment
+        expect(
+          categorize(
+            'SSG BW sagt Danke, Heidelberg DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card',
+          ),
+        ).toBe('Entertainment')
+
+        // 41. DARS d.d. (Slovenian Motorway Company) -> Transport
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1043667601270/PP.4585.PP/. DARS, d. d., Ihr Einkauf bei DARS, d.d.',
+          ),
+        ).toBe('Transport')
+      })
+
     })
   })
 })

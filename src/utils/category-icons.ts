@@ -112,6 +112,11 @@ export function findMatchingMerchant(text: string): MerchantSuggestion | undefin
       }
     }
 
+    // Exact matches must beat partial substring inclusions (e.g. 'Uber' must match 'Uber', not 'Uber Eats')
+    if (merchant.keyword === textLower || nameLower === textLower) {
+      score += 1000
+    }
+
     if (score > 0) {
       if (PAYMENT_PROCESSOR_IDS.has(merchant.id)) {
         if (score > bestProcessorScore) {
@@ -133,9 +138,15 @@ export function findMatchingMerchant(text: string): MerchantSuggestion | undefin
   }
 
   // If this is an intermediary payment processor transaction (e.g. PayPal / Klarna purchase for an online merchant)
-  // but the underlying merchant was not recognized above, do NOT fall back to the processor (e.g. PayPal).
+  // but an underlying merchant was discovered from the text (e.g. via extractMerchantKeyword),
+  // do NOT fall back to the processor (e.g. PayPal) because the display should represent the underlying store.
+  // HOWEVER, if no underlying merchant can be discovered from the transaction text,
+  // fall back to the processor (e.g. PayPal logo) so the transaction is branded with PayPal.
   if (isPaymentProcessorIntermediary(repaired)) {
-    return undefined
+    const extracted = extractMerchantKeyword(repaired)
+    if (extracted && !PAYMENT_PROCESSOR_IDS.has(extracted.toLowerCase())) {
+      return undefined
+    }
   }
 
   return bestProcessorMerchant
@@ -192,11 +203,14 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
   const merchant = findMatchingMerchant(nameTrimmed)
 
   if (merchant) {
-    const mWords = merchant.name.trim().split(/\s+/)
+    const cleanMerchantName = merchant.name.replace(/[()[\]{}]/g, ' ').replace(/\s+/g, ' ').trim()
+    const mWords = cleanMerchantName.split(/\s+/)
     const initials =
       mWords.length > 1
-        ? `${mWords[0][0] || ''}${mWords[1][0] || ''}`.toUpperCase()
-        : (merchant.name.slice(0, 2) || 'TX').toUpperCase()
+        ? (mWords[0].length >= 2 && mWords[0] === mWords[0].toUpperCase() && merchant.name.includes('('))
+          ? mWords[0].slice(0, 2).toUpperCase()
+          : `${mWords[0][0] || ''}${mWords[1][0] || ''}`.toUpperCase()
+        : (cleanMerchantName.slice(0, 2) || 'TX').toUpperCase()
 
     const logoComponent =
       merchant.logo && MERCHANT_LOGOS[merchant.logo]
@@ -219,15 +233,18 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
   }
 
   // For unrecognized transactions, derive clean display name if it went through an intermediary processor
-  const displayLabel = isPaymentProcessorIntermediary(nameTrimmed)
-    ? extractMerchantKeyword(nameTrimmed) || nameTrimmed
+  const isIntermediary = isPaymentProcessorIntermediary(nameTrimmed)
+  const extracted = isIntermediary ? extractMerchantKeyword(nameTrimmed) : ''
+  const displayLabel = isIntermediary
+    ? (extracted || 'Shopping')
     : nameTrimmed
 
-  const words = displayLabel.split(/\s+/)
+  const cleanLabel = displayLabel.replace(/[()[\]{}]/g, ' ').replace(/\s+/g, ' ').trim()
+  const words = cleanLabel.split(/\s+/)
   const initials =
     words.length > 1
       ? `${words[0][0] || ''}${words[1][0] || ''}`.toUpperCase()
-      : (displayLabel.slice(0, 2) || 'TX').toUpperCase()
+      : (cleanLabel.slice(0, 2) || (isIntermediary ? 'SH' : 'TX')).toUpperCase()
 
   // Generate deterministic dynamic brand color from merchant name
   const fallbackPalette = [

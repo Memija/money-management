@@ -67,6 +67,13 @@ export const RollerLogo = createWordmarkLogo({
   displayName: 'RollerLogo',
 })
 
+/** home24 — German online furniture and home decor retailer (home24 SE). */
+export const Home24Logo = createImageLogo({
+  src: '/brands/home24.png',
+  label: 'home24',
+  displayName: 'Home24Logo',
+})
+
 export const FURNITURE_LOGOS: Record<string, IconComponent> = {
   PocoLogo,
   XxxlutzLogo,
@@ -80,4 +87,9 @@ export const FURNITURE_LOGOS: Record<string, IconComponent> = {
   JyskLogo,
   DaenischesBettenlagerLogo: JyskLogo,
   RollerLogo,
+  Home24Logo,
+  home24Logo: Home24Logo,
+  'home24': Home24Logo,
+  'home24-se': Home24Logo,
 }
+

@@ -442,3 +442,6 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   ...TOUR_OPERATOR_LOGOS,
   ...VARIETY_STORE_LOGOS,
 }
+
+export { BaeckereiMoosLogo, OkkaBakeryLogo } from './dining-logos'
+
