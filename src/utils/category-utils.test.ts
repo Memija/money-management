@@ -73,6 +73,17 @@ describe('category-utils', () => {
           'Baeckerei Moos Bad Homburg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Baeckerei Moos'
         )
       ).toBe('Dining Out')
+      expect(
+        categorize(
+          'MAXI RESTORAN DESETKA  ORASJE BA Karte Nr. 5355 3100 0931 8380 Virtual Debit Card MAXI RESTORAN DESETKA    ORASJE    BIH 2024-08-05T15:41:57 Kartenzahlung Original 29,00BAM 1EUR=1,9458000BAM Entgelt Auslandseinsatz 0,22EUR'
+        )
+      ).toBe('Dining Out')
+      expect(
+        categorize(
+          'MAXI RESTORAN DESETKA  ORASJE BA Karte Nr. 5355 3100 0931 8380 Virtual Debit Card MAXI RESTORAN DESETKA    ORASJE    BIH 2024-08-05T15:41:57 Kartenzahlung Original 29,00BAM 1EUR=1,9458000BAM Entgelt Auslandseinsatz 0,22EUR',
+          { amount: -14.9, type: 'expense' }
+        )
+      ).toBe('Dining Out')
     })
 
     it('categorizes transport descriptions correctly', () => {
@@ -1595,6 +1606,11 @@ describe('category-utils', () => {
         expect(categorize('Kaufland Berlin')).toBe('Groceries')
         expect(categorize('Aldi Süd')).toBe('Groceries')
         expect(categorize('Aldi Sued')).toBe('Groceries')
+        expect(
+          categorize(
+            'ALDI SE U. CO. KG//ESCHBORN/DE 2022-04-08T12:48:20 KFN 0  VJ 2412 Kartenzahlung'
+          )
+        ).toBe('Groceries')
         expect(categorize('Biedronka')).toBe('Groceries')
         expect(categorize('Bingo d.o.o.')).toBe('Groceries')
       })

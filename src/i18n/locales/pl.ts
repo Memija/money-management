@@ -699,6 +699,8 @@ export const pl: TranslationStrings = {
     ],
     DiningOut: [
       'restauracja',
+      'restoran',
+      'restaurant',
       'kawiarnia',
       'cafeteria',
       'kafeteria',

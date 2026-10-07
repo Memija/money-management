@@ -201,6 +201,22 @@ const GERMAN_HEALTH_INSURANCE_REGEX =
   /(?:\b(?:krankenvers\w*|krankenkasse\w*)\b)/i
 
 /**
+ * Regex to detect explicit dining venue / establishment terms
+ * (e.g. 'Restoran', 'Restaurant', 'Bistro', 'Pizzeria', 'Caffe & Restoran', 'Konoba', 'Gostionica', 'Ćevabdžinica', 'Kafana')
+ * to ensure dining establishments located inside or affiliated with shopping centers or supermarket chains prioritize Dining Out over Groceries/Shopping.
+ */
+export const DINING_ESTABLISHMENT_REGEX =
+  /(?:\b(?:restoran|restaurant|bistro|pizzeria|pizzaria|trattoria|osteria|konoba|gostionica|caffe\s*&?\s*restoran|kafana|[cć]evabd[zž]inica|grill\s*restoran|steakhouse|brasserie)\b)/i
+
+/**
+ * Regex to detect card payments, POS purchases, and bank/service fee contexts
+ * (e.g. 'Entgelt Auslandseinsatz', 'Kartenzahlung', 'Virtual Debit Card', 'POS-Zahlung')
+ * to prevent card charges and bank fees containing 'entgelt' from misclassifying as personal Salary.
+ */
+export const CARD_OR_BANK_FEE_REGEX =
+  /(?:\b(?:kartenzahlung|karteneinkauf|pos[- ]?zahlung|pos[- ]?einkauf|virtual\s+debit|debit\s+card|credit\s+card|karte\s+nr|kartenabrechnung|auslandseinsatz|karteneinsatz)\b|\bentgelt\s+(?:auslands|karten|abschluss|konto|depot|info|buchung|service)\w*\b)/i
+
+/**
  * Infers a category from a transaction description and context.
  * Returns one of the standardized canonical category keys (e.g. 'Salary', 'Groceries', 'Dining Out').
  */
@@ -272,10 +288,13 @@ export function categorize(
     if (cat === 'Salary') {
       if (INCOME_TAX_REGEX.test(d)) continue
       if (POLISH_ATM_WITHDRAWAL_REGEX.test(d)) continue
-      if (isExpense) {
-        const isExplicitSalaryPayment =
-          /\b(?:salary\s+payment|monthly\s+salary|gehaltszahlung|lohnauszahlung|reisespesen|reisesp|reisekosten|spesenabrechnung|spesenerstattung|auslagenerstattung|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*)\b/i.test(d)
-        if (!isExplicitSalaryPayment) continue
+      const isExplicitSalaryPayment =
+        /\b(?:salary\s+payment|monthly\s+salary|gehaltszahlung|lohnauszahlung|reisespesen|reisesp|reisekosten|spesenabrechnung|spesenerstattung|auslagenerstattung|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*)\b/i.test(d)
+      if (isExpense && !isExplicitSalaryPayment) {
+        continue
+      }
+      if (!isExplicitSalaryPayment && CARD_OR_BANK_FEE_REGEX.test(d)) {
+        continue
       }
     }
     if (cat === 'Rent' && CAR_OR_EQUIPMENT_RENTAL_REGEX.test(d)) {
@@ -306,6 +325,9 @@ export function categorize(
     } else if (popularCat === 'Insurance' && GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
       if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Healthcare')
       return 'Healthcare'
+    } else if ((popularCat === 'Groceries' || popularCat === 'Shopping') && DINING_ESTABLISHMENT_REGEX.test(d)) {
+      if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Dining Out')
+      return 'Dining Out'
     } else {
       if (!customKeywords) defaultCategoryCache.set(cacheKey, popularCat)
       return popularCat
@@ -317,6 +339,13 @@ export function categorize(
   if (GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
     if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Healthcare')
     return 'Healthcare'
+  }
+
+  // Explicit dining establishment venue indicators (e.g. 'Restoran', 'Restaurant', 'Bistro', 'Pizzeria')
+  // take precedence over general grocery or shopping dictionaries
+  if (DINING_ESTABLISHMENT_REGEX.test(d) && !GERMAN_CITY_ESSEN_REGEX.test(d)) {
+    if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Dining Out')
+    return 'Dining Out'
   }
 
   // 4. General category matching

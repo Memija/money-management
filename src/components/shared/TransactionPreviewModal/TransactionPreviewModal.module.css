@@ -2076,7 +2076,32 @@
 .icon-avatar svg[aria-label*="Edukativni Centar" i],
 .icon-avatar svg[aria-label*="Rani Razvoj" i],
 .icon-avatar svg[aria-label="CHECK24"],
-.icon-avatar svg[aria-label*="CHECK24" i] {
+.icon-avatar svg[aria-label*="CHECK24" i],
+.icon-avatar svg[aria-label*="REWE" i],
+.icon-avatar svg[aria-label*="Lidl" i],
+.icon-avatar svg[aria-label*="ALDI" i],
+.icon-avatar svg[aria-label*="EDEKA" i],
+.icon-avatar svg[aria-label*="Kaufland" i],
+.icon-avatar svg[aria-label*="Penny" i],
+.icon-avatar svg[aria-label*="Netto" i],
+.icon-avatar svg[aria-label*="SPAR" i],
+.icon-avatar svg[aria-label*="BILLA" i],
+.icon-avatar svg[aria-label*="Biedronka" i],
+.icon-avatar svg[aria-label*="Zabka" i],
+.icon-avatar svg[aria-label*="Żabka" i],
+.icon-avatar svg[aria-label*="Carrefour" i],
+.icon-avatar svg[aria-label*="Auchan" i],
+.icon-avatar svg[aria-label*="Coop" i],
+.icon-avatar svg[aria-label*="Tesco" i],
+.icon-avatar svg[aria-label*="ASDA" i],
+.icon-avatar svg[aria-label*="Morrisons" i],
+.icon-avatar svg[aria-label*="HelloFresh" i],
+.icon-avatar svg[aria-label*="Anadolu" i],
+.icon-avatar svg[aria-label*="Transgourmet" i],
+.icon-avatar svg[aria-label*="Feinkost" i],
+.icon-avatar svg[aria-label*="Dino" i],
+.icon-avatar svg[aria-label*="Bingo" i],
+.icon-avatar svg[aria-label*="Konzum" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;

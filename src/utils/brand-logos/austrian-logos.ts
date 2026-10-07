@@ -1,19 +1,7 @@
+import { BillaLogo, BillaPlusLogo } from './grocery-logos'
 import { createImageLogo } from './logo-factory'
 import type { IconComponent } from './types'
 
-/** BILLA — Austria's premier supermarket chain (Rewe International). */
-export const BillaLogo = createImageLogo({
-  src: '/brands/billa.png',
-  label: 'BILLA',
-  displayName: 'BillaLogo',
-})
-
-/** BILLA PLUS — Austrian hypermarket chain (formerly Merkur). */
-export const BillaPlusLogo = createImageLogo({
-  src: '/brands/billa-plus.png',
-  label: 'BILLA PLUS',
-  displayName: 'BillaPlusLogo',
-})
 
 /** BIPA — Austria's leading drugstore & perfume retailer (Rewe Group). */
 export const BipaLogo = createImageLogo({

@@ -5,6 +5,7 @@ import { type MerchantSuggestion, POPULAR_MERCHANTS } from '../data/merchants'
 import type { CustomCategory } from '../types'
 import { MERCHANT_LOGOS } from './brand-logos/merchant-logos'
 import type { IconComponent } from './brand-logos/types'
+import { DINING_ESTABLISHMENT_REGEX } from './categorizer/categorizer'
 import {
   extractMerchantKeyword,
   isPaymentProcessorIntermediary,
@@ -246,7 +247,10 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
           ? 'Bank Fees'
           : merchant.category === 'Insurance' && isHealthInsurance
             ? 'Healthcare'
-            : merchant.category,
+            : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
+                DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
+              ? 'Dining Out'
+              : merchant.category,
       initials,
     }
   }

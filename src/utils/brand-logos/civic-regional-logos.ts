@@ -29,6 +29,13 @@ export const SkolaStudiumLogo = createImageLogo({
   displayName: 'SkolaStudiumLogo',
 })
 
+/** Cerebrum IQ — online cognitive assessment and brain training platform. */
+export const CerebrumIqLogo = createImageLogo({
+  src: '/brands/cerebrum-iq.png',
+  label: 'Cerebrum IQ',
+  displayName: 'CerebrumIqLogo',
+})
+
 export const CIVIC_REGIONAL_LOGOS: Record<string, IconComponent> = {
   BadNauheimLogo,
   badNauheimLogo: BadNauheimLogo,
@@ -48,4 +55,9 @@ export const CIVIC_REGIONAL_LOGOS: Record<string, IconComponent> = {
   skolaStudiumLogo: SkolaStudiumLogo,
   'skola-studium': SkolaStudiumLogo,
   'skola': SkolaStudiumLogo,
+  CerebrumIqLogo,
+  cerebrumIqLogo: CerebrumIqLogo,
+  'cerebrum-iq': CerebrumIqLogo,
+  'cerebrum': CerebrumIqLogo,
+  'cerebrumiq': CerebrumIqLogo,
 }

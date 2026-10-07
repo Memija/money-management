@@ -2506,10 +2506,10 @@ describe('category-icons', () => {
 
       // 27. Cerebrum IQ
       const cerebrumInfo = getMerchantBrandInfo(
-        'PayPal Europe S.a.r.l. et Cie S.C.A 1046113189247/. Cerebrum IQ, Ihr Ei nkauf bei Cerebrum IQ End-to-',
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1046113189247/. Cerebrum IQ, Ihr Ei nkauf bei Cerebrum IQ End-to-End-Ref.: 1046113189247 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
       )
       expect(cerebrumInfo.merchant?.name).toBe('Cerebrum IQ')
-      expect(cerebrumInfo.logoComponent).toBe(AVAILABLE_ICONS.GraduationCap)
+      expect(cerebrumInfo.logoComponent).toBe(MERCHANT_LOGOS.CerebrumIqLogo)
       expect(cerebrumInfo.suggestedCategory).toBe('Education')
 
       // 28. Heise Medien
@@ -3044,6 +3044,171 @@ describe('category-icons', () => {
       expect(txSvg?.classList.contains('brand-logo-full')).toBe(true)
       expect(txSvg?.style.borderRadius).toBe('inherit')
       expect(txSvg?.getAttribute('aria-label')).toBe('CHECK24')
+    })
+
+    it('matches ALDI SE U. (Aldi Süd) and renders proper ALDI SÜD logo', () => {
+      const tx = 'ALDI SE U. CO. KG//ESCHBORN/DE 2022-04-08T12:48:20 KFN 0  VJ 2412 Kartenzahlung'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.id).toBe('aldi-sued')
+      expect(brandInfo.merchant?.name).toBe('ALDI SÜD')
+      expect(brandInfo.suggestedCategory).toBe('Groceries')
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.AldiSudLogo)
+      expect(brandInfo.brandColor).toBe('#00205B')
+
+      // Render AldiSudLogo directly
+      const { AldiSudLogo, AldiNordLogo, AldiLogo } = MERCHANT_LOGOS
+      expect(AldiSudLogo).toBeTruthy()
+      expect(AldiNordLogo).toBeTruthy()
+      expect(AldiLogo).toBe(AldiSudLogo)
+
+      const { container: aldiSudContainer } = render(React.createElement(AldiSudLogo, { size: 24 }))
+      const aldiSudSvg = aldiSudContainer.querySelector('svg')
+      expect(aldiSudSvg).toBeTruthy()
+      expect(aldiSudSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(aldiSudSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(aldiSudSvg?.style.borderRadius).toBe('inherit')
+      expect(aldiSudSvg?.getAttribute('aria-label')).toBe('ALDI SÜD')
+
+      // Render via getCategoryIcon with the user's transaction description
+      const { container: txContainer } = render(
+        <div>{getCategoryIcon('Groceries', 24, undefined, tx)}</div>,
+      )
+      const txSvg = txContainer.querySelector('svg')
+      expect(txSvg).toBeTruthy()
+      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txSvg?.getAttribute('aria-label')).toBe('ALDI SÜD')
+    })
+
+    it('matches Lidl and renders proper authentic vector Lidl logo', () => {
+      const tx = 'LIDL Dienstleistung GmbH & Co. KG Filiale 1234'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.id).toBe('lidl')
+      expect(brandInfo.merchant?.name).toBe('Lidl')
+      expect(brandInfo.suggestedCategory).toBe('Groceries')
+      expect(brandInfo.brandColor).toBe('#0050AA')
+
+      // Render LidlLogo directly
+      const { LidlLogo, SiLidl } = MERCHANT_LOGOS
+      expect(LidlLogo).toBeTruthy()
+      expect(SiLidl).toBe(LidlLogo)
+
+      const { container: lidlContainer } = render(React.createElement(LidlLogo, { size: 24 }))
+      const lidlSvg = lidlContainer.querySelector('svg')
+      expect(lidlSvg).toBeTruthy()
+      expect(lidlSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(lidlSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(lidlSvg?.style.borderRadius).toBe('inherit')
+      expect(lidlSvg?.getAttribute('aria-label')).toBe('Lidl')
+
+      // Render via getCategoryIcon with transaction description
+      const { container: txContainer } = render(
+        <div>{getCategoryIcon('Groceries', 24, undefined, tx)}</div>,
+      )
+      const txSvg = txContainer.querySelector('svg')
+      expect(txSvg).toBeTruthy()
+      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txSvg?.getAttribute('aria-label')).toBe('Lidl')
+    })
+
+    it('matches ANADOLU SUPERMARKT and renders authentic vector storefront logo', () => {
+      const tx =
+        'ANADOLU SUPERMARKT GIR 69287732//BA 2022-06-23T11:25:33 KFN 0  VJ 2412 Kartenzahlung'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.id).toBe('anadolu-supermarkt')
+      expect(brandInfo.merchant?.name).toBe('Anadolu Supermarkt')
+      expect(brandInfo.suggestedCategory).toBe('Groceries')
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.AnadoluSupermarktLogo)
+      expect(brandInfo.brandColor).toBe('#B91C1C')
+
+      // Render AnadoluSupermarktLogo directly
+      const { AnadoluSupermarktLogo } = MERCHANT_LOGOS
+      expect(AnadoluSupermarktLogo).toBeTruthy()
+
+      const { container: logoContainer } = render(
+        React.createElement(AnadoluSupermarktLogo, { size: 24 }),
+      )
+      const logoSvg = logoContainer.querySelector('svg')
+      expect(logoSvg).toBeTruthy()
+      expect(logoSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(logoSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(logoSvg?.style.borderRadius).toBe('inherit')
+      expect(logoSvg?.getAttribute('aria-label')).toBe('Anadolu Supermarkt')
+
+      // Render via getCategoryIcon with the user's exact transaction string
+      const { container: txContainer } = render(
+        <div>{getCategoryIcon('Groceries', 24, undefined, tx)}</div>,
+      )
+      const txSvg = txContainer.querySelector('svg')
+      expect(txSvg).toBeTruthy()
+      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txSvg?.getAttribute('aria-label')).toBe('Anadolu Supermarkt')
+    })
+
+    it('matches MAXI RESTORAN DESETKA and categorizes as Dining Out with Restoran Desetka logo', () => {
+      const tx =
+        'MAXI RESTORAN DESETKA  ORASJE BA Karte Nr. 5355 3100 0931 8380 Virtual Debit Card MAXI RESTORAN DESETKA    ORASJE    BIH 2024-08-05T15:41:57 Kartenzahlung Original 29,00BAM 1EUR=1,9458000BAM Entgelt Auslandseinsatz 0,22EUR'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.id).toBe('restoran-desetka')
+      expect(brandInfo.merchant?.name).toBe('Restoran Desetka')
+      expect(brandInfo.suggestedCategory).toBe('Dining Out')
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.RestoranDesetkaLogo)
+      expect(brandInfo.brandColor).toBe('#881337')
+
+      // Render RestoranDesetkaLogo directly
+      const { RestoranDesetkaLogo } = MERCHANT_LOGOS
+      expect(RestoranDesetkaLogo).toBeTruthy()
+
+      const { container: logoContainer } = render(
+        React.createElement(RestoranDesetkaLogo, { size: 24 }),
+      )
+      const logoSvg = logoContainer.querySelector('svg')
+      expect(logoSvg).toBeTruthy()
+      expect(logoSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(logoSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(logoSvg?.getAttribute('aria-label')).toBe('Restoran Desetka Orašje')
+
+      // Render via getCategoryIcon with transaction description
+      const { container: txContainer } = render(
+        <div>{getCategoryIcon('Dining Out', 24, undefined, tx)}</div>,
+      )
+      const txSvg = txContainer.querySelector('svg')
+      expect(txSvg).toBeTruthy()
+      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txSvg?.getAttribute('aria-label')).toBe('Restoran Desetka Orašje')
+    })
+
+    it('matches SPAR and renders official SPAR brand image logo', () => {
+      const tx = 'SPAR Supermarket 2024-06-12 Kartenzahlung'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.id).toBe('spar')
+      expect(brandInfo.merchant?.name).toBe('SPAR')
+      expect(brandInfo.suggestedCategory).toBe('Groceries')
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.SparLogo)
+      expect(brandInfo.brandColor).toBe('#EE1C25')
+
+      // Render SparLogo directly
+      const { SparLogo } = MERCHANT_LOGOS
+      expect(SparLogo).toBeTruthy()
+
+      const { container: logoContainer } = render(
+        React.createElement(SparLogo, { size: 24 }),
+      )
+      const logoImg = logoContainer.querySelector('img')
+      expect(logoImg).toBeTruthy()
+      expect(logoImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(logoImg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(logoImg?.getAttribute('aria-label')).toBe('SPAR')
+      expect(logoImg?.getAttribute('src')).toBe('/brands/spar.png')
+
+      // Render via getCategoryIcon with transaction description
+      const { container: txContainer } = render(
+        <div>{getCategoryIcon('Groceries', 24, undefined, tx)}</div>,
+      )
+      const txImg = txContainer.querySelector('img')
+      expect(txImg).toBeTruthy()
+      expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txImg?.getAttribute('aria-label')).toBe('SPAR')
+      expect(txImg?.getAttribute('src')).toBe('/brands/spar.png')
     })
   })
 })

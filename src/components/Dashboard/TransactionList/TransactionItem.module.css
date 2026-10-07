@@ -142,7 +142,32 @@
 .iconBox svg[aria-label*="Edukativni Centar" i],
 .iconBox svg[aria-label*="Rani Razvoj" i],
 .iconBox svg[aria-label="CHECK24"],
-.iconBox svg[aria-label*="CHECK24" i] {
+.iconBox svg[aria-label*="CHECK24" i],
+.iconBox svg[aria-label*="REWE" i],
+.iconBox svg[aria-label*="Lidl" i],
+.iconBox svg[aria-label*="ALDI" i],
+.iconBox svg[aria-label*="EDEKA" i],
+.iconBox svg[aria-label*="Kaufland" i],
+.iconBox svg[aria-label*="Penny" i],
+.iconBox svg[aria-label*="Netto" i],
+.iconBox svg[aria-label*="SPAR" i],
+.iconBox svg[aria-label*="BILLA" i],
+.iconBox svg[aria-label*="Biedronka" i],
+.iconBox svg[aria-label*="Zabka" i],
+.iconBox svg[aria-label*="Żabka" i],
+.iconBox svg[aria-label*="Carrefour" i],
+.iconBox svg[aria-label*="Auchan" i],
+.iconBox svg[aria-label*="Coop" i],
+.iconBox svg[aria-label*="Tesco" i],
+.iconBox svg[aria-label*="ASDA" i],
+.iconBox svg[aria-label*="Morrisons" i],
+.iconBox svg[aria-label*="HelloFresh" i],
+.iconBox svg[aria-label*="Anadolu" i],
+.iconBox svg[aria-label*="Transgourmet" i],
+.iconBox svg[aria-label*="Feinkost" i],
+.iconBox svg[aria-label*="Dino" i],
+.iconBox svg[aria-label*="Bingo" i],
+.iconBox svg[aria-label*="Konzum" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;

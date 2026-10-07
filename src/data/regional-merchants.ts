@@ -18,6 +18,7 @@ export const REGIONAL_MERCHANTS: MerchantSuggestion[] = [
   { id: 'energopetrol', name: 'Energopetrol', keyword: 'energopetrol', category: 'Transport', brandColor: '#004B87', icon: 'Fuel' },
   { id: 'hifa', name: 'Hifa Oil / Petrol', keyword: 'hifa', category: 'Transport', brandColor: '#E30613', icon: 'Fuel' },
   { id: 'nestro', name: 'Nestro Petrol', keyword: 'nestro', category: 'Transport', brandColor: '#003399', icon: 'Fuel' },
+  { id: 'restoran-desetka', name: 'Restoran Desetka', keyword: 'restoran desetka', aliases: ['maxi restoran desetka', 'caffe & restoran desetka', 'caffe restoran desetka', 'restoran desetka orasje', 'desetka orasje', 'desetka orašje'], category: 'Dining Out', logo: 'RestoranDesetkaLogo', brandColor: '#881337', icon: 'Utensils' },
 
   // Serbia (sr)
   { id: 'maxi', name: 'Maxi', keyword: 'maxi', category: 'Groceries', brandColor: '#E2001A', icon: 'ShoppingCart' },
@@ -69,7 +70,9 @@ export const REGIONAL_MERCHANTS: MerchantSuggestion[] = [
   // Germany / Austria / Switzerland (de) — Retail & Groceries
   { id: 'rewe', name: 'REWE', keyword: 'rewe', aliases: ['rewe markt', 'rewe center', 'rewe city'], category: 'Groceries', logo: 'SiRewe', brandColor: '#CC071E', icon: 'ShoppingCart' },
   { id: 'edeka', name: 'EDEKA', keyword: 'edeka', aliases: ['edeka markt', 'edeka center'], category: 'Groceries', logo: 'SiEdeka', brandColor: '#005CA9', icon: 'ShoppingCart' },
-  { id: 'aldi', name: 'ALDI', keyword: 'aldi', aliases: ['aldi süd', 'aldi sued', 'aldi nord'], category: 'Groceries', logo: 'SiAldisud', brandColor: '#003A6A', icon: 'ShoppingCart' },
+  { id: 'aldi-sued', name: 'ALDI SÜD', keyword: 'aldi süd', aliases: ['aldi sued', 'aldi-süd', 'aldi-sued', 'aldi se u.', 'aldi se u', 'aldi se & co. kg', 'aldi se & co', 'aldi se und co', 'aldi se u. co. kg', 'aldi sued dienstleistung', 'aldi süd dienstleistung', 'aldi sued dienstleistungs', 'aldi süd dienstleistungs', 'aldi eschborn'], category: 'Groceries', logo: 'AldiSudLogo', brandColor: '#00205B', icon: 'ShoppingCart' },
+  { id: 'aldi-nord', name: 'ALDI Nord', keyword: 'aldi nord', aliases: ['aldi-nord', 'aldi nord dienstleistung', 'aldi nord gmbh'], category: 'Groceries', logo: 'AldiNordLogo', brandColor: '#00205B', icon: 'ShoppingCart' },
+  { id: 'aldi', name: 'ALDI', keyword: 'aldi', aliases: ['aldi markt', 'aldi einkauf', 'aldi filial', 'aldi filiale'], category: 'Groceries', logo: 'AldiSudLogo', brandColor: '#00205B', icon: 'ShoppingCart' },
   { id: 'lidl', name: 'Lidl', keyword: 'lidl', aliases: ['lidl plus', 'lidl dienstleistung'], category: 'Groceries', logo: 'SiLidl', brandColor: '#0050AA', icon: 'ShoppingCart' },
   { id: 'kaufland', name: 'Kaufland', keyword: 'kaufland', aliases: ['kaufland dienstleistung'], category: 'Groceries', logo: 'SiKaufland', brandColor: '#E3000F', icon: 'ShoppingCart' },
   { id: 'coop', name: 'Coop', keyword: 'coop', category: 'Groceries', logo: 'SiCoop', brandColor: '#E35205', icon: 'ShoppingCart' },
@@ -366,7 +369,7 @@ export const REGIONAL_MERCHANTS: MerchantSuggestion[] = [
   { id: 'skola-studium', name: 'Škola Studium', keyword: 'skola studium', aliases: ['skola studium', 'škola studium', 'skola s'], category: 'Education', logo: 'SkolaStudiumLogo', brandColor: '#1D4ED8', icon: 'GraduationCap' },
   { id: 'edukativni-centar-rani-razvoj', name: 'Edukativni Centar Rani Razvoj', keyword: 'edukativni centar', aliases: ['edukativni centar rani razvoj', 'rani razvoj', 'edukativni centar', 'edukativni'], category: 'Education', logo: 'EdukativniCentarLogo', brandColor: '#2563EB', icon: 'GraduationCap' },
   { id: 'pdf-guru', name: 'PDF Converter Guru', keyword: 'pdf converter guru', aliases: ['pdf converter guru', 'pdf converter', 'pdf guru', 'pdfguru', 'pdfguru.com'], category: 'Utilities', logo: 'PdfGuruLogo', brandColor: '#2563EB', icon: 'Monitor' },
-  { id: 'cerebrum-iq', name: 'Cerebrum IQ', keyword: 'cerebrum iq', aliases: ['cerebrum iq', 'cerebrum', 'cerebrumiq', 'cerebrumiq.com', 'cerebrum iq end-to'], category: 'Education', brandColor: '#016FF2', icon: 'GraduationCap' },
+  { id: 'cerebrum-iq', name: 'Cerebrum IQ', keyword: 'cerebrum iq', aliases: ['cerebrum iq', 'cerebrum', 'cerebrumiq', 'cerebrumiq.com', 'cerebrum iq end-to'], category: 'Education', logo: 'CerebrumIqLogo', brandColor: '#016FF2', icon: 'GraduationCap' },
   { id: 'heise-medien', name: 'Heise Medien', keyword: 'heise medien', aliases: ['heise medien', 'heise', 'heise online', 'heise gruppe', 'heise medien gmbh', 'c\'t magazin', 'ix magazin'], category: 'Entertainment', logo: 'HeiseMedienLogo', brandColor: '#10A34E', icon: 'Tv' },
   { id: 'raj-toys', name: 'Raj Toys', keyword: 'raj toys', aliases: ['raj toys', 'raj toys s.r.o.', 'raj toy', 'rajhraciek', 'rajspielzeug', 'raj toys sro'], category: 'Shopping', brandColor: '#E11D48', icon: 'Gamepad2' },
   { id: 'fahrerlaubnisbehoerde-bad-homburg', name: 'Fahrerlaubnisbehörde Bad Homburg', keyword: 'fahrerlaubnisbehoerde', aliases: ['fahrerlaubnisbehoerde bad homburg', 'fahrerlaubnisbehörde bad homburg', 'fahrerlaubnisbehörde', 'fahrerlaubnisbehoerde', 'fahrerlaubnisbehoerde//bad homburg'], category: 'Taxes', logo: 'BadHomburgLogo', brandColor: '#0F47AF', icon: 'Landmark' },

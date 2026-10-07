@@ -1,5 +1,17 @@
-import { createImageLogo } from './logo-factory'
+import { FruechteFeinkostLogo, TransgourmetLogo } from './grocery-logos'
+import { createImageLogo, createWordmarkLogo } from './logo-factory'
 import type { IconComponent } from './types'
+
+/** Restoran Desetka — traditional restaurant, grill and cafe in Orašje, Bosnia and Herzegovina. */
+export const RestoranDesetkaLogo = createWordmarkLogo({
+  label: 'Restoran Desetka Orašje',
+  text: 'DESETKA',
+  background: '#881337',
+  textColor: '#FFFFFF',
+  accentColor: '#F59E0B',
+  fontSize: 9.5,
+  displayName: 'RestoranDesetkaLogo',
+})
 
 /** Pizza Hut — American international restaurant chain and pizza franchise (Yum! Brands). */
 export const PizzaHutLogo = createImageLogo({
@@ -127,19 +139,6 @@ export const BrotHausLogo = createImageLogo({
   displayName: 'BrotHausLogo',
 })
 
-/** Transgourmet Deutschland — leading B2B wholesale food and catering supplies distributor. */
-export const TransgourmetLogo = createImageLogo({
-  src: '/brands/transgourmet.png',
-  label: 'Transgourmet',
-  displayName: 'TransgourmetLogo',
-})
-
-/** Früchte und Feinkost — fresh fruit, vegetable, and delicatessen market in Rothenburg ob der Tauber. */
-export const FruechteFeinkostLogo = createImageLogo({
-  src: '/brands/fruechte-und-feinkost.png',
-  label: 'Früchte und Feinkost',
-  displayName: 'FruechteFeinkostLogo',
-})
 
 /** Bäckerei Moos — traditional artisan bakery & cafe chain across Central Hesse and Bad Homburg. */
 export const BaeckereiMoosLogo = createImageLogo({
@@ -239,6 +238,11 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   badHomburgRetailLogo: BadHomburgRetailLogo,
   'bad-homburg-store': BadHomburgRetailLogo,
   'bad-homburg-retail': BadHomburgRetailLogo,
+  RestoranDesetkaLogo,
+  restoranDesetkaLogo: RestoranDesetkaLogo,
+  'restoran-desetka': RestoranDesetkaLogo,
+  'maxi-restoran-desetka': RestoranDesetkaLogo,
+  'desetka': RestoranDesetkaLogo,
 }
 
 
