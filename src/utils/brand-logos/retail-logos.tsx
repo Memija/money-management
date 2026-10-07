@@ -10,14 +10,15 @@ export const Check24Logo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '3px',
+      borderRadius: 'inherit',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="CHECK24"
     role="img"
   >
-    <rect width="48" height="48" rx="8" fill="#002D72" />
+    <rect width="48" height="48" fill="#002D72" />
     <text
       x="24"
       y="15.5"
@@ -48,6 +49,7 @@ export const Check24Logo: IconComponent = ({ size = 16, className }) => (
   </svg>
 )
 Check24Logo.displayName = 'Check24Logo'
+export { Check24Logo as CHECK24Logo }
 
 export const SumupLogo: IconComponent = ({ size = 16, className }) => (
   <svg

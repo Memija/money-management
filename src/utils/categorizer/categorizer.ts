@@ -176,7 +176,7 @@ const POLISH_ATM_WITHDRAWAL_REGEX =
 // Regex to detect SEPA and credit transfer / standing order reference patterns
 // (e.g. 'CCB.321.UE.328580', 'MOB.210.EE.POS00026333', 'CD-SCT-12345', 'SEPA-Überweisung', 'Dauerauftrag', 'Umbuchung', 'End-to-End-Ref ... Kundenreferenz ...')
 const SEPA_TRANSFER_REGEX =
-  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da|ee|ta|sct|inst)(?:\.[a-z0-9_-]+)?\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref\b.*\bkundenreferenz\b|\bkundenreferenz\b.*\bend-to-end-ref\b)|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*(?:notprovided|null|\d{8}-[a-z0-9_-]+|[a-z0-9_.-]*(?:ue|da|ee|ta|sct|inst|mob|si)[a-z0-9_.-]*)\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?(?:transfer|back)|geld[- ]?zur[uü]ck|sent\s+from|echtzeit[uü]berweisung|echtzeit[- ]?[uü]berweisung|instant[- ]?transfer|instant[- ]?payment)\b|(?:\b[a-z]{4}[a-z]{2}[a-z0-9]{2}(?:[a-z0-9]{3})?\s+[a-z]{2}\d{2}[a-z0-9]{11,30}\b|\b[a-z]{2}\d{2}[a-z0-9]{11,30}\b).*\b(?:end-to-end-ref|kundenreferenz)\b|\b(?:anel\s*(?:o\.?|oder|u\.?|und|\/|&)\s*biljana\s*memic|biljana\s*(?:o\.?|oder|u\.?|und|\/|&)\s*anel\s*memic)\b)/i
+  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da|ee|ta|sct|inst)(?:\.[a-z0-9_-]+)?\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref\b.*\bkundenreferenz\b|\bkundenreferenz\b.*\bend-to-end-ref\b)|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*(?:notprovided|null|\d{8}-[a-z0-9_-]+|[a-z0-9_.-]*(?:ue|da|ee|ta|sct|inst|mob|si)[a-z0-9_.-]*)\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?(?:transfer|back)|geld[- ]?zur[uü]ck|sent\s+from|echtzeit[uü]berweisung|echtzeit[- ]?[uü]berweisung|instant[- ]?transfer|instant[- ]?payment)\b|(?:\b[a-z]{4}[a-z]{2}[a-z0-9]{2}(?:[a-z0-9]{3})?\s+[a-z]{2}\d{2}[a-z0-9]{11,30}\b|\b[a-z]{2}\d{2}[a-z0-9]{11,30}\b).*\b(?:end-to-end-ref|kundenreferenz)\b|\b(?:anel(?:\s+memic)?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*biljana\s*memic|biljana(?:\s+memic)?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*anel\s*memic)\b)/i
 
 // Regex to detect commercial purchase / order indicators in SEPA payments
 // to prevent business invoices, orders, and corporate collections with End-to-End-Ref from falling into Transfers.
@@ -194,6 +194,11 @@ const defaultCategoryCache = new Map<string, string>()
 // Municipalities bill these too, so the purpose must win over the municipal authority's default 'Taxes' category.
 const CHILDCARE_FEE_REGEX =
   /\b(?:kindertagesst(?:ä|ae|a)tte\w*|kita[- ]?(?:geb(?:ü|ue|u)hr\w*|beitr(?:ä|ae|a)g\w*)|(?:kindergarten|krippen|hort|betreuungs)(?:geb(?:ü|ue|u)hr\w*|beitr(?:ä|ae|a)g\w*)|schulkindbetreuung)/i
+
+// Regex to detect German health insurance context (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenvers', 'Krankenkasse')
+// to categorize health insurance transactions as Healthcare rather than general Insurance even from multi-line insurers like AXA, Debeka, etc.
+const GERMAN_HEALTH_INSURANCE_REGEX =
+  /(?:\b(?:krankenvers\w*|krankenkasse\w*)\b)/i
 
 /**
  * Infers a category from a transaction description and context.
@@ -298,10 +303,20 @@ export function categorize(
   if (popularCat) {
     if (popularCat === 'Dining Out' && GERMAN_CITY_ESSEN_REGEX.test(d)) {
       // Ignore false positives from city of Essen
+    } else if (popularCat === 'Insurance' && GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
+      if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Healthcare')
+      return 'Healthcare'
     } else {
       if (!customKeywords) defaultCategoryCache.set(cacheKey, popularCat)
       return popularCat
     }
+  }
+
+  // Health insurance priority check (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenkasse')
+  // categorized as Healthcare rather than falling into general Insurance or Other
+  if (GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
+    if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Healthcare')
+    return 'Healthcare'
   }
 
   // 4. General category matching

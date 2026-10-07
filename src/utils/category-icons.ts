@@ -233,6 +233,9 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
         nameTrimmed,
       )
 
+    const isHealthInsurance =
+      /(?:\b(?:krankenvers\w*|krankenkasse\w*)\b)/i.test(nameTrimmed)
+
     return {
       merchant,
       logoComponent,
@@ -241,7 +244,9 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
         ? 'Salary'
         : isBankFeeOrRefund
           ? 'Bank Fees'
-          : merchant.category,
+          : merchant.category === 'Insurance' && isHealthInsurance
+            ? 'Healthcare'
+            : merchant.category,
       initials,
     }
   }

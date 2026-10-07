@@ -140,7 +140,9 @@
 .iconBox svg[aria-label*="Bad Nauheim" i],
 .iconBox svg[aria-label*="Hochtaunuskreis" i],
 .iconBox svg[aria-label*="Edukativni Centar" i],
-.iconBox svg[aria-label*="Rani Razvoj" i] {
+.iconBox svg[aria-label*="Rani Razvoj" i],
+.iconBox svg[aria-label="CHECK24"],
+.iconBox svg[aria-label*="CHECK24" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;

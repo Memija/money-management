@@ -1663,6 +1663,15 @@ describe('category-utils', () => {
         expect(categorize('Anel Memic Geld zurück')).toBe('Transfers')
         expect(categorize('CD-SCT-20260401-12345 Max Mustermann')).toBe('Transfers')
         expect(categorize('SEPA-Überweisung an Max Mustermann')).toBe('Transfers')
+
+        // Joint account / family transfers
+        expect(categorize('Anel o. Biljana Memic')).toBe('Transfers')
+        expect(categorize('ANEL O. BILJANA MEMIC')).toBe('Transfers')
+        expect(categorize('Anel oder Biljana Memic')).toBe('Transfers')
+        expect(categorize('Biljana o. Anel Memic')).toBe('Transfers')
+        expect(categorize('Anel / Biljana Memic')).toBe('Transfers')
+        expect(categorize('Anel & Biljana Memic')).toBe('Transfers')
+        expect(categorize('Anel Memic o. Biljana Memic')).toBe('Transfers')
         expect(
           categorize('Finanzamt Frankfurt am Main End-to-End-Ref.: CCB.321.UE.998877'),
         ).toBe('Taxes')
@@ -1889,7 +1898,7 @@ describe('category-utils', () => {
     })
 
     describe('insurance provider and camelCase policy categorization', () => {
-      it('categorizes iptiQ and AeguronRisikoLV bank bookings as Insurance', () => {
+      it('categorizes Aeguron and AeguronRisikoLV bank bookings as Insurance', () => {
         expect(
           categorize(
             'IPTIQ LIFE SA NIEDERLASSUNG DEUTSCH LAND AeguronRisikoLV 09/26 6267061-P End-to-End-R',
@@ -2307,14 +2316,21 @@ describe('category-utils', () => {
           ),
         ).toBe('Insurance')
         expect(categorize('Haftpflichtkasse Darmstadt Beitrag')).toBe('Insurance')
-        expect(categorize('Debeka Krankenversicherung a.G.')).toBe('Insurance')
+        expect(categorize('Debeka Versicherung a.G.')).toBe('Insurance')
         expect(categorize('ERGO Versicherung AG')).toBe('Insurance')
         expect(categorize('AXA Konzern AG Beitrag')).toBe('Insurance')
+        expect(
+          categorize(
+            'AXA Versicherung Aktiengesellschaft Kfz-Versicherung 88331191217 MTK-BA  117 BTR. 04/22 89,52 EUR End-to-End-Ref.: 580024561334/0001 Mandatsref: 21054199212 Gläubiger-ID: DE23G0100000066097 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Insurance')
+        expect(categorize('AXA Kfz-Versicherung')).toBe('Insurance')
+        expect(categorize('Kfz-Versicherung Beitrag')).toBe('Insurance')
         expect(categorize('Generali Deutschland Versicherung')).toBe('Insurance')
         expect(categorize('R+V Allgemeine Versicherung AG')).toBe('Insurance')
         expect(categorize('Signal Iduna Gruppe')).toBe('Insurance')
         expect(categorize('HanseMerkur Versicherung')).toBe('Insurance')
-        expect(categorize('Barmenia Krankenversicherung')).toBe('Insurance')
+        expect(categorize('Barmenia Versicherung')).toBe('Insurance')
         expect(categorize('Gothaer Allgemeine Versicherung')).toBe('Insurance')
         expect(categorize('ARAG SE Rechtsschutz')).toBe('Insurance')
         expect(categorize('DEVK Versicherungen')).toBe('Insurance')
@@ -2351,13 +2367,25 @@ describe('category-utils', () => {
         expect(categorize('Main-Taunus-Kreis Kreiskasse Gebühren')).toBe('Taxes')
       })
 
-      it('categorizes Münchener Verein Krankenversicherung as Healthcare', () => {
+      it('categorizes AXA Krankenversicherung, Krankenvers., and other health insurance as Healthcare', () => {
+        expect(
+          categorize(
+            'AXA Krankenversicherung Aktiengesel Krankenvers. 493886204X ERSTBTR 10/ 21 9,17 EUR End-to-End-Ref.: 545020471096/0003 Mandatsref: 21054199212 Gläubiger-ID: DE23G0100000066097 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Healthcare')
+        expect(categorize('AXA Krankenversicherung')).toBe('Healthcare')
+        expect(categorize('Krankenvers. 493886204X ERSTBTR 10/ 21')).toBe('Healthcare')
+        expect(categorize('Krankenvers Beitrag')).toBe('Healthcare')
+        expect(categorize('Debeka Krankenversicherung a.G.')).toBe('Healthcare')
+        expect(categorize('Barmenia Krankenversicherung')).toBe('Healthcare')
         expect(
           categorize(
             'Muenchener VEREIN Krankenversicheru ng a. Kundennummer S88063 KV1003 17,46 End-to-End-Ref.',
           ),
         ).toBe('Healthcare')
         expect(categorize('Münchener Verein Krankenversicherung a.G.')).toBe('Healthcare')
+        expect(categorize('Techniker Krankenkasse Beitrag')).toBe('Healthcare')
+        expect(categorize('Barmer Krankenkasse')).toBe('Healthcare')
       })
 
       it('categorizes WebID Solutions, IDnow, POSTIDENT, and Verimi as Bank Fees', () => {
@@ -2395,7 +2423,7 @@ describe('category-utils', () => {
         expect(categorize('Alte Leipziger Lebensversicherung')).toBe('Savings')
       })
 
-      it('categorizes Aeguron, iptiQ, WGV and related community/term life insurers as Insurance', () => {
+      it('categorizes Aeguron, WGV and related community/term life insurers as Insurance', () => {
         expect(
           categorize(
             'Aeguron Risiko-Lebensversicherung AeguronRisikoLV 02/26 6267061-P End-to-End-Ref.: 89c9c867',

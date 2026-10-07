@@ -129,6 +129,7 @@ import { PROPERTY_LOGOS } from './property-logos'
 import {
   BauhausLogo,
   CadoozLogo,
+  CHECK24Logo,
   Check24Logo,
   DellLogo,
   HornbachLogo,
@@ -290,6 +291,10 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   schauinsland: SchauinslandLogo,
   Schauinsland: SchauinslandLogo,
   Check24Logo,
+  CHECK24Logo,
+  check24Logo: Check24Logo,
+  'check24': Check24Logo,
+  'CHECK24': Check24Logo,
   SumupLogo,
   SiDhl, SiDeutschepost, SiDazn, SiSky,
   BeitragsserviceLogo, TkLogo, AokLogo, EinsUndEinsLogo,

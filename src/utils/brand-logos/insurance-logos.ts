@@ -116,12 +116,6 @@ export const WgvLogo = createImageLogo({
   displayName: 'WgvLogo',
 })
 
-/** iptiQ Life S.A. — digital life insurer (Swiss Re Group). */
-export const IptiqLogo = createImageLogo({
-  src: '/brands/iptiq.png',
-  label: 'iptiQ',
-  displayName: 'IptiqLogo',
-})
 
 /** Aeguron — digital term life insurance (iptiQ Life / Aurum Protect). */
 export const AeguronLogo = createImageLogo({
@@ -220,8 +214,6 @@ export const INSURANCE_LOGOS: Record<string, IconComponent> = {
   CosmosDirektLogo,
   WgvLogo,
   WGVLogo: WgvLogo,
-  IptiqLogo,
-  IPTIQLogo: IptiqLogo,
   AeguronLogo,
   AEGURONLogo: AeguronLogo,
   SwissReLogo,

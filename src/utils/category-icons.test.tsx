@@ -716,9 +716,12 @@ describe('category-icons', () => {
       ['JYSK GmbH', 'jysk', 'JyskLogo', 'Shopping'],
       ['Turnverein Dornholzhausen 1918 e.V. Sammelbuchung TV Dornholzhausen/Ts. 1918 e.V., Memic Anel', 'tv-dornholzhausen', 'TvDornholzhausenLogo', 'Healthcare'],
       ['Die Haftpflichtkasse VVaG 60603542 / Unfall Beitrag 23.01.25 - meine-hk.de - Jetzt anmelden und Re', 'haftpflichtkasse', 'HaftpflichtkasseLogo', 'Insurance'],
-      ['Debeka Krankenversicherung', 'debeka', 'DebekaLogo', 'Insurance'],
+      ['Debeka Versicherung', 'debeka', 'DebekaLogo', 'Insurance'],
+      ['AXA Krankenversicherung Aktiengesel Krankenvers. 493886204X ERSTBTR 10/ 21 9,17 EUR End-to-End-Ref.: 545020471096/0003 Mandatsref: 21054199212 Gläubiger-ID: DE23G0100000066097 SEPA-BASISLASTSCHRIFT wiederholend', 'axa', 'AxaLogo', 'Healthcare'],
+      ['Debeka Krankenversicherung a.G.', 'debeka', 'DebekaLogo', 'Healthcare'],
       ['ERGO Versicherung', 'ergo', 'ErgoLogo', 'Insurance'],
       ['AXA Konzern AG', 'axa', 'AxaLogo', 'Insurance'],
+      ['AXA Versicherung Aktiengesellschaft Kfz-Versicherung 88331191217 MTK-BA  117 BTR. 04/22 89,52 EUR End-to-End-Ref.: 580024561334/0001 Mandatsref: 21054199212 Gläubiger-ID: DE23G0100000066097 SEPA-BASISLASTSCHRIFT wiederholend', 'axa', 'AxaLogo', 'Insurance'],
       ['Generali Versicherung', 'generali', 'GeneraliLogo', 'Insurance'],
       ['R+V Versicherung AG', 'ruv', 'RuvLogo', 'Insurance'],
       ['Signal Iduna Gruppe', 'signal-iduna', 'SignalIdunaLogo', 'Insurance'],
@@ -747,7 +750,7 @@ describe('category-icons', () => {
       ['Canada Life Assurance Europe', 'canada-life', 'CanadaLifeLogo', 'Savings'],
       ['Alte Leipziger Lebensversicherung', 'alte-leipziger', 'AlteLeipzigerLogo', 'Savings'],
       ['Aeguron Risiko-Lebensversicherung AeguronRisikoLV 02/26 6267061-P End-to-End-Ref.: 89c9c867', 'aeguron', 'AeguronLogo', 'Insurance'],
-      ['iptiQ Life SA AeguronRisikoLV 04/26 6267061-P End-to-End-Ref.: de3e4c7022094659943152a87c2', 'iptiq', 'IptiqLogo', 'Insurance'],
+      ['iptiQ Life SA AeguronRisikoLV 04/26 6267061-P End-to-End-Ref.: de3e4c7022094659943152a87c2', 'aeguron', 'AeguronLogo', 'Insurance'],
       ['WGV-Wuertt. Gemeinde-Versicherung MTK-BA 117 V90092776488 01.06.2025- 01.07.2025 End-to-E', 'wgv', 'WgvLogo', 'Insurance'],
       ['Hannoversche Lebensversicherung AG', 'hannoversche', 'HannoverscheLogo', 'Insurance'],
       ['Provinzial Versicherung AG', 'provinzial', 'ProvinzialLogo', 'Insurance'],
@@ -3014,6 +3017,33 @@ describe('category-icons', () => {
       expect(htkImg?.getAttribute('data-brand-logo')).toBe('true')
       expect(htkImg?.classList.contains('brand-logo-full')).toBe(true)
       expect(htkImg?.style.borderRadius).toBe('inherit')
+    })
+
+    it('renders Check24Logo with full-bleed attributes and matches CHECK24 cashback transactions', () => {
+      const { Check24Logo } = MERCHANT_LOGOS
+      expect(Check24Logo).toBeTruthy()
+
+      // Render Check24Logo directly
+      const { container: c24Container } = render(React.createElement(Check24Logo, { size: 20 }))
+      const c24Svg = c24Container.querySelector('svg')
+      expect(c24Svg).toBeTruthy()
+      expect(c24Svg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(c24Svg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(c24Svg?.style.borderRadius).toBe('inherit')
+      expect(c24Svg?.getAttribute('aria-label')).toBe('CHECK24')
+
+      // Render via getCategoryIcon with user transaction description
+      const txDesc =
+        'CHECK24 Vergleichsportal für Kranke nversicherungen GmbH CHECK24 Cashback - fuer Ihre Zahnzu satzversicherung: 10338717 End-to-End-Ref.: 235790923429 Kundenreferenz: 617207769488'
+      const { container: txContainer } = render(
+        <div>{getCategoryIcon('Shopping', 20, undefined, txDesc)}</div>,
+      )
+      const txSvg = txContainer.querySelector('svg')
+      expect(txSvg).toBeTruthy()
+      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(txSvg?.style.borderRadius).toBe('inherit')
+      expect(txSvg?.getAttribute('aria-label')).toBe('CHECK24')
     })
   })
 })

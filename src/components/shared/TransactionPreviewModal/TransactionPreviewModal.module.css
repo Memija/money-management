@@ -2074,7 +2074,9 @@
 .icon-avatar svg[aria-label*="Bad Nauheim" i],
 .icon-avatar svg[aria-label*="Hochtaunuskreis" i],
 .icon-avatar svg[aria-label*="Edukativni Centar" i],
-.icon-avatar svg[aria-label*="Rani Razvoj" i] {
+.icon-avatar svg[aria-label*="Rani Razvoj" i],
+.icon-avatar svg[aria-label="CHECK24"],
+.icon-avatar svg[aria-label*="CHECK24" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;

@@ -420,7 +420,9 @@
 .logoBox svg[aria-label*="Bad Nauheim" i],
 .logoBox svg[aria-label*="Hochtaunuskreis" i],
 .logoBox svg[aria-label*="Edukativni Centar" i],
-.logoBox svg[aria-label*="Rani Razvoj" i] {
+.logoBox svg[aria-label*="Rani Razvoj" i],
+.logoBox svg[aria-label="CHECK24"],
+.logoBox svg[aria-label*="CHECK24" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
@@ -748,7 +750,9 @@
 .tooltipLogoBox svg[aria-label*="Bad Nauheim" i],
 .tooltipLogoBox svg[aria-label*="Hochtaunuskreis" i],
 .tooltipLogoBox svg[aria-label*="Edukativni Centar" i],
-.tooltipLogoBox svg[aria-label*="Rani Razvoj" i] {
+.tooltipLogoBox svg[aria-label*="Rani Razvoj" i],
+.tooltipLogoBox svg[aria-label="CHECK24"],
+.tooltipLogoBox svg[aria-label*="CHECK24" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
