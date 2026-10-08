@@ -2922,12 +2922,19 @@ describe('category-utils', () => {
           ),
         ).toBe('Entertainment')
 
-        // 3. Avaaz Foundation -> Shopping
+        // 3. Avaaz Foundation -> Donations
         expect(
           categorize(
             'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Avaaz Foundation, Ihr Einkauf bei Avaaz Foundatio',
           ),
-        ).toBe('Shopping')
+        ).toBe('Donations')
+
+        // 3b. Exact statement: Avaaz Foundation donation via PayPal SEPA Direct Debit -> Donations
+        expect(
+          categorize(
+            'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Avaaz Foundation, Ihr Einkauf bei Avaaz Foundation End-to-End-Ref.: 1016748328387 PP.4585.PP PAYPAL Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Donations')
 
         // 4. Direct PayPal account debit (ABBUCHUNG VOM PAYPAL-KO NTO) -> Transfers
         expect(
@@ -3071,12 +3078,12 @@ describe('category-utils', () => {
           ),
         ).toBe('Education')
 
-        // 18. Deutscher Caritasverband e. V. -> Shopping
+        // 18. Deutscher Caritasverband e. V. -> Donations
         expect(
           categorize(
             'PayPal Europe S.a.r.l. et Cie S.C.A 1038041208163/PP.4585.PP/. Deutsche r Caritasverband e. V. / Cari',
           ),
-        ).toBe('Shopping')
+        ).toBe('Donations')
 
         // 19. NAGA Markets Europe Ltd -> Savings
         expect(

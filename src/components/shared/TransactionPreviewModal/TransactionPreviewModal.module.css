@@ -2101,7 +2101,18 @@
 .icon-avatar svg[aria-label*="Feinkost" i],
 .icon-avatar svg[aria-label*="Dino" i],
 .icon-avatar svg[aria-label*="Bingo" i],
-.icon-avatar svg[aria-label*="Konzum" i] {
+.icon-avatar svg[aria-label*="Konzum" i],
+.icon-avatar svg[aria-label*="PayPal" i],
+.icon-avatar svg[aria-label*="Google Pay" i],
+.icon-avatar svg[aria-label*="GPay" i],
+.icon-avatar svg[aria-label*="G Pay" i],
+.icon-avatar img[aria-label*="Google Pay" i],
+.icon-avatar img[aria-label*="GPay" i],
+.icon-avatar img[aria-label*="G Pay" i],
+.icon-avatar svg[aria-label*="Amazon" i],
+.icon-avatar svg[aria-label*="INTRA-TEC" i],
+.icon-avatar svg[aria-label*="eBay" i],
+.icon-avatar svg[aria-label*="IKEA" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;

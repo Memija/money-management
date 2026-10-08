@@ -21,6 +21,7 @@ export const DEFAULT_CATEGORY_KEYS = [
   'Travel',
   'Crypto',
   'Bank Fees',
+  'Donations',
   'Other',
 ] as const
 
@@ -48,5 +49,6 @@ export const categoryI18nKeys: Record<string, keyof TranslationStrings> = {
   'Bank Fees': 'catBankFees',
   BankFees: 'catBankFees',
   Fees: 'catBankFees',
+  Donations: 'catDonations',
   Other: 'catOther',
 }

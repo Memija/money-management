@@ -74,6 +74,13 @@ export const Home24Logo = createImageLogo({
   displayName: 'Home24Logo',
 })
 
+/** IKEA — official Swedish brand logo tile. */
+export const IkeaLogo = createImageLogo({
+  src: '/brands/ikea.svg',
+  label: 'IKEA',
+  displayName: 'IkeaLogo',
+})
+
 export const FURNITURE_LOGOS: Record<string, IconComponent> = {
   PocoLogo,
   XxxlutzLogo,
@@ -91,5 +98,10 @@ export const FURNITURE_LOGOS: Record<string, IconComponent> = {
   home24Logo: Home24Logo,
   'home24': Home24Logo,
   'home24-se': Home24Logo,
+  IkeaLogo,
+  IKEALogo: IkeaLogo,
+  SiIkea: IkeaLogo,
+  'ikea': IkeaLogo,
 }
+
 

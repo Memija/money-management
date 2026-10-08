@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <rect width="48" height="48" fill="#007A3D" />
+  <text x="24" y="26" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="15" fill="#E30613" text-anchor="middle" dominant-baseline="central" letter-spacing="-0.5">dino</text>
+  <circle cx="21" cy="18" r="1.8" fill="#FED100" />
+</svg>

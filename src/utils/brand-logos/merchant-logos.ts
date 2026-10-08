@@ -1,13 +1,13 @@
-import { FaAmazon, FaAws, FaMicrosoft } from 'react-icons/fa'
+import { FaAws, FaMicrosoft } from 'react-icons/fa'
 import {
   SiAcer, SiAirbnb, SiAircanada, SiAirfrance, SiAldisud, SiAliexpress, SiAllegro, SiAmd, SiAmericanairlines, SiApple, SiApplepay, SiAsda, SiAsus, SiAuchan,
   SiBankofamerica, SiBarclays, SiBinance, SiBose, SiBritishairways, SiBunq, SiBurgerking, SiCarrefour,
   SiCashapp, SiChase, SiCloudflare, SiCoinbase, SiCoop, SiCorsair, SiDazn, SiDeliveroo,
-  SiDelta, SiDeutschebank, SiDeutschepost, SiDeutschetelekom, SiDhl, SiDigitalocean, SiDiscord, SiDm, SiDoordash, SiDuolingo, SiEasyjet, SiEbay, SiEdeka,
-  SiEmirates, SiEpicgames, SiEpson, SiEtihadairways, SiEtsy, SiExpedia, SiFiat, SiFord, SiFreenet, SiGithub, SiGlovo, SiGojek, SiGooglepay, SiGrab, SiHellofresh, SiHetzner, SiHilton, SiHonda, SiHotelsdotcom, SiHp, SiHsbc, SiHuawei, SiHyundai, SiIkea, SiIntel, SiIonos, SiJusteat, SiKaufland, SiKfc,
+  SiDelta, SiDeutschebank, SiDeutschepost, SiDeutschetelekom, SiDhl, SiDigitalocean, SiDiscord, SiDm, SiDoordash, SiDuolingo, SiEasyjet, SiEdeka,
+  SiEmirates, SiEpicgames, SiEpson, SiEtihadairways, SiEtsy, SiExpedia, SiFiat, SiFord, SiFreenet, SiGithub, SiGlovo, SiGojek, SiGrab, SiHellofresh, SiHetzner, SiHilton, SiHonda, SiHotelsdotcom, SiHp, SiHsbc, SiHuawei, SiHyundai, SiIntel, SiIonos, SiJusteat, SiKaufland, SiKfc,
   SiKia, SiKlarna, SiKlm, SiLenovo, SiLg, SiLidl, SiLufthansa, SiLyft, SiMarriott, SiMastercard, SiMazda, SiMcdonalds, SiMediamarkt, SiMoneygram, SiMonzo,
-  SiMorrisons, SiMsi, SiN26, SiNetcup, SiNetflix, SiNetto, SiNike, SiNissan, SiNvidia, SiO2, SiOpel, SiOrange, SiOvh, SiPayoneer, SiPaypal, SiPenny,
-  SiPeugeot, SiPlaystation, SiQantas, SiQatarairways, SiRazer, SiRenault, SiRevolut, SiRewe, SiRossmann, SiRyanair, SiSamsung, SiSeagate, SiSeat, SiSennheiser, SiShopee, SiSingaporeairlines, SiSkoda, SiSky, SiSony, SiSouthwestairlines, SiSparkasse,
+  SiMorrisons, SiMsi, SiN26, SiNetcup, SiNetflix, SiNetto, SiNike, SiNissan, SiNvidia, SiO2, SiOpel, SiOrange, SiOvh, SiPayoneer, SiPenny,
+  SiPeugeot, SiPlaystation, SiQantas, SiQatarairways, SiRazer, SiRenault, SiRevolut, SiRewe, SiRossmann, SiRyanair, SiSeagate, SiSeat, SiSennheiser, SiShopee, SiSingaporeairlines, SiSkoda, SiSky, SiSony, SiSouthwestairlines, SiSparkasse,
   SiSpotify, SiStarbucks, SiStarlingbank, SiSteam, SiStrava, SiStripe, SiTarget, SiTesco, SiToyota, SiTripadvisor, SiTrivago, SiTurkishairlines, SiTwitch, SiUber,
   SiUbereats, SiUnitedairlines, SiVenmo, SiVercel, SiVinted, SiVisa, SiVodafone, SiVolvo,
   SiWesternunion, SiWise, SiWizzair, SiXiaomi, SiYoutube,
@@ -85,7 +85,7 @@ import { DIY_LOGOS } from './diy-logos'
 import { ENERGY_GRID_LOGOS } from './energy-grid-logos'
 import { ENTERTAINMENT_LOGOS } from './entertainment-logos'
 import { FASHION_LOGOS } from './fashion-logos'
-import { FURNITURE_LOGOS } from './furniture-logos'
+import { FURNITURE_LOGOS, IkeaLogo } from './furniture-logos'
 import {
   BadenWuerttembergFlagLogo,
   BayernFlagLogo,
@@ -122,20 +122,23 @@ import {
   FaerberHutzelLogo,
 } from './legal-logos'
 import { MOTORWAY_LOGOS } from './motorway-logos'
-import { PAYMENT_LOGOS } from './payment-logos'
+import { GooglePayLogo, PAYMENT_LOGOS, PaypalLogo } from './payment-logos'
 import { PENSION_LOGOS } from './pension-logos'
 import { PORTUGUESE_LOGOS } from './portuguese-logos'
 import { PROPERTY_LOGOS } from './property-logos'
 import {
+  AmazonLogo,
   BauhausLogo,
   CadoozLogo,
   CHECK24Logo,
   Check24Logo,
   DellLogo,
+  EbayLogo,
   HornbachLogo,
   IntratecLogo,
   ObiLogo,
   PaybackLogo,
+  SamsungLogo,
   SumupLogo,
   TchiboLogo,
 } from './retail-logos'
@@ -213,7 +216,17 @@ import { VARIETY_STORE_LOGOS } from './variety-store-logos'
 
 export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiNetflix, SiSpotify, SiUber, SiStarbucks, SiSteam, SiMcdonalds,
-  SiIkea, SiApple, SiPaypal, SiAirbnb, SiNike, SiDm, SiRewe,
+  IkeaLogo,
+  SiIkea: IkeaLogo,
+  'ikea': IkeaLogo,
+  'IKEA': IkeaLogo,
+  SiApple,
+  PaypalLogo,
+  PayPalLogo: PaypalLogo,
+  SiPaypal: PaypalLogo,
+  'paypal': PaypalLogo,
+  'PayPal': PaypalLogo,
+  SiAirbnb, SiNike, SiDm, SiRewe,
   SiKaufland,
   ShellLogo,
   SiShell: ShellLogo,
@@ -225,14 +238,23 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   db: DbLogo,
   DB: DbLogo,
   SiDeutschetelekom, SiVodafone, SiO2,
-  FaAmazon, SiAldisud,
+  AmazonLogo,
+  FaAmazon: AmazonLogo,
+  'amazon': AmazonLogo,
+  'Amazon': AmazonLogo,
+  SiAldisud,
   AralLogo,
   SiAral: AralLogo,
   aral: AralLogo,
   Aral: AralLogo,
   SiEdeka, SiLidl,
   SiZalando, SiTesco, SiShopee, SiOrange, SiGrab, SiGojek, SiDeliveroo,
-  SiCarrefour, SiAllegro, SiJusteat, SiEbay, SiAuchan,
+  SiCarrefour, SiAllegro, SiJusteat,
+  EbayLogo,
+  SiEbay: EbayLogo,
+  'ebay': EbayLogo,
+  'eBay': EbayLogo,
+  SiAuchan,
   BookingLogo,
   BookingDotComLogo: BookingLogo,
   SiBookingdotcom: BookingLogo,
@@ -246,7 +268,15 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   commerzbank: CommerzbankLogo,
   Commerzbank: CommerzbankLogo,
   SiDeutschebank, SiGlovo,
-  SiGooglepay, SiHsbc, SiMonzo, SiPayoneer, SiStripe, SiVenmo,
+  GooglePayLogo,
+  SiGooglepay: GooglePayLogo,
+  GooglepayLogo: GooglePayLogo,
+  GPayLogo: GooglePayLogo,
+  'google-pay': GooglePayLogo,
+  'google pay': GooglePayLogo,
+  'gpay': GooglePayLogo,
+  'GPay': GooglePayLogo,
+  SiHsbc, SiMonzo, SiPayoneer, SiStripe, SiVenmo,
   SiRossmann, SiMediamarkt, SiVinted, SiAliexpress, SiEtsy, SiHellofresh,
   SiBunq, SiStarlingbank, SiEpicgames, SiDiscord, SiGithub, SiDuolingo, SiStrava,
   ComdirectLogo, DkbLogo, IngLogo, PostbankLogo, TradeRepublicLogo,
@@ -317,7 +347,9 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiHp,
   HpLogo,
   SiLenovo,
-  SiSamsung,
+  SamsungLogo,
+  samsung: SamsungLogo,
+  SiSamsung: SamsungLogo,
   SiAsus,
   SiAcer,
   AcerLogo: SiAcer,
@@ -565,4 +597,5 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
 }
 
 export { BaeckereiMoosLogo, OkkaBakeryLogo } from './dining-logos'
+export { AmazonLogo, EbayLogo, GooglePayLogo, IkeaLogo, IntratecLogo, PaypalLogo }
 

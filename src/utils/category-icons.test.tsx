@@ -174,6 +174,10 @@ describe('category-icons', () => {
         { category: 'Kawa', expectedIcon: AVAILABLE_ICONS.Coffee },
         { category: 'Kopi', expectedIcon: AVAILABLE_ICONS.Coffee },
         { category: 'Кафа', expectedIcon: AVAILABLE_ICONS.Coffee },
+        { category: 'Donations', expectedIcon: AVAILABLE_ICONS.Heart },
+        { category: 'Spenden', expectedIcon: AVAILABLE_ICONS.Heart },
+        { category: 'Donacije', expectedIcon: AVAILABLE_ICONS.Heart },
+        { category: 'Darowizny', expectedIcon: AVAILABLE_ICONS.Heart },
       ]
 
       for (const { category, expectedIcon } of testCases) {
@@ -453,6 +457,15 @@ describe('category-icons', () => {
       expect(boseInfo.logoComponent).toBe(MERCHANT_LOGOS.SiBose)
       expect(boseInfo.brandColor).toBe('#000000')
       expect(boseInfo.suggestedCategory).toBe('Shopping')
+
+      // Samsung
+      const samsungInfo = getMerchantBrandInfo('Samsung Shop Online Store')
+      expect(samsungInfo.merchant?.id).toBe('samsung')
+      expect(samsungInfo.logoComponent).toBe(MERCHANT_LOGOS.SamsungLogo)
+      expect(samsungInfo.brandColor).toBe('#1428A0')
+      expect(samsungInfo.suggestedCategory).toBe('Shopping')
+      const samsungIcon = getCategoryIcon('Shopping', 20, undefined, 'Samsung Electronics purchase')
+      expect(samsungIcon).toBeDefined()
     })
 
     it('matches fair parken and EasyPark logos for parking transactions', () => {
@@ -1028,9 +1041,9 @@ describe('category-icons', () => {
           )}
         </div>,
       )
-      const svg = container.querySelector('svg')
-      expect(svg).toBeInTheDocument()
-      expect(svg).toHaveAttribute('aria-label', 'INTRA-TEC')
+      const logo = container.querySelector('[aria-label="INTRA-TEC"]')
+      expect(logo).toBeInTheDocument()
+      expect(logo).toHaveAttribute('aria-label', 'INTRA-TEC')
     })
 
     it('matches GermanyFlagLogo for Finanzamt and FA Nidda tax return transactions', () => {
@@ -2220,14 +2233,14 @@ describe('category-icons', () => {
       expect(xsollaInfo.suggestedCategory).toBe('Entertainment')
       expect(xsollaInfo.initials).toBe('XS')
 
-      // 3. Avaaz Foundation -> Avaaz (Shopping, AvaazLogo)
+      // 3. Avaaz Foundation -> Avaaz (Donations, AvaazLogo)
       const avaazTx =
         'PayPal (Europe) S.a.r.l. et Cie., S .C.A. PP.4585.PP . Avaaz Foundation, Ihr Einkauf bei Avaaz Foundatio'
       const avaazInfo = getMerchantBrandInfo(avaazTx)
       expect(avaazInfo.merchant?.id).toBe('avaaz')
       expect(avaazInfo.merchant?.name).toBe('Avaaz')
       expect(avaazInfo.logoComponent).toBe(MERCHANT_LOGOS.AvaazLogo)
-      expect(avaazInfo.suggestedCategory).toBe('Shopping')
+      expect(avaazInfo.suggestedCategory).toBe('Donations')
       expect(avaazInfo.initials).toBe('AV')
 
       // 4. Direct PayPal account debit (ABBUCHUNG VOM PAYPAL-KO NTO) -> PayPal (Transfers, SiPaypal)
@@ -2290,7 +2303,7 @@ describe('category-icons', () => {
 
       // 3. AvaazLogo
       const { container: c3 } = render(
-        <div>{getCategoryIcon('Shopping', 24, undefined, 'Avaaz Foundation Donation')}</div>,
+        <div>{getCategoryIcon('Donations', 24, undefined, 'Avaaz Foundation Donation')}</div>,
       )
       const img3 = c3.querySelector('img')
       expect(img3).toBeInTheDocument()
@@ -2444,7 +2457,7 @@ describe('category-icons', () => {
       )
       expect(caritasInfo.merchant?.name).toBe('Caritas')
       expect(caritasInfo.logoComponent).toBe(MERCHANT_LOGOS.CaritasLogo)
-      expect(caritasInfo.suggestedCategory).toBe('Shopping')
+      expect(caritasInfo.suggestedCategory).toBe('Donations')
 
       // 19. NAGA
       const nagaInfo = getMerchantBrandInfo(
@@ -3062,24 +3075,25 @@ describe('category-icons', () => {
       expect(AldiLogo).toBe(AldiSudLogo)
 
       const { container: aldiSudContainer } = render(React.createElement(AldiSudLogo, { size: 24 }))
-      const aldiSudSvg = aldiSudContainer.querySelector('svg')
-      expect(aldiSudSvg).toBeTruthy()
-      expect(aldiSudSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(aldiSudSvg?.classList.contains('brand-logo-full')).toBe(true)
-      expect(aldiSudSvg?.style.borderRadius).toBe('inherit')
-      expect(aldiSudSvg?.getAttribute('aria-label')).toBe('ALDI SÜD')
+      const aldiSudImg = aldiSudContainer.querySelector('img')
+      expect(aldiSudImg).toBeTruthy()
+      expect(aldiSudImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(aldiSudImg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(aldiSudImg?.getAttribute('aria-label')).toBe('ALDI SÜD')
+      expect(aldiSudImg?.getAttribute('src')).toBe('/brands/aldi-sud.svg')
 
       // Render via getCategoryIcon with the user's transaction description
       const { container: txContainer } = render(
         <div>{getCategoryIcon('Groceries', 24, undefined, tx)}</div>,
       )
-      const txSvg = txContainer.querySelector('svg')
-      expect(txSvg).toBeTruthy()
-      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(txSvg?.getAttribute('aria-label')).toBe('ALDI SÜD')
+      const txImg = txContainer.querySelector('img')
+      expect(txImg).toBeTruthy()
+      expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txImg?.getAttribute('aria-label')).toBe('ALDI SÜD')
+      expect(txImg?.getAttribute('src')).toBe('/brands/aldi-sud.svg')
     })
 
-    it('matches Lidl and renders proper authentic vector Lidl logo', () => {
+    it('matches Lidl and renders official brand Lidl logo', () => {
       const tx = 'LIDL Dienstleistung GmbH & Co. KG Filiale 1234'
       const brandInfo = getMerchantBrandInfo(tx)
       expect(brandInfo.merchant?.id).toBe('lidl')
@@ -3093,24 +3107,25 @@ describe('category-icons', () => {
       expect(SiLidl).toBe(LidlLogo)
 
       const { container: lidlContainer } = render(React.createElement(LidlLogo, { size: 24 }))
-      const lidlSvg = lidlContainer.querySelector('svg')
-      expect(lidlSvg).toBeTruthy()
-      expect(lidlSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(lidlSvg?.classList.contains('brand-logo-full')).toBe(true)
-      expect(lidlSvg?.style.borderRadius).toBe('inherit')
-      expect(lidlSvg?.getAttribute('aria-label')).toBe('Lidl')
+      const lidlImg = lidlContainer.querySelector('img')
+      expect(lidlImg).toBeTruthy()
+      expect(lidlImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(lidlImg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(lidlImg?.getAttribute('aria-label')).toBe('Lidl')
+      expect(lidlImg?.getAttribute('src')).toBe('/brands/lidl.svg')
 
       // Render via getCategoryIcon with transaction description
       const { container: txContainer } = render(
         <div>{getCategoryIcon('Groceries', 24, undefined, tx)}</div>,
       )
-      const txSvg = txContainer.querySelector('svg')
-      expect(txSvg).toBeTruthy()
-      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(txSvg?.getAttribute('aria-label')).toBe('Lidl')
+      const txImg = txContainer.querySelector('img')
+      expect(txImg).toBeTruthy()
+      expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txImg?.getAttribute('aria-label')).toBe('Lidl')
+      expect(txImg?.getAttribute('src')).toBe('/brands/lidl.svg')
     })
 
-    it('matches ANADOLU SUPERMARKT and renders authentic vector storefront logo', () => {
+    it('matches ANADOLU SUPERMARKT and renders official brand logo', () => {
       const tx =
         'ANADOLU SUPERMARKT GIR 69287732//BA 2022-06-23T11:25:33 KFN 0  VJ 2412 Kartenzahlung'
       const brandInfo = getMerchantBrandInfo(tx)
@@ -3127,21 +3142,22 @@ describe('category-icons', () => {
       const { container: logoContainer } = render(
         React.createElement(AnadoluSupermarktLogo, { size: 24 }),
       )
-      const logoSvg = logoContainer.querySelector('svg')
-      expect(logoSvg).toBeTruthy()
-      expect(logoSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(logoSvg?.classList.contains('brand-logo-full')).toBe(true)
-      expect(logoSvg?.style.borderRadius).toBe('inherit')
-      expect(logoSvg?.getAttribute('aria-label')).toBe('Anadolu Supermarkt')
+      const logoImg = logoContainer.querySelector('img')
+      expect(logoImg).toBeTruthy()
+      expect(logoImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(logoImg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(logoImg?.getAttribute('aria-label')).toBe('Anadolu Supermarkt')
+      expect(logoImg?.getAttribute('src')).toBe('/brands/anadolu.png')
 
       // Render via getCategoryIcon with the user's exact transaction string
       const { container: txContainer } = render(
         <div>{getCategoryIcon('Groceries', 24, undefined, tx)}</div>,
       )
-      const txSvg = txContainer.querySelector('svg')
-      expect(txSvg).toBeTruthy()
-      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(txSvg?.getAttribute('aria-label')).toBe('Anadolu Supermarkt')
+      const txImg = txContainer.querySelector('img')
+      expect(txImg).toBeTruthy()
+      expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txImg?.getAttribute('aria-label')).toBe('Anadolu Supermarkt')
+      expect(txImg?.getAttribute('src')).toBe('/brands/anadolu.png')
     })
 
     it('matches MAXI RESTORAN DESETKA and categorizes as Dining Out with Restoran Desetka logo', () => {
@@ -3209,6 +3225,39 @@ describe('category-icons', () => {
       expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
       expect(txImg?.getAttribute('aria-label')).toBe('SPAR')
       expect(txImg?.getAttribute('src')).toBe('/brands/spar.png')
+    })
+
+    it('resolves and renders official GooglePayLogo asset correctly for Google Pay transactions', () => {
+      const tx = 'GOOGLE *PAY SERVICES 2024-03-01'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.name).toBe('Google Pay')
+      expect(brandInfo.brandColor).toBe('#4285F4')
+
+      // Verify MERCHANT_LOGOS mapping
+      const { GooglePayLogo, SiGooglepay } = MERCHANT_LOGOS
+      expect(GooglePayLogo).toBeTruthy()
+      expect(SiGooglepay).toBe(GooglePayLogo)
+
+      // Render GooglePayLogo directly
+      const { container: logoContainer } = render(
+        React.createElement(GooglePayLogo, { size: 24 }),
+      )
+      const logoImg = logoContainer.querySelector('img')
+      expect(logoImg).toBeTruthy()
+      expect(logoImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(logoImg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(logoImg?.getAttribute('aria-label')).toBe('Google Pay')
+      expect(logoImg?.getAttribute('src')).toBe('/brands/google-pay.svg')
+
+      // Render via getCategoryIcon with transaction description
+      const { container: txContainer } = render(
+        <div>{getCategoryIcon('Transfers', 24, undefined, tx)}</div>,
+      )
+      const txImg = txContainer.querySelector('img')
+      expect(txImg).toBeTruthy()
+      expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txImg?.getAttribute('aria-label')).toBe('Google Pay')
+      expect(txImg?.getAttribute('src')).toBe('/brands/google-pay.svg')
     })
   })
 })

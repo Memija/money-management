@@ -447,7 +447,20 @@
 .logoBox svg[aria-label*="Feinkost" i],
 .logoBox svg[aria-label*="Dino" i],
 .logoBox svg[aria-label*="Bingo" i],
-.logoBox svg[aria-label*="Konzum" i] {
+.logoBox svg[aria-label*="Rossmann" i],
+.logoBox svg[aria-label*="dm-drogerie" i],
+.logoBox svg[aria-label*="Konzum" i],
+.logoBox svg[aria-label*="PayPal" i],
+.logoBox svg[aria-label*="Google Pay" i],
+.logoBox svg[aria-label*="GPay" i],
+.logoBox svg[aria-label*="G Pay" i],
+.logoBox img[aria-label*="Google Pay" i],
+.logoBox img[aria-label*="GPay" i],
+.logoBox img[aria-label*="G Pay" i],
+.logoBox svg[aria-label*="Amazon" i],
+.logoBox svg[aria-label*="INTRA-TEC" i],
+.logoBox svg[aria-label*="eBay" i],
+.logoBox svg[aria-label*="IKEA" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
@@ -802,7 +815,18 @@
 .tooltipLogoBox svg[aria-label*="Feinkost" i],
 .tooltipLogoBox svg[aria-label*="Dino" i],
 .tooltipLogoBox svg[aria-label*="Bingo" i],
-.tooltipLogoBox svg[aria-label*="Konzum" i] {
+.tooltipLogoBox svg[aria-label*="Konzum" i],
+.tooltipLogoBox svg[aria-label*="PayPal" i],
+.tooltipLogoBox svg[aria-label*="Google Pay" i],
+.tooltipLogoBox svg[aria-label*="GPay" i],
+.tooltipLogoBox svg[aria-label*="G Pay" i],
+.tooltipLogoBox img[aria-label*="Google Pay" i],
+.tooltipLogoBox img[aria-label*="GPay" i],
+.tooltipLogoBox img[aria-label*="G Pay" i],
+.tooltipLogoBox svg[aria-label*="Amazon" i],
+.tooltipLogoBox svg[aria-label*="INTRA-TEC" i],
+.tooltipLogoBox svg[aria-label*="eBay" i],
+.tooltipLogoBox svg[aria-label*="IKEA" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;

@@ -153,5 +153,6 @@ export const CANONICAL_CATEGORY_ICONS: Record<string, IconComponent> = {
   'Bank Fees': Percent,
   BankFees: Percent,
   Fees: Percent,
+  Donations: Heart,
   Other: Package,
 }

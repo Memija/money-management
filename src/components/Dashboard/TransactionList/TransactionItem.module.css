@@ -167,7 +167,22 @@
 .iconBox svg[aria-label*="Feinkost" i],
 .iconBox svg[aria-label*="Dino" i],
 .iconBox svg[aria-label*="Bingo" i],
-.iconBox svg[aria-label*="Konzum" i] {
+.iconBox svg[aria-label*="Rossmann" i],
+.iconBox svg[aria-label*="dm-drogerie" i],
+.iconBox svg[aria-label*="Konzum" i],
+.iconBox svg[aria-label*="PayPal" i],
+.iconBox svg[aria-label*="Google Pay" i],
+.iconBox svg[aria-label*="GPay" i],
+.iconBox svg[aria-label*="G Pay" i],
+.iconBox img[aria-label*="Google Pay" i],
+.iconBox img[aria-label*="GPay" i],
+.iconBox img[aria-label*="G Pay" i],
+.iconBox svg[aria-label*="Amazon" i],
+.iconBox svg[aria-label*="INTRA-TEC" i],
+.iconBox svg[aria-label*="eBay" i],
+.iconBox svg[aria-label*="IKEA" i],
+.iconBox svg[aria-label*="Samsung" i],
+.iconBox img[aria-label*="Samsung" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;

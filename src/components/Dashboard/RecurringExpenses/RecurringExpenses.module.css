@@ -420,7 +420,18 @@
 .brandIconBox svg[aria-label*="Feinkost" i],
 .brandIconBox svg[aria-label*="Dino" i],
 .brandIconBox svg[aria-label*="Bingo" i],
-.brandIconBox svg[aria-label*="Konzum" i] {
+.brandIconBox svg[aria-label*="Konzum" i],
+.brandIconBox svg[aria-label*="PayPal" i],
+.brandIconBox svg[aria-label*="Google Pay" i],
+.brandIconBox svg[aria-label*="GPay" i],
+.brandIconBox svg[aria-label*="G Pay" i],
+.brandIconBox img[aria-label*="Google Pay" i],
+.brandIconBox img[aria-label*="GPay" i],
+.brandIconBox img[aria-label*="G Pay" i],
+.brandIconBox svg[aria-label*="Amazon" i],
+.brandIconBox svg[aria-label*="INTRA-TEC" i],
+.brandIconBox svg[aria-label*="eBay" i],
+.brandIconBox svg[aria-label*="IKEA" i] {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;

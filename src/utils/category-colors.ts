@@ -27,6 +27,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   'Bank Fees': '#be123c',  // Rose / Crimson
   BankFees: '#be123c',
   Fees: '#be123c',
+  Donations: '#e11d48',    // Rose Red / Heart Crimson
   Other: '#a855f7',        // Lilac
 }
 

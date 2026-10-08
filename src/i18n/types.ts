@@ -33,6 +33,7 @@ export interface CategoryKeywords {
   Taxes: string[]
   Crypto: string[]
   BankFees: string[]
+  Donations: string[]
 }
 
 export interface TranslationStrings {
@@ -575,6 +576,7 @@ export interface TranslationStrings {
   catTaxes: string
   catCrypto: string
   catBankFees: string
+  catDonations: string
   catOther: string
 
   // Category keywords for auto-categorization
