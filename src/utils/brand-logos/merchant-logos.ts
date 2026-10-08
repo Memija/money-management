@@ -130,6 +130,8 @@ import {
   AmazonLogo,
   BauhausLogo,
   CadoozLogo,
+  CaLogo,
+  CAndALogo,
   CHECK24Logo,
   Check24Logo,
   DellLogo,
@@ -343,6 +345,12 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   Condor: CondorLogo,
   BarmerLogo, DakLogo, ShopApothekeLogo, DocMorrisLogo,
   ObiLogo, BauhausLogo, HornbachLogo, TchiboLogo, DellLogo,
+  CaLogo,
+  CAndALogo,
+  'c-and-a': CaLogo,
+  'C&A': CaLogo,
+  'c&a': CaLogo,
+  'ca': CaLogo,
   SiDell: DellLogo,
   SiHp,
   HpLogo,
@@ -597,5 +605,5 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
 }
 
 export { BaeckereiMoosLogo, OkkaBakeryLogo } from './dining-logos'
-export { AmazonLogo, EbayLogo, GooglePayLogo, IkeaLogo, IntratecLogo, PaypalLogo }
+export { AmazonLogo, CaLogo, CAndALogo, EbayLogo, GooglePayLogo, IkeaLogo, IntratecLogo, PaypalLogo }
 

@@ -28,7 +28,9 @@ export function keywordToPattern(keyword: string): string {
   if (!stripped) return ''
 
   const escaped = escapeRegExp(stripped)
-  return `(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`
+  const leading = /^[\p{L}\p{N}]/u.test(stripped) ? '(?<![\\p{L}\\p{N}])' : ''
+  const trailing = /[\p{L}\p{N}]$/u.test(stripped) ? '(?![\\p{L}\\p{N}])' : ''
+  return `${leading}${escaped}${trailing}`
 }
 
 // Pre-compile regular expressions for categorization
@@ -75,7 +77,9 @@ if (transferMerchantPatterns.length > 0) {
 }
 
 function matchesTerm(text: string, term: string): boolean {
-  const pattern = new RegExp(`(^|[^a-z0-9])${escapeRegExp(term)}([^a-z0-9]|$)`, 'i')
+  const leadingBoundary = /^[a-z0-9]/i.test(term) ? '(^|[^a-z0-9])' : ''
+  const trailingBoundary = /[a-z0-9]$/i.test(term) ? '([^a-z0-9]|$)' : ''
+  const pattern = new RegExp(`${leadingBoundary}${escapeRegExp(term)}${trailingBoundary}`, 'i')
   return pattern.test(text)
 }
 
@@ -195,10 +199,15 @@ const defaultCategoryCache = new Map<string, string>()
 const CHILDCARE_FEE_REGEX =
   /\b(?:kindertagesst(?:ä|ae|a)tte\w*|kita[- ]?(?:geb(?:ü|ue|u)hr\w*|beitr(?:ä|ae|a)g\w*)|(?:kindergarten|krippen|hort|betreuungs)(?:geb(?:ü|ue|u)hr\w*|beitr(?:ä|ae|a)g\w*)|schulkindbetreuung)/i
 
-// Regex to detect German health insurance context (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenvers', 'Krankenkasse')
+// Regex to detect German health insurance context (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenvers', 'Krankenkasse', 'Zahnzusatzversicherung')
 // to categorize health insurance transactions as Healthcare rather than general Insurance even from multi-line insurers like AXA, Debeka, etc.
-const GERMAN_HEALTH_INSURANCE_REGEX =
-  /(?:\b(?:krankenvers\w*|krankenkasse\w*)\b)/i
+export const GERMAN_HEALTH_INSURANCE_REGEX =
+  /(?:\b(?:kr(?:anke\s*n|anken)vers\w*|krankenkasse\w*|zahn(?:zu\s*)?satz\w*)\b)/i
+
+// Regex to detect German vehicle or general insurance context (e.g. 'KFZ Versicherung', 'Kfz-Versicherung', 'Autoversicherung', 'Haftpflichtversicherung')
+// to categorize policy payments, fees, or broker/comparison portal cashback (e.g. CHECK24 Gutscheinauszahlung) as Insurance.
+export const GERMAN_INSURANCE_PURPOSE_REGEX =
+  /(?:\b(?:kfz[- ]?vers\w*|auto[- ]?vers\w*|fahrzeug[- ]?vers\w*|motorrad[- ]?vers\w*|haftpflicht\w*|hausrat\w*|rechtsschutz\w*|unfallvers\w*|lebensvers\w*|risikolv\w*|sterbegeld\w*|tierhalterhaftpflicht\w*|hundehaftpflicht\w*|wohngeb[aä]udevers\w*|geb[aä]udevers\w*|versicherungs?(?:auszahlung|beitrag|pr[aä]mie)?)\b)/i
 
 /**
  * Regex to detect explicit dining venue / establishment terms
@@ -328,17 +337,30 @@ export function categorize(
     } else if ((popularCat === 'Groceries' || popularCat === 'Shopping') && DINING_ESTABLISHMENT_REGEX.test(d)) {
       if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Dining Out')
       return 'Dining Out'
+    } else if (popularCat === 'Shopping' && GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
+      if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Healthcare')
+      return 'Healthcare'
+    } else if (popularCat === 'Shopping' && GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
+      if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Insurance')
+      return 'Insurance'
     } else {
       if (!customKeywords) defaultCategoryCache.set(cacheKey, popularCat)
       return popularCat
     }
   }
 
-  // Health insurance priority check (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenkasse')
+  // Health insurance priority check (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenkasse', 'Zahnzusatzversicherung')
   // categorized as Healthcare rather than falling into general Insurance or Other
   if (GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
     if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Healthcare')
     return 'Healthcare'
+  }
+
+  // General/vehicle insurance priority check (e.g. 'KFZ Versicherung', 'Kfz-Versicherung', 'Haftpflichtversicherung')
+  // categorized as Insurance rather than falling into general Shopping or Other
+  if (GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
+    if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Insurance')
+    return 'Insurance'
   }
 
   // Explicit dining establishment venue indicators (e.g. 'Restoran', 'Restaurant', 'Bistro', 'Pizzeria')

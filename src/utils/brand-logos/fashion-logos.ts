@@ -1,4 +1,5 @@
 import { createImageLogo } from './logo-factory'
+import { CaLogo, CAndALogo } from './retail-logos'
 import type { IconComponent } from './types'
 
 /** majo Markenschuhe — German footwear retailer chain in the Rhine-Main area (Kelkheim, Eschborn, etc.). */
@@ -36,12 +37,13 @@ export const MyShoesLogo = createImageLogo({
   displayName: 'MyShoesLogo',
 })
 
-/** STONES — German menswear, tailored suits, and casual fashion brand. */
+/** STONES Baustoffe GmbH — German natural stone, landscaping, and building materials retailer (stones-baustoffe.de). */
 export const StonesLogo = createImageLogo({
   src: '/brands/stones.png',
-  label: 'STONES Menswear',
+  label: 'STONES Baustoffe',
   displayName: 'StonesLogo',
 })
+export { StonesLogo as StonesBaustoffeLogo }
 
 export const FASHION_LOGOS: Record<string, IconComponent> = {
   MajoSchuheLogo,
@@ -58,7 +60,13 @@ export const FASHION_LOGOS: Record<string, IconComponent> = {
   'my-shoes': MyShoesLogo,
   StonesLogo,
   stonesLogo: StonesLogo,
+  StonesBaustoffeLogo: StonesLogo,
   'stones': StonesLogo,
+  'stones-baustoffe': StonesLogo,
   'stones-gmbh': StonesLogo,
   'stones-menswear': StonesLogo,
+  CaLogo,
+  CAndALogo,
+  'c-and-a': CaLogo,
+  'c&a': CaLogo,
 }

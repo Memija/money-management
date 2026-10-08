@@ -1,280 +1,68 @@
 import { createImageLogo } from './logo-factory'
 import type { IconComponent } from './types'
 
-export const Check24Logo: IconComponent = ({ size = 16, className }) => (
-  <svg
-    viewBox="0 0 48 48"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      display: 'inline-block',
-      verticalAlign: 'middle',
-      borderRadius: 'inherit',
-      flexShrink: 0,
-    }}
-    className={['brand-logo-full', className].filter(Boolean).join(' ')}
-    data-brand-logo="true"
-    aria-label="CHECK24"
-    role="img"
-  >
-    <rect width="48" height="48" fill="#002D72" />
-    <text
-      x="24"
-      y="15.5"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fill="#FFFFFF"
-      fontWeight="900"
-      fontSize="10"
-      letterSpacing="0.8px"
-      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    >
-      CHECK
-    </text>
-    <circle cx="24" cy="31.5" r="9" fill="#FFCC00" />
-    <text
-      x="24"
-      y="31.5"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fill="#002D72"
-      fontWeight="900"
-      fontSize="10.5"
-      letterSpacing="-0.5px"
-      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    >
-      24
-    </text>
-  </svg>
-)
+/** Official CHECK24 comparison portal brand tile. */
+const RawCheck24Logo = createImageLogo({
+  src: '/brands/check24.png',
+  label: 'CHECK24',
+  displayName: 'Check24Logo',
+})
+export const Check24Logo: IconComponent = (props) => <RawCheck24Logo {...props} />
 Check24Logo.displayName = 'Check24Logo'
 export { Check24Logo as CHECK24Logo }
 
-export const SumupLogo: IconComponent = ({ size = 16, className }) => (
-  <svg
-    viewBox="0 0 48 48"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      display: 'inline-block',
-      verticalAlign: 'middle',
-      borderRadius: '3px',
-      flexShrink: 0,
-    }}
-    className={className}
-    aria-label="SumUp"
-    role="img"
-  >
-    <rect width="48" height="48" rx="8" fill="#0050FF" />
-    <text
-      x="24"
-      y="24"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fill="#FFFFFF"
-      fontWeight="900"
-      fontSize="12.5"
-      letterSpacing="-0.5px"
-      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    >
-      sumup
-    </text>
-  </svg>
-)
+/** Official SumUp card reader & payments brand tile. */
+const RawSumupLogo = createImageLogo({
+  src: '/brands/sumup.svg',
+  label: 'SumUp',
+  displayName: 'SumupLogo',
+})
+export const SumupLogo: IconComponent = (props) => <RawSumupLogo {...props} />
 SumupLogo.displayName = 'SumupLogo'
 
-export const ObiLogo: IconComponent = ({ size = 16, className }) => (
-  <svg
-    viewBox="0 0 48 48"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      display: 'inline-block',
-      verticalAlign: 'middle',
-      borderRadius: '3px',
-      flexShrink: 0,
-    }}
-    className={className}
-    aria-label="OBI"
-    role="img"
-  >
-    <rect width="48" height="48" rx="8" fill="#FF6600" />
-    <text
-      x="24"
-      y="25"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fill="#FFFFFF"
-      fontWeight="900"
-      fontSize="17"
-      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-      letterSpacing="-0.5px"
-    >
-      OBI
-    </text>
-  </svg>
-)
+/** Official OBI home improvement and DIY store brand tile. */
+const RawObiLogo = createImageLogo({
+  src: '/brands/obi.svg',
+  label: 'OBI',
+  displayName: 'ObiLogo',
+})
+export const ObiLogo: IconComponent = (props) => <RawObiLogo {...props} />
 ObiLogo.displayName = 'ObiLogo'
 
-export const BauhausLogo: IconComponent = ({ size = 16, className }) => (
-  <svg
-    viewBox="0 0 48 48"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      display: 'inline-block',
-      verticalAlign: 'middle',
-      borderRadius: '3px',
-      flexShrink: 0,
-    }}
-    className={className}
-    aria-label="BAUHAUS"
-    role="img"
-  >
-    <rect width="48" height="48" rx="8" fill="#D40000" />
-    {/* 3 iconic interlocking pitched house outlines */}
-    <g fill="#FFFFFF">
-      <path d="M 14 18 L 20 12 L 26 18 L 26 27 L 14 27 Z" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinejoin="miter" />
-      <path d="M 22 18 L 28 12 L 34 18 L 34 27 L 22 27 Z" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinejoin="miter" />
-    </g>
-    <text
-      x="24"
-      y="38.5"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fill="#FFFFFF"
-      fontWeight="900"
-      fontSize="6.5"
-      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-      letterSpacing="0.8px"
-    >
-      BAUHAUS
-    </text>
-  </svg>
-)
+/** Official BAUHAUS home improvement & workshop brand tile. */
+const RawBauhausLogo = createImageLogo({
+  src: '/brands/bauhaus.svg',
+  label: 'BAUHAUS',
+  displayName: 'BauhausLogo',
+})
+export const BauhausLogo: IconComponent = (props) => <RawBauhausLogo {...props} />
 BauhausLogo.displayName = 'BauhausLogo'
 
-export const HornbachLogo: IconComponent = ({ size = 16, className }) => (
-  <svg
-    viewBox="0 0 48 48"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      display: 'inline-block',
-      verticalAlign: 'middle',
-      borderRadius: '3px',
-      flexShrink: 0,
-    }}
-    className={className}
-    aria-label="HORNBACH"
-    role="img"
-  >
-    <rect width="48" height="48" rx="8" fill="#F28C00" />
-    {/* Hornbach iconic hammer emblem */}
-    <path
-      d="M 17 15 L 31 15 L 31 21 L 27 21 L 27 29 L 21 29 L 21 21 L 17 21 Z"
-      fill="#000000"
-    />
-    <text
-      x="24"
-      y="39"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fill="#FFFFFF"
-      fontWeight="900"
-      fontSize="6"
-      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-      letterSpacing="0.5px"
-    >
-      HORNBACH
-    </text>
-  </svg>
-)
+/** Official HORNBACH building supplies & DIY brand tile. */
+const RawHornbachLogo = createImageLogo({
+  src: '/brands/hornbach.svg',
+  label: 'HORNBACH',
+  displayName: 'HornbachLogo',
+})
+export const HornbachLogo: IconComponent = (props) => <RawHornbachLogo {...props} />
 HornbachLogo.displayName = 'HornbachLogo'
 
-export const TchiboLogo: IconComponent = ({ size = 16, className }) => (
-  <svg
-    viewBox="0 0 48 48"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      display: 'inline-block',
-      verticalAlign: 'middle',
-      borderRadius: '3px',
-      flexShrink: 0,
-    }}
-    className={className}
-    aria-label="Tchibo"
-    role="img"
-  >
-    <rect width="48" height="48" rx="8" fill="#072042" />
-    {/* Tchibo iconic golden coffee bean with aroma steam */}
-    <g fill="#DCA432">
-      {/* Left lobe of bean */}
-      <path d="M 23 8 C 16 9 14 15 14 19.5 C 14 24.5 17.5 27.5 22.5 27.8 C 21.2 24.5 21 20 22.8 15 C 23.3 13.5 23.2 10.5 23 8 Z" />
-      {/* Right lobe of bean */}
-      <path d="M 25 8.2 C 25.2 10.5 25.1 13.5 24.6 15 C 22.8 20 23 24.5 24.3 27.8 C 29.5 27.5 33 24.5 33 19.5 C 33 15 31 9 25 8.2 Z" />
-      {/* Steam swirl */}
-      <path
-        d="M 23.2 8.5 C 23 5.5 25.5 4.5 27 3.5 C 27.8 2.8 27.2 2 26 2 C 24.2 2 23.5 3.5 23.5 5"
-        fill="none"
-        stroke="#DCA432"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </g>
-    <text
-      x="24"
-      y="38"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fill="#FFFFFF"
-      fontWeight="800"
-      fontSize="8.5"
-      fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-      letterSpacing="0.2px"
-    >
-      Tchibo
-    </text>
-  </svg>
-)
+/** Official Tchibo coffee & consumer goods brand tile. */
+const RawTchiboLogo = createImageLogo({
+  src: '/brands/tchibo.svg',
+  label: 'Tchibo',
+  displayName: 'TchiboLogo',
+})
+export const TchiboLogo: IconComponent = (props) => <RawTchiboLogo {...props} />
 TchiboLogo.displayName = 'TchiboLogo'
 
-export const DellLogo: IconComponent = ({ size = 16, className }) => (
-  <svg
-    viewBox="0 0 48 48"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      display: 'inline-block',
-      verticalAlign: 'middle',
-      borderRadius: '3px',
-      flexShrink: 0,
-    }}
-    className={className}
-    aria-label="Dell"
-    role="img"
-  >
-    <rect width="48" height="48" rx="8" fill="#007DB8" />
-    <g transform="translate(7.2, 7.2) scale(1.4)" fill="#FFFFFF">
-      <path d="M17.963 14.6V9.324h1.222v4.204h2.14v1.07h-3.362zm-9.784-3.288l2.98-2.292c.281.228.56.458.841.687l-2.827 2.14.611.535 2.827-2.216c.281.228.56.458.841.688a295.83 295.83 0 0 1-2.827 2.216l.61.536 2.83-2.295-.001-1.986h1.223v4.204h2.216v1.07h-3.362v-1.987c-.995.763-1.987 1.529-2.981 2.292l-2.981-2.292c-.144.729-.653 1.36-1.312 1.694-.285.147-.597.24-.915.276-.183.022-.367.017-.551.017H3.516V9.325H5.69a2.544 2.544 0 0 1 1.563.557c.454.36.778.872.927 1.43m-3.516-.917v3.21l.953-.001a1.377 1.377 0 0 0 1.036-.523 1.74 1.74 0 0 0 .182-1.889 1.494 1.494 0 0 0-.976-.766c-.166-.04-.338-.03-.507-.032h-.688zM11.82 0h.337a11.94 11.94 0 0 1 5.405 1.373 12.101 12.101 0 0 1 4.126 3.557A11.93 11.93 0 0 1 24 11.82v.36a11.963 11.963 0 0 1-3.236 8.033A11.967 11.967 0 0 1 12.182 24h-.361a11.993 11.993 0 0 1-4.145-.806 12.04 12.04 0 0 1-4.274-2.836A12.057 12.057 0 0 1 .576 15.67 12.006 12.006 0 0 1 0 12.181v-.361a11.924 11.924 0 0 1 1.992-6.396 12.211 12.211 0 0 1 4.71-4.172A11.875 11.875 0 0 1 11.82 0m-.153 1.23a10.724 10.724 0 0 0-6.43 2.375 10.78 10.78 0 0 0-3.319 4.573 10.858 10.858 0 0 0 .193 8.12 10.788 10.788 0 0 0 3.546 4.421 10.698 10.698 0 0 0 4.786 1.946c1.456.209 2.955.124 4.376-.26a10.756 10.756 0 0 0 5.075-3.062 10.742 10.742 0 0 0 2.686-5.28 10.915 10.915 0 0 0-.122-4.682 10.77 10.77 0 0 0-7.098-7.626 10.78 10.78 0 0 0-3.693-.525z" />
-    </g>
-  </svg>
-)
+/** Official Dell Technologies computer hardware brand tile. */
+const RawDellLogo = createImageLogo({
+  src: '/brands/dell.svg',
+  label: 'Dell',
+  displayName: 'DellLogo',
+})
+export const DellLogo: IconComponent = (props) => <RawDellLogo {...props} />
 DellLogo.displayName = 'DellLogo'
 
 /** Official INTRA-TEC technical fastener brand tile. */
@@ -285,7 +73,6 @@ const RawIntratecLogo = createImageLogo({
 })
 export const IntratecLogo: IconComponent = (props) => <RawIntratecLogo {...props} />
 IntratecLogo.displayName = 'IntratecLogo'
-
 export { IntratecLogo as IntraTecLogo }
 
 /** Official Amazon brand tile with full wordmark and signature smile arrow. */
@@ -306,97 +93,24 @@ const RawEbayLogo = createImageLogo({
 export const EbayLogo: IconComponent = (props) => <RawEbayLogo {...props} />
 EbayLogo.displayName = 'EbayLogo'
 
-
-/**
- * Official vector logo of cadooz GmbH (Hamburg voucher, gift card, and incentive rewards provider).
- * Features cadooz's signature royal indigo card (#2D2E83) with the interlocking white and
- * orange gradient ribbon loops representing gift vouchers and rewards.
- */
-export const CadoozLogo: IconComponent = ({ size = 16, className }) => (
-  <svg
-    viewBox="0 0 48 48"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      display: 'inline-block',
-      verticalAlign: 'middle',
-      borderRadius: '8px',
-      overflow: 'hidden',
-      flexShrink: 0,
-    }}
-    className={className}
-    aria-label="cadooz"
-    role="img"
-  >
-    <rect width="48" height="48" rx="8" fill="#2D2E83" />
-    <rect
-      x="0.5"
-      y="0.5"
-      width="47"
-      height="47"
-      rx="7.5"
-      fill="none"
-      stroke="rgba(255, 255, 255, 0.15)"
-      strokeWidth="1"
-    />
-    <defs>
-      <linearGradient id="cadoozOrange" gradientUnits="userSpaceOnUse" x1="21.43" y1="21.82" x2="33.71" y2="9.53">
-        <stop offset="0" stopColor="#E94E1B" />
-        <stop offset="1" stopColor="#F29100" />
-      </linearGradient>
-      <linearGradient id="cadoozGloss" gradientUnits="userSpaceOnUse" x1="29.48" y1="10.26" x2="25.91" y2="20.08">
-        <stop offset="0" stopColor="#FFFFFF" stopOpacity="0" />
-        <stop offset="1" stopColor="#FFFFFF" stopOpacity="0.3" />
-      </linearGradient>
-    </defs>
-    <g transform="translate(-4.74, 5.04) scale(1.2)">
-      {/* White Loop */}
-      <path
-        fill="#FFFFFF"
-        d="M31.1,15.8c0,0.8-0.3,1.6-0.9,2.2l-7.9,7.9c-0.6,0.6-1.4,0.9-2.2,0.9c-0.8,0-1.6-0.3-2.2-0.9l-7.9-7.9c-0.6-0.6-0.9-1.4-0.9-2.2c0-0.8,0.3-1.6,0.9-2.2L18,5.7c0.6-0.6,1.3-0.9,2.2-0.9c0.8,0,1.6,0.3,2.2,0.9l1.1,1.2l-1.9,1.9l-1-1c-0.1-0.1-0.3-0.2-0.5-0.2c-0.2,0-0.4,0.1-0.5,0.2l-7.5,7.5c-0.3,0.3-0.3,0.7,0,1l7.5,7.5c0.1,0.1,0.3,0.2,0.5,0.2c0.2,0,0.3-0.1,0.5-0.2l7.5-7.5c0.1-0.1,0.2-0.3,0.2-0.5c0-0.2-0.1-0.4-0.2-0.5l-4-4L26,9.4l4.2,4.2C30.8,14.2,31.1,15,31.1,15.8z"
-      />
-      {/* Orange Gradient Loop */}
-      <path
-        fill="url(#cadoozOrange)"
-        d="M38.4,15.8c0,0.8-0.3,1.6-0.9,2.2l-7.9,7.9c-0.6,0.6-1.3,0.9-2.2,0.9c-0.8,0-1.6-0.3-2.2-0.9l-1.1-1.2l1.9-1.9l1,0.9c0.1,0.1,0.3,0.2,0.5,0.2c0.2,0,0.4-0.1,0.5-0.2l7.5-7.5c0.1-0.1,0.2-0.3,0.2-0.5c0-0.2-0.1-0.4-0.2-0.5L28,7.8c-0.1-0.1-0.3-0.2-0.5-0.2c-0.2,0-0.4,0.1-0.5,0.2l-7.5,7.5c-0.3,0.3-0.3,0.7,0,1l4,4l-1.9,1.9l-4.2-4.2c-0.6-0.6-0.9-1.4-0.9-2.2c0-0.8,0.3-1.6,0.9-2.2l7.9-7.9c0.6-0.6,1.3-0.9,2.2-0.9c0.8,0,1.6,0.3,2.2,0.9l7.9,7.9C38.1,14.2,38.4,15,38.4,15.8z"
-      />
-      {/* Translucent Highlight Gloss */}
-      <path
-        fill="url(#cadoozGloss)"
-        d="M38.4,15.8c0-0.8-0.3-1.6-0.9-2.2l-7.9-7.9c-0.6-0.6-1.3-0.9-2.2-0.9c-0.8,0-1.6,0.3-2.2,0.9l-7.9,7.9c-0.4,0.4-0.7,0.9-0.8,1.4c1,0.5,2.1,1,3.1,1.5l-0.3-0.3c-0.3-0.3-0.3-0.7,0-1L27,7.8c0.1-0.1,0.3-0.2,0.5-0.2c0.2,0,0.4,0.1,0.5,0.2l7.5,7.5c0.1,0.1,0.2,0.3,0.2,0.5c0,0.2-0.1,0.4-0.2,0.5l-2.8,2.8c0,0,0.1,0,0.1,0c1.3,0,2.6-0.1,3.9-0.2l0.9-0.9C38.1,17.3,38.4,16.6,38.4,15.8z"
-      />
-    </g>
-  </svg>
-)
+/** Official cadooz voucher, gift card, and incentive rewards brand tile. */
+const RawCadoozLogo = createImageLogo({
+  src: '/brands/cadooz.svg',
+  label: 'cadooz',
+  displayName: 'CadoozLogo',
+})
+export const CadoozLogo: IconComponent = (props) => <RawCadoozLogo {...props} />
 CadoozLogo.displayName = 'CadoozLogo'
-
 export { CadoozLogo as CadoozGmbHLogo }
 
-/**
- * Official logo of PAYBACK (Payback Pay / Paymorrow / Payback GmbH).
- * Uses the official PAYBACK app icon featuring the signature royal blue background with the iconic 4 circles.
- */
-export const PaybackLogo: IconComponent = ({ size = 16, className }) => (
-  <img
-    src="/brands/payback.png"
-    alt="PAYBACK"
-    width={typeof size === 'number' ? size : undefined}
-    height={typeof size === 'number' ? size : undefined}
-    style={{
-      width: typeof size === 'number' ? `${size}px` : size,
-      height: typeof size === 'number' ? `${size}px` : size,
-      objectFit: 'contain',
-      borderRadius: '3px',
-      display: 'inline-block',
-      verticalAlign: 'middle',
-    }}
-    className={className}
-  />
-)
+/** Official PAYBACK bonus and rewards program brand tile. */
+const RawPaybackLogo = createImageLogo({
+  src: '/brands/payback.png',
+  label: 'PAYBACK',
+  displayName: 'PaybackLogo',
+})
+export const PaybackLogo: IconComponent = (props) => <RawPaybackLogo {...props} />
 PaybackLogo.displayName = 'PaybackLogo'
-
 export { PaybackLogo as PaybackPayLogo, PaybackLogo as PaymorrowLogo }
 
 /** Official Samsung brand tile with signature Samsung Blue (#1428A0) and authentic white lettermark. */
@@ -408,5 +122,12 @@ const RawSamsungLogo = createImageLogo({
 export const SamsungLogo: IconComponent = (props) => <RawSamsungLogo {...props} />
 SamsungLogo.displayName = 'SamsungLogo'
 
-
-
+/** Official C&A clothing and fashion retail brand tile. */
+const RawCaLogo = createImageLogo({
+  src: '/brands/c-and-a.svg',
+  label: 'C&A',
+  displayName: 'CaLogo',
+})
+export const CaLogo: IconComponent = (props) => <RawCaLogo {...props} />
+CaLogo.displayName = 'CaLogo'
+export { CaLogo as CAndALogo }

@@ -5,7 +5,11 @@ import { type MerchantSuggestion, POPULAR_MERCHANTS } from '../data/merchants'
 import type { CustomCategory } from '../types'
 import { MERCHANT_LOGOS } from './brand-logos/merchant-logos'
 import type { IconComponent } from './brand-logos/types'
-import { DINING_ESTABLISHMENT_REGEX } from './categorizer/categorizer'
+import {
+  DINING_ESTABLISHMENT_REGEX,
+  GERMAN_HEALTH_INSURANCE_REGEX,
+  GERMAN_INSURANCE_PURPOSE_REGEX,
+} from './categorizer/categorizer'
 import {
   extractMerchantKeyword,
   isPaymentProcessorIntermediary,
@@ -41,7 +45,9 @@ function escapeRegExp(string: string): string {
 }
 
 function matchesTerm(text: string, term: string): boolean {
-  const pattern = new RegExp(`(^|[^a-z0-9])${escapeRegExp(term)}([^a-z0-9]|$)`, 'i')
+  const leadingBoundary = /^[a-z0-9]/i.test(term) ? '(^|[^a-z0-9])' : ''
+  const trailingBoundary = /[a-z0-9]$/i.test(term) ? '([^a-z0-9]|$)' : ''
+  const pattern = new RegExp(`${leadingBoundary}${escapeRegExp(term)}${trailingBoundary}`, 'i')
   return pattern.test(text)
 }
 
@@ -234,8 +240,8 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
         nameTrimmed,
       )
 
-    const isHealthInsurance =
-      /(?:\b(?:krankenvers\w*|krankenkasse\w*)\b)/i.test(nameTrimmed)
+    const isHealthInsurance = GERMAN_HEALTH_INSURANCE_REGEX.test(nameTrimmed)
+    const isGeneralInsurance = GERMAN_INSURANCE_PURPOSE_REGEX.test(nameTrimmed)
 
     return {
       merchant,
@@ -245,12 +251,15 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
         ? 'Salary'
         : isBankFeeOrRefund
           ? 'Bank Fees'
-          : merchant.category === 'Insurance' && isHealthInsurance
+          : (merchant.category === 'Insurance' || merchant.id === 'check24') && isHealthInsurance
             ? 'Healthcare'
-            : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
-                DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
-              ? 'Dining Out'
-              : merchant.category,
+            : (merchant.category === 'Insurance' || merchant.id === 'check24' || merchant.category === 'Shopping') &&
+                isGeneralInsurance
+              ? 'Insurance'
+              : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
+                  DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
+                ? 'Dining Out'
+                : merchant.category,
       initials,
     }
   }

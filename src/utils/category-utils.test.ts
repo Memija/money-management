@@ -160,6 +160,16 @@ describe('category-utils', () => {
       expect(categorize('Tchibo.de Online Shop')).toBe('Shopping')
     })
 
+    it('categorizes C&A retail transactions as Shopping', () => {
+      expect(
+        categorize(
+          'CA//Sulzbach/DE 2022-05-05T13:28:17 KFN 0  VJ 2412 Kartenzahlung'
+        )
+      ).toBe('Shopping')
+      expect(categorize('C&A Mode Filiale Frankfurt')).toBe('Shopping')
+      expect(categorize('C&A Online Shop')).toBe('Shopping')
+    })
+
     it('categorizes Dell retail and hardware transactions as Shopping (not ordinary Transfers)', () => {
       expect(
         categorize(
@@ -2353,6 +2363,16 @@ describe('category-utils', () => {
         expect(categorize('HDI Versicherung AG')).toBe('Insurance')
         expect(categorize('VHV Versicherungen')).toBe('Insurance')
         expect(categorize('CosmosDirekt Versicherung')).toBe('Insurance')
+
+        // CHECK24 Gutscheinauszahlung / Cashback with vehicle/general insurance context
+        expect(
+          categorize(
+            'CHECK24 CHECK24 Gutscheinauszahlung - Antra g 1444-2533-2410-18 - fuer Ihre neu e KFZ Versicherung End-to-End-Ref.: 22233743- 4451322143 Kundenreferenz: a62a9c9cd0f048cb80de71590f93fac6c70',
+          ),
+        ).toBe('Insurance')
+        expect(categorize('CHECK24 KFZ-Versicherung Gutschein')).toBe('Insurance')
+        expect(categorize('CHECK24 Kfz Versicherung Auszahlung')).toBe('Insurance')
+        expect(categorize('CHECK24 Haftpflichtversicherung Cashback')).toBe('Insurance')
       })
 
       it('categorizes byebye tour operator and hostels (DJH, a&o, MEININGER) as Travel', () => {
@@ -2402,6 +2422,11 @@ describe('category-utils', () => {
         expect(categorize('Münchener Verein Krankenversicherung a.G.')).toBe('Healthcare')
         expect(categorize('Techniker Krankenkasse Beitrag')).toBe('Healthcare')
         expect(categorize('Barmer Krankenkasse')).toBe('Healthcare')
+        expect(
+          categorize(
+            'CHECK24 Vergleichsportal für Kranke nversicherungen GmbH CHECK24 Cashback - fuer Ihre Zahnzu satzversicherung: 10338717 End-to-End-Ref.: 235790923429 Kundenreferenz: 617207769488',
+          ),
+        ).toBe('Healthcare')
       })
 
       it('categorizes WebID Solutions, IDnow, POSTIDENT, and Verimi as Bank Fees', () => {
@@ -2632,13 +2657,13 @@ describe('category-utils', () => {
         ).toBe('Transport')
         expect(categorize('Reifen Diehl Reifenwechsel')).toBe('Transport')
 
-        // 5. STONES Menswear -> Shopping
+        // 5. STONES Baustoffe -> Shopping
         expect(
           categorize(
             'STONES GMBH 120510420024424241253413150 ELV6534 1315 12.05 10.42 ME0 End-to-End-Ref.: 12',
           ),
         ).toBe('Shopping')
-        expect(categorize('STONES Menswear Store')).toBe('Shopping')
+        expect(categorize('STONES Baustoffe Store')).toBe('Shopping')
 
         // 6. Liebig-Apotheke Bad Homburg -> Healthcare
         expect(

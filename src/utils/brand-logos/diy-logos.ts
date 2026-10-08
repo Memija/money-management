@@ -1,3 +1,4 @@
+import { StonesBaustoffeLogo, StonesLogo } from './fashion-logos'
 import { createImageLogo } from './logo-factory'
 import type { IconComponent } from './types'
 
@@ -8,10 +9,18 @@ export const ToomLogo = createImageLogo({
   displayName: 'ToomLogo',
 })
 
+export { StonesBaustoffeLogo, StonesLogo }
+
 export const DIY_LOGOS: Record<string, IconComponent> = {
   ToomLogo,
   toomLogo: ToomLogo,
   ToomBaumarktLogo: ToomLogo,
   'toom': ToomLogo,
   'toom-baumarkt': ToomLogo,
+  StonesLogo,
+  stonesLogo: StonesLogo,
+  StonesBaustoffeLogo,
+  'stones': StonesLogo,
+  'stones-baustoffe': StonesLogo,
+  'stones-gmbh': StonesLogo,
 }

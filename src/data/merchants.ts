@@ -96,6 +96,7 @@ const GLOBAL_MERCHANTS: MerchantSuggestion[] = [
   { id: 'apple', name: 'Apple', keyword: 'apple', aliases: ['apple.com', 'itunes', 'app store'], category: 'Shopping', logo: 'SiApple', icon: 'Smartphone' },
   { id: 'nike', name: 'Nike', keyword: 'nike', aliases: ['nike.com'], category: 'Shopping', logo: 'SiNike', icon: 'Shirt' },
   { id: 'zara', name: 'Zara', keyword: 'zara', aliases: ['zara.com'], category: 'Shopping', logo: 'SiZara', brandColor: '#000000', icon: 'Shirt' },
+  { id: 'c-and-a', name: 'C&A', keyword: 'c&a', aliases: ['c and a', 'c & a', 'c&a mode', 'ca//', 'c-and-a', 'c und a', 'c&a online', 'c&a mode gmbh', 'c&a mode gmbh & co. kg'], category: 'Shopping', logo: 'CaLogo', brandColor: '#002C6C', icon: 'Shirt' },
   { id: 'ikea', name: 'IKEA', keyword: 'ikea', aliases: ['ikea.de', 'ikea.com'], category: 'Shopping', logo: 'SiIkea', brandColor: '#0051BA', icon: 'Building2' },
   // Furniture retailers: XXXLutz group (POCO, XXXLutz, mömax) and competitors
   { id: 'poco', name: 'POCO Einrichtungsmärkte', keyword: 'poco', aliases: ['poco einrichtungsmärkte', 'poco einrichtungsmaerkte', 'poco einrichtungsmarkte', 'poco einrichtungsmarkt', 'poco einrichtungsmärkte gmbh', 'poco einrichtungsmarkte gmbh', 'poco.de'], category: 'Shopping', logo: 'PocoLogo', brandColor: '#851B23', icon: 'Home' },
@@ -108,7 +109,7 @@ const GLOBAL_MERCHANTS: MerchantSuggestion[] = [
   { id: 'porta', name: 'porta Möbel', keyword: 'porta möbel', aliases: ['porta moebel', 'porta mobel', 'porta-möbel', 'porta-moebel', 'porta einrichtungshaus', 'porta möbelhandel'], category: 'Shopping', logo: 'PortaLogo', brandColor: '#ED1C24', icon: 'Home' },
   { id: 'jysk', name: 'JYSK', keyword: 'jysk', aliases: ['jysk gmbh', 'jysk.de', 'dänisches bettenlager', 'daenisches bettenlager', 'danisches bettenlager'], category: 'Shopping', logo: 'JyskLogo', brandColor: '#034694', icon: 'Home' },
   { id: 'home24', name: 'home24', keyword: 'home24', aliases: ['home24 se', 'home24 s e', 'home 24', 'home24.de'], category: 'Shopping', logo: 'Home24Logo', brandColor: '#F45334', icon: 'Home' },
-  { id: 'stones', name: 'STONES Menswear', keyword: 'stones', aliases: ['stones gmbh', 'stones menswear'], category: 'Shopping', logo: 'StonesLogo', brandColor: '#121212', icon: 'ShoppingBag' },
+  { id: 'stones', name: 'STONES Baustoffe', keyword: 'stones', aliases: ['stones gmbh', 'stones baustoffe', 'stones-baustoffe', 'stones baustoffe gmbh', 'stones natursteine', 'stones menswear'], category: 'Shopping', logo: 'StonesLogo', brandColor: '#8ABA18', icon: 'Wrench' },
   { id: 'target', name: 'Target', keyword: 'target', category: 'Shopping', logo: 'SiTarget', brandColor: '#CC0000', icon: 'ShoppingBag' },
   { id: 'rossmann', name: 'Rossmann', keyword: 'rossmann', aliases: ['dirk rossmann', 'dirk ros smann', 'ros smann', 'rossmann online', 'rossmann drogerie', 'rossmann.de', 'rossmann markt'], category: 'Shopping', logo: 'SiRossmann', brandColor: '#E30613', icon: 'ShoppingBag' },
   { id: 'mediamarkt', name: 'MediaMarkt / Saturn', keyword: 'mediamarkt', aliases: ['media markt', 'saturn', 'saturn online', 'mediamarkt saturn', 'msh', 'mediamarkt.de', 'saturn.de'], category: 'Shopping', logo: 'SiMediamarkt', brandColor: '#DF0000', icon: 'Monitor' },

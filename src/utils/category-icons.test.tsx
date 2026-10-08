@@ -468,6 +468,21 @@ describe('category-icons', () => {
       expect(samsungIcon).toBeDefined()
     })
 
+    it('matches C&A brand info and logo for CA//Sulzbach/DE transaction', () => {
+      const caTx = 'CA//Sulzbach/DE 2022-05-05T13:28:17 KFN 0  VJ 2412 Kartenzahlung'
+      const caInfo = getMerchantBrandInfo(caTx)
+      expect(caInfo.merchant?.id).toBe('c-and-a')
+      expect(caInfo.merchant?.name).toBe('C&A')
+      expect(caInfo.logoComponent).toBe(MERCHANT_LOGOS.CaLogo)
+      expect(caInfo.brandColor).toBe('#002C6C')
+      expect(caInfo.suggestedCategory).toBe('Shopping')
+      const caIcon = getCategoryIcon('Shopping', 20, undefined, caTx)
+      expect(React.isValidElement(caIcon)).toBe(true)
+
+      const rendered = render(<>{caIcon}</>)
+      expect(rendered.container.querySelector('img, svg')).toBeTruthy()
+    })
+
     it('matches fair parken and EasyPark logos for parking transactions', () => {
       const fairParkenTx =
         'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-'
@@ -786,6 +801,8 @@ describe('category-icons', () => {
         'STONES GMBH 260410190023798241253413150 ELV6534 1315 26.04 10.19 ME0 End-to-End-Ref.: 26',
       )
       expect(info.merchant?.id).toBe('stones')
+      expect(info.merchant?.name).toBe('STONES Baustoffe')
+      expect(info.brandColor).toBe('#8ABA18')
       expect(info.logoComponent).toBe(MERCHANT_LOGOS.StonesLogo)
       expect(info.suggestedCategory).toBe('Shopping')
     })
@@ -1106,9 +1123,9 @@ describe('category-icons', () => {
           )}
         </div>,
       )
-      const svg = container.querySelector('svg')
-      expect(svg).toBeInTheDocument()
-      expect(svg).toHaveAttribute('aria-label', 'cadooz')
+      const logo = container.querySelector('img, svg')
+      expect(logo).toBeInTheDocument()
+      expect(logo).toHaveAttribute('aria-label', 'cadooz')
     })
 
     it('matches LotharBraunLogo for Lothar Braun door installations and carpentry transactions', () => {
@@ -1553,6 +1570,14 @@ describe('category-icons', () => {
       expect(check24Info.suggestedCategory).toBe('Shopping')
       expect(check24Info.brandColor).toBe('#002D72')
 
+      const check24KfzInfo = getMerchantBrandInfo(
+        'CHECK24 CHECK24 Gutscheinauszahlung - Antra g 1444-2533-2410-18 - fuer Ihre neu e KFZ Versicherung End-to-End-Ref.: 22233743- 4451322143 Kundenreferenz: a62a9c9cd0f048cb80de71590f93fac6c70',
+      )
+      expect(check24KfzInfo.merchant?.id).toBe('check24')
+      expect(check24KfzInfo.logoComponent).toBe(MERCHANT_LOGOS.Check24Logo)
+      expect(check24KfzInfo.suggestedCategory).toBe('Insurance')
+      expect(check24KfzInfo.brandColor).toBe('#002D72')
+
       const chech24Info = getMerchantBrandInfo('Chech24')
       expect(chech24Info.merchant?.id).toBe('check24')
       expect(chech24Info.logoComponent).toBe(MERCHANT_LOGOS.Check24Logo)
@@ -1994,11 +2019,22 @@ describe('category-icons', () => {
       expect(reifenDiehlInfo.logoComponent).toBe(MERCHANT_LOGOS.ReifenDiehlLogo)
       expect(reifenDiehlInfo.suggestedCategory).toBe('Transport')
 
-      // 5. STONES Menswear
+      // 5. STONES Baustoffe
       const stonesInfo = getMerchantBrandInfo('STONES GMBH 120510420024424241253413150 ELV6534 1315 12.05 10.42 ME0 End-to-End-Ref.: 12')
       expect(stonesInfo.merchant?.id).toBe('stones')
+      expect(stonesInfo.merchant?.name).toBe('STONES Baustoffe')
+      expect(stonesInfo.brandColor).toBe('#8ABA18')
       expect(stonesInfo.logoComponent).toBe(MERCHANT_LOGOS.StonesLogo)
       expect(stonesInfo.suggestedCategory).toBe('Shopping')
+
+      // Also verify full transaction string with Mandatsref and Gläubiger-ID:
+      const stonesFullInfo = getMerchantBrandInfo(
+        'STONES GMBH 120510420024424241253413150 ELV6534 1315 12.05 10.42 ME0 End-to-End-Ref.: 12051042002442424125341315065341315 Mandatsref: 6534131513972205121042 Gläubiger-ID: DE16ZZZ00000020245 SEPA-BASISLASTSCHRIFT einmalig',
+      )
+      expect(stonesFullInfo.merchant?.id).toBe('stones')
+      expect(stonesFullInfo.merchant?.name).toBe('STONES Baustoffe')
+      expect(stonesFullInfo.brandColor).toBe('#8ABA18')
+      expect(stonesFullInfo.logoComponent).toBe(MERCHANT_LOGOS.StonesLogo)
 
       // 6. Liebig-Apotheke Bad Homburg
       const liebigApoInfo = getMerchantBrandInfo('LIEBIG-APOTHEKE//BAD HOMBURG/DE 2022-05-24T10:32:50 KFN 0 VJ 2412 Kartenzahlung')
@@ -3038,12 +3074,12 @@ describe('category-icons', () => {
 
       // Render Check24Logo directly
       const { container: c24Container } = render(React.createElement(Check24Logo, { size: 20 }))
-      const c24Svg = c24Container.querySelector('svg')
-      expect(c24Svg).toBeTruthy()
-      expect(c24Svg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(c24Svg?.classList.contains('brand-logo-full')).toBe(true)
-      expect(c24Svg?.style.borderRadius).toBe('inherit')
-      expect(c24Svg?.getAttribute('aria-label')).toBe('CHECK24')
+      const c24Element = c24Container.querySelector<HTMLElement>('img, svg')
+      expect(c24Element).toBeTruthy()
+      expect(c24Element?.getAttribute('data-brand-logo')).toBe('true')
+      expect(c24Element?.classList.contains('brand-logo-full')).toBe(true)
+      expect(c24Element?.style.borderRadius).toBe('inherit')
+      expect(c24Element?.getAttribute('aria-label')).toBe('CHECK24')
 
       // Render via getCategoryIcon with user transaction description
       const txDesc =
@@ -3051,12 +3087,23 @@ describe('category-icons', () => {
       const { container: txContainer } = render(
         <div>{getCategoryIcon('Shopping', 20, undefined, txDesc)}</div>,
       )
-      const txSvg = txContainer.querySelector('svg')
-      expect(txSvg).toBeTruthy()
-      expect(txSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(txSvg?.classList.contains('brand-logo-full')).toBe(true)
-      expect(txSvg?.style.borderRadius).toBe('inherit')
-      expect(txSvg?.getAttribute('aria-label')).toBe('CHECK24')
+      const txElement = txContainer.querySelector<HTMLElement>('img, svg')
+      expect(txElement).toBeTruthy()
+      expect(txElement?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txElement?.classList.contains('brand-logo-full')).toBe(true)
+      expect(txElement?.style.borderRadius).toBe('inherit')
+      expect(txElement?.getAttribute('aria-label')).toBe('CHECK24')
+
+      // Also render via getCategoryIcon with the KFZ Versicherung transaction description
+      const kfzTxDesc =
+        'CHECK24 CHECK24 Gutscheinauszahlung - Antra g 1444-2533-2410-18 - fuer Ihre neu e KFZ Versicherung End-to-End-Ref.: 22233743- 4451322143 Kundenreferenz: a62a9c9cd0f048cb80de71590f93fac6c70'
+      const { container: kfzTxContainer } = render(
+        <div>{getCategoryIcon('Insurance', 20, undefined, kfzTxDesc)}</div>,
+      )
+      const kfzTxElement = kfzTxContainer.querySelector<HTMLElement>('img, svg')
+      expect(kfzTxElement).toBeTruthy()
+      expect(kfzTxElement?.getAttribute('data-brand-logo')).toBe('true')
+      expect(kfzTxElement?.getAttribute('aria-label')).toBe('CHECK24')
     })
 
     it('matches ALDI SE U. (Aldi Süd) and renders proper ALDI SÜD logo', () => {
