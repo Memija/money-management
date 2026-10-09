@@ -43,6 +43,14 @@ export const DarsLogo = createImageLogo({
   displayName: 'DarsLogo',
 })
 
+/** VSPO (Via Strassenabgaben Portal Online / Via Portal - E-Vignette Schweiz) — Swiss federal electronic motorway vignette & road user charge portal (via.admin.ch / BAZG). */
+export const VspoLogo = createImageLogo({
+  src: '/brands/vspo.svg',
+  label: 'VSPO',
+  displayName: 'VspoLogo',
+})
+export { VspoLogo as ViaPortalLogo }
+
 export const MOTORWAY_LOGOS: Record<string, IconComponent> = {
   HacAutocesteLogo,
   hacAutocesteLogo: HacAutocesteLogo,
@@ -74,5 +82,12 @@ export const MOTORWAY_LOGOS: Record<string, IconComponent> = {
   'dars-dd': DarsLogo,
   'dars-d-d': DarsLogo,
   'dars-e-vinjeta': DarsLogo,
+  VspoLogo,
+  vspoLogo: VspoLogo,
+  'vspo': VspoLogo,
+  'vspo-bern': VspoLogo,
+  'via-portal': VspoLogo,
+  'via-portal-e-vignette': VspoLogo,
+  ViaPortalLogo: VspoLogo,
 }
 

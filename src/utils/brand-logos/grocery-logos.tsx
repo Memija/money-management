@@ -76,6 +76,15 @@ const RawNettoLogo = createImageLogo({
 export const NettoLogo: IconComponent = (props) => <RawNettoLogo {...props} />
 NettoLogo.displayName = 'NettoLogo'
 
+// GLOBUS / Globus Markthalle
+const RawGlobusLogo = createImageLogo({
+  src: '/brands/globus.svg',
+  label: 'GLOBUS',
+  displayName: 'GlobusLogo',
+})
+export const GlobusLogo: IconComponent = (props) => <RawGlobusLogo {...props} />
+GlobusLogo.displayName = 'GlobusLogo'
+
 // BILLA
 const RawBillaLogo = createImageLogo({
   src: '/brands/billa.svg',
@@ -338,6 +347,16 @@ export const GROCERY_LOGOS: Record<string, IconComponent> = {
   spar: SparLogo,
   SPAR: SparLogo,
   'spar-portugal': SparLogo,
+
+  // GLOBUS / Globus Markthalle
+  GlobusLogo,
+  globusLogo: GlobusLogo,
+  globus: GlobusLogo,
+  GLOBUS: GlobusLogo,
+  'globus-markthalle': GlobusLogo,
+  'globus markthalle': GlobusLogo,
+  'globus-handelshof': GlobusLogo,
+  'globus-holding': GlobusLogo,
 
   // BILLA
   BillaLogo,

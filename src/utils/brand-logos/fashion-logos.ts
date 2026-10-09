@@ -45,6 +45,20 @@ export const StonesLogo = createImageLogo({
 })
 export { StonesLogo as StonesBaustoffeLogo }
 
+/** Takko Fashion (Takko Holding GmbH) — German discount fashion retailer (takko.com). */
+export const TakkoLogo = createImageLogo({
+  src: '/brands/takko.svg',
+  label: 'Takko Fashion',
+  displayName: 'TakkoLogo',
+})
+
+/** Bergfreunde (Bergfreunde GmbH) — leading European online outdoor, mountaineering, and climbing specialist (bergfreunde.de). */
+export const BergfreundeLogo = createImageLogo({
+  src: '/brands/bergfreunde.png',
+  label: 'Bergfreunde',
+  displayName: 'BergfreundeLogo',
+})
+
 export const FASHION_LOGOS: Record<string, IconComponent> = {
   MajoSchuheLogo,
   'majo-schuhe': MajoSchuheLogo,
@@ -69,4 +83,10 @@ export const FASHION_LOGOS: Record<string, IconComponent> = {
   CAndALogo,
   'c-and-a': CaLogo,
   'c&a': CaLogo,
+  TakkoLogo,
+  'takko': TakkoLogo,
+  'takko-fashion': TakkoLogo,
+  BergfreundeLogo,
+  'bergfreunde': BergfreundeLogo,
+  'bergfreunde-gmbh': BergfreundeLogo,
 }

@@ -36,6 +36,21 @@ export const ThaliaLogo = createImageLogo({
   displayName: 'ThaliaLogo',
 })
 
+/** Buchhandlung Rupprecht (Buchhandlung Rupprecht GmbH) — regional bookstore chain in Bavaria and Baden-Württemberg (rupprecht.de). */
+export const RupprechtLogo = createImageLogo({
+  src: '/brands/rupprecht.png',
+  label: 'Buchhandlung Rupprecht',
+  displayName: 'RupprechtLogo',
+})
+export { RupprechtLogo as BuchhandlungRupprechtLogo }
+
+/** ABH-Nord (ABH-Nord GmbH / batterie24.de) — German battery & energy storage specialist (abh-nord.de). */
+export const AbhNordLogo = createImageLogo({
+  src: '/brands/abh-nord.png',
+  label: 'ABH-Nord',
+  displayName: 'AbhNordLogo',
+})
+
 /** DPD (DPD Deutschland GmbH) — European parcel delivery and logistics service. */
 export const DpdLogo = createImageLogo({
   src: '/brands/dpd.png',
@@ -106,6 +121,13 @@ export const DedicomLogo = createImageLogo({
   displayName: 'DedicomLogo',
 })
 
+/** Raj Toys (Raj Toys s.r.o. / rajspielzeug.de / rajhraciek.sk) — European online toy & games retailer. */
+export const RajToysLogo = createImageLogo({
+  src: '/brands/raj-toys.png',
+  label: 'Raj Toys',
+  displayName: 'RajToysLogo',
+})
+
 export const VARIETY_STORE_LOGOS: Record<string, IconComponent> = {
   TediLogo,
   tediLogo: TediLogo,
@@ -126,6 +148,14 @@ export const VARIETY_STORE_LOGOS: Record<string, IconComponent> = {
   thaliaLogo: ThaliaLogo,
   'thalia': ThaliaLogo,
   'thalia-buchhandlung': ThaliaLogo,
+  RupprechtLogo,
+  BuchhandlungRupprechtLogo: RupprechtLogo,
+  'rupprecht': RupprechtLogo,
+  'buchhandlung-rupprecht': RupprechtLogo,
+  AbhNordLogo,
+  'abh-nord': AbhNordLogo,
+  'abh-nord-gmbh': AbhNordLogo,
+  'batterie24': AbhNordLogo,
   DpdLogo,
   dpdLogo: DpdLogo,
   'dpd': DpdLogo,
@@ -164,4 +194,9 @@ export const VARIETY_STORE_LOGOS: Record<string, IconComponent> = {
   dedicomLogo: DedicomLogo,
   'dedicom': DedicomLogo,
   'dedicom-gmbh': DedicomLogo,
+  RajToysLogo,
+  rajToysLogo: RajToysLogo,
+  'raj-toys': RajToysLogo,
+  'raj-toys-sro': RajToysLogo,
+  'raj-toys-s-r-o': RajToysLogo,
 }

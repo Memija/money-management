@@ -57,6 +57,13 @@ export const SsgBwLogo = createImageLogo({
   displayName: 'SsgBwLogo',
 })
 
+/** Taunus Wunderland (Taunus Wunderland e.K. Otto Barth) — family amusement and theme park in Schlangenbad / Taunus (taunuswunderland.de). */
+export const TaunusWunderlandLogo = createImageLogo({
+  src: '/brands/taunus-wunderland.png',
+  label: 'Taunus Wunderland',
+  displayName: 'TaunusWunderlandLogo',
+})
+
 export const ENTERTAINMENT_LOGOS: Record<string, IconComponent> = {
   DisneyPlusLogo,
   disneyPlusLogo: DisneyPlusLogo,
@@ -90,6 +97,10 @@ export const ENTERTAINMENT_LOGOS: Record<string, IconComponent> = {
   ssgBwLogo: SsgBwLogo,
   'ssg-bw': SsgBwLogo,
   'ssg': SsgBwLogo,
+  TaunusWunderlandLogo,
+  taunusWunderlandLogo: TaunusWunderlandLogo,
+  'taunus-wunderland': TaunusWunderlandLogo,
+  'taunuswunderland': TaunusWunderlandLogo,
 }
 
 

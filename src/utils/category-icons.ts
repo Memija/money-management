@@ -3,10 +3,12 @@ import { Coffee, Package } from 'lucide-react'
 
 import { type MerchantSuggestion, POPULAR_MERCHANTS } from '../data/merchants'
 import type { CustomCategory } from '../types'
+import { memoizeStringFn } from './bounded-cache'
 import { MERCHANT_LOGOS } from './brand-logos/merchant-logos'
 import type { IconComponent } from './brand-logos/types'
 import {
   DINING_ESTABLISHMENT_REGEX,
+  GERMAN_COMMUNICATION_PURPOSE_REGEX,
   GERMAN_HEALTH_INSURANCE_REGEX,
   GERMAN_INSURANCE_PURPOSE_REGEX,
   GERMAN_TRAVEL_PURPOSE_REGEX,
@@ -23,6 +25,7 @@ import {
   COFFEE_REGEX,
 } from './category-icon-definitions'
 import { resolveCanonicalCategory } from './category-utils'
+import { matchesLowercaseTerm } from './regex-utils'
 
 export { MERCHANT_LOGOS } from './brand-logos/merchant-logos'
 export type { IconComponent } from './brand-logos/types'
@@ -41,22 +44,11 @@ export interface MerchantBrandInfo {
   initials: string
 }
 
-function escapeRegExp(string: string): string {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-function matchesTerm(text: string, term: string): boolean {
-  const leadingBoundary = /^[a-z0-9]/i.test(term) ? '(^|[^a-z0-9])' : ''
-  const trailingBoundary = /[a-z0-9]$/i.test(term) ? '([^a-z0-9]|$)' : ''
-  const pattern = new RegExp(`${leadingBoundary}${escapeRegExp(term)}${trailingBoundary}`, 'i')
-  return pattern.test(text)
-}
-
 function getMerchantMatchScore(merchant: MerchantSuggestion, textLower: string): number {
   let best = 0
   const kw = merchant.keyword.toLowerCase()
   if (kw.length <= 4) {
-    if (matchesTerm(textLower, kw)) {
+    if (matchesLowercaseTerm(textLower, kw)) {
       best = Math.max(best, kw.length)
     }
   } else if (textLower.includes(kw)) {
@@ -67,7 +59,7 @@ function getMerchantMatchScore(merchant: MerchantSuggestion, textLower: string):
     for (const alias of merchant.aliases) {
       const a = alias.toLowerCase()
       if (a.length <= 4) {
-        if (matchesTerm(textLower, a)) {
+        if (matchesLowercaseTerm(textLower, a)) {
           best = Math.max(best, a.length)
         }
       } else if (textLower.includes(a)) {
@@ -92,9 +84,14 @@ const PAYMENT_PROCESSOR_IDS = new Set<string>([
  * Finds the most specific matching popular merchant for a given text
  * by checking its keyword, aliases, and display name.
  * Prioritizes the underlying merchant over payment processors/intermediaries (e.g. Booking.com over PayPal).
+ * Results are memoized since this scans every popular merchant and is called for each rendered row.
  */
 export function findMatchingMerchant(text: string): MerchantSuggestion | undefined {
   if (!text) return undefined
+  return memoizedFindMatchingMerchant(text)
+}
+
+function computeMatchingMerchant(text: string): MerchantSuggestion | undefined {
   const repaired = repairBrokenWords(text)
   const textLower = repaired.replace(/\s+/g, ' ').trim().toLowerCase()
   let bestDirectMerchant: MerchantSuggestion | undefined
@@ -106,12 +103,12 @@ export function findMatchingMerchant(text: string): MerchantSuggestion | undefin
     let score = getMerchantMatchScore(merchant, textLower)
     const nameLower = merchant.name.toLowerCase()
     if (nameLower.length <= 3) {
-      if (matchesTerm(textLower, nameLower) && nameLower.length > score) {
+      if (matchesLowercaseTerm(textLower, nameLower) && nameLower.length > score) {
         score = nameLower.length
       }
     } else {
       if (
-        (textLower.length >= 3 ? nameLower.includes(textLower) : matchesTerm(nameLower, textLower)) &&
+        (textLower.length >= 3 ? nameLower.includes(textLower) : matchesLowercaseTerm(nameLower, textLower)) &&
         textLower.length > score
       ) {
         score = textLower.length
@@ -159,6 +156,8 @@ export function findMatchingMerchant(text: string): MerchantSuggestion | undefin
 
   return bestProcessorMerchant
 }
+
+const memoizedFindMatchingMerchant = memoizeStringFn(computeMatchingMerchant)
 
 export function getCategoryIcon(
   categoryName: string,
@@ -244,6 +243,7 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
     const isHealthInsurance = GERMAN_HEALTH_INSURANCE_REGEX.test(nameTrimmed)
     const isGeneralInsurance = GERMAN_INSURANCE_PURPOSE_REGEX.test(nameTrimmed)
     const isTravelPurpose = GERMAN_TRAVEL_PURPOSE_REGEX.test(nameTrimmed)
+    const isCommunicationPurpose = GERMAN_COMMUNICATION_PURPOSE_REGEX.test(nameTrimmed)
 
     return {
       merchant,
@@ -261,10 +261,13 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
               : (merchant.category === 'Shopping' || merchant.id === 'check24' || merchant.category === 'Services') &&
                   isTravelPurpose
                 ? 'Travel'
-                : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
-                    DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
-                  ? 'Dining Out'
-                  : merchant.category,
+                : (merchant.category === 'Shopping' || merchant.id === 'check24' || merchant.category === 'Services') &&
+                    isCommunicationPurpose
+                  ? 'Communication'
+                  : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
+                      DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
+                    ? 'Dining Out'
+                    : merchant.category,
       initials,
     }
   }

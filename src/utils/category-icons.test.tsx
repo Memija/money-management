@@ -1586,6 +1586,14 @@ describe('category-icons', () => {
       expect(check24ReiseInfo.suggestedCategory).toBe('Travel')
       expect(check24ReiseInfo.brandColor).toBe('#002D72')
 
+      const check24MobilfunkInfo = getMerchantBrandInfo(
+        'CHECK24.de Cashback - Antrag 537946469 - fuer Ihren neuen Mobilfunk Tarif End-to-End-Ref.: Cashback Mobilfunk-  537946469 Kundenreferenz: af93d1697d52d7dbb3d5fa3ffc8fd783b2a',
+      )
+      expect(check24MobilfunkInfo.merchant?.id).toBe('check24')
+      expect(check24MobilfunkInfo.logoComponent).toBe(MERCHANT_LOGOS.Check24Logo)
+      expect(check24MobilfunkInfo.suggestedCategory).toBe('Communication')
+      expect(check24MobilfunkInfo.brandColor).toBe('#002D72')
+
       const chech24Info = getMerchantBrandInfo('Chech24')
       expect(chech24Info.merchant?.id).toBe('check24')
       expect(chech24Info.logoComponent).toBe(MERCHANT_LOGOS.Check24Logo)
@@ -2582,7 +2590,8 @@ describe('category-icons', () => {
         'PayPal Europe S.a.r.l. et Cie S.C.A 1048027734591/PP.4585.PP/. Raj Toys s.r.o., Ihr Einkauf bei Raj Toy',
       )
       expect(rajInfo.merchant?.name).toBe('Raj Toys')
-      expect(rajInfo.logoComponent).toBe(AVAILABLE_ICONS.Gamepad2)
+      expect(rajInfo.logoComponent).toBe(MERCHANT_LOGOS.RajToysLogo)
+      expect(rajInfo.brandColor).toBe('#5CA038')
       expect(rajInfo.suggestedCategory).toBe('Shopping')
 
       // 30. Fahrerlaubnisbehörde Bad Homburg
@@ -2606,8 +2615,9 @@ describe('category-icons', () => {
         'VSPO 0FF06d850afAbFc, Bern CH Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card ',
       )
       expect(vspoInfo.merchant?.name).toBe('VSPO')
-      expect(vspoInfo.logoComponent).toBe(AVAILABLE_ICONS.ShoppingBag)
-      expect(vspoInfo.suggestedCategory).toBe('Shopping')
+      expect(vspoInfo.logoComponent).toBe(MERCHANT_LOGOS.VspoLogo)
+      expect(vspoInfo.brandColor).toBe('#FF2F32')
+      expect(vspoInfo.suggestedCategory).toBe('Transport')
 
       // 33. Stadt Bad Homburg / Rathaus
       const rathausInfo = getMerchantBrandInfo(
@@ -2736,6 +2746,46 @@ describe('category-icons', () => {
       expect(edukativniInfo.suggestedCategory).toBe('Education')
       expect(edukativniInfo.brandColor).toBe('#2563EB')
       expect(edukativniInfo.initials).toBe('EC')
+
+      // 48. Takko Fashion via PayPal SEPA direct debit with line-wrap broken word "Ho lding"
+      const takkoInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1030463918747/PP.4585.PP/. Takko Ho lding GmbH, Ihr Einkauf bei Takko H olding GmbH End-to-End-Ref.: 1030463918747 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+      )
+      expect(takkoInfo.merchant?.name).toBe('Takko Fashion')
+      expect(takkoInfo.logoComponent).toBe(MERCHANT_LOGOS.TakkoLogo)
+      expect(takkoInfo.suggestedCategory).toBe('Shopping')
+
+      // 49. Bergfreunde GmbH via PayPal SEPA direct debit with line-wrap broken words "Bergfreu nde" / "Bergfreun de"
+      const bergfreundeInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1031041394365/PP.4585.PP/. Bergfreu nde GmbH, Ihr Einkauf bei Bergfreun de GmbH End-to-End-Ref.: 1031041394365 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+      )
+      expect(bergfreundeInfo.merchant?.name).toBe('Bergfreunde')
+      expect(bergfreundeInfo.logoComponent).toBe(MERCHANT_LOGOS.BergfreundeLogo)
+      expect(bergfreundeInfo.suggestedCategory).toBe('Shopping')
+
+      // 50. ABH-Nord GmbH via PayPal SEPA direct debit with line-wrap broken word "Gmb H"
+      const abhNordInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1031070225349/PP.4585.PP/. ABH-Nord  GmbH, Ihr Einkauf bei ABH-Nord Gmb H End-to-End-Ref.: 1031070225349 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+      )
+      expect(abhNordInfo.merchant?.name).toBe('ABH-Nord')
+      expect(abhNordInfo.logoComponent).toBe(MERCHANT_LOGOS.AbhNordLogo)
+      expect(abhNordInfo.suggestedCategory).toBe('Shopping')
+
+      // 51. Buchhandlung Rupprecht in Rothenburg
+      const rupprechtInfo = getMerchantBrandInfo(
+        'Buchhandlung Rupprecht  Rothenburg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Buchhandlung Rupprecht   Rothenburg    DEU 2023-12-21T17:12:05 Kartenzahlung',
+      )
+      expect(rupprechtInfo.merchant?.name).toBe('Buchhandlung Rupprecht')
+      expect(rupprechtInfo.logoComponent).toBe(MERCHANT_LOGOS.RupprechtLogo)
+      expect(rupprechtInfo.suggestedCategory).toBe('Shopping')
+
+      // 52. Taunus Wunderland via PayPal SEPA direct debit with line-wrap broken word "Taunus W underland"
+      const taunusInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1027852711911 PP.4585.PP . Taunus W underland e.K. Otto Barth, Ihr Eink auf bei Taunus Wunderland e.K. Otto  Barth End-to-End-Ref.: 1027852711911 PP.4585.PP PAYPAL Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+      )
+      expect(taunusInfo.merchant?.name).toBe('Taunus Wunderland')
+      expect(taunusInfo.logoComponent).toBe(MERCHANT_LOGOS.TaunusWunderlandLogo)
+      expect(taunusInfo.suggestedCategory).toBe('Entertainment')
     })
 
     it('renders Edukativni Centar Rani Razvoj SVG logo into the DOM via getCategoryIcon', () => {
@@ -3112,6 +3162,18 @@ describe('category-icons', () => {
       expect(kfzTxElement).toBeTruthy()
       expect(kfzTxElement?.getAttribute('data-brand-logo')).toBe('true')
       expect(kfzTxElement?.getAttribute('aria-label')).toBe('CHECK24')
+
+      // Also render via getCategoryIcon with Mobilfunk Cashback transaction description
+      const mobilfunkTxDesc =
+        'CHECK24.de Cashback - Antrag 537946469 - fuer Ihren neuen Mobilfunk Tarif End-to-End-Ref.: Cashback Mobilfunk-  537946469 Kundenreferenz: af93d1697d52d7dbb3d5fa3ffc8fd783b2a'
+      const { container: mobilfunkTxContainer } = render(
+        <div>{getCategoryIcon('Communication', 20, undefined, mobilfunkTxDesc)}</div>,
+      )
+      const mobilfunkTxElement = mobilfunkTxContainer.querySelector<HTMLElement>('img, svg')
+      expect(mobilfunkTxElement).toBeTruthy()
+      expect(mobilfunkTxElement?.getAttribute('data-brand-logo')).toBe('true')
+      expect(mobilfunkTxElement?.classList.contains('brand-logo-full')).toBe(true)
+      expect(mobilfunkTxElement?.getAttribute('aria-label')).toBe('CHECK24')
     })
 
     it('matches ALDI SE U. (Aldi Süd) and renders proper ALDI SÜD logo', () => {
@@ -3146,6 +3208,39 @@ describe('category-icons', () => {
       expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
       expect(txImg?.getAttribute('aria-label')).toBe('ALDI SÜD')
       expect(txImg?.getAttribute('src')).toBe('/brands/aldi-sud.svg')
+    })
+
+    it('matches Globus Markthalle Eschborn and renders official GLOBUS logo', () => {
+      const tx =
+        'Globus Markthalle  Eschborn DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Globus Markthalle        Eschborn    DEU 2024-04-06T12:31:40 Kartenzahlung'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.id).toBe('globus')
+      expect(brandInfo.merchant?.name).toBe('GLOBUS')
+      expect(brandInfo.suggestedCategory).toBe('Groceries')
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.GlobusLogo)
+      expect(brandInfo.brandColor).toBe('#07632E')
+
+      // Render GlobusLogo directly
+      const { GlobusLogo } = MERCHANT_LOGOS
+      expect(GlobusLogo).toBeTruthy()
+
+      const { container: globusContainer } = render(React.createElement(GlobusLogo, { size: 24 }))
+      const globusImg = globusContainer.querySelector('img')
+      expect(globusImg).toBeTruthy()
+      expect(globusImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(globusImg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(globusImg?.getAttribute('aria-label')).toBe('GLOBUS')
+      expect(globusImg?.getAttribute('src')).toBe('/brands/globus.svg')
+
+      // Render via getCategoryIcon with the user's transaction description
+      const { container: txContainer } = render(
+        <div>{getCategoryIcon('Groceries', 24, undefined, tx)}</div>,
+      )
+      const txImg = txContainer.querySelector('img')
+      expect(txImg).toBeTruthy()
+      expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txImg?.getAttribute('aria-label')).toBe('GLOBUS')
+      expect(txImg?.getAttribute('src')).toBe('/brands/globus.svg')
     })
 
     it('matches Lidl and renders official brand Lidl logo', () => {
@@ -3313,6 +3408,58 @@ describe('category-icons', () => {
       expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
       expect(txImg?.getAttribute('aria-label')).toBe('Google Pay')
       expect(txImg?.getAttribute('src')).toBe('/brands/google-pay.svg')
+    })
+
+    it('resolves Brötchenmacher brand info and Dining Out category for PayPal Brotchen macher transactions', () => {
+      const tx =
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1037732910084/PP.4585.PP/. Brotchen macher, Ihr Einkauf bei Brotchenmac her End-to-End-Ref.: 1037732910084 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.name).toBe('Brötchenmacher')
+      expect(brandInfo.merchant?.category).toBe('Dining Out')
+      expect(brandInfo.suggestedCategory).toBe('Dining Out')
+      expect(brandInfo.logoComponent).toBe(AVAILABLE_ICONS.Utensils)
+      expect(brandInfo.brandColor).toBe('#D97706')
+      expect(brandInfo.initials).toBe('BR')
+
+      // Render via getCategoryIcon with transaction description
+      const { container } = render(<div>{getCategoryIcon('Dining Out', 24, undefined, tx)}</div>)
+      expect(container.firstChild).toBeInTheDocument()
+    })
+
+    it('resolves Raj Toys brand info and official logo for PayPal Raj Toys transactions', () => {
+      const tx =
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1037930985714/PP.4585.PP/. Raj Toys \u00a0s.r.o., Ihr Einkauf bei Raj Toys s .r.o. End-to-End-Ref.: 1037930985714 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.name).toBe('Raj Toys')
+      expect(brandInfo.suggestedCategory).toBe('Shopping')
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.RajToysLogo)
+      expect(brandInfo.brandColor).toBe('#5CA038')
+
+      // Render via getCategoryIcon with transaction description
+      const { container } = render(<div>{getCategoryIcon('Shopping', 24, undefined, tx)}</div>)
+      const txImg = container.querySelector('img')
+      expect(txImg).toBeTruthy()
+      expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txImg?.getAttribute('aria-label')).toBe('Raj Toys')
+      expect(txImg?.getAttribute('src')).toBe('/brands/raj-toys.png')
+    })
+
+    it('resolves VSPO (Via Portal - E-Vignette Schweiz) brand info and official logo for Swiss motorway vignette transactions', () => {
+      const tx =
+        'VSPO 0FF06d850afAbFc, Bern  CH Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 2026-05-04 21:45:39 Originalbetrag: 40,00 CHF Kurs: 0,9101 CHF               /EUR Entgelt Auslandseinsatz: 0,66 EUR'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.name).toBe('VSPO')
+      expect(brandInfo.suggestedCategory).toBe('Transport')
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.VspoLogo)
+      expect(brandInfo.brandColor).toBe('#FF2F32')
+
+      // Render via getCategoryIcon with transaction description
+      const { container } = render(<div>{getCategoryIcon('Transport', 24, undefined, tx)}</div>)
+      const txImg = container.querySelector('img')
+      expect(txImg).toBeTruthy()
+      expect(txImg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(txImg?.getAttribute('aria-label')).toBe('VSPO')
+      expect(txImg?.getAttribute('src')).toBe('/brands/vspo.svg')
     })
   })
 })

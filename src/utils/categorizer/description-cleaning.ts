@@ -1,4 +1,5 @@
 import type { Transaction } from '../../types'
+import { memoizeStringFn } from '../bounded-cache'
 
 /**
  * Checks whether a transaction is an informative entry with a value of 0 euro.
@@ -126,11 +127,18 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\bheise\s+me\s+dien\b/iu, 'Heise Medien'],
   [/\bme\s+dien\b/iu, 'Medien'],
   [/\braj\s+toy\b(?!\s*s)/iu, 'Raj Toys'],
+  [/\bs\s*\.\s*r\s*\.\s*o\.?/iu, 's.r.o.'],
   [/\bstadt\s+bad\s+hombg\b/iu, 'Stadt Bad Homburg'],
   [/\b(?:bad\s+)?hombur\s+g\b/iu, 'Bad Homburg'],
   [/\bfahrerlaubnisbehoerde\b/iu, 'Fahrerlaubnisbehörde'],
   [/\bantra\s+g\b/iu, 'Antrag'],
   [/\bneu\s+e\b/iu, 'neue'],
+  [/\bbergfreu\s+nde\b/iu, 'Bergfreunde'],
+  [/\bbergfreun\s+de\b/iu, 'Bergfreunde'],
+  [/\bgmb\s+h\b/iu, 'GmbH'],
+  [/\btaunus\s+w\s+underland\b/iu, 'Taunus Wunderland'],
+  [/\bw\s+underland\b/iu, 'Wunderland'],
+  [/\beink\s+auf\b/iu, 'Einkauf'],
   [/(?:gutschein)[-\s]+(?:auszahlung)/iu, 'Gutscheinauszahlung'],
   [/\bkranke\s+nversicher/iu, 'Krankenversicher'],
   [/\bzahnzu\s+satzversicher/iu, 'Zahnzusatzversicher'],
@@ -200,6 +208,8 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\bUNIPES\b/iu, 'Unipessoal'],
   [/(?:ros|ross)[-\s]+(?:smann|mann)\b/iu, 'Rossmann'],
   [/\b(?:u|ub|ube)[-\s]+(?:ber|er|r)\b/iu, 'Uber'],
+  [/(?:brotchenmac|brötchenmac)[-\s]+(?:her)\b/iu, 'Brotchenmacher'],
+  [/(?:brotchen|brötchen)[-\s]+(?:macher)\b/iu, 'Brotchenmacher'],
   // English line-break word splits
   [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
   [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],
@@ -233,18 +243,24 @@ const COMPILED_WORD_REPAIR_RULES: Array<[RegExp, string]> = WORD_REPAIR_RULES.ma
   rep,
 ])
 
-/**
- * Repairs common banking words split by line breaks, column wrapping, or OCR noise
- * (e.g. "Ei nkauf" -> "Einkauf", "Pur chase" -> "Purchase", "Za kup" -> "Zakup").
- */
-export function repairBrokenWords(text: string): string {
-  if (!text || typeof text !== 'string') return ''
-
+const applyWordRepairRules = (text: string): string => {
   let repaired = text
   for (const [pattern, replacement] of COMPILED_WORD_REPAIR_RULES) {
     repaired = repaired.replace(pattern, replacement)
   }
   return repaired
+}
+
+const memoizedApplyWordRepairRules = memoizeStringFn(applyWordRepairRules)
+
+/**
+ * Repairs common banking words split by line breaks, column wrapping, or OCR noise
+ * (e.g. "Ei nkauf" -> "Einkauf", "Pur chase" -> "Purchase", "Za kup" -> "Zakup").
+ * Results are memoized because the ~200 repair rules are costly to run per render.
+ */
+export function repairBrokenWords(text: string): string {
+  if (!text || typeof text !== 'string') return ''
+  return memoizedApplyWordRepairRules(text)
 }
 
 /**
@@ -498,7 +514,7 @@ export function extractMerchantKeyword(desc: string): string {
 
   // 2. Remove corporate legal entity suffixes
   merchant = merchant.replace(
-    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|s\s*\.?\s*e\.?|ltd\.?|limited|limite|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\s*\.?\s*o\s*\.?\s*o\.?|d\s*\.?\s*d\.?|bv|s\.?a\.?r\.?l\.?|o[uü]|gbr|lda|unipessoal|unipes|sa|foundation|foundatio)(?![\p{L}\p{N}])/giu,
+    /(?<![\p{L}\p{N}])(?:gmbh(?:\s*&\s*co\.?\s*kg)?|ag|s\s*\.?\s*e\.?|ltd\.?|limited|limite|inc\.?|llc|kgaa|ug|e\.?\s*k\.?|co\.?\s*kg|sp\.?\s*z\s*o\.?\s*o\.?|d\s*\.?\s*o\s*\.?\s*o\.?|d\s*\.?\s*d\.?|bv|s\.?a\.?r\.?l\.?|s\s*\.?\s*r\s*\.?\s*o\.?|o[uü]|gbr|lda|unipessoal|unipes|sa|foundation|foundatio)(?![\p{L}\p{N}])/giu,
     ' ',
   )
 

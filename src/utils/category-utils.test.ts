@@ -2385,6 +2385,34 @@ describe('category-utils', () => {
         expect(categorize('CHECK24 Pauschalreise Mallorca')).toBe('Travel')
         expect(categorize('CHECK24 Hotelbuchung')).toBe('Travel')
         expect(categorize('CHECK24 Flugbuchung')).toBe('Travel')
+
+        // CHECK24 Cashback / Auszahlung with Mobilfunk / telecommunication context
+        expect(
+          categorize(
+            'CHECK24.de Cashback - Antrag 537946469 - fuer Ihren neuen Mobilfunk Tarif End-to-End-Ref.: Cashback Mobilfunk-  537946469 Kundenreferenz: af93d1697d52d7dbb3d5fa3ffc8fd783b2a',
+          ),
+        ).toBe('Communication')
+        expect(
+          categorize(
+            'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542586686C116',
+          ),
+        ).toBe('Communication')
+        expect(categorize('CHECK24 Mobilfunk')).toBe('Communication')
+        expect(categorize('CHECK24 Handyvertrag Cashback')).toBe('Communication')
+        expect(categorize('CHECK24 DSL Tarif Auszahlung')).toBe('Communication')
+        expect(categorize('CHECK24 Internet-Tarif Cashback')).toBe('Communication')
+        expect(categorize('CHECK24 Glasfaser Cashback')).toBe('Communication')
+      })
+
+      it('categorizes Globus Markthalle and hypermarket transactions as Groceries', () => {
+        expect(
+          categorize(
+            'Globus Markthalle  Eschborn DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Globus Markthalle        Eschborn    DEU 2024-04-06T12:31:40 Kartenzahlung',
+          ),
+        ).toBe('Groceries')
+        expect(categorize('Globus Markthalle Eschborn')).toBe('Groceries')
+        expect(categorize('GLOBUS SB-Warenhaus')).toBe('Groceries')
+        expect(categorize('Globus Handelshof')).toBe('Groceries')
       })
 
       it('categorizes byebye tour operator and hostels (DJH, a&o, MEININGER) as Travel', () => {
@@ -3213,12 +3241,12 @@ describe('category-utils', () => {
           ),
         ).toBe('Entertainment')
 
-        // 32. VSPO Bern -> Shopping
+        // 32. VSPO Bern -> Transport
         expect(
           categorize(
             'VSPO 0FF06d850afAbFc, Bern CH Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card ',
           ),
-        ).toBe('Shopping')
+        ).toBe('Transport')
 
         // 33. Stadt Bad Homburg / Rathaus -> Taxes
         expect(
@@ -3280,6 +3308,62 @@ describe('category-utils', () => {
         expect(
           categorize(
             'PayPal Europe S.a.r.l. et Cie S.C.A 1043667601270/PP.4585.PP/. DARS, d. d., Ihr Einkauf bei DARS, d.d.',
+          ),
+        ).toBe('Transport')
+
+        // 42. Takko Fashion via PayPal SEPA direct debit -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1030463918747/PP.4585.PP/. Takko Ho lding GmbH, Ihr Einkauf bei Takko H olding GmbH End-to-End-Ref.: 1030463918747 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Shopping')
+
+        // 43. Bergfreunde GmbH via PayPal SEPA direct debit -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1031041394365/PP.4585.PP/. Bergfreu nde GmbH, Ihr Einkauf bei Bergfreun de GmbH End-to-End-Ref.: 1031041394365 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Shopping')
+
+        // 44. ABH-Nord GmbH via PayPal SEPA direct debit -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1031070225349/PP.4585.PP/. ABH-Nord  GmbH, Ihr Einkauf bei ABH-Nord Gmb H End-to-End-Ref.: 1031070225349 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Shopping')
+
+        // 45. Buchhandlung Rupprecht in Rothenburg -> Shopping
+        expect(
+          categorize(
+            'Buchhandlung Rupprecht  Rothenburg DE Karte Nr. 5355 3100 0931 8380 Virtual Debit Card Buchhandlung Rupprecht   Rothenburg    DEU 2023-12-21T17:12:05 Kartenzahlung',
+          ),
+        ).toBe('Shopping')
+
+        // 46. Taunus Wunderland via PayPal SEPA direct debit -> Entertainment
+        expect(
+          categorize(
+            'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1027852711911 PP.4585.PP . Taunus W underland e.K. Otto Barth, Ihr Eink auf bei Taunus Wunderland e.K. Otto  Barth End-to-End-Ref.: 1027852711911 PP.4585.PP PAYPAL Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Entertainment')
+
+        // 47. Brotchen macher via PayPal SEPA direct debit -> Dining Out
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1037732910084/PP.4585.PP/. Brotchen macher, Ihr Einkauf bei Brotchenmac her End-to-End-Ref.: 1037732910084 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Dining Out')
+
+        // 48. Raj Toys via PayPal SEPA direct debit -> Shopping
+        expect(
+          categorize(
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1037930985714/PP.4585.PP/. Raj Toys \u00a0s.r.o., Ihr Einkauf bei Raj Toys s .r.o. End-to-End-Ref.: 1037930985714 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+          ),
+        ).toBe('Shopping')
+
+        // 49. VSPO (Via Portal - E-Vignette Schweiz) -> Transport
+        expect(
+          categorize(
+            'VSPO 0FF06d850afAbFc, Bern  CH Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 2026-05-04 21:45:39 Originalbetrag: 40,00 CHF Kurs: 0,9101 CHF               /EUR Entgelt Auslandseinsatz: 0,66 EUR',
           ),
         ).toBe('Transport')
       })
