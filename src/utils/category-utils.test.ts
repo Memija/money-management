@@ -2373,6 +2373,18 @@ describe('category-utils', () => {
         expect(categorize('CHECK24 KFZ-Versicherung Gutschein')).toBe('Insurance')
         expect(categorize('CHECK24 Kfz Versicherung Auszahlung')).toBe('Insurance')
         expect(categorize('CHECK24 Haftpflichtversicherung Cashback')).toBe('Insurance')
+
+        // CHECK24 Auszahlung Guthaben / Reise booking context
+        expect(
+          categorize(
+            'CHECK24 CHECK24 Auszahlung Guthaben - Exago n Park, Mallorca, 17.08.2023 - 24.0 8.2023, Buchungsnr. 2896131 - fuer Ihre Reise End-to-End-Ref.: 24734301- 4t2byobilb1gjrjm Kundenreferenz: f621846439897af9602534c88adb2af87db',
+          ),
+        ).toBe('Travel')
+        expect(categorize('CHECK24 Reise Guthaben')).toBe('Travel')
+        expect(categorize('CHECK24 Reisen Auszahlung')).toBe('Travel')
+        expect(categorize('CHECK24 Pauschalreise Mallorca')).toBe('Travel')
+        expect(categorize('CHECK24 Hotelbuchung')).toBe('Travel')
+        expect(categorize('CHECK24 Flugbuchung')).toBe('Travel')
       })
 
       it('categorizes byebye tour operator and hostels (DJH, a&o, MEININGER) as Travel', () => {

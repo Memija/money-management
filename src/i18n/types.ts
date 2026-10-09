@@ -198,6 +198,7 @@ export interface TranslationStrings {
   batchCategoryPrompt: string
   batchCategoryOnlyThis: string
   batchCategoryUpdateAll: string
+  batchCategoryUpdateSelected: string
   batchCategoryRememberRule: string
   batchCategoryMatchingTransactions: string
   bulkApplyUnlockedOffer: string

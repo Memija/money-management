@@ -171,6 +171,7 @@ export const sr: TranslationStrings = {
     'Пронађено је {count} повезаних трансакција. Желите ли да промените категорију за све на {category}?',
   batchCategoryOnlyThis: 'Само ова трансакција',
   batchCategoryUpdateAll: 'Ажурирај све ({count})',
+  batchCategoryUpdateSelected: 'Ажурирај одабране ({count})',
   batchCategoryRememberRule: 'Запамти ово правило за будуће увозе',
   batchCategoryMatchingTransactions: 'Подударне трансакције',
   bulkApplyUnlockedOffer: 'Примени измене на још {count} откључаних трансакција?',

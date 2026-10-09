@@ -113,6 +113,7 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\bautobahn\s+en\b/iu, 'Autobahnen'],
   [/\bschnellstrasen[-\s]*fina\b/iu, 'Schnellstraßen-Finanzierungs'],
   [/\bst\s+udium\b/iu, 'Studium'],
+  [/\bexago\s+n\b/iu, 'Exagon'],
   [/\bdeutsche\s+r\b/iu, 'Deutscher'],
   [/\bmar\s+kets\b/iu, 'Markets'],
   [/\bmega[-\s]*hol\s+z\b/iu, 'Mega-Holz'],

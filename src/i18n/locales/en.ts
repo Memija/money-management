@@ -171,6 +171,7 @@ export const en: TranslationStrings = {
     'Found {count} related transaction(s). Update the category for all of them to {category}?',
   batchCategoryOnlyThis: 'Only this transaction',
   batchCategoryUpdateAll: 'Update all ({count})',
+  batchCategoryUpdateSelected: 'Update selected ({count})',
   batchCategoryRememberRule: 'Remember this rule for future imports',
   batchCategoryMatchingTransactions: 'Matching transactions',
   bulkApplyUnlockedOffer: 'Apply changes to {count} other unlocked transactions?',

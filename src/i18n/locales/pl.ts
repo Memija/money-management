@@ -175,6 +175,7 @@ export const pl: TranslationStrings = {
     'Znaleziono {count} powiązanych transakcji. Czy chcesz zmienić kategorię dla wszystkich na {category}?',
   batchCategoryOnlyThis: 'Tylko ta transakcja',
   batchCategoryUpdateAll: 'Zaktualizuj wszystkie ({count})',
+  batchCategoryUpdateSelected: 'Zaktualizuj wybrane ({count})',
   batchCategoryRememberRule: 'Zapamiętaj tę regułę dla przyszłych importów',
   batchCategoryMatchingTransactions: 'Pasujące transakcje',
   bulkApplyUnlockedOffer: 'Zastosować zmiany do {count} innych odblokowanych transakcji?',

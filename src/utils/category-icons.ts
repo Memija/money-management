@@ -9,6 +9,7 @@ import {
   DINING_ESTABLISHMENT_REGEX,
   GERMAN_HEALTH_INSURANCE_REGEX,
   GERMAN_INSURANCE_PURPOSE_REGEX,
+  GERMAN_TRAVEL_PURPOSE_REGEX,
 } from './categorizer/categorizer'
 import {
   extractMerchantKeyword,
@@ -242,6 +243,7 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
 
     const isHealthInsurance = GERMAN_HEALTH_INSURANCE_REGEX.test(nameTrimmed)
     const isGeneralInsurance = GERMAN_INSURANCE_PURPOSE_REGEX.test(nameTrimmed)
+    const isTravelPurpose = GERMAN_TRAVEL_PURPOSE_REGEX.test(nameTrimmed)
 
     return {
       merchant,
@@ -256,10 +258,13 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
             : (merchant.category === 'Insurance' || merchant.id === 'check24' || merchant.category === 'Shopping') &&
                 isGeneralInsurance
               ? 'Insurance'
-              : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
-                  DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
-                ? 'Dining Out'
-                : merchant.category,
+              : (merchant.category === 'Shopping' || merchant.id === 'check24' || merchant.category === 'Services') &&
+                  isTravelPurpose
+                ? 'Travel'
+                : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
+                    DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
+                  ? 'Dining Out'
+                  : merchant.category,
       initials,
     }
   }

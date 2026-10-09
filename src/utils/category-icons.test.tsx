@@ -1578,6 +1578,14 @@ describe('category-icons', () => {
       expect(check24KfzInfo.suggestedCategory).toBe('Insurance')
       expect(check24KfzInfo.brandColor).toBe('#002D72')
 
+      const check24ReiseInfo = getMerchantBrandInfo(
+        'CHECK24 CHECK24 Auszahlung Guthaben - Exago n Park, Mallorca, 17.08.2023 - 24.0 8.2023, Buchungsnr. 2896131 - fuer Ihre Reise End-to-End-Ref.: 24734301- 4t2byobilb1gjrjm Kundenreferenz: f621846439897af9602534c88adb2af87db',
+      )
+      expect(check24ReiseInfo.merchant?.id).toBe('check24')
+      expect(check24ReiseInfo.logoComponent).toBe(MERCHANT_LOGOS.Check24Logo)
+      expect(check24ReiseInfo.suggestedCategory).toBe('Travel')
+      expect(check24ReiseInfo.brandColor).toBe('#002D72')
+
       const chech24Info = getMerchantBrandInfo('Chech24')
       expect(chech24Info.merchant?.id).toBe('check24')
       expect(chech24Info.logoComponent).toBe(MERCHANT_LOGOS.Check24Logo)

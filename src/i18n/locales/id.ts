@@ -172,6 +172,7 @@ export const id: TranslationStrings = {
     'Ditemukan {count} transaksi terkait. Perbarui kategori untuk semuanya ke {category}?',
   batchCategoryOnlyThis: 'Hanya transaksi ini',
   batchCategoryUpdateAll: 'Perbarui semua ({count})',
+  batchCategoryUpdateSelected: 'Perbarui yang dipilih ({count})',
   batchCategoryRememberRule: 'Ingat aturan ini untuk impor mendatang',
   batchCategoryMatchingTransactions: 'Transaksi yang cocok',
   bulkApplyUnlockedOffer: 'Terapkan perubahan ke {count} transaksi tidak terkunci lainnya?',

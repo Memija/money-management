@@ -209,6 +209,11 @@ export const GERMAN_HEALTH_INSURANCE_REGEX =
 export const GERMAN_INSURANCE_PURPOSE_REGEX =
   /(?:\b(?:kfz[- ]?vers\w*|auto[- ]?vers\w*|fahrzeug[- ]?vers\w*|motorrad[- ]?vers\w*|haftpflicht\w*|hausrat\w*|rechtsschutz\w*|unfallvers\w*|lebensvers\w*|risikolv\w*|sterbegeld\w*|tierhalterhaftpflicht\w*|hundehaftpflicht\w*|wohngeb[aä]udevers\w*|geb[aä]udevers\w*|versicherungs?(?:auszahlung|beitrag|pr[aä]mie)?)\b)/i
 
+// Regex to detect German travel, vacation, booking, flight, and lodging context (e.g. 'Reise', 'Reisen', 'Reisebuchung', 'Urlaub', 'Pauschalreise', 'Hotel', 'Flug')
+// to categorize travel bookings, tour operator packages, or comparison portal cashback/refunds (e.g. CHECK24 Auszahlung Guthaben - fuer Ihre Reise) as Travel.
+export const GERMAN_TRAVEL_PURPOSE_REGEX =
+  /(?:\b(?:(?:an|ab)?reise\b|reisen\b|reisebuchung\w*|reisedienst\w*|reisepartner\w*|urlaub\w*|pauschalreise\w*|flug(?:buchung|reise|ticket)?\w*|fl[uü]ge\b|hotel(?:buchung|reservierung)?\w*|resort\w*|ferien(?:wohnung|haus|resort)?\w*|kreuzfahrt\w*)\b)/i
+
 /**
  * Regex to detect explicit dining venue / establishment terms
  * (e.g. 'Restoran', 'Restaurant', 'Bistro', 'Pizzeria', 'Caffe & Restoran', 'Konoba', 'Gostionica', 'Ćevabdžinica', 'Kafana')
@@ -343,6 +348,12 @@ export function categorize(
     } else if (popularCat === 'Shopping' && GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
       if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Insurance')
       return 'Insurance'
+    } else if (
+      (popularCat === 'Shopping' || popularCat === 'Services' || popularCat === 'Insurance') &&
+      GERMAN_TRAVEL_PURPOSE_REGEX.test(d)
+    ) {
+      if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Travel')
+      return 'Travel'
     } else {
       if (!customKeywords) defaultCategoryCache.set(cacheKey, popularCat)
       return popularCat
@@ -361,6 +372,13 @@ export function categorize(
   if (GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
     if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Insurance')
     return 'Insurance'
+  }
+
+  // Travel priority check (e.g. 'Reise', 'Reisen', 'Urlaub', 'Pauschalreise', 'Hotel', 'Flug')
+  // categorized as Travel rather than falling into general Shopping or Other
+  if (GERMAN_TRAVEL_PURPOSE_REGEX.test(d)) {
+    if (!customKeywords) defaultCategoryCache.set(cacheKey, 'Travel')
+    return 'Travel'
   }
 
   // Explicit dining establishment venue indicators (e.g. 'Restoran', 'Restaurant', 'Bistro', 'Pizzeria')

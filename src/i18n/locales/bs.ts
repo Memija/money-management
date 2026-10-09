@@ -171,6 +171,7 @@ export const bs: TranslationStrings = {
     'Pronađeno {count} povezanih transakcija. Želite li promijeniti kategoriju za sve na {category}?',
   batchCategoryOnlyThis: 'Samo ova transakcija',
   batchCategoryUpdateAll: 'Ažuriraj sve ({count})',
+  batchCategoryUpdateSelected: 'Ažuriraj odabrane ({count})',
   batchCategoryRememberRule: 'Zapamti ovo pravilo za buduće uvoze',
   batchCategoryMatchingTransactions: 'Podudarne transakcije',
   bulkApplyUnlockedOffer: 'Primijeni izmjene na još {count} otključanih transakcija?',

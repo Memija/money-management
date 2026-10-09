@@ -1308,6 +1308,76 @@ describe('TransactionList Component', () => {
       expect(screen.queryByText('Update Related Transactions')).not.toBeInTheDocument()
     })
 
+    it('allows unchecking a related transaction to update only the selected one in bulk', () => {
+      const tripleCheck24Tx: Transaction[] = [
+        {
+          id: 'tx-check24-1',
+          date: '2024-03-01',
+          amount: 25.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description:
+            'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542586686C116',
+          category: 'Other',
+          type: 'income',
+        },
+        {
+          id: 'tx-check24-2',
+          date: '2024-03-15',
+          amount: 15.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description:
+            'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542491879C1159',
+          category: 'Other',
+          type: 'income',
+        },
+        {
+          id: 'tx-check24-3',
+          date: '2024-03-20',
+          amount: 10.0,
+          currency: 'EUR',
+          institution: 'Bank A',
+          description:
+            'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung End-to-End-Ref.: C542491879C9999',
+          category: 'Other',
+          type: 'income',
+        },
+      ]
+
+      render(
+        <TransactionList
+          filteredTx={tripleCheck24Tx}
+          allTransactions={tripleCheck24Tx}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+        />,
+      )
+
+      const triggerButtons = screen.getAllByRole('button', { name: /Cat: Other/i })
+      fireEvent.click(triggerButtons[0])
+
+      const commOption = screen.getByRole('option', { name: /Cat: Communication/i })
+      fireEvent.click(commOption)
+
+      expect(screen.getByText('Update Related Transactions')).toBeInTheDocument()
+
+      const cbTx2 = screen.getByTestId('related-checkbox-tx-check24-2')
+      const cbTx3 = screen.getByTestId('related-checkbox-tx-check24-3')
+      expect(cbTx2).toBeChecked()
+      expect(cbTx3).toBeChecked()
+
+      // Uncheck tx-check24-3 so only tx-check24-2 is selected
+      fireEvent.click(cbTx3)
+      expect(cbTx3).not.toBeChecked()
+
+      const updateBtn = screen.getByTestId('batch-category-update-all-btn')
+      fireEvent.click(updateBtn)
+
+      expect(screen.queryByText('Update Related Transactions')).not.toBeInTheDocument()
+    })
+
     it('closes modal without changing category when user clicks cancel', () => {
       render(
         <TransactionList

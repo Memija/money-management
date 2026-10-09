@@ -173,6 +173,7 @@ export const de: TranslationStrings = {
     '{count} zugehörige Transaktion(en) gefunden. Möchten Sie die Kategorie für alle auf {category} aktualisieren?',
   batchCategoryOnlyThis: 'Nur diese Transaktion',
   batchCategoryUpdateAll: 'Alle ({count}) aktualisieren',
+  batchCategoryUpdateSelected: 'Ausgewählte ({count}) aktualisieren',
   batchCategoryRememberRule: 'Diese Regel für zukünftige Importe merken',
   batchCategoryMatchingTransactions: 'Passende Transaktionen',
   bulkApplyUnlockedOffer: 'Änderungen auf {count} weitere entsperrte Buchungen anwenden?',

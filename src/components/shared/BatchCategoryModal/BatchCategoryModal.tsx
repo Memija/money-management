@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ArrowRight, CheckCheck, Layers } from 'lucide-react'
 
 import { useAppStore } from '../../../store/useAppStore'
@@ -46,6 +46,15 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
   const customCategories = useAppStore((s) => s.customCategories)
   const isPrivacyMode = usePrivacyStore((s) => s.isPrivacyMode)
   const [rememberRule, setRememberRule] = useState<boolean>(true)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(
+    () => new Set(relatedTransactions.map((tx) => tx.id)),
+  )
+
+  useEffect(() => {
+    if (isOpen && targetTransaction) {
+      setSelectedIds(new Set(relatedTransactions.map((tx) => tx.id)))
+    }
+  }, [isOpen, targetTransaction, newCategory, relatedTransactions])
 
   if (!targetTransaction) return null
 
@@ -55,16 +64,42 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
   const currentCategoryLabel = getCategoryLabel(currentCategory, t, locale, customCategories)
   const currentCategoryColor = getCategoryColor(currentCategory, customCategories)
 
+  const isAllSelected =
+    relatedTransactions.length > 0 && selectedIds.size === relatedTransactions.length
+  const isSomeSelected = selectedIds.size > 0 && selectedIds.size < relatedTransactions.length
+  const selectedRelatedTransactions = relatedTransactions.filter((tx) => selectedIds.has(tx.id))
+  const selectedRelatedCount = selectedRelatedTransactions.length
   const totalAffectedCount = relatedTransactions.length + 1
+  const totalSelectedCount = selectedRelatedCount + 1
 
   const handleOnlyThis = () => {
     onConfirmOnlyThis(targetTransaction, newCategory)
     onClose()
   }
 
-  const handleUpdateAll = () => {
-    onConfirmAll(targetTransaction, relatedTransactions, newCategory, rememberRule)
+  const handleUpdate = () => {
+    onConfirmAll(targetTransaction, selectedRelatedTransactions, newCategory, rememberRule)
     onClose()
+  }
+
+  const handleToggleTx = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
+  const handleToggleSelectAll = () => {
+    if (selectedIds.size === relatedTransactions.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(relatedTransactions.map((tx) => tx.id)))
+    }
   }
 
   const promptMessage = (
@@ -74,10 +109,20 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
     .replace('{count}', String(relatedTransactions.length))
     .replace('{category}', targetCategoryLabel)
 
-  const updateAllButtonText = (t.batchCategoryUpdateAll || 'Update all ({count})').replace(
-    '{count}',
-    String(totalAffectedCount),
-  )
+  const updateButtonText = isAllSelected
+    ? (t.batchCategoryUpdateAll || 'Update all ({count})').replace(
+        '{count}',
+        String(totalAffectedCount),
+      )
+    : (t.batchCategoryUpdateSelected || 'Update selected ({count})').replace(
+        '{count}',
+        String(totalSelectedCount),
+      )
+
+  const badgeText =
+    selectedRelatedCount === relatedTransactions.length
+      ? String(relatedTransactions.length)
+      : `${selectedRelatedCount} / ${relatedTransactions.length}`
 
   return (
     <Modal
@@ -110,13 +155,13 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
           <button
             type="button"
             className={styles.updateAllButton}
-            onClick={handleUpdateAll}
-            title={updateAllButtonText}
-            aria-label={updateAllButtonText}
+            onClick={handleUpdate}
+            title={updateButtonText}
+            aria-label={updateButtonText}
             data-testid="batch-category-update-all-btn"
           >
             <CheckCheck size={16} aria-hidden="true" />
-            <span>{updateAllButtonText}</span>
+            <span>{updateButtonText}</span>
           </button>
         </div>
       }
@@ -183,20 +228,80 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
         {/* Matching Related Transactions List */}
         <div className={styles.relatedSection}>
           <div className={styles.relatedSectionHeader}>
-            <span className={styles.relatedSectionTitle}>
-              {t.batchCategoryMatchingTransactions || 'Matching transactions'}
-            </span>
-            <span className={styles.countBadge}>{relatedTransactions.length}</span>
+            <div className={styles.relatedHeaderLeft}>
+              <label className={styles.selectAllLabel}>
+                <input
+                  type="checkbox"
+                  id="batch-category-select-all"
+                  data-testid="batch-category-select-all"
+                  className={styles.checkbox}
+                  checked={isAllSelected}
+                  ref={(el) => {
+                    if (el) {
+                      el.indeterminate = isSomeSelected
+                    }
+                  }}
+                  onChange={handleToggleSelectAll}
+                  aria-label={
+                    isAllSelected
+                      ? t.deselectAll || 'Deselect All'
+                      : t.selectAll || 'Select All'
+                  }
+                />
+                <span className={styles.relatedSectionTitle}>
+                  {t.batchCategoryMatchingTransactions || 'Matching transactions'}
+                </span>
+              </label>
+              <span className={styles.countBadge} data-testid="batch-category-count-badge">
+                {badgeText}
+              </span>
+            </div>
+            <button
+              type="button"
+              className={styles.selectAllBtn}
+              onClick={handleToggleSelectAll}
+              data-testid="batch-category-select-all-btn"
+              title={isAllSelected ? t.deselectAll || 'Deselect All' : t.selectAll || 'Select All'}
+              aria-label={
+                isAllSelected ? t.deselectAll || 'Deselect All' : t.selectAll || 'Select All'
+              }
+            >
+              {isAllSelected ? t.deselectAll || 'Deselect All' : t.selectAll || 'Select All'}
+            </button>
           </div>
 
           <div className={styles.relatedList} role="region" aria-label="Matching transactions list">
             {relatedTransactions.map((tx) => {
+              const isSelected = selectedIds.has(tx.id)
               const txCat = tx.category || 'Other'
               const txCatColor = getCategoryColor(txCat, customCategories)
               const txCatLabel = getCategoryLabel(txCat, t, locale, customCategories)
 
               return (
-                <div key={tx.id} className={styles.relatedItem} data-testid={`related-tx-${tx.id}`}>
+                <div
+                  key={tx.id}
+                  className={`${styles.relatedItem} ${isSelected ? styles.relatedItemSelected : ''}`}
+                  data-testid={`related-tx-${tx.id}`}
+                  onClick={(e) => {
+                    if ((e.target as HTMLElement).closest('button')) return
+                    handleToggleTx(tx.id)
+                  }}
+                >
+                  <div
+                    className={styles.itemCheckboxWrapper}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      id={`batch-select-tx-${tx.id}`}
+                      data-testid={`related-checkbox-${tx.id}`}
+                      className={styles.checkbox}
+                      checked={isSelected}
+                      onChange={() => handleToggleTx(tx.id)}
+                      aria-label={tx.description}
+                    />
+                  </div>
+
                   <div className={styles.relatedItemLeft}>
                     <div className={styles.relatedDescRow}>
                       <p
