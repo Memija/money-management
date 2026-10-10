@@ -946,8 +946,8 @@ describe('category-icons', () => {
           {getCategoryIcon('Communication', 24, undefined, 'ALDI TALK Guthaben')}
         </div>,
       )
-      expect(container.querySelector('svg[aria-label="congstar"]')).toBeInTheDocument()
-      expect(container.querySelector('svg[aria-label="ALDI TALK"]')).toBeInTheDocument()
+      expect(container.querySelector('[aria-label="congstar"]')).toBeInTheDocument()
+      expect(container.querySelector('[aria-label="ALDI TALK"]')).toBeInTheDocument()
     })
 
     it('matches Gerichtskasse Hessen state emblem for judicial and property purchase tax transactions', () => {
@@ -2976,35 +2976,35 @@ describe('category-icons', () => {
 
       // Render EurowingsLogo
       const { container: eurowingsContainer } = render(React.createElement(EurowingsLogo, { size: 20 }))
-      const eurowingsSvg = eurowingsContainer.querySelector('svg')
-      expect(eurowingsSvg).toBeTruthy()
-      expect(eurowingsSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(eurowingsSvg?.classList.contains('brand-logo-full')).toBe(true)
-      expect(eurowingsSvg?.getAttribute('aria-label')).toBe('Eurowings')
+      const eurowingsElement = eurowingsContainer.querySelector('[data-brand-logo="true"]')
+      expect(eurowingsElement).toBeTruthy()
+      expect(eurowingsElement?.getAttribute('data-brand-logo')).toBe('true')
+      expect(eurowingsElement?.classList.contains('brand-logo-full')).toBe(true)
+      expect(eurowingsElement?.getAttribute('aria-label')).toBe('Eurowings')
 
       // Render DertourLogo
       const { container: dertourContainer } = render(React.createElement(DertourLogo, { size: 20 }))
-      const dertourSvg = dertourContainer.querySelector('svg')
-      expect(dertourSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(dertourSvg?.classList.contains('brand-logo-full')).toBe(true)
+      const dertourElement = dertourContainer.querySelector('[data-brand-logo="true"]')
+      expect(dertourElement?.getAttribute('data-brand-logo')).toBe('true')
+      expect(dertourElement?.classList.contains('brand-logo-full')).toBe(true)
 
       // Render AlltoursLogo
       const { container: alltoursContainer } = render(React.createElement(AlltoursLogo, { size: 20 }))
-      const alltoursSvg = alltoursContainer.querySelector('svg')
-      expect(alltoursSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(alltoursSvg?.classList.contains('brand-logo-full')).toBe(true)
+      const alltoursElement = alltoursContainer.querySelector('[data-brand-logo="true"]')
+      expect(alltoursElement?.getAttribute('data-brand-logo')).toBe('true')
+      expect(alltoursElement?.classList.contains('brand-logo-full')).toBe(true)
 
       // Render SchauinslandLogo
       const { container: schauContainer } = render(React.createElement(SchauinslandLogo, { size: 20 }))
-      const schauSvg = schauContainer.querySelector('svg')
-      expect(schauSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(schauSvg?.classList.contains('brand-logo-full')).toBe(true)
+      const schauElement = schauContainer.querySelector('[data-brand-logo="true"]')
+      expect(schauElement?.getAttribute('data-brand-logo')).toBe('true')
+      expect(schauElement?.classList.contains('brand-logo-full')).toBe(true)
 
       // Render CondorLogo
       const { container: condorContainer } = render(React.createElement(CondorLogo, { size: 20 }))
-      const condorSvg = condorContainer.querySelector('svg')
-      expect(condorSvg?.getAttribute('data-brand-logo')).toBe('true')
-      expect(condorSvg?.classList.contains('brand-logo-full')).toBe(true)
+      const condorElement = condorContainer.querySelector('[data-brand-logo="true"]')
+      expect(condorElement?.getAttribute('data-brand-logo')).toBe('true')
+      expect(condorElement?.classList.contains('brand-logo-full')).toBe(true)
 
       // Brand info resolution
       expect(getMerchantBrandInfo('TUI Deutschland GmbH').logoComponent).toBe(TuiLogo)
