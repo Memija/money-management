@@ -245,7 +245,19 @@ const COMPILED_WORD_REPAIR_RULES: Array<[RegExp, string]> = WORD_REPAIR_RULES.ma
   rep,
 ])
 
+/**
+ * Matches if ANY repair rule would match. If none matches the input, every sequential
+ * replace below would be a no-op, so the text can be returned unchanged after a single scan.
+ */
+const ANY_WORD_REPAIR_RULE = new RegExp(
+  `(?<![\\p{L}\\p{N}])(?:${WORD_REPAIR_RULES.map(([regex]) => `(?:${regex.source})`).join('|')})(?![\\p{L}\\p{N}])`,
+  'iu',
+)
+
 const applyWordRepairRules = (text: string): string => {
+  if (!ANY_WORD_REPAIR_RULE.test(text)) {
+    return text
+  }
   let repaired = text
   for (const [pattern, replacement] of COMPILED_WORD_REPAIR_RULES) {
     repaired = repaired.replace(pattern, replacement)

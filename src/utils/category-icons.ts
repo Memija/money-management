@@ -1,7 +1,7 @@
 import React from 'react'
 import { Coffee, ImageOff, Package } from 'lucide-react'
 
-import { type MerchantSuggestion, POPULAR_MERCHANTS } from '../data/merchants'
+import type { MerchantSuggestion } from '../data/merchants'
 import type { CustomCategory } from '../types'
 import { memoizeStringFn } from './bounded-cache'
 import { MERCHANT_LOGOS } from './brand-logos/merchant-logos'
@@ -25,6 +25,7 @@ import {
   COFFEE_REGEX,
 } from './category-icon-definitions'
 import { resolveCanonicalCategory } from './category-utils'
+import { getCandidateMerchants, type IndexedMerchant } from './merchant-index'
 import { matchesLowercaseTerm } from './regex-utils'
 
 export { MERCHANT_LOGOS } from './brand-logos/merchant-logos'
@@ -44,9 +45,8 @@ export interface MerchantBrandInfo {
   initials: string
 }
 
-function getMerchantMatchScore(merchant: MerchantSuggestion, textLower: string): number {
+function getMerchantMatchScore({ keywordLower: kw, aliasesLower }: IndexedMerchant, textLower: string): number {
   let best = 0
-  const kw = merchant.keyword.toLowerCase()
   if (kw.length <= 4) {
     if (matchesLowercaseTerm(textLower, kw)) {
       best = Math.max(best, kw.length)
@@ -55,16 +55,13 @@ function getMerchantMatchScore(merchant: MerchantSuggestion, textLower: string):
     best = Math.max(best, kw.length)
   }
 
-  if (merchant.aliases) {
-    for (const alias of merchant.aliases) {
-      const a = alias.toLowerCase()
-      if (a.length <= 4) {
-        if (matchesLowercaseTerm(textLower, a)) {
-          best = Math.max(best, a.length)
-        }
-      } else if (textLower.includes(a)) {
+  for (const a of aliasesLower) {
+    if (a.length <= 4) {
+      if (matchesLowercaseTerm(textLower, a)) {
         best = Math.max(best, a.length)
       }
+    } else if (textLower.includes(a)) {
+      best = Math.max(best, a.length)
     }
   }
   return best
@@ -109,9 +106,11 @@ function computeMatchingMerchant(text: string): MerchantSuggestion | undefined {
   let bestProcessorMerchant: MerchantSuggestion | undefined
   let bestProcessorScore = 0
 
-  for (const merchant of POPULAR_MERCHANTS) {
-    let score = getMerchantMatchScore(merchant, textLower)
-    const nameLower = merchant.name.toLowerCase()
+  // Only merchants whose terms occur in the text (or whose name contains the text) can score above zero
+  const candidates = getCandidateMerchants(textLower, { includeNamesContainingText: true })
+  for (const indexed of candidates) {
+    const { merchant, nameLower } = indexed
+    let score = getMerchantMatchScore(indexed, textLower)
     if (nameLower.length <= 3) {
       if (matchesLowercaseTerm(textLower, nameLower) && nameLower.length > score) {
         score = nameLower.length

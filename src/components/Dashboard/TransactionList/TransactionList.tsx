@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ChevronLeft,
@@ -96,7 +96,13 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
       relatedTx: Transaction[]
     } | null>(null)
 
-    const categoryFilter = selectedCategory !== undefined ? selectedCategory : internalCategory
+    const rawCategory = selectedCategory !== undefined ? selectedCategory : internalCategory
+    const categoryFilter =
+      !filterTransactionsWithoutLogos && rawCategory === 'without-logos' ? 'all' : rawCategory
+
+    if (!filterTransactionsWithoutLogos && internalCategory === 'without-logos') {
+      setInternalCategory('all')
+    }
 
     const handleCategoryFilterChange = useCallback(
       (cat: string) => {
@@ -109,12 +115,6 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
       },
       [setSelectedCategory],
     )
-
-    useEffect(() => {
-      if (!filterTransactionsWithoutLogos && categoryFilter === 'without-logos') {
-        handleCategoryFilterChange('all')
-      }
-    }, [filterTransactionsWithoutLogos, categoryFilter, handleCategoryFilterChange])
 
     // Single-pass computation for filtered categories, types, counts, and financial totals
     const {

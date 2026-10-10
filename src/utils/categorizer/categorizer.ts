@@ -1,6 +1,7 @@
 import { POPULAR_MERCHANTS } from '../../data/merchants'
 import { type CategoryKeywords, translations } from '../../i18n/translations'
 import { createBoundedCache } from '../bounded-cache'
+import { getCandidateMerchants } from '../merchant-index'
 import { escapeRegExp, matchesLowercaseTerm } from '../regex-utils'
 import { isPaymentProcessorIntermediary, repairBrokenWords } from './description-cleaning'
 
@@ -131,24 +132,20 @@ function findPopularMerchantCategory(textLower: string): string | undefined {
   let bestProcessorCategory: string | undefined
   let bestProcessorScore = 0
 
-  for (const merchant of POPULAR_MERCHANTS) {
+  for (const { merchant, keywordLower: kw, aliasesLower, nameLower } of getCandidateMerchants(textLower)) {
     if (merchant.category === 'Transfers') continue
-    const kw = merchant.keyword.toLowerCase()
     let score = 0
     if (matchesLowercaseTerm(textLower, kw)) {
       score = kw.length
     }
 
-    if (merchant.aliases) {
-      for (const alias of merchant.aliases) {
-        const a = alias.toLowerCase()
-        if (matchesLowercaseTerm(textLower, a)) {
-          score = Math.max(score, a.length)
-        }
+    for (const a of aliasesLower) {
+      if (matchesLowercaseTerm(textLower, a)) {
+        score = Math.max(score, a.length)
       }
     }
 
-    if (score > 0 && (kw === textLower || merchant.name.toLowerCase() === textLower)) {
+    if (score > 0 && (kw === textLower || nameLower === textLower)) {
       score += 1000
     }
 
@@ -227,26 +224,52 @@ interface CompiledCustomKeyword {
   regex?: RegExp
 }
 
-// Compiled custom keyword regexes, keyed by the (immutable) customKeywords object from the store.
-const compiledCustomKeywordsCache = new WeakMap<Record<string, string[]>, CompiledCustomKeyword[]>()
+interface CompiledCustomKeywords {
+  entries: CompiledCustomKeyword[]
+  /** Single combined regex matching if ANY keyword matches; used to reject most descriptions in one test. */
+  anyMatch?: RegExp
+}
 
-function compileCustomKeywords(customKeywords: Record<string, string[]>): CompiledCustomKeyword[] {
+// Compiled custom keyword regexes, keyed by the (immutable) customKeywords object from the store.
+const compiledCustomKeywordsCache = new WeakMap<Record<string, string[]>, CompiledCustomKeywords>()
+
+function buildCombinedPrefilter(words: string[]): RegExp | undefined {
+  try {
+    return buildKeywordRegex(words)
+  } catch {
+    return undefined
+  }
+}
+
+function compileCustomKeywords(customKeywords: Record<string, string[]>): CompiledCustomKeywords {
   const cached = compiledCustomKeywordsCache.get(customKeywords)
   if (cached) return cached
 
-  const compiled: CompiledCustomKeyword[] = []
+  const entries: CompiledCustomKeyword[] = []
+  const prefilterWords: string[] = []
+  let canPrefilter = true
   for (const [category, words] of Object.entries(customKeywords)) {
     if (!words || words.length === 0) continue
     for (const word of words) {
       if (!word || !word.trim()) continue
+      const pattern = keywordToPattern(word)
       let regex: RegExp | undefined
       try {
-        regex = new RegExp(keywordToPattern(word), 'iu')
+        regex = new RegExp(pattern, 'iu')
       } catch {
         regex = undefined
       }
-      compiled.push({ category, word: word.toLowerCase(), regex })
+      // Entries that fall back to substring matching (or match everything) can't be expressed in the prefilter
+      if (!regex || !pattern) {
+        canPrefilter = false
+      }
+      prefilterWords.push(word)
+      entries.push({ category, word: word.toLowerCase(), regex })
     }
+  }
+  const compiled: CompiledCustomKeywords = {
+    entries,
+    anyMatch: canPrefilter ? buildCombinedPrefilter(prefilterWords) : undefined,
   }
   compiledCustomKeywordsCache.set(customKeywords, compiled)
   return compiled
@@ -259,7 +282,9 @@ function toDisplayCategory(cat: string): string {
 }
 
 function matchCustomKeywords(d: string, customKeywords: Record<string, string[]>): string | undefined {
-  for (const { category, word, regex } of compileCustomKeywords(customKeywords)) {
+  const { entries, anyMatch } = compileCustomKeywords(customKeywords)
+  if (anyMatch && !anyMatch.test(d)) return undefined
+  for (const { category, word, regex } of entries) {
     const isMatch = regex ? regex.test(d) : d.includes(word)
     if (isMatch) return toDisplayCategory(category)
   }

@@ -100,15 +100,17 @@
 .orb-3 {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
+  /* Softness comes from the radial gradient itself; a filter blur here forced a full
+     re-rasterization of three huge layers on every animation frame. */
   opacity: 0.6;
+  will-change: transform;
   animation: orbDrift 18s ease-in-out infinite;
 }
 
 .orb-1 {
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, var(--glow-emerald) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--glow-emerald) 0%, transparent 72%);
   top: -200px;
   left: -150px;
   animation-duration: 22s;
@@ -117,7 +119,7 @@
 .orb-2 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, var(--glow-indigo) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--glow-indigo) 0%, transparent 72%);
   top: 30%;
   right: -180px;
   animation-duration: 18s;
@@ -127,7 +129,7 @@
 .orb-3 {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, var(--glow-amber) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--glow-amber) 0%, transparent 72%);
   bottom: 10%;
   left: 35%;
   animation-duration: 25s;
@@ -139,6 +141,15 @@
   33%  { transform: translate(30px, -20px) scale(1.06); }
   66%  { transform: translate(-20px, 30px) scale(0.95); }
   100% { transform: translate(0, 0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb-1,
+  .orb-2,
+  .orb-3,
+  .balance-hero::after {
+    animation: none;
+  }
 }
 
 /* Ensure main content is above the orbs */
@@ -290,7 +301,7 @@
   pointer-events: none;
 }
 
-/* Shimmer sweep */
+/* Shimmer sweep (transform-based so it runs on the compositor without repainting) */
 .balance-hero::after {
   content: '';
   position: absolute;
@@ -301,14 +312,15 @@
     rgba(255, 255, 255, 0.035) 50%,
     transparent 60%
   );
-  background-size: 200% 100%;
+  transform: translateX(-100%);
+  will-change: transform;
   animation: heroShimmer 4s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes heroShimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .balance-hero.negative::before {
@@ -363,8 +375,6 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 0.85rem 1.4rem;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
   min-width: 160px;
 }
 

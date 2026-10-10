@@ -68,20 +68,26 @@ describe('AdvancedSettings', () => {
         {
           institutionId: 'bank-1',
           institutionName: 'Test Bank',
+          importedAt: '2026-04-01T00:00:00.000Z',
+          importedFingerprints: [],
           transactions: [
             {
               id: 'tx-1',
               date: '2026-04-01',
               amount: -12.99,
               description: 'Netflix subscription',
+              currency: 'EUR',
               type: 'expense',
+              institution: 'Test Bank',
             },
             {
               id: 'tx-2',
               date: '2026-04-02',
               amount: -50.0,
               description: 'Local bakery without logo',
+              currency: 'EUR',
               type: 'expense',
+              institution: 'Test Bank',
             },
           ],
         },

@@ -1,4 +1,5 @@
 import { createElement } from 'react'
+
 import { createImageLogo } from './logo-factory'
 import type { IconComponent } from './types'
 

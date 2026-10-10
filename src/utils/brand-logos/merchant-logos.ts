@@ -40,7 +40,6 @@ import {
   GlsBankLogo,
   HypoVereinsbankLogo,
   IngLogo,
-  KlarnaBankLogo,
   KlarnaLogo,
   N26Logo,
   NorisbankLogo,
@@ -80,8 +79,8 @@ import {
   LotharBraunLogo,
 } from './craft-logos'
 import {
-  CRYPTO_LOGOS,
   CoinbaseLogo,
+  CRYPTO_LOGOS,
   GuardarianLogo,
   KrakenLogo,
 } from './crypto-logos'
@@ -146,7 +145,6 @@ import {
   HornbachLogo,
   IntratecLogo,
   MediaMarktLogo,
-  MediamarktLogo,
   ObiLogo,
   PaybackLogo,
   PortraitnetLogo,
@@ -202,7 +200,6 @@ import {
   TotalEnergiesLogo,
   TurmoelLogo,
   UberLogo,
-  UberRidesLogo,
   VrrLogo,
 } from './transit-logos'
 import {
@@ -239,16 +236,13 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiNetflix: NetflixLogo,
   NetflixLogo,
   netflix: NetflixLogo,
-  'netflix': NetflixLogo,
   SiSpotify, SiStarbucks, SiSteam,
   SiUber: UberLogo,
   UberLogo,
   uber: UberLogo,
-  'uber': UberLogo,
   SiMcdonalds: McdonaldsLogo,
   McdonaldsLogo,
   mcdonalds: McdonaldsLogo,
-  'mcdonalds': McdonaldsLogo,
   "mcdonald's": McdonaldsLogo,
   IkeaLogo,
   SiIkea: IkeaLogo,
@@ -257,7 +251,6 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiApple: AppleLogo,
   AppleLogo,
   apple: AppleLogo,
-  'apple': AppleLogo,
   PaypalLogo,
   PayPalLogo: PaypalLogo,
   SiPaypal: PaypalLogo,
@@ -278,11 +271,9 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiVodafone: VodafoneLogo,
   VodafoneLogo,
   vodafone: VodafoneLogo,
-  'vodafone': VodafoneLogo,
   SiO2: O2Logo,
   O2Logo,
   o2: O2Logo,
-  'o2': O2Logo,
   AmazonLogo,
   FaAmazon: AmazonLogo,
   'amazon': AmazonLogo,
@@ -309,7 +300,6 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   KlarnaLogo,
   KlarnaBankLogo: KlarnaLogo,
   klarna: KlarnaLogo,
-  'klarna': KlarnaLogo,
   SiN26, SiMastercard,
   SiVisa, SiZara, SiLyft, SiYoutube, SiTwitch, SiPlaystation, SiSparkasse,
   SiWesternunion: WesternUnionLogo,
@@ -322,7 +312,6 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiCoinbase: CoinbaseLogo,
   CoinbaseLogo,
   coinbase: CoinbaseLogo,
-  'coinbase': CoinbaseLogo,
   SiCommerzbank: CommerzbankLogo,
   CommerzbankLogo,
   commerzbank: CommerzbankLogo,
@@ -347,7 +336,6 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   MediaMarktLogo,
   MediamarktLogo: MediaMarktLogo,
   mediamarkt: MediaMarktLogo,
-  'mediamarkt': MediaMarktLogo,
   'media-markt': MediaMarktLogo,
   SiVinted, SiAliexpress, SiEtsy, SiHellofresh,
   SiBunq, SiStarlingbank, SiEpicgames, SiDiscord, SiGithub, SiDuolingo, SiStrava,
@@ -609,7 +597,6 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   HerokuLogo,
   SiHeroku: HerokuLogo,
   heroku: HerokuLogo,
-  'heroku': HerokuLogo,
   CyberportLogo,
   cyberportLogo: CyberportLogo,
   'cyberport': CyberportLogo,
@@ -618,7 +605,6 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiCloudflare: CloudflareLogo,
   CloudflareLogo,
   cloudflare: CloudflareLogo,
-  'cloudflare': CloudflareLogo,
   SiDigitalocean,
   DigitalOceanLogo: SiDigitalocean,
   SiFreenet,
@@ -706,18 +692,18 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   ...VARIETY_STORE_LOGOS,
 }
 
-export { ErsteBankLogo, DeutscheBankLogo, KlarnaBankLogo, KlarnaLogo } from './bank-logos'
+export { DeutscheBankLogo, ErsteBankLogo, KlarnaBankLogo, KlarnaLogo } from './bank-logos'
+export { CoinbaseLogo } from './crypto-logos'
 export { BaeckereiMoosLogo, BrotchenmacherLogo, FeinkostStrahmannLogo, McdonaldsLogo, OkkaBakeryLogo, ThaiSnackLogo } from './dining-logos'
+export { NetflixLogo } from './entertainment-logos'
 export { AppleLogo, EightAPLLogo, MediaMarktLogo, MediamarktLogo, PortraitnetLogo, ShopPortraitnetLogo, SnapOutdoorLogo, WunschgutscheinLogo } from './retail-logos'
 export { AirportParkingGmbhLogo, AirportParkingLogo, WizzAirLogo } from './travel-logos'
-export { CoinbaseLogo } from './crypto-logos'
-export { NetflixLogo } from './entertainment-logos'
 export { KinderplanetLogo } from './variety-store-logos'
 export { AmazonLogo, CaLogo, CAndALogo, EbayLogo, GooglePayLogo, IkeaLogo, IntratecLogo, PaypalLogo }
 export { LotharBraunLogo, SchreinereiBraunLogo, SchreinereiLotharBraunLogo } from './craft-logos'
-export { HerokuLogo, CloudflareLogo } from './tech-logos'
-export { O2Logo, VodafoneLogo } from './telecom-logos'
 export { WesternUnionLogo } from './payment-logos'
+export { CloudflareLogo,HerokuLogo } from './tech-logos'
+export { O2Logo, VodafoneLogo } from './telecom-logos'
 export { UberLogo, UberRidesLogo } from './transit-logos'
 
 
