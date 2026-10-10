@@ -680,3 +680,53 @@
     flex-shrink: 0;
   }
 }
+
+/* ─────────────────────────────────────────────────
+   Without Logos Filter Notice
+───────────────────────────────────────────────── */
+.noLogoNotice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  margin: 0.5rem 0 0.75rem;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: var(--radius-md);
+  color: var(--primary);
+  font-size: 0.825rem;
+  font-weight: 500;
+}
+
+.noLogoNoticeLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.noLogoNoticeIcon {
+  flex-shrink: 0;
+}
+
+.noLogoNoticeText {
+  color: var(--text-main);
+}
+
+.noLogoNoticeClose {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.noLogoNoticeClose:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+

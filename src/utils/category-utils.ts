@@ -65,6 +65,10 @@ export function getCategoryLabel(
   locale?: string,
   customCategories?: CustomCategory[],
 ): string {
+  if (catKey === 'without-logos') {
+    return t.filterWithoutLogosBadge || 'Without logos'
+  }
+
   const i18nKey = categoryI18nKeys[catKey]
   if (i18nKey && t[i18nKey]) {
     return t[i18nKey] as string

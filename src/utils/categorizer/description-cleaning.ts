@@ -210,6 +210,8 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\b(?:u|ub|ube)[-\s]+(?:ber|er|r)\b/iu, 'Uber'],
   [/(?:brotchenmac|brötchenmac)[-\s]+(?:her)\b/iu, 'Brotchenmacher'],
   [/(?:brotchen|brötchen)[-\s]+(?:macher)\b/iu, 'Brotchenmacher'],
+  [/\b(?:sn)[-\s]+(?:ap)\b/iu, 'Snap'],
+  [/\b(?:out)[-\s]+(?:door)\b/iu, 'Outdoor'],
   // English line-break word splits
   [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
   [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],

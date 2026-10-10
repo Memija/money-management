@@ -1,5 +1,38 @@
+import { createElement } from 'react'
 import { createImageLogo } from './logo-factory'
 import type { IconComponent } from './types'
+
+/** Netflix (Netflix, Inc.) — global subscription video streaming service. */
+export const NetflixLogo: IconComponent = ({ size = 16, className }) =>
+  createElement(
+    'svg',
+    {
+      viewBox: '0 0 48 48',
+      width: typeof size === 'number' ? size : undefined,
+      height: typeof size === 'number' ? size : undefined,
+      style: {
+        width: typeof size === 'number' ? `${size}px` : size,
+        height: typeof size === 'number' ? `${size}px` : size,
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        borderRadius: 'inherit',
+        flexShrink: 0,
+      },
+      className: ['brand-logo-full', className].filter(Boolean).join(' '),
+      'data-brand-logo': 'true',
+      'aria-label': 'Netflix',
+      role: 'img',
+    },
+    createElement('rect', { width: '48', height: '48', fill: '#141414' }),
+    createElement(
+      'g',
+      { transform: 'translate(5.4, 5.4) scale(1.55)', fill: '#E50914' },
+      createElement('path', {
+        d: 'm5.398 0 8.348 23.602c2.346.059 4.856.398 4.856.398L10.113 0H5.398zm8.489 0v9.172l4.715 13.33V0h-4.715zM5.398 1.5V24c1.873-.225 2.81-.312 4.715-.398V14.83L5.398 1.5z',
+      }),
+    ),
+  )
+NetflixLogo.displayName = 'NetflixLogo'
 
 /** Disney+ — global subscription video-on-demand streaming service by The Walt Disney Company. */
 export const DisneyPlusLogo = createImageLogo({
@@ -65,6 +98,9 @@ export const TaunusWunderlandLogo = createImageLogo({
 })
 
 export const ENTERTAINMENT_LOGOS: Record<string, IconComponent> = {
+  NetflixLogo,
+  netflixLogo: NetflixLogo,
+  'netflix': NetflixLogo,
   DisneyPlusLogo,
   disneyPlusLogo: DisneyPlusLogo,
   DisneyLogo: DisneyPlusLogo,

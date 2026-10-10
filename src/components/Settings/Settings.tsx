@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, CopyCheck, Database, Info, Plus, Settings as SettingsIcon, Sliders, Tag, Type, X } from 'lucide-react'
+import { ArrowLeft, CopyCheck, Database, Info, Plus, Settings as SettingsIcon, Sliders, SlidersHorizontal, Tag, Type, X } from 'lucide-react'
 
 import { POPULAR_MERCHANTS } from '../../data/merchants'
 import { DEFAULT_CATEGORY_KEYS } from '../../i18n/categories'
@@ -10,6 +10,7 @@ import { ICON_COLORS } from '../../utils/category-colors'
 import { AVAILABLE_ICONS, getCategoryIcon, MERCHANT_LOGOS } from '../../utils/category-icons'
 import { getCategoryLabel } from '../../utils/category-utils'
 import { CategorySelect } from '../shared/CategorySelect'
+import { AdvancedSettings } from './AdvancedSettings'
 import { CustomCategoriesSettings } from './CustomCategoriesSettings'
 import { DataManagement } from './DataManagement'
 import { DuplicateRulesSettings } from './DuplicateRulesSettings'
@@ -24,7 +25,7 @@ export const Settings: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>(DEFAULT_CATEGORY_KEYS[0])
   const [newKeyword, setNewKeyword] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const [activeTab, setActiveTab] = useState<'categories' | 'duplicate-rules' | 'data'>('categories')
+  const [activeTab, setActiveTab] = useState<'categories' | 'duplicate-rules' | 'advanced' | 'data'>('categories')
 
   const handleAddKeyword = (e: React.FormEvent) => {
     e.preventDefault()
@@ -117,6 +118,20 @@ export const Settings: React.FC = () => {
             <span>{t.duplicateRulesTab || 'Duplicate Rules'}</span>
           </button>
         )}
+
+        <button
+          type="button"
+          role="tab"
+          id="tab-advanced"
+          aria-selected={activeTab === 'advanced'}
+          aria-controls="tabpanel-advanced"
+          className={`${styles.tabButton} ${activeTab === 'advanced' ? styles.tabButtonActive : ''}`}
+          onClick={() => setActiveTab('advanced')}
+          data-testid="tab-advanced"
+        >
+          <SlidersHorizontal size={16} aria-hidden="true" />
+          <span>{t.advancedTab || 'Advanced'}</span>
+        </button>
 
         <button
           type="button"
@@ -324,6 +339,12 @@ export const Settings: React.FC = () => {
   {activeTab === 'duplicate-rules' && (
     <div role="tabpanel" id="tabpanel-duplicate-rules" aria-labelledby="tab-duplicate-rules">
       <DuplicateRulesSettings />
+    </div>
+  )}
+
+  {activeTab === 'advanced' && (
+    <div role="tabpanel" id="tabpanel-advanced" aria-labelledby="tab-advanced">
+      <AdvancedSettings />
     </div>
   )}
 

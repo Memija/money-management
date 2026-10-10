@@ -128,6 +128,13 @@ export const RajToysLogo = createImageLogo({
   displayName: 'RajToysLogo',
 })
 
+/** Kinderplanet (Kinderplanet GmbH) — coin-operated children rides and family entertainment play equipment (kinderplanet.de). */
+export const KinderplanetLogo = createImageLogo({
+  src: '/brands/kinderplanet.jpg',
+  label: 'Kinderplanet',
+  displayName: 'KinderplanetLogo',
+})
+
 export const VARIETY_STORE_LOGOS: Record<string, IconComponent> = {
   TediLogo,
   tediLogo: TediLogo,
@@ -199,4 +206,8 @@ export const VARIETY_STORE_LOGOS: Record<string, IconComponent> = {
   'raj-toys': RajToysLogo,
   'raj-toys-sro': RajToysLogo,
   'raj-toys-s-r-o': RajToysLogo,
+  KinderplanetLogo,
+  kinderplanetLogo: KinderplanetLogo,
+  'kinderplanet': KinderplanetLogo,
+  'kinderplanet-gmbh': KinderplanetLogo,
 }

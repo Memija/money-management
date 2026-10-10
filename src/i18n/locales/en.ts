@@ -482,6 +482,18 @@ export const en: TranslationStrings = {
   manageInSettingsHint: 'Want multi-language translations or rules? Manage in Settings',
   categoriesAndRules: 'Categories & Rules',
 
+  // Advanced Settings
+  advancedTab: 'Advanced',
+  advancedSettingsTitle: 'Advanced Settings',
+  advancedSettingsDesc: 'Configure advanced preferences and specialized transaction filters.',
+  filterWithoutLogosTitle: 'Filter transactions without logos',
+  filterWithoutLogosDesc: 'Applies only to All Transactions at the bottom of the dashboard and displays transactions without logos.',
+  filterWithoutLogosActiveNotice: 'Showing transactions without logos',
+  filterWithoutLogosBadge: 'Without logos',
+  filterWithoutLogosInfo: 'This option helps you identify transactions and merchants that do not yet have an assigned brand logo. It only filters the All Transactions list at the bottom of the dashboard.',
+  active: 'Active',
+  inactive: 'Inactive',
+
   // Data Management
   dataManagementTitle: 'Data Management',
   dataManagementDesc: 'Manage your locally stored financial data, backups, and privacy settings.',

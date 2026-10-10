@@ -481,6 +481,18 @@ export const bs: TranslationStrings = {
   manageInSettingsHint: 'Želite višejezične prevode ili pravila? Upravljajte u postavkama',
   categoriesAndRules: 'Kategorije i pravila',
 
+  // Advanced Settings
+  advancedTab: 'Napredno',
+  advancedSettingsTitle: 'Napredne postavke',
+  advancedSettingsDesc: 'Konfigurišite napredne opcije i specijalizovane filtere transakcija.',
+  filterWithoutLogosTitle: 'Filtriraj transakcije bez logotipa',
+  filterWithoutLogosDesc: 'Primjenjuje se samo na „Sve transakcije” na dnu kontrolne ploče i prikazuje transakcije bez logotipa.',
+  filterWithoutLogosActiveNotice: 'Prikazuju se transakcije bez logotipa',
+  filterWithoutLogosBadge: 'Bez logotipa',
+  filterWithoutLogosInfo: 'Ova opcija pomaže u prepoznavanju transakcija i trgovaca koji još nemaju dodijeljen logotip brenda. Filtrira samo listu „Sve transakcije” na dnu kontrolne ploče.',
+  active: 'Aktivno',
+  inactive: 'Neaktivno',
+
   // Data Management
   dataManagementTitle: 'Upravljanje podacima',
   dataManagementDesc:

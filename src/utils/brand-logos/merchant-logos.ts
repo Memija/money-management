@@ -1,16 +1,16 @@
 import { FaAws, FaMicrosoft } from 'react-icons/fa'
 import {
-  SiAcer, SiAirbnb, SiAircanada, SiAirfrance, SiAldisud, SiAliexpress, SiAllegro, SiAmd, SiAmericanairlines, SiApple, SiApplepay, SiAsda, SiAsus, SiAuchan,
+  SiAcer, SiAirbnb, SiAircanada, SiAirfrance, SiAldisud, SiAliexpress, SiAllegro, SiAmd, SiAmericanairlines, SiApplepay, SiAsda, SiAsus, SiAuchan,
   SiBankofamerica, SiBarclays, SiBinance, SiBose, SiBritishairways, SiBunq, SiBurgerking, SiCarrefour,
-  SiCashapp, SiChase, SiCloudflare, SiCoinbase, SiCoop, SiCorsair, SiDazn, SiDeliveroo,
-  SiDelta, SiDeutschebank, SiDeutschepost, SiDeutschetelekom, SiDhl, SiDigitalocean, SiDiscord, SiDm, SiDoordash, SiDuolingo, SiEasyjet, SiEdeka,
+  SiCashapp, SiChase, SiCoop, SiCorsair, SiDazn, SiDeliveroo,
+  SiDelta, SiDeutschepost, SiDeutschetelekom, SiDhl, SiDigitalocean, SiDiscord, SiDm, SiDoordash, SiDuolingo, SiEasyjet, SiEdeka,
   SiEmirates, SiEpicgames, SiEpson, SiEtihadairways, SiEtsy, SiExpedia, SiFiat, SiFord, SiFreenet, SiGithub, SiGlovo, SiGojek, SiGrab, SiHellofresh, SiHetzner, SiHilton, SiHonda, SiHotelsdotcom, SiHp, SiHsbc, SiHuawei, SiHyundai, SiIntel, SiIonos, SiJusteat, SiKaufland, SiKfc,
-  SiKia, SiKlarna, SiKlm, SiLenovo, SiLg, SiLidl, SiLufthansa, SiLyft, SiMarriott, SiMastercard, SiMazda, SiMcdonalds, SiMediamarkt, SiMoneygram, SiMonzo,
-  SiMorrisons, SiMsi, SiN26, SiNetcup, SiNetflix, SiNetto, SiNike, SiNissan, SiNvidia, SiO2, SiOpel, SiOrange, SiOvh, SiPayoneer, SiPenny,
+  SiKia, SiKlm, SiLenovo, SiLg, SiLidl, SiLufthansa, SiLyft, SiMarriott, SiMastercard, SiMazda, SiMoneygram, SiMonzo,
+  SiMorrisons, SiMsi, SiN26, SiNetcup, SiNetto, SiNike, SiNissan, SiNvidia, SiOpel, SiOrange, SiOvh, SiPayoneer, SiPenny,
   SiPeugeot, SiPlaystation, SiQantas, SiQatarairways, SiRazer, SiRenault, SiRevolut, SiRewe, SiRossmann, SiRyanair, SiSeagate, SiSeat, SiSennheiser, SiShopee, SiSingaporeairlines, SiSkoda, SiSky, SiSony, SiSouthwestairlines, SiSparkasse,
-  SiSpotify, SiStarbucks, SiStarlingbank, SiSteam, SiStrava, SiStripe, SiTarget, SiTesco, SiToyota, SiTripadvisor, SiTrivago, SiTurkishairlines, SiTwitch, SiUber,
-  SiUbereats, SiUnitedairlines, SiVenmo, SiVercel, SiVinted, SiVisa, SiVodafone, SiVolvo,
-  SiWesternunion, SiWise, SiWizzair, SiXiaomi, SiYoutube,
+  SiSpotify, SiStarbucks, SiStarlingbank, SiSteam, SiStrava, SiStripe, SiTarget, SiTesco, SiToyota, SiTripadvisor, SiTrivago, SiTurkishairlines, SiTwitch,
+  SiUbereats, SiUnitedairlines, SiVenmo, SiVercel, SiVinted, SiVisa, SiVolvo,
+  SiWise, SiXiaomi, SiYoutube,
   SiZabka, SiZalando, SiZara
 } from 'react-icons/si'
 
@@ -30,14 +30,18 @@ import {
   CommerzbankLogo,
   ConsorsbankLogo,
   DegiroLogo,
+  DeutscheBankLogo,
   Direkt1822Logo,
   DkbLogo,
   EbaseLogo,
+  ErsteBankLogo,
   FlatexLogo,
   FnzBankLogo,
   GlsBankLogo,
   HypoVereinsbankLogo,
   IngLogo,
+  KlarnaBankLogo,
+  KlarnaLogo,
   N26Logo,
   NorisbankLogo,
   PostbankLogo,
@@ -77,13 +81,14 @@ import {
 } from './craft-logos'
 import {
   CRYPTO_LOGOS,
+  CoinbaseLogo,
   GuardarianLogo,
   KrakenLogo,
 } from './crypto-logos'
-import { DINING_LOGOS } from './dining-logos'
+import { DINING_LOGOS, McdonaldsLogo } from './dining-logos'
 import { DIY_LOGOS } from './diy-logos'
 import { ENERGY_GRID_LOGOS } from './energy-grid-logos'
-import { ENTERTAINMENT_LOGOS } from './entertainment-logos'
+import { ENTERTAINMENT_LOGOS, NetflixLogo } from './entertainment-logos'
 import { FASHION_LOGOS } from './fashion-logos'
 import { FURNITURE_LOGOS, IkeaLogo } from './furniture-logos'
 import {
@@ -122,12 +127,13 @@ import {
   FaerberHutzelLogo,
 } from './legal-logos'
 import { MOTORWAY_LOGOS } from './motorway-logos'
-import { GooglePayLogo, PAYMENT_LOGOS, PaypalLogo } from './payment-logos'
+import { GooglePayLogo, PAYMENT_LOGOS, PaypalLogo, WesternUnionLogo } from './payment-logos'
 import { PENSION_LOGOS } from './pension-logos'
 import { PORTUGUESE_LOGOS } from './portuguese-logos'
 import { PROPERTY_LOGOS } from './property-logos'
 import {
   AmazonLogo,
+  AppleLogo,
   BauhausLogo,
   CadoozLogo,
   CaLogo,
@@ -136,13 +142,20 @@ import {
   Check24Logo,
   DellLogo,
   EbayLogo,
+  EightAPLLogo,
   HornbachLogo,
   IntratecLogo,
+  MediaMarktLogo,
+  MediamarktLogo,
   ObiLogo,
   PaybackLogo,
+  PortraitnetLogo,
   SamsungLogo,
+  ShopPortraitnetLogo,
+  SnapOutdoorLogo,
   SumupLogo,
   TchiboLogo,
+  WunschgutscheinLogo,
 } from './retail-logos'
 import { SPORTS_CLUB_LOGOS } from './sports-club-logos'
 import {
@@ -154,6 +167,7 @@ import {
 } from './tax-logos'
 import {
   CanonLogo,
+  CloudflareLogo,
   CyberportLogo,
   HerokuLogo,
   HpLogo,
@@ -161,7 +175,7 @@ import {
   MicrosoftLogo,
   PhilipsLogo,
 } from './tech-logos'
-import { TELECOM_LOGOS } from './telecom-logos'
+import { O2Logo, TELECOM_LOGOS, VodafoneLogo } from './telecom-logos'
 import { TOUR_OPERATOR_LOGOS } from './tour-operator-logos'
 import {
   AralLogo,
@@ -187,9 +201,13 @@ import {
   SixtLogo,
   TotalEnergiesLogo,
   TurmoelLogo,
+  UberLogo,
+  UberRidesLogo,
   VrrLogo,
 } from './transit-logos'
 import {
+  AirportParkingGmbhLogo,
+  AirportParkingLogo,
   AlltoursLogo,
   BookingLogo,
   CondorLogo,
@@ -200,6 +218,7 @@ import {
   SanderHotelLogo,
   SchauinslandLogo,
   TuiLogo,
+  WizzAirLogo,
 } from './travel-logos'
 import type { IconComponent } from './types'
 import {
@@ -217,12 +236,28 @@ import {
 import { VARIETY_STORE_LOGOS } from './variety-store-logos'
 
 export const MERCHANT_LOGOS: Record<string, IconComponent> = {
-  SiNetflix, SiSpotify, SiUber, SiStarbucks, SiSteam, SiMcdonalds,
+  SiNetflix: NetflixLogo,
+  NetflixLogo,
+  netflix: NetflixLogo,
+  'netflix': NetflixLogo,
+  SiSpotify, SiStarbucks, SiSteam,
+  SiUber: UberLogo,
+  UberLogo,
+  uber: UberLogo,
+  'uber': UberLogo,
+  SiMcdonalds: McdonaldsLogo,
+  McdonaldsLogo,
+  mcdonalds: McdonaldsLogo,
+  'mcdonalds': McdonaldsLogo,
+  "mcdonald's": McdonaldsLogo,
   IkeaLogo,
   SiIkea: IkeaLogo,
   'ikea': IkeaLogo,
   'IKEA': IkeaLogo,
-  SiApple,
+  SiApple: AppleLogo,
+  AppleLogo,
+  apple: AppleLogo,
+  'apple': AppleLogo,
   PaypalLogo,
   PayPalLogo: PaypalLogo,
   SiPaypal: PaypalLogo,
@@ -239,7 +274,15 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiDeutschebahn: DbLogo,
   db: DbLogo,
   DB: DbLogo,
-  SiDeutschetelekom, SiVodafone, SiO2,
+  SiDeutschetelekom,
+  SiVodafone: VodafoneLogo,
+  VodafoneLogo,
+  vodafone: VodafoneLogo,
+  'vodafone': VodafoneLogo,
+  SiO2: O2Logo,
+  O2Logo,
+  o2: O2Logo,
+  'o2': O2Logo,
   AmazonLogo,
   FaAmazon: AmazonLogo,
   'amazon': AmazonLogo,
@@ -261,15 +304,35 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   BookingDotComLogo: BookingLogo,
   SiBookingdotcom: BookingLogo,
   SiZabka, SiAsda, SiMorrisons, SiCoop, SiTarget, SiBurgerking, SiKfc,
-  SiDoordash, SiUbereats, SiRevolut, SiWise, SiKlarna, SiN26, SiMastercard,
+  SiDoordash, SiUbereats, SiRevolut, SiWise,
+  SiKlarna: KlarnaLogo,
+  KlarnaLogo,
+  KlarnaBankLogo: KlarnaLogo,
+  klarna: KlarnaLogo,
+  'klarna': KlarnaLogo,
+  SiN26, SiMastercard,
   SiVisa, SiZara, SiLyft, SiYoutube, SiTwitch, SiPlaystation, SiSparkasse,
-  SiWesternunion, SiMoneygram, SiApplepay, SiBankofamerica, SiBarclays, SiBinance,
-  SiCashapp, SiChase, SiCoinbase,
+  SiWesternunion: WesternUnionLogo,
+  WesternUnionLogo,
+  westernunion: WesternUnionLogo,
+  'western-union': WesternUnionLogo,
+  'western union': WesternUnionLogo,
+  SiMoneygram, SiApplepay, SiBankofamerica, SiBarclays, SiBinance,
+  SiCashapp, SiChase,
+  SiCoinbase: CoinbaseLogo,
+  CoinbaseLogo,
+  coinbase: CoinbaseLogo,
+  'coinbase': CoinbaseLogo,
   SiCommerzbank: CommerzbankLogo,
   CommerzbankLogo,
   commerzbank: CommerzbankLogo,
   Commerzbank: CommerzbankLogo,
-  SiDeutschebank, SiGlovo,
+  SiDeutschebank: DeutscheBankLogo,
+  DeutscheBankLogo,
+  deutschebank: DeutscheBankLogo,
+  'deutsche-bank': DeutscheBankLogo,
+  'deutsche bank': DeutscheBankLogo,
+  SiGlovo,
   GooglePayLogo,
   SiGooglepay: GooglePayLogo,
   GooglepayLogo: GooglePayLogo,
@@ -279,7 +342,14 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   'gpay': GooglePayLogo,
   'GPay': GooglePayLogo,
   SiHsbc, SiMonzo, SiPayoneer, SiStripe, SiVenmo,
-  SiRossmann, SiMediamarkt, SiVinted, SiAliexpress, SiEtsy, SiHellofresh,
+  SiRossmann,
+  SiMediamarkt: MediaMarktLogo,
+  MediaMarktLogo,
+  MediamarktLogo: MediaMarktLogo,
+  mediamarkt: MediaMarktLogo,
+  'mediamarkt': MediaMarktLogo,
+  'media-markt': MediaMarktLogo,
+  SiVinted, SiAliexpress, SiEtsy, SiHellofresh,
   SiBunq, SiStarlingbank, SiEpicgames, SiDiscord, SiGithub, SiDuolingo, SiStrava,
   ComdirectLogo, DkbLogo, IngLogo, PostbankLogo, TradeRepublicLogo,
   ScalableCapitalLogo, VolksbankLogo, TargobankLogo, SpardaBankLogo, C24Logo, ConsorsbankLogo,
@@ -312,7 +382,12 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SiDelta, SiEasyjet, SiEmirates,
   SiEtihadairways, SiExpedia, SiHilton, SiHotelsdotcom, SiKlm, SiLufthansa, SiMarriott, SiNetto,
   SiPenny, SiQantas, SiQatarairways, SiRyanair, SiSingaporeairlines, SiSouthwestairlines, SiTripadvisor,
-  SiTrivago, SiTurkishairlines, SiUnitedairlines, SiWizzair,
+  SiTrivago, SiTurkishairlines, SiUnitedairlines,
+  SiWizzair: WizzAirLogo,
+  WizzAirLogo,
+  wizzair: WizzAirLogo,
+  'wizz-air': WizzAirLogo,
+  'wizz air': WizzAirLogo,
   DertourLogo,
   dertour: DertourLogo,
   DERTOUR: DertourLogo,
@@ -504,6 +579,8 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   LotharBraunLogo,
   SchreinereiBraunLogo: LotharBraunLogo,
   SchreinereiLotharBraunLogo: LotharBraunLogo,
+  'lothar-braun': LotharBraunLogo,
+  'schreinerei-lothar-braun': LotharBraunLogo,
   RevolutLogo,
   RevoltLogo: RevolutLogo,
   RevolutBankLogo: RevolutLogo,
@@ -531,13 +608,17 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   KlarmobilDeLogo: KlarmobilLogo,
   HerokuLogo,
   SiHeroku: HerokuLogo,
+  heroku: HerokuLogo,
+  'heroku': HerokuLogo,
   CyberportLogo,
   cyberportLogo: CyberportLogo,
   'cyberport': CyberportLogo,
   FaAws,
   AwsLogo: FaAws,
-  SiCloudflare,
-  CloudflareLogo: SiCloudflare,
+  SiCloudflare: CloudflareLogo,
+  CloudflareLogo,
+  cloudflare: CloudflareLogo,
+  'cloudflare': CloudflareLogo,
   SiDigitalocean,
   DigitalOceanLogo: SiDigitalocean,
   SiFreenet,
@@ -574,6 +655,27 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   SanderHotelLogo,
   sanderHotelLogo: SanderHotelLogo,
   'sander-hotel': SanderHotelLogo,
+  ErsteBankLogo,
+  ersteBankLogo: ErsteBankLogo,
+  'erste-bank': ErsteBankLogo,
+  WunschgutscheinLogo,
+  wunschgutscheinLogo: WunschgutscheinLogo,
+  'wunschgutschein': WunschgutscheinLogo,
+  SnapOutdoorLogo,
+  snapOutdoorLogo: SnapOutdoorLogo,
+  'snap-outdoor': SnapOutdoorLogo,
+  EightAPLLogo,
+  '8a-pl': SnapOutdoorLogo,
+  '8a': SnapOutdoorLogo,
+  PortraitnetLogo,
+  portraitnetLogo: PortraitnetLogo,
+  'portraitnet': PortraitnetLogo,
+  'shop-portraitnet': PortraitnetLogo,
+  ShopPortraitnetLogo,
+  AirportParkingLogo,
+  airportParkingLogo: AirportParkingLogo,
+  AirportParkingGmbhLogo,
+  'airport-parking': AirportParkingLogo,
   ...AUSTRIAN_LOGOS,
   AdacLogo,
   AdacEvLogo,
@@ -604,6 +706,18 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   ...VARIETY_STORE_LOGOS,
 }
 
-export { BaeckereiMoosLogo, OkkaBakeryLogo } from './dining-logos'
+export { ErsteBankLogo, DeutscheBankLogo, KlarnaBankLogo, KlarnaLogo } from './bank-logos'
+export { BaeckereiMoosLogo, BrotchenmacherLogo, FeinkostStrahmannLogo, McdonaldsLogo, OkkaBakeryLogo, ThaiSnackLogo } from './dining-logos'
+export { AppleLogo, EightAPLLogo, MediaMarktLogo, MediamarktLogo, PortraitnetLogo, ShopPortraitnetLogo, SnapOutdoorLogo, WunschgutscheinLogo } from './retail-logos'
+export { AirportParkingGmbhLogo, AirportParkingLogo, WizzAirLogo } from './travel-logos'
+export { CoinbaseLogo } from './crypto-logos'
+export { NetflixLogo } from './entertainment-logos'
+export { KinderplanetLogo } from './variety-store-logos'
 export { AmazonLogo, CaLogo, CAndALogo, EbayLogo, GooglePayLogo, IkeaLogo, IntratecLogo, PaypalLogo }
+export { LotharBraunLogo, SchreinereiBraunLogo, SchreinereiLotharBraunLogo } from './craft-logos'
+export { HerokuLogo, CloudflareLogo } from './tech-logos'
+export { O2Logo, VodafoneLogo } from './telecom-logos'
+export { WesternUnionLogo } from './payment-logos'
+export { UberLogo, UberRidesLogo } from './transit-logos'
+
 

@@ -8,6 +8,7 @@ import {
   AVAILABLE_ICONS,
   getCategoryIcon,
   getMerchantBrandInfo,
+  hasMerchantLogo,
   ICON_GROUPS,
   MERCHANT_LOGOS,
 } from './category-icons'
@@ -2106,10 +2107,11 @@ describe('category-icons', () => {
       expect(kmkInfo.logoComponent).toBe(MERCHANT_LOGOS.KmkImmobilienLogo)
       expect(kmkInfo.suggestedCategory).toBe('Rent')
 
-      // 14b. WEG Landwehrweg 1 (without KMK in name -> no custom brand merchant, uses default category icons)
+      // 14b. WEG Landwehrweg 1 (with official Bad Homburg city logo)
       const wegInfo = getMerchantBrandInfo('WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld Landwehrweg End-to-End-Ref.: NOTPROVIDED Mandatsref: LANDWEHRCC25 Gläubiger-ID: DE85ZZZ00002471357 SEPA-BASISLASTSCHRIFT wiederholend')
-      expect(wegInfo.merchant).toBeUndefined()
-      expect(wegInfo.logoComponent).toBeUndefined()
+      expect(wegInfo.merchant?.id).toBe('weg-landwehrweg')
+      expect(wegInfo.logoComponent).toBe(MERCHANT_LOGOS.BadHomburgLogo)
+      expect(wegInfo.suggestedCategory).toBe('Rent')
       expect(wegInfo.initials).toBeTruthy()
       expect(wegInfo.brandColor).toBeTruthy()
 
@@ -2607,7 +2609,7 @@ describe('category-icons', () => {
         'NYA*Kinderplanet GmbH, Berlin DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual Debit Card 20',
       )
       expect(kinderInfo.merchant?.name).toBe('Kinderplanet')
-      expect(kinderInfo.logoComponent).toBe(AVAILABLE_ICONS.Gamepad2)
+      expect(kinderInfo.logoComponent).toBe(MERCHANT_LOGOS.KinderplanetLogo)
       expect(kinderInfo.suggestedCategory).toBe('Entertainment')
 
       // 32. VSPO Bern
@@ -2632,7 +2634,7 @@ describe('category-icons', () => {
         'NNT*shop portraitnet o, 490203 3150 95 DE Karte Nr. 5355 31XX XXXX 8380 Kartenzahlung Virtual ',
       )
       expect(portraitInfo.merchant?.name).toBe('shop portraitnet')
-      expect(portraitInfo.logoComponent).toBe(AVAILABLE_ICONS.ShoppingBag)
+      expect(portraitInfo.logoComponent).toBe(MERCHANT_LOGOS.PortraitnetLogo)
       expect(portraitInfo.suggestedCategory).toBe('Shopping')
 
       // 35. dedicom GmbH
@@ -3416,14 +3418,23 @@ describe('category-icons', () => {
       const brandInfo = getMerchantBrandInfo(tx)
       expect(brandInfo.merchant?.name).toBe('Brötchenmacher')
       expect(brandInfo.merchant?.category).toBe('Dining Out')
-      expect(brandInfo.suggestedCategory).toBe('Dining Out')
-      expect(brandInfo.logoComponent).toBe(AVAILABLE_ICONS.Utensils)
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.BrotchenmacherLogo)
       expect(brandInfo.brandColor).toBe('#D97706')
       expect(brandInfo.initials).toBe('BR')
 
       // Render via getCategoryIcon with transaction description
       const { container } = render(<div>{getCategoryIcon('Dining Out', 24, undefined, tx)}</div>)
       expect(container.firstChild).toBeInTheDocument()
+      const img = container.querySelector('img')
+      expect(img?.getAttribute('src')).toBe('/brands/brotchenmacher.png')
+    })
+
+    it('uses the Klarna logo (not Chase) for Klarna Bank AB "Purchase at" transactions without a known merchant', () => {
+      const tx =
+        'Klarna Bank AB Purchase at smartport GmbH End-to-End-Ref.: RTE-178783713 Mandatsref: D692F4B5AE974BED92E9E1FED934CB1F Gläubiger-ID: SE71ZZZ5567370431 SEPA-BASISLASTSCHRIFT wiederholend'
+      const brandInfo = getMerchantBrandInfo(tx)
+      expect(brandInfo.merchant?.id).toBe('klarna')
+      expect(brandInfo.logoComponent).toBe(MERCHANT_LOGOS.SiKlarna)
     })
 
     it('resolves Raj Toys brand info and official logo for PayPal Raj Toys transactions', () => {
@@ -3462,5 +3473,222 @@ describe('category-icons', () => {
       expect(txImg?.getAttribute('src')).toBe('/brands/vspo.svg')
     })
   })
+
+  describe('hasMerchantLogo', () => {
+    it('returns true for transactions that match merchants with brand logos', () => {
+      expect(hasMerchantLogo('Netflix.com monthly subscription')).toBe(true)
+      expect(hasMerchantLogo('Spotify Premium')).toBe(true)
+      expect(hasMerchantLogo('Rewe Filiale 1234')).toBe(true)
+      expect(hasMerchantLogo('LIDL Dienstleistung')).toBe(true)
+      expect(hasMerchantLogo('Amazon EU S.a.r.L.')).toBe(true)
+    })
+
+    it('returns true for newly supported retail, dining, travel, and banking merchants', () => {
+      expect(hasMerchantLogo('PayPal Europe S.a.r.l. et Cie S.C.A 1034066035058/PP.4585.PP/. Wunschgu tschein GmbH')).toBe(true)
+      expect(hasMerchantLogo('PayPal Europe S.a.r.l. et Cie S.C.A 1034839345667/PP.4585.PP/. Snap Out door Sp. z o.o.')).toBe(true)
+      expect(hasMerchantLogo('PayPal Europe S.a.r.l. et Cie S.C.A 1029466710300 Airport Parking GmbH')).toBe(true)
+      expect(hasMerchantLogo('THAI SNACK GASTRONOMIE Frankfurt DE')).toBe(true)
+      expect(hasMerchantLogo('FCS Feinkost Catering Frankfurt DE')).toBe(true)
+      expect(hasMerchantLogo('SANJA PETRUSIC ESBCHR22XXX HR3024020063200783081 Knjige')).toBe(true)
+      expect(hasMerchantLogo('WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld')).toBe(true)
+      expect(hasMerchantLogo('Biljana Memic Kundenreferenz: CD-SCT-INST-665122573')).toBe(true)
+      expect(hasMerchantLogo('ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KREDITRATE')).toBe(true)
+      expect(hasMerchantLogo('ANEL MEMIC NTSBDEB1XXX DE35100110012621828092 FOR SPACES.')).toBe(true)
+      expect(hasMerchantLogo('BILJANA MEMIC Help End-to-End-Ref.: MOB.341.UE.33587')).toBe(true)
+      expect(hasMerchantLogo('Das mobileTAN-Verfahren ist zwar sicher, aber nicht mehr zeitgemäß.')).toBe(true)
+    })
+
+    it('resolves merchant logo via counterpartyIban when description is non-branded', () => {
+      expect(hasMerchantLogo('ANEL MEMIC', 'DE92500400000646293100')).toBe(true)
+      expect(hasMerchantLogo('Anel Memic', 'DE92500400000646293100')).toBe(true)
+      expect(hasMerchantLogo('Anel o. Biljana Memic', 'DE36550905000003696413')).toBe(true)
+      expect(hasMerchantLogo('Transfer to spaces', 'DE35100110012621828092')).toBe(true)
+    })
+
+    it('returns false for generic or unknown transactions without brand logos', () => {
+      expect(hasMerchantLogo('Miete April 2026')).toBe(false)
+      expect(hasMerchantLogo('Gehalt Mustermann GmbH')).toBe(false)
+      expect(hasMerchantLogo('Unbekannter Laden')).toBe(false)
+      expect(hasMerchantLogo('Barabhebung Geldautomat')).toBe(false)
+      expect(hasMerchantLogo('')).toBe(false)
+      expect(hasMerchantLogo(undefined)).toBe(false)
+    })
+  })
+
+  describe('rendering new brand logos', () => {
+    it('renders newly added official brand assets correctly into DOM', () => {
+      // Erste Bank
+      const { container: ersteContainer } = render(<div>{getCategoryIcon('Transfers', 24, undefined, 'ESBCHR22XXX Erste Bank')}</div>)
+      expect(ersteContainer.querySelector('img')?.getAttribute('src')).toBe('/banks/erste-bank.svg')
+
+      // Wunschgutschein
+      const { container: wunschContainer } = render(<div>{getCategoryIcon('Shopping', 24, undefined, 'Wunschgutschein GmbH')}</div>)
+      expect(wunschContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/wunschgutschein.svg')
+
+      // Snap Outdoor
+      const { container: snapContainer } = render(<div>{getCategoryIcon('Shopping', 24, undefined, 'Snap Outdoor Sp. z o.o.')}</div>)
+      expect(snapContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/snap-outdoor.png')
+
+      const { container: snapPaypalContainer } = render(
+        <div>
+          {getCategoryIcon(
+            'Shopping',
+            24,
+            undefined,
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1034839345667/PP.4585.PP/. Snap Out door Sp. z o.o., Ihr Einkauf bei Sn ap Outdoor Sp. z o.o. End-to-End-Ref.: 1034839345667 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+          )}
+        </div>,
+      )
+      expect(snapPaypalContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/snap-outdoor.png')
+
+      // Airport Parking
+      const { container: parkingContainer } = render(<div>{getCategoryIcon('Travel', 24, undefined, 'Airport Parking GmbH')}</div>)
+      expect(parkingContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/airport-parking.png')
+
+      // Thai Snack
+      const { container: thaiContainer } = render(<div>{getCategoryIcon('Dining Out', 24, undefined, 'THAI SNACK GASTRONOMIE')}</div>)
+      expect(thaiContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/thai-snack.png')
+
+      // FCS Feinkost Catering
+      const { container: fcsContainer } = render(<div>{getCategoryIcon('Dining Out', 24, undefined, 'FCS Feinkost Catering')}</div>)
+      expect(fcsContainer.firstChild).toBeInTheDocument()
+
+      // Commerzbank via counterpartyIban
+      const { container: cbIbanContainer } = render(<div>{getCategoryIcon('Transfers', 24, undefined, 'ANEL MEMIC', 'DE92500400000646293100')}</div>)
+      expect(cbIbanContainer.querySelector('img')?.getAttribute('src')).toBe('/banks/commerzbank.png')
+    })
+
+    it('renders Coinbase, Netflix, and Wizz Air with full-bleed brand logo attributes and proper labels', () => {
+      const { CoinbaseLogo, NetflixLogo, WizzAirLogo, SiCoinbase, SiNetflix, SiWizzair } = MERCHANT_LOGOS
+
+      expect(CoinbaseLogo).toBeTruthy()
+      expect(NetflixLogo).toBeTruthy()
+      expect(WizzAirLogo).toBeTruthy()
+      expect(SiCoinbase).toBe(CoinbaseLogo)
+      expect(SiNetflix).toBe(NetflixLogo)
+      expect(SiWizzair).toBe(WizzAirLogo)
+
+      // Render CoinbaseLogo
+      const { container: cbContainer } = render(React.createElement(CoinbaseLogo, { size: 24 }))
+      const cbSvg = cbContainer.querySelector('svg')
+      expect(cbSvg).toBeTruthy()
+      expect(cbSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(cbSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(cbSvg?.getAttribute('aria-label')).toBe('Coinbase')
+
+      // Render NetflixLogo
+      const { container: nfContainer } = render(React.createElement(NetflixLogo, { size: 24 }))
+      const nfSvg = nfContainer.querySelector('svg')
+      expect(nfSvg).toBeTruthy()
+      expect(nfSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(nfSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(nfSvg?.getAttribute('aria-label')).toBe('Netflix')
+
+      // Render WizzAirLogo
+      const { container: wizzContainer } = render(React.createElement(WizzAirLogo, { size: 24 }))
+      const wizzSvg = wizzContainer.querySelector('svg')
+      expect(wizzSvg).toBeTruthy()
+      expect(wizzSvg?.getAttribute('data-brand-logo')).toBe('true')
+      expect(wizzSvg?.classList.contains('brand-logo-full')).toBe(true)
+      expect(wizzSvg?.getAttribute('aria-label')).toBe('Wizz Air')
+
+      // Check getCategoryIcon integration
+      const { container: cbIconContainer } = render(<div>{getCategoryIcon('Crypto', 24, undefined, 'Coinbase Ireland Limited')}</div>)
+      expect(cbIconContainer.querySelector('svg')?.getAttribute('data-brand-logo')).toBe('true')
+      expect(cbIconContainer.querySelector('svg')?.getAttribute('aria-label')).toBe('Coinbase')
+
+      const { container: nfIconContainer } = render(<div>{getCategoryIcon('Entertainment', 24, undefined, 'Netflix Subscription')}</div>)
+      expect(nfIconContainer.querySelector('svg')?.getAttribute('data-brand-logo')).toBe('true')
+      expect(nfIconContainer.querySelector('svg')?.getAttribute('aria-label')).toBe('Netflix')
+
+      const { container: wizzIconContainer } = render(<div>{getCategoryIcon('Travel', 24, undefined, 'WIZZ AIR Flight Ticket')}</div>)
+      expect(wizzIconContainer.querySelector('svg')?.getAttribute('data-brand-logo')).toBe('true')
+      expect(wizzIconContainer.querySelector('svg')?.getAttribute('aria-label')).toBe('Wizz Air')
+    })
+
+    it('renders Vodafone, Heroku, Deutsche Bank, Cloudflare, Lothar Braun, Western Union, O2, McDonald\'s, Apple, Uber, Klarna, and MediaMarkt with full-bleed brand logo attributes and proper labels', () => {
+      const {
+        VodafoneLogo,
+        SiVodafone,
+        HerokuLogo,
+        SiHeroku,
+        DeutscheBankLogo,
+        SiDeutschebank,
+        CloudflareLogo,
+        SiCloudflare,
+        LotharBraunLogo,
+        WesternUnionLogo,
+        SiWesternunion,
+        O2Logo,
+        SiO2,
+        McdonaldsLogo,
+        SiMcdonalds,
+        AppleLogo,
+        SiApple,
+        UberLogo,
+        SiUber,
+        KlarnaLogo,
+        SiKlarna,
+        MediaMarktLogo,
+        SiMediamarkt,
+      } = MERCHANT_LOGOS
+
+      expect(VodafoneLogo).toBeTruthy()
+      expect(SiVodafone).toBe(VodafoneLogo)
+      expect(HerokuLogo).toBeTruthy()
+      expect(SiHeroku).toBe(HerokuLogo)
+      expect(DeutscheBankLogo).toBeTruthy()
+      expect(SiDeutschebank).toBe(DeutscheBankLogo)
+      expect(CloudflareLogo).toBeTruthy()
+      expect(SiCloudflare).toBe(CloudflareLogo)
+      expect(LotharBraunLogo).toBeTruthy()
+      expect(WesternUnionLogo).toBeTruthy()
+      expect(SiWesternunion).toBe(WesternUnionLogo)
+      expect(O2Logo).toBeTruthy()
+      expect(SiO2).toBe(O2Logo)
+      expect(McdonaldsLogo).toBeTruthy()
+      expect(SiMcdonalds).toBe(McdonaldsLogo)
+      expect(AppleLogo).toBeTruthy()
+      expect(SiApple).toBe(AppleLogo)
+      expect(UberLogo).toBeTruthy()
+      expect(SiUber).toBe(UberLogo)
+      expect(KlarnaLogo).toBeTruthy()
+      expect(SiKlarna).toBe(KlarnaLogo)
+      expect(MediaMarktLogo).toBeTruthy()
+      expect(SiMediamarkt).toBe(MediaMarktLogo)
+
+      const testCases = [
+        { logo: VodafoneLogo, label: 'Vodafone', desc: 'Vodafone GmbH Mobilfunk', cat: 'Communication' },
+        { logo: HerokuLogo, label: 'Heroku', desc: 'Heroku hosting monthly', cat: 'Utilities' },
+        { logo: DeutscheBankLogo, label: 'Deutsche Bank', desc: 'Deutsche Bank AG Überweisung', cat: 'Transfers' },
+        { logo: CloudflareLogo, label: 'Cloudflare', desc: 'Cloudflare Inc DNS service', cat: 'Utilities' },
+        { logo: LotharBraunLogo, label: 'Schreinerei Lothar Braun', desc: 'Lothar Braun GmbH Rechnung', cat: 'Shopping' },
+        { logo: WesternUnionLogo, label: 'Western Union', desc: 'Western Union Money Transfer', cat: 'Transfers' },
+        { logo: O2Logo, label: 'O2', desc: 'O2 Telefonica Mobilfunk', cat: 'Communication' },
+        { logo: McdonaldsLogo, label: "McDonald's", desc: "McDonald's Restaurant Burger", cat: 'Dining Out' },
+        { logo: AppleLogo, label: 'Apple', desc: 'Apple.com / App Store', cat: 'Shopping' },
+        { logo: UberLogo, label: 'Uber', desc: 'UBER *TRIP 1234', cat: 'Transport' },
+        { logo: KlarnaLogo, label: 'Klarna', desc: 'Klarna Bank AB Rechnung', cat: 'Transfers' },
+        { logo: MediaMarktLogo, label: 'MediaMarkt', desc: 'MediaMarkt Saturn online', cat: 'Shopping' },
+      ]
+
+      for (const tc of testCases) {
+        const { container } = render(React.createElement(tc.logo, { size: 24 }))
+        const svg = container.querySelector('svg')
+        expect(svg).toBeTruthy()
+        expect(svg?.getAttribute('data-brand-logo')).toBe('true')
+        expect(svg?.classList.contains('brand-logo-full')).toBe(true)
+        expect(svg?.getAttribute('aria-label')).toBe(tc.label)
+
+        const { container: iconContainer } = render(<div>{getCategoryIcon(tc.cat, 24, undefined, tc.desc)}</div>)
+        const iconSvg = iconContainer.querySelector('svg')
+        expect(iconSvg).toBeTruthy()
+        expect(iconSvg?.getAttribute('data-brand-logo')).toBe('true')
+        expect(iconSvg?.classList.contains('brand-logo-full')).toBe(true)
+        expect(iconSvg?.getAttribute('aria-label')).toBe(tc.label)
+      }
+    })
+  })
 })
+
 

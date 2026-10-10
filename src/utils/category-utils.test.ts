@@ -476,6 +476,15 @@ describe('category-utils', () => {
       expect(getCategoryLabel('UnknownCategory', mockT)).toBe('UnknownCategory')
       expect(getCategoryLabel('', mockT)).toBe('')
     })
+
+    it('returns without logos label for without-logos key', () => {
+      expect(getCategoryLabel('without-logos', mockT)).toBe('Without logos')
+      const mockWithBadge = {
+        ...mockT,
+        filterWithoutLogosBadge: 'Ohne Logos',
+      } as unknown as TranslationStrings
+      expect(getCategoryLabel('without-logos', mockWithBadge)).toBe('Ohne Logos')
+    })
   })
 
   describe('formatCategoryCount', () => {

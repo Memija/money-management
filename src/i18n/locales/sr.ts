@@ -481,6 +481,18 @@ export const sr: TranslationStrings = {
   manageInSettingsHint: 'Желите вишејезичне преводе или правила? Управљајте у подешавањима',
   categoriesAndRules: 'Категорије и правила',
 
+  // Advanced Settings
+  advancedTab: 'Напредно',
+  advancedSettingsTitle: 'Напредна подешавања',
+  advancedSettingsDesc: 'Конфигуришите напредне опције и специјализоване филтере трансакција.',
+  filterWithoutLogosTitle: 'Филтрирај трансакције без логотипа',
+  filterWithoutLogosDesc: 'Примењује се само на „Све трансакције” на дну контролне табле и приказује трансакције без логотипа.',
+  filterWithoutLogosActiveNotice: 'Приказују се трансакције без логотипа',
+  filterWithoutLogosBadge: 'Без логотипа',
+  filterWithoutLogosInfo: 'Ова опција помаже у препознавању трансакција и трговаца који још немају додељен логотип бренда. Филтрира само листу „Све трансакције” на дну контролне табле.',
+  active: 'Активно',
+  inactive: 'Неактивно',
+
   // Data Management
   dataManagementTitle: 'Управљање подацима',
   dataManagementDesc:

@@ -14,6 +14,7 @@ vi.mock('../../store/useLanguageStore', () => ({
         settingsTitle: 'Settings',
         categoriesAndRules: 'Categories & Rules',
         duplicateRulesTab: 'Duplicate Rules',
+        advancedTab: 'Advanced',
         dataManagementTitle: 'Data Management',
         createCustomRule: 'Create Custom Rule',
         createCustomRuleDesc: 'Add specific keywords to automatically categorize transactions.',
@@ -157,6 +158,18 @@ describe('Settings Component', () => {
     render(<Settings />)
 
     expect(screen.queryByRole('tab', { name: 'Duplicate Rules' })).not.toBeInTheDocument()
+  })
+
+  it('switches to Advanced tab and renders advanced settings', () => {
+    render(<Settings />)
+
+    const advancedTab = screen.getByRole('tab', { name: 'Advanced' })
+    expect(advancedTab).toHaveAttribute('aria-selected', 'false')
+
+    fireEvent.click(advancedTab)
+
+    expect(advancedTab).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByText('Filter transactions without logos')).toBeInTheDocument()
   })
 
   it('switches to dedicated Duplicate Rules tab when duplicates exist', () => {

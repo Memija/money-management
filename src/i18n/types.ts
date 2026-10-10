@@ -476,6 +476,18 @@ export interface TranslationStrings {
   manageInSettingsHint: string
   categoriesAndRules: string
 
+  // Advanced Settings
+  advancedTab: string
+  advancedSettingsTitle: string
+  advancedSettingsDesc: string
+  filterWithoutLogosTitle: string
+  filterWithoutLogosDesc: string
+  filterWithoutLogosActiveNotice: string
+  filterWithoutLogosBadge: string
+  filterWithoutLogosInfo: string
+  active: string
+  inactive: string
+
   // Data Management
   dataManagementTitle: string
   dataManagementDesc: string

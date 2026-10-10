@@ -485,6 +485,18 @@ export const pl: TranslationStrings = {
   manageInSettingsHint: 'Chcesz tłumaczeń lub reguł? Zarządzaj w ustawieniach',
   categoriesAndRules: 'Kategorie i reguły',
 
+  // Advanced Settings
+  advancedTab: 'Zaawansowane',
+  advancedSettingsTitle: 'Ustawienia zaawansowane',
+  advancedSettingsDesc: 'Konfiguruj zaawansowane opcje i specjalistyczne filtry transakcji.',
+  filterWithoutLogosTitle: 'Filtruj transakcje bez logo',
+  filterWithoutLogosDesc: 'Dotyczy tylko sekcji „Wszystkie transakcje” na dole pulpitu i wyświetla transakcje bez logo.',
+  filterWithoutLogosActiveNotice: 'Wyświetlanie transakcji bez logo',
+  filterWithoutLogosBadge: 'Bez logo',
+  filterWithoutLogosInfo: 'Ta opcja pomaga zidentyfikować transakcje i sprzedawców, którzy nie mają jeszcze przypisanego logo marki. Filtruje tylko listę „Wszystkie transakcje” na dole pulpitu.',
+  active: 'Aktywny',
+  inactive: 'Nieaktywny',
+
   // Data Management
   dataManagementTitle: 'Zarządzanie danymi',
   dataManagementDesc:

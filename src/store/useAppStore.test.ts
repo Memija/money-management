@@ -1716,4 +1716,27 @@ describe('useAppStore', () => {
       expect(state.currentStep).toBe('country')
     })
   })
+
+  describe('filterTransactionsWithoutLogos', () => {
+    it('defaults to false', () => {
+      expect(useAppStore.getState().filterTransactionsWithoutLogos).toBe(false)
+    })
+
+    it('sets filterTransactionsWithoutLogos correctly', () => {
+      useAppStore.getState().setFilterTransactionsWithoutLogos(true)
+      expect(useAppStore.getState().filterTransactionsWithoutLogos).toBe(true)
+
+      useAppStore.getState().setFilterTransactionsWithoutLogos(false)
+      expect(useAppStore.getState().filterTransactionsWithoutLogos).toBe(false)
+    })
+
+    it('resets filterTransactionsWithoutLogos on clearAllData', () => {
+      useAppStore.getState().setFilterTransactionsWithoutLogos(true)
+      expect(useAppStore.getState().filterTransactionsWithoutLogos).toBe(true)
+
+      useAppStore.getState().clearAllData()
+      expect(useAppStore.getState().filterTransactionsWithoutLogos).toBe(false)
+    })
+  })
 })
+

@@ -16,11 +16,12 @@ export const LotharBraunLogo: IconComponent = ({ size = 16, className }) => (
       height: typeof size === 'number' ? `${size}px` : size,
       display: 'inline-block',
       verticalAlign: 'middle',
-      borderRadius: '8px',
+      borderRadius: 'inherit',
       overflow: 'hidden',
       flexShrink: 0,
     }}
-    className={className}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
     aria-label="Schreinerei Lothar Braun"
     role="img"
   >

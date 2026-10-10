@@ -15,7 +15,9 @@ export interface AppState {
   manualCategories: Record<string, string>
   customCategories: CustomCategory[]
   duplicateOverrideRules: DuplicateOverrideRule[]
+  filterTransactionsWithoutLogos: boolean
 
+  setFilterTransactionsWithoutLogos: (enabled: boolean) => void
   setCustomKeywords: (category: string, keywords: string[]) => void
   setManualCategory: (transactionId: string, category: string) => void
   setManualCategoriesBulk: (mapping: Record<string, string>) => void
@@ -249,6 +251,10 @@ export const useAppStore = create<AppState>()(
       manualCategories: {},
       customCategories: [],
       duplicateOverrideRules: [],
+      filterTransactionsWithoutLogos: false,
+
+      setFilterTransactionsWithoutLogos: (enabled) =>
+        set({ filterTransactionsWithoutLogos: enabled }),
 
       addCustomCategory: (category) =>
         set((state) => ({
@@ -801,6 +807,7 @@ export const useAppStore = create<AppState>()(
           manualCategories: {},
           customCategories: [],
           duplicateOverrideRules: [],
+          filterTransactionsWithoutLogos: false,
         })
         try {
           useAppStore.persist?.clearStorage()

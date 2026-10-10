@@ -2,6 +2,7 @@ import type { HTMLAttributes } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { useAppStore } from '../../../store/useAppStore'
 import { type LanguageState, useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
 import * as clipboardModule from '../../../utils/clipboard'
@@ -54,6 +55,7 @@ vi.mock('../../../utils/category-utils', async (importOriginal) => {
 
 vi.mock('../../../utils/category-icons', () => ({
   getCategoryIcon: () => <div data-testid="category-icon" />,
+  hasMerchantLogo: vi.fn((desc) => Boolean(desc && desc.toLowerCase().includes('logo'))),
   AVAILABLE_ICONS: {},
   ICON_GROUPS: [],
   ICON_COLORS: {},
@@ -91,6 +93,8 @@ const mockTranslations = {
   totalIncome: 'Total Income',
   totalExpenses: 'Total Expenses',
   modified: 'Modified',
+  filterWithoutLogosActiveNotice: 'Showing transactions without logos',
+  filterWithoutLogosBadge: 'Without logos',
 }
 
 const mockTransactions: Transaction[] = [
@@ -118,6 +122,7 @@ const mockTransactions: Transaction[] = [
 
 describe('TransactionList Component', () => {
   beforeEach(() => {
+    useAppStore.setState({ filterTransactionsWithoutLogos: false })
     ;(useLanguageStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector) => {
       const state = { t: mockTranslations, locale: 'en' } as unknown as LanguageState
       return typeof selector === 'function' ? selector(state) : state
@@ -1517,5 +1522,91 @@ describe('TransactionList Component', () => {
 
       expect(copySpy).toHaveBeenCalledWith(mockTransactions[0].description)
     })
+
+    it('supports filtering transactions without logos via category filter when option is active', () => {
+      const mixedTransactions: Transaction[] = [
+        {
+          id: 'tx-with-logo',
+          date: '2026-04-01',
+          description: 'Merchant with Logo',
+          amount: 50,
+          currency: 'EUR',
+          type: 'expense',
+          category: 'Shopping',
+          institution: 'Bank A',
+        },
+        {
+          id: 'tx-without-logo',
+          date: '2026-04-02',
+          description: 'Local Bakery No Brand',
+          amount: 15,
+          currency: 'EUR',
+          type: 'expense',
+          category: 'Food',
+          institution: 'Bank A',
+        },
+      ]
+
+      // 1. When filterTransactionsWithoutLogos is false, without-logos category is NOT present in options
+      useAppStore.setState({ filterTransactionsWithoutLogos: false })
+
+      const { unmount } = render(
+        <TransactionList
+          filteredTx={mixedTransactions}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          selectedInstitution="all"
+          setSelectedInstitution={vi.fn()}
+          sortOrder="newest"
+          setSortOrder={vi.fn()}
+        />,
+      )
+
+      let categorySelect = screen.getByLabelText('Filter by category')
+      expect(categorySelect).not.toHaveTextContent('Without logos')
+      unmount()
+
+      // 2. When filterTransactionsWithoutLogos is true, without-logos category IS available
+      useAppStore.setState({ filterTransactionsWithoutLogos: true })
+
+      render(
+        <TransactionList
+          filteredTx={mixedTransactions}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          selectedInstitution="all"
+          setSelectedInstitution={vi.fn()}
+          sortOrder="newest"
+          setSortOrder={vi.fn()}
+        />,
+      )
+
+      categorySelect = screen.getByLabelText('Filter by category')
+      expect(categorySelect).toHaveTextContent('Without logos')
+
+      // In 'all' category (default), both transactions are visible and no badge is shown
+      expect(screen.getByText('Merchant with Logo')).toBeInTheDocument()
+      expect(screen.getByText('Local Bakery No Brand')).toBeInTheDocument()
+      expect(screen.queryByTestId('without-logos-filter-badge')).not.toBeInTheDocument()
+
+      // 3. Select 'without-logos' category
+      fireEvent.change(categorySelect, { target: { value: 'without-logos' } })
+
+      // Now the transaction with logo is filtered out, only without-logo transaction is visible
+      expect(screen.queryByText('Merchant with Logo')).not.toBeInTheDocument()
+      expect(screen.getByText('Local Bakery No Brand')).toBeInTheDocument()
+      expect(screen.getByTestId('without-logos-filter-badge')).toBeInTheDocument()
+      expect(screen.getByText('Showing transactions without logos')).toBeInTheDocument()
+
+      // 4. Clicking the clear button on the banner resets category back to 'all'
+      const clearBtn = screen.getByTestId('clear-without-logos-btn')
+      fireEvent.click(clearBtn)
+      expect(screen.getByText('Merchant with Logo')).toBeInTheDocument()
+      expect(screen.getByText('Local Bakery No Brand')).toBeInTheDocument()
+      expect(screen.queryByTestId('without-logos-filter-badge')).not.toBeInTheDocument()
+    })
   })
 })
+

@@ -1,6 +1,41 @@
+import { createElement } from 'react'
+
 import { FruechteFeinkostLogo, TransgourmetLogo } from './grocery-logos'
 import { createImageLogo, createWordmarkLogo } from './logo-factory'
 import type { IconComponent } from './types'
+
+/** Official McDonald's fast-food brand tile with golden arches on red background. */
+export const McdonaldsLogo: IconComponent = ({ size = 16, className }) =>
+  createElement(
+    'svg',
+    {
+      viewBox: '0 0 48 48',
+      width: typeof size === 'number' ? size : undefined,
+      height: typeof size === 'number' ? size : undefined,
+      style: {
+        width: typeof size === 'number' ? `${size}px` : size,
+        height: typeof size === 'number' ? `${size}px` : size,
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        borderRadius: 'inherit',
+        overflow: 'hidden',
+        flexShrink: 0,
+      },
+      className: ['brand-logo-full', className].filter(Boolean).join(' '),
+      'data-brand-logo': 'true',
+      'aria-label': "McDonald's",
+      role: 'img',
+    },
+    createElement('rect', { width: '48', height: '48', fill: '#DA291C' }),
+    createElement(
+      'g',
+      { transform: 'translate(6, 6) scale(1.5)', fill: '#FFC72C' },
+      createElement('path', {
+        d: 'M17.243 3.006c2.066 0 3.742 8.714 3.742 19.478H24c0-11.588-3.042-20.968-6.766-20.968-2.127 0-4.007 2.81-5.248 7.227-1.242-4.417-3.12-7.227-5.248-7.227C3.013 1.516 0 10.896 0 22.484h3.015c0-10.764 1.676-19.478 3.742-19.478 2.067 0 3.743 8.714 3.743 19.478h3.001c0-10.764 1.675-19.478 3.742-19.478Z',
+      }),
+    ),
+  )
+McdonaldsLogo.displayName = 'McdonaldsLogo'
 
 /** Restoran Desetka — traditional restaurant, grill and cafe in Orašje, Bosnia and Herzegovina. */
 export const RestoranDesetkaLogo = createWordmarkLogo({
@@ -154,6 +189,33 @@ export const OkkaBakeryLogo = createImageLogo({
   displayName: 'OkkaBakeryLogo',
 })
 
+/** Brötchenmacher Frankfurt — artisanal bakery, cafe & breakfast delivery service (broetchenmacher-ffm.de). */
+export const BrotchenmacherLogo = createImageLogo({
+  src: '/brands/brotchenmacher.png',
+  label: 'Brötchenmacher Frankfurt',
+  displayName: 'BrotchenmacherLogo',
+})
+
+/** Thai Snack Gastronomie — authentic Thai cuisine & catering in Frankfurt am Main (thaisnack.de). */
+export const ThaiSnackLogo = createImageLogo({
+  src: '/brands/thai-snack.png',
+  label: 'Thai Snack Gastronomie',
+  displayName: 'ThaiSnackLogo',
+})
+
+/** FCS Feinkost Catering Strahmann — artisanal deli, focaccia & event catering in Frankfurt (strahmann.shop). */
+export const FeinkostStrahmannLogo = createWordmarkLogo({
+  label: 'Feinkost Catering Strahmann',
+  text: 'FCS',
+  background: '#781D26',
+  textColor: '#FFFFFF',
+  accentColor: '#D4AF37',
+  fontSize: 14,
+  displayName: 'FeinkostStrahmannLogo',
+})
+export { FeinkostStrahmannLogo as FcsFeinkostLogo }
+
+
 export const DINING_LOGOS: Record<string, IconComponent> = {
   BaeckereiMoosLogo,
   baeckereiMoosLogo: BaeckereiMoosLogo,
@@ -243,6 +305,23 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   'restoran-desetka': RestoranDesetkaLogo,
   'maxi-restoran-desetka': RestoranDesetkaLogo,
   'desetka': RestoranDesetkaLogo,
+  BrotchenmacherLogo,
+  brotchenmacherLogo: BrotchenmacherLogo,
+  'brotchenmacher': BrotchenmacherLogo,
+  'broetchenmacher': BrotchenmacherLogo,
+  ThaiSnackLogo,
+  thaiSnackLogo: ThaiSnackLogo,
+  'thai-snack': ThaiSnackLogo,
+  FeinkostStrahmannLogo,
+  feinkostStrahmannLogo: FeinkostStrahmannLogo,
+  'feinkost-strahmann': FeinkostStrahmannLogo,
+  'fcs-feinkost': FeinkostStrahmannLogo,
+  'fcs-feinkost-catering': FeinkostStrahmannLogo,
+  McdonaldsLogo,
+  mcdonaldsLogo: McdonaldsLogo,
+  'mcdonalds': McdonaldsLogo,
+  "mcdonald's": McdonaldsLogo,
+  SiMcdonalds: McdonaldsLogo,
 }
 
 

@@ -244,4 +244,69 @@ export const EbaseLogo: IconComponent = ({ size = 16, className }) => (
 )
 EbaseLogo.displayName = 'EbaseLogo'
 
+/** Erste Bank (Erste Group / Erste & Steiermärkische Bank) */
+export const ErsteBankLogo: IconComponent = ({ size = 16, className }) => (
+  <BankImage src="/banks/erste-bank.svg" alt="Erste Bank" size={size} className={className} />
+)
+ErsteBankLogo.displayName = 'ErsteBankLogo'
+
+/** Official Deutsche Bank brand tile with signature square & slash motif. */
+export const DeutscheBankLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: 'inherit',
+      overflow: 'hidden',
+      flexShrink: 0,
+    }}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
+    aria-label="Deutsche Bank"
+    role="img"
+  >
+    <rect width="48" height="48" fill="#0018A8" />
+    <g transform="translate(7.8, 7.8) scale(1.35)" fill="#FFFFFF">
+      <path d="M3.375 3.375v17.25h17.25V3.375H3.375zM0 0h24v24H0V0zm5.25 18.225 9.15-12.45h4.35L9.6 18.225H5.25z" />
+    </g>
+  </svg>
+)
+DeutscheBankLogo.displayName = 'DeutscheBankLogo'
+
+/** Official Klarna Bank brand tile with signature pink background and dark lettermark. */
+export const KlarnaLogo: IconComponent = ({ size = 16, className }) => (
+  <svg
+    viewBox="0 0 48 48"
+    width={typeof size === 'number' ? size : undefined}
+    height={typeof size === 'number' ? size : undefined}
+    style={{
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      verticalAlign: 'middle',
+      borderRadius: 'inherit',
+      overflow: 'hidden',
+      flexShrink: 0,
+    }}
+    className={['brand-logo-full', className].filter(Boolean).join(' ')}
+    data-brand-logo="true"
+    aria-label="Klarna"
+    role="img"
+  >
+    <rect width="48" height="48" fill="#FFB3C7" />
+    <g transform="translate(0.6, 0.6) scale(1.95)" fill="#0A0A0A">
+      <path d="M4.592 2v20H0V2h4.592zm11.46 0c0 4.194-1.583 8.105-4.415 11.068l-.278.283L17.702 22h-5.668l-6.893-9.4 1.779-1.332c2.858-2.14 4.535-5.378 4.637-8.924L11.562 2h4.49zM21.5 17a2.5 2.5 0 110 5 2.5 2.5 0 010-5z" />
+    </g>
+  </svg>
+)
+KlarnaLogo.displayName = 'KlarnaLogo'
+
+export { KlarnaLogo as KlarnaBankLogo }
+
+
 

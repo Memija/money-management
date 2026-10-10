@@ -481,6 +481,18 @@ export const id: TranslationStrings = {
   manageInSettingsHint: 'Ingin terjemahan atau aturan? Kelola di Pengaturan',
   categoriesAndRules: 'Kategori & Aturan',
 
+  // Advanced Settings
+  advancedTab: 'Lanjutan',
+  advancedSettingsTitle: 'Pengaturan Lanjutan',
+  advancedSettingsDesc: 'Konfigurasikan opsi lanjutan dan filter transaksi khusus.',
+  filterWithoutLogosTitle: 'Filter transaksi tanpa logo',
+  filterWithoutLogosDesc: 'Hanya berlaku untuk "Semua Transaksi" di bagian bawah dasbor dan menampilkan transaksi tanpa logo.',
+  filterWithoutLogosActiveNotice: 'Menampilkan transaksi tanpa logo',
+  filterWithoutLogosBadge: 'Tanpa logo',
+  filterWithoutLogosInfo: 'Opsi ini membantu Anda mengidentifikasi transaksi dan pedagang yang belum memiliki logo merek. Ini hanya memfilter daftar Semua Transaksi di bagian bawah dasbor.',
+  active: 'Aktif',
+  inactive: 'Nonaktif',
+
   // Data Management
   dataManagementTitle: 'Manajemen Data',
   dataManagementDesc:

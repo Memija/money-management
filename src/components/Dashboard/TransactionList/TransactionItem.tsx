@@ -49,7 +49,7 @@ export const TransactionItem = React.memo<TransactionItemProps>(
             {isZeroAmount ? (
               <Info size={20} color="var(--text-dim)" aria-hidden="true" />
             ) : (
-              getCategoryIcon(tx.category || 'Other', 20, customCategories, tx.description)
+              getCategoryIcon(tx.category || 'Other', 20, customCategories, tx.description, tx.counterpartyIban)
             )}
           </div>
           <div className={styles.txDetails}>

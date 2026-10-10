@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ChevronLeft,
   ChevronRight,
   Copy,
   Ghost,
+  ImageOff,
   Receipt,
   RotateCcw,
   Search,
@@ -18,7 +19,7 @@ import { useFormatters } from '../../../hooks/useFormatters'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
-import { getCategoryIcon } from '../../../utils/category-icons'
+import { getCategoryIcon, hasMerchantLogo } from '../../../utils/category-icons'
 import {
   extractCleanDescription,
   extractMerchantKeyword,
@@ -78,6 +79,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
     const setManualCategoriesBulk = useAppStore((s) => s.setManualCategoriesBulk)
     const customKeywords = useAppStore((s) => s.customKeywords)
     const setCustomKeywords = useAppStore((s) => s.setCustomKeywords)
+    const filterTransactionsWithoutLogos = useAppStore((s) => s.filterTransactionsWithoutLogos)
     const { formatDate, formatCurrency, formatTransactionCount } = useFormatters()
 
     const shouldShowBankName =
@@ -108,6 +110,12 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
       [setSelectedCategory],
     )
 
+    useEffect(() => {
+      if (!filterTransactionsWithoutLogos && categoryFilter === 'without-logos') {
+        handleCategoryFilterChange('all')
+      }
+    }, [filterTransactionsWithoutLogos, categoryFilter, handleCategoryFilterChange])
+
     // Single-pass computation for filtered categories, types, counts, and financial totals
     const {
       normalTx,
@@ -124,6 +132,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
       totalGhostCount,
     } = useMemo(() => {
       const isAllCat = categoryFilter === 'all'
+      const isWithoutLogos = categoryFilter === 'without-logos'
       const normal: Transaction[] = []
       const ghost: Transaction[] = []
       const duplicate: Transaction[] = []
@@ -145,7 +154,11 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
           continue
         }
 
-        if (!isAllCat) {
+        if (isWithoutLogos) {
+          if (hasMerchantLogo(tx.description, tx.counterpartyIban)) {
+            continue
+          }
+        } else if (!isAllCat) {
           if (!tx.category || tx.category !== categoryFilter) {
             continue
           }
@@ -302,13 +315,26 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
           label: t.allCategories || 'All Categories',
           icon: <Tag size={14} />,
         },
+        ...(filterTransactionsWithoutLogos
+          ? [
+              {
+                value: 'without-logos',
+                label: t.filterWithoutLogosBadge || 'Without logos',
+                icon: <ImageOff size={14} />,
+              },
+            ]
+          : []),
         ...availableCategories.map((cat) => ({
           value: cat,
           label: getCategoryLabel(cat, t, locale, customCategories),
           icon: getCategoryIcon(cat, 14, customCategories),
         })),
       ]
-      if (categoryFilter !== 'all' && !availableCategories.includes(categoryFilter)) {
+      if (
+        categoryFilter !== 'all' &&
+        categoryFilter !== 'without-logos' &&
+        !availableCategories.includes(categoryFilter)
+      ) {
         options.push({
           value: categoryFilter,
           label: getCategoryLabel(categoryFilter, t, locale, customCategories),
@@ -316,7 +342,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
         })
       }
       return options
-    }, [availableCategories, categoryFilter, t, locale, customCategories])
+    }, [availableCategories, categoryFilter, filterTransactionsWithoutLogos, t, locale, customCategories])
 
     // Filter transactions by Type (All / Income / Expense / Transfers / Duplicates / Modified)
     // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', 'expense', 'duplicates', or 'modified'!
@@ -659,6 +685,27 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
             )}
           </div>
         </div>
+
+        {categoryFilter === 'without-logos' && (
+          <div className={styles.noLogoNotice} data-testid="without-logos-filter-badge">
+            <div className={styles.noLogoNoticeLeft}>
+              <ImageOff size={15} className={styles.noLogoNoticeIcon} aria-hidden="true" />
+              <span className={styles.noLogoNoticeText}>
+                {t.filterWithoutLogosActiveNotice || 'Showing transactions without logos'}
+              </span>
+            </div>
+            <button
+              type="button"
+              className={styles.noLogoNoticeClose}
+              onClick={() => handleCategoryFilterChange('all')}
+              title={t.clear || 'Clear without logos filter'}
+              aria-label={t.clear || 'Clear without logos filter'}
+              data-testid="clear-without-logos-btn"
+            >
+              <X size={13} />
+            </button>
+          </div>
+        )}
 
         {/* Transactions List */}
         <div className={styles.transactionList} data-testid="transaction-list">

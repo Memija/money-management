@@ -71,7 +71,42 @@ export const NagaLogo = createImageLogo({
   displayName: 'NagaLogo',
 })
 
+/** Coinbase (Coinbase Ireland Limited / Coinbase Global, Inc.) — leading cryptocurrency exchange. */
+export const CoinbaseLogo: IconComponent = ({ size = 16, className }) =>
+  createElement(
+    'svg',
+    {
+      viewBox: '0 0 48 48',
+      width: typeof size === 'number' ? size : undefined,
+      height: typeof size === 'number' ? size : undefined,
+      style: {
+        width: typeof size === 'number' ? `${size}px` : size,
+        height: typeof size === 'number' ? `${size}px` : size,
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        borderRadius: 'inherit',
+        flexShrink: 0,
+      },
+      className: ['brand-logo-full', className].filter(Boolean).join(' '),
+      'data-brand-logo': 'true',
+      'aria-label': 'Coinbase',
+      role: 'img',
+    },
+    createElement('rect', { width: '48', height: '48', fill: '#0052FF' }),
+    createElement(
+      'g',
+      { transform: 'translate(10.03, -1.17) scale(0.20)', fill: '#FFFFFF' },
+      createElement('path', {
+        d: 'M71.02,84.26c16.7,0,29.95,10.3,34.98,25.62h33.66c-6.1-32.75-33.13-54.94-68.37-54.94C31.27,54.94,0,85.32,0,126s30.48,70.79,71.29,70.79c34.45,0,62.01-22.19,68.11-55.21H106c-4.77,15.32-18.02,25.89-34.72,25.89c-23.06,0-39.22-17.96-39.22-41.47S47.96,84.26,71.02,84.26z',
+      }),
+    ),
+  )
+CoinbaseLogo.displayName = 'CoinbaseLogo'
+
 export const CRYPTO_LOGOS: Record<string, IconComponent> = {
+  CoinbaseLogo,
+  coinbaseLogo: CoinbaseLogo,
+  'coinbase': CoinbaseLogo,
   GuardarianLogo,
   'guardarian': GuardarianLogo,
   KrakenLogo,
@@ -83,3 +118,4 @@ export const CRYPTO_LOGOS: Record<string, IconComponent> = {
   'naga': NagaLogo,
   'naga-markets': NagaLogo,
 }
+
