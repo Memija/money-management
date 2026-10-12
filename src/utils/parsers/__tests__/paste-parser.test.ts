@@ -138,13 +138,13 @@ Zinsen
     const rawText = `
 01.01.2023
 Max Mustermann
-IBAN DE89370400440532013000
+IBAN DE89370400440000000001
 Überweisung
 -50,00 EUR
     `
     const result = parseBankStatementPaste(rawText, 'TestBank')
     expect(result).toHaveLength(1)
-    expect(result[0].counterpartyIban).toBe('DE89370400440532013000')
+    expect(result[0].counterpartyIban).toBe('DE89370400440000000001')
   })
 })
 
@@ -152,10 +152,10 @@ describe('extractAccountIbansFromPaste', () => {
   it('extracts IBAN from header line', () => {
     const rawText = `
 Konto: Girokonto
-IBAN: DE35 1001 1001 2621 8280 92
+IBAN: DE35 1001 1001 0000 0000 01
 Saldo: 1.000,00 EUR
     `
     const ibans = extractAccountIbansFromPaste(rawText)
-    expect(ibans).toContain('DE35100110012621828092')
+    expect(ibans).toContain('DE35100110010000000001')
   })
 })

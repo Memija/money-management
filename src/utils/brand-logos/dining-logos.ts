@@ -113,7 +113,7 @@ export const WasserpalastLogo = createImageLogo({
 
 /** Burger King — global fast-food restaurant chain. */
 export const BurgerKingLogo = createImageLogo({
-  src: '/brands/burger-king.png',
+  src: '/brands/burger-king.svg',
   label: 'Burger King',
   displayName: 'BurgerKingLogo',
 })
@@ -134,7 +134,7 @@ export const EatingPointLogo = createImageLogo({
 
 /** Rasthaus Göttingen Ost — motorway service area and restaurant in Rosdorf (Tank & Rast / Serways). */
 export const RasthausGoettingenLogo = createImageLogo({
-  src: '/brands/rasthaus-goettingen.png',
+  src: '/brands/rasthaus-goettingen.svg',
   label: 'Rasthaus Göttingen Ost',
   displayName: 'RasthausGoettingenLogo',
 })
@@ -148,17 +148,11 @@ export const WienerFeinbaeckereiLogo = createImageLogo({
 
 /** Köschinger Forst Ost — motorway service station and restaurant near Hepberg (Tank & Rast / Serways). */
 export const KoeschingerForstLogo = createImageLogo({
-  src: '/brands/koeschinger-forst.png',
+  src: '/brands/koeschinger-forst.svg',
   label: 'Köschinger Forst Ost',
   displayName: 'KoeschingerForstLogo',
 })
 
-/** Bad Homburg Retail / Store 3798 — local shop and food store in Bad Homburg vor der Höhe. */
-export const BadHomburgRetailLogo = createImageLogo({
-  src: '/brands/bad-homburg-retail.png',
-  label: 'Bad Homburg Retail',
-  displayName: 'BadHomburgRetailLogo',
-})
 
 /** Kalea (Kalea GmbH) — craft beer discovery boxes, advent calendars, and beer tasting community. */
 export const KaleaLogo = createImageLogo({
@@ -296,10 +290,6 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   koeschingerForstLogo: KoeschingerForstLogo,
   'koeschinger-forst': KoeschingerForstLogo,
   'koeschinger-forst-ost': KoeschingerForstLogo,
-  BadHomburgRetailLogo,
-  badHomburgRetailLogo: BadHomburgRetailLogo,
-  'bad-homburg-store': BadHomburgRetailLogo,
-  'bad-homburg-retail': BadHomburgRetailLogo,
   RestoranDesetkaLogo,
   restoranDesetkaLogo: RestoranDesetkaLogo,
   'restoran-desetka': RestoranDesetkaLogo,

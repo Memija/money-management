@@ -55,17 +55,26 @@ export const WEEKDAY_FALLBACKS: Partial<Record<Locale, string[]>> = {
   sr: ['Пон', 'Уто', 'Сре', 'Чет', 'Пет', 'Суб', 'Нед'],
 }
 
+const monthNamesCache = new Map<string, string[]>()
+const weekdaysCache = new Map<string, string[]>()
+
 export const getLocalizedMonthNames = (locale: string, format: MonthFormat = 'short'): string[] => {
   const fallback = MONTH_FALLBACKS[locale as Locale]
   if (fallback) {
     return fallback[format]
   }
 
-  return Array.from({ length: 12 }, (_, i) => {
+  const cacheKey = `${locale}_${format}`
+  const cached = monthNamesCache.get(cacheKey)
+  if (cached) return cached
+
+  const names = Array.from({ length: 12 }, (_, i) => {
     const d = new Date(2023, i, 1)
     const name = new Intl.DateTimeFormat(locale, { month: format }).format(d)
     return name.charAt(0).toUpperCase() + name.slice(1)
   })
+  monthNamesCache.set(cacheKey, names)
+  return names
 }
 
 export const getLocalizedWeekdays = (locale: string): string[] => {
@@ -74,12 +83,17 @@ export const getLocalizedWeekdays = (locale: string): string[] => {
     return fallback
   }
 
-  return Array.from({ length: 7 }, (_, i) => {
+  const cached = weekdaysCache.get(locale)
+  if (cached) return cached
+
+  const days = Array.from({ length: 7 }, (_, i) => {
     // January 2, 2023 was a Monday
     const d = new Date(2023, 0, 2 + i)
     const name = new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d)
     return name.charAt(0).toUpperCase() + name.slice(1)
   })
+  weekdaysCache.set(locale, days)
+  return days
 }
 
 const monthYearCache = new Map<string, string>()
@@ -108,28 +122,35 @@ export const formatMonthYearLocalized = (
   locale: string,
   yearFormat: '2-digit' | 'numeric' = '2-digit',
 ): string => {
-  const cacheKey = `${dateString}_${locale}_${yearFormat}`
+  if (!dateString) return ''
+  const validYearFormat = yearFormat === 'numeric' ? 'numeric' : '2-digit'
+  const cacheKey = `${dateString}_${locale}_${validYearFormat}`
   const cached = monthYearCache.get(cacheKey)
   if (cached !== undefined) return cached
 
+  if (!/^\d{4}-\d{2}/.test(dateString)) {
+    monthYearCache.set(cacheKey, dateString)
+    return dateString
+  }
+
   let result = ''
   const parts = dateString.split('-')
-  if (parts.length >= 2) {
-    const yearNum = parts[0]
-    const monthIndex = parseInt(parts[1], 10) - 1
+  const yearNum = parts[0]
+  const monthIndex = parseInt(parts[1], 10) - 1
 
-    if (!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) {
-      if (locale in MONTH_FALLBACKS) {
-        const months = getLocalizedMonthNames(locale, 'short')
-        const yearStr = yearFormat === '2-digit' ? yearNum.slice(-2) : yearNum
-        result = `${months[monthIndex]} ${yearStr}`
-      }
+  if (!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) {
+    if (locale in MONTH_FALLBACKS) {
+      const months = getLocalizedMonthNames(locale, 'short')
+      const yearStr = validYearFormat === '2-digit' ? yearNum.slice(-2) : yearNum
+      result = `${months[monthIndex]} ${yearStr}`
     }
   }
 
   if (!result) {
     const intlLocale = locale in MONTH_FALLBACKS ? 'de-DE' : locale
-    result = getMonthYearDtf(intlLocale, yearFormat).format(new Date(dateString + '-01'))
+    result = getMonthYearDtf(intlLocale, validYearFormat).format(
+      new Date(`${yearNum}-${parts[1]}-01T00:00:00`),
+    )
   }
 
   monthYearCache.set(cacheKey, result)

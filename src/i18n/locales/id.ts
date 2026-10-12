@@ -671,9 +671,10 @@ export const id: TranslationStrings = {
     Salary: ['gaji', 'pendapatan', 'upah', 'reisesp', 'reisespesen', 'uang jalan', 'reimbursement', 'rücküberweisung', 'rueckueberweisung'],
     Rent: ['sewa', 'kos', 'kontrakan', 'kautionsabrechnung', 'deposit sewa', 'uang jaminan'],
     Loans: ['pinjaman', 'kredit', 'cicilan', 'angsuran', 'pelunasan pinjaman', 'kreditrate'],
-    Groceries: ['indomaret', 'alfamart', 'supermarket', 'pasar', 'belanjaan'],
+    Groceries: ['indomaret', 'alfamart', 'supermarket', 'pasar', 'belanjaan', 'toko daging'],
     DiningOut: [
       'restoran',
+      'resto',
       'warung',
       'makan',
       'kafe',
@@ -711,8 +712,8 @@ export const id: TranslationStrings = {
     ],
     Transport: ['gojek', 'grab', 'bensin', 'tol', 'parkir', 'transportasi'],
     Entertainment: ['bioskop', 'netflix', 'spotify', 'hiburan', 'gym'],
-    Insurance: ['asuransi', 'bpjs'],
-    Utilities: ['listrik', '\\bair\\b', 'pdam', 'tagihan'],
+    Insurance: ['asuransi', 'bpjs', 'iptiq', 'iptiq life', 'asuransi kredit', 'restkreditversicherung', 'ratenschutz'],
+    Utilities: ['listrik', '\\bair\\b', 'pdam', 'tagihan', 'openai', 'chatgpt', 'anthropic', 'claude.ai', 'midjourney', 'perplexity', 'google gemini', 'google one', 'cursor ai'],
     Communication: [
       'internet',
       'pulsa',
@@ -772,6 +773,10 @@ export const id: TranslationStrings = {
     Transfers: [
       'transfer',
       'kirim uang',
+      'western union',
+      'westernunion',
+      'wu.com',
+      'moneygram',
       'gopay',
       'ovo',
       'dana',

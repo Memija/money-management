@@ -7,15 +7,19 @@ import { memoizeStringFn } from './bounded-cache'
 import { MERCHANT_LOGOS } from './brand-logos/merchant-logos'
 import type { IconComponent } from './brand-logos/types'
 import {
+  BUTCHER_MEAT_SHOP_REGEX,
+  CREDIT_INSURANCE_REGEX,
   DINING_ESTABLISHMENT_REGEX,
   GERMAN_COMMUNICATION_PURPOSE_REGEX,
   GERMAN_HEALTH_INSURANCE_REGEX,
   GERMAN_INSURANCE_PURPOSE_REGEX,
   GERMAN_TRAVEL_PURPOSE_REGEX,
+  REMITTANCE_TRANSFER_REGEX,
 } from './categorizer/categorizer'
 import {
   extractMerchantKeyword,
   isPaymentProcessorIntermediary,
+  NON_RETAIL_OTTO_REGEX,
   repairBrokenWords,
 } from './categorizer/description-cleaning'
 import { getCategoryColor, ICON_COLORS } from './category-colors'
@@ -129,6 +133,11 @@ function computeMatchingMerchant(text: string): MerchantSuggestion | undefined {
     // Exact matches must beat partial substring inclusions (e.g. 'Uber' must match 'Uber', not 'Uber Eats')
     if (merchant.keyword === textLower || nameLower === textLower) {
       score += 1000
+    }
+
+    // Reject false-positive matches for OTTO on personal names or rental transactions
+    if (merchant.id === 'otto' && NON_RETAIL_OTTO_REGEX.test(textLower)) {
+      score = 0
     }
 
     if (score > 0) {
@@ -280,6 +289,7 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
 
     const isHealthInsurance = GERMAN_HEALTH_INSURANCE_REGEX.test(nameTrimmed)
     const isGeneralInsurance = GERMAN_INSURANCE_PURPOSE_REGEX.test(nameTrimmed)
+    const isCreditInsurance = CREDIT_INSURANCE_REGEX.test(nameTrimmed)
     const isTravelPurpose = GERMAN_TRAVEL_PURPOSE_REGEX.test(nameTrimmed)
     const isCommunicationPurpose = GERMAN_COMMUNICATION_PURPOSE_REGEX.test(nameTrimmed)
 
@@ -293,8 +303,8 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
           ? 'Bank Fees'
           : (merchant.category === 'Insurance' || merchant.id === 'check24') && isHealthInsurance
             ? 'Healthcare'
-            : (merchant.category === 'Insurance' || merchant.id === 'check24' || merchant.category === 'Shopping') &&
-                isGeneralInsurance
+            : (merchant.category === 'Insurance' || merchant.id === 'check24' || merchant.category === 'Shopping' || merchant.category === 'Loans') &&
+                (isGeneralInsurance || isCreditInsurance)
               ? 'Insurance'
               : (merchant.category === 'Shopping' || merchant.id === 'check24' || merchant.category === 'Services') &&
                   isTravelPurpose
@@ -305,7 +315,13 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
                   : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
                       DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
                     ? 'Dining Out'
-                    : merchant.category,
+                    : (merchant.category === 'Shopping' || merchant.id === 'sumup' || merchant.category === 'Services') &&
+                        BUTCHER_MEAT_SHOP_REGEX.test(nameTrimmed)
+                      ? 'Groceries'
+                      : (merchant.category === 'Shopping' || merchant.id === 'sumup' || merchant.category === 'Services') &&
+                          REMITTANCE_TRANSFER_REGEX.test(nameTrimmed)
+                        ? 'Transfers'
+                        : merchant.category,
       initials,
     }
   }

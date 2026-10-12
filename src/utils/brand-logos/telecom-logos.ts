@@ -17,12 +17,38 @@ export const TeranetLogo = createImageLogo({
   displayName: 'TeranetLogo',
 })
 
-/** mobilezone GmbH / HIGH mobile — leading telecommunications retailer and MVNO provider. */
-export const MobilezoneLogo = createImageLogo({
-  src: '/brands/mobilezone.png',
-  label: 'mobilezone',
-  displayName: 'MobilezoneLogo',
-})
+/** Official mobilezone telecommunications brand tile with iconic white "m" on signature red background. */
+export const MobilezoneLogo: IconComponent = ({ size = 16, className }) =>
+  createElement(
+    'svg',
+    {
+      viewBox: '0 0 48 48',
+      width: typeof size === 'number' ? size : undefined,
+      height: typeof size === 'number' ? size : undefined,
+      style: {
+        width: typeof size === 'number' ? `${size}px` : size,
+        height: typeof size === 'number' ? `${size}px` : size,
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        borderRadius: 'inherit',
+        overflow: 'hidden',
+        flexShrink: 0,
+      },
+      className: ['brand-logo-full', className].filter(Boolean).join(' '),
+      'data-brand-logo': 'true',
+      'aria-label': 'mobilezone',
+      role: 'img',
+    },
+    createElement('rect', { width: '48', height: '48', fill: '#EE3125' }),
+    createElement(
+      'g',
+      { transform: 'translate(5.8, -15.8)', fill: '#FFFFFF' },
+      createElement('path', {
+        d: 'M0,53.4h10V39.2c0-2.7,0.9-4.7,3.4-4.7c3,0,3.3,2.2,3.3,4.7v14.2h10V39.2c0-2.7,0.9-4.7,3.4-4.7c3,0,3.3,2.2,3.3,4.7v14.2h10V35.4c0-4.2-2.3-8.9-9-8.9c-6.5,0-8.5,3.8-8.9,4.1c-1.2-2.6-4.2-4.1-7.1-4.1c-3.6,0-6.6,1.1-8.6,4.1H9.6v-3.5H0V53.4L0,53.4L0,53.4z',
+      }),
+    ),
+  )
+MobilezoneLogo.displayName = 'MobilezoneLogo'
 
 /** Official Vodafone brand tile with iconic white speechmark on red background. */
 export const VodafoneLogo: IconComponent = ({ size = 16, className }) =>

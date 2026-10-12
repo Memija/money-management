@@ -213,7 +213,7 @@ describe('DuplicateRulesSettings', () => {
     mockDuplicateRules = [
       {
         id: 'drule_mod_1',
-        descriptionPattern: 'ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE',
+        descriptionPattern: 'MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE',
         amount: -502.58,
         institutionId: 'commerzbank',
         institutionName: 'Commerzbank',
@@ -222,7 +222,7 @@ describe('DuplicateRulesSettings', () => {
         applyCount: 57,
         modifications: {
           amount: 502.58,
-          description: 'ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE ADJUSTED',
+          description: 'MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE ADJUSTED',
           category: 'Loans',
           date: '2026-09-20',
         },
@@ -239,7 +239,7 @@ describe('DuplicateRulesSettings', () => {
     expect(screen.getByTestId('rule-inst-drule_mod_1')).toHaveTextContent('Commerzbank')
 
     // Original transaction values shown
-    expect(screen.getByTestId('rule-pattern-drule_mod_1')).toHaveTextContent('ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE')
+    expect(screen.getByTestId('rule-pattern-drule_mod_1')).toHaveTextContent('MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE')
     expect(screen.getByTestId('rule-amount-drule_mod_1')).toHaveTextContent('€502.58')
     expect(screen.getByTestId('rule-applied-drule_mod_1')).toHaveTextContent('Applied 57 times • Last: 2026-09-20')
 
@@ -257,7 +257,7 @@ describe('DuplicateRulesSettings', () => {
     // Description modification row
     const descMod = screen.getByTestId('rule-mod-desc-drule_mod_1')
     expect(descMod).toBeInTheDocument()
-    expect(descMod).toHaveTextContent('ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE ADJUSTED')
+    expect(descMod).toHaveTextContent('MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE ADJUSTED')
 
     // Category and Date modification rows
     expect(screen.getByTestId('rule-mod-cat-drule_mod_1')).toHaveTextContent('Loans')
@@ -271,7 +271,7 @@ describe('DuplicateRulesSettings', () => {
     expect(screen.getByTestId('modal-rule-preview-drule_mod_1')).toBeInTheDocument()
     expect(screen.getByTestId('modal-rule-inst-drule_mod_1')).toHaveTextContent('Commerzbank')
     expect(screen.getByTestId('modal-rule-action-badge-drule_mod_1')).toHaveTextContent('Duplicated and modified')
-    expect(screen.getByTestId('modal-rule-pattern-drule_mod_1')).toHaveTextContent('ANEL O. BILJANA MEMIC GENODEF1S01 KREDITRATE')
+    expect(screen.getByTestId('modal-rule-pattern-drule_mod_1')).toHaveTextContent('MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE')
     expect(screen.getByTestId('modal-rule-amount-drule_mod_1')).toHaveTextContent('€502.58')
     expect(screen.getByTestId('modal-rule-modifications-drule_mod_1')).toBeInTheDocument()
   })

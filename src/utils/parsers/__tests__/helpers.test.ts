@@ -52,7 +52,7 @@ describe('helpers', () => {
       expect(
         inferType(
           -25,
-          'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 400 6462931/PERSNR: 6832901 End-to-End-Ref.: 2024-1-0035357 Kundenreferenz: 2024-1',
+          'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 100 0000000/PERSNR: 0000000 End-to-End-Ref.: 2024-1-0000001 Kundenreferenz: 2024-1',
         ),
       ).toBe('income')
       expect(inferType(-10, 'Rückvergütung von Entgelten')).toBe('income')
@@ -62,15 +62,31 @@ describe('helpers', () => {
 
     it('returns income when description contains Rücküberweisung / Rueckueberweisung', () => {
       const desc =
-        'Commerzbank AG Rücküberweisung von Karte Nr.   5232 2XXXXXX07296   Anel Memic Card-ID:  5520009001872996 End-to-End-Ref.: null Kundenreferenz: a9d752972a1043a18e7805b6647ed5fa'
+        'Commerzbank AG Rücküberweisung von Karte Nr.   5000 0XXXXXX00000   Max Mustermann Card-ID:  5000000000000000 End-to-End-Ref.: null Kundenreferenz: e0000000000000000000000000000001'
       expect(inferType(150, desc)).toBe('income')
       expect(inferType(-150, desc)).toBe('income')
       expect(
         inferType(
           -250,
-          'Commerzbank AG Rueckueberweisung von Karte Nr. 5232 2XXXXXX07296 Anel Memic Card-ID: 5520009001872996',
+          'Commerzbank AG Rueckueberweisung von Karte Nr. 5000 0XXXXXX00000 Max Mustermann Card-ID: 5000000000000000',
         ),
       ).toBe('income')
+    })
+
+    it('does not treat foreign card fee (Entgelt Auslandseinsatz) or ATM fees (Kundenentgelt) as income', () => {
+      expect(
+        inferType(
+          -38.88,
+          'McDonaldIs Restaurant, Vaduz  LI Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2026-05-05 16:00:20 Originalbetrag: 34,80 CHF Kurs: 0,9082 CHF /EUR Entgelt Auslandseinsatz: 0,57 EUR',
+        ),
+      ).toBe('expense')
+      expect(
+        inferType(
+          -103.95,
+          'Bargeldauszahlung mit Kundenentgelt BAD HOMBG.//Taunus Sparkasse/DE 2023-05-08T09:18:54 KFN 0  VJ 2412 Entgelt 3,95EUR',
+        ),
+      ).toBe('expense')
+      expect(inferType(-79, 'Hochtaunuskreis Essenentgelt fuer Mustermann, Max')).toBe('expense')
     })
   })
 

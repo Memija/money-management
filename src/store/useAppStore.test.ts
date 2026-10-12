@@ -12,6 +12,7 @@ import {
   sanitizeDuplicateOverrideRules,
   useAppStore,
 } from './useAppStore'
+import { CATEGORIZER_RULES_VERSION } from '../utils/categorizer/categorizer'
 
 describe('useAppStore', () => {
   beforeEach(() => {
@@ -404,7 +405,7 @@ describe('useAppStore', () => {
         {
           id: 'cb-tx-1',
           date: '2026-08-20',
-          description: 'ANEL MEMIC N26 Transfer',
+          description: 'MAX MUSTERMANN N26 Transfer',
           amount: -500,
           currency: 'EUR',
           type: 'expense',
@@ -428,7 +429,7 @@ describe('useAppStore', () => {
         {
           id: 'n26-tx-1',
           date: '2026-08-21',
-          description: 'ANEL MEMIC Commerzbank',
+          description: 'MAX MUSTERMANN Commerzbank',
           amount: 500,
           currency: 'EUR',
           type: 'income',
@@ -999,7 +1000,7 @@ describe('useAppStore', () => {
               {
                 id: 'tx-orig',
                 date: '2026-09-20',
-                description: 'ANEL O. BILJANA MEMIC KREDITRATE',
+                description: 'MAX O. ERIKA MUSTERMANN KREDITRATE',
                 amount: -502.58,
                 currency: 'EUR',
                 type: 'expense',
@@ -1010,7 +1011,7 @@ describe('useAppStore', () => {
               {
                 id: 'tx-mod',
                 date: '2026-09-20',
-                description: 'ANEL O. BILJANA MEMIC KREDITRATE',
+                description: 'MAX O. ERIKA MUSTERMANN KREDITRATE',
                 amount: 502.58,
                 currency: 'EUR',
                 type: 'income',
@@ -1026,7 +1027,7 @@ describe('useAppStore', () => {
         duplicateOverrideRules: [
           {
             id: 'drule-kredit',
-            descriptionPattern: 'ANEL O. BILJANA MEMIC KREDITRATE',
+            descriptionPattern: 'MAX O. ERIKA MUSTERMANN KREDITRATE',
             amount: -502.58,
             institutionId: 'commerzbank',
             institutionName: 'Commerzbank',
@@ -1736,6 +1737,119 @@ describe('useAppStore', () => {
 
       useAppStore.getState().clearAllData()
       expect(useAppStore.getState().filterTransactionsWithoutLogos).toBe(false)
+    })
+  })
+
+  describe('migrateHealthInsurance', () => {
+    it('migrates legacy Insurance health and dental transactions to Healthcare and clears obsolete localStorage', () => {
+      const legacyAccount: ImportedAccount = {
+        institutionId: 'commerzbank',
+        institutionName: 'Commerzbank',
+        transactions: [
+          {
+            id: 'legacy-check24',
+            date: '2025-09-22',
+            description:
+              'CHECK24 Vergleichsportal für Kranke nversicherungen GmbH CHECK24 Cashback - fuer Ihre Zahnzu satzversicherung: 10338717',
+            amount: 15,
+            currency: 'EUR',
+            type: 'income',
+            category: 'Insurance',
+            institution: 'Commerzbank',
+          },
+          {
+            id: 'car-insurance',
+            date: '2025-09-22',
+            description: 'HUK-Coburg Kfz-Versicherung',
+            amount: -50,
+            currency: 'EUR',
+            type: 'expense',
+            category: 'Insurance',
+            institution: 'Commerzbank',
+          },
+        ],
+        importedAt: '2025-09-22T10:00:00Z',
+        importedFingerprints: ['fp-1'],
+      }
+
+      useAppStore.setState({
+        importedAccounts: [legacyAccount],
+      })
+
+      localStorage.setItem('mm-app-storage', JSON.stringify({ old: 'data' }))
+      expect(localStorage.getItem('mm-app-storage')).not.toBeNull()
+
+      useAppStore.getState().migrateHealthInsurance()
+
+      const state = useAppStore.getState()
+      expect(state.importedAccounts[0].transactions[0].category).toBe('Healthcare')
+      expect(state.importedAccounts[0].transactions[1].category).toBe('Insurance')
+      expect(localStorage.getItem('mm-app-storage')).toBeNull()
+    })
+
+    it('automatically re-evaluates unedited transactions on version bump while strictly preserving manual overrides', () => {
+      const accountWithMixedCategories: ImportedAccount = {
+        institutionId: 'commerzbank',
+        institutionName: 'Commerzbank',
+        transactions: [
+          {
+            id: 'tx-dental-unmodified',
+            date: '2025-09-22',
+            description:
+              'CHECK24 Vergleichsportal für Kranke nversicherungen GmbH CHECK24 Cashback - fuer Ihre Zahnzu satzversicherung: 10338717',
+            amount: 15,
+            currency: 'EUR',
+            type: 'income',
+            category: 'Insurance', // Stale legacy category
+            institution: 'Commerzbank',
+          },
+          {
+            id: 'tx-manual-locked',
+            date: '2025-09-22',
+            description: 'CHECK24 Vergleichsportal Mobilfunk GmbH Cashback Auszahlung',
+            amount: 20,
+            currency: 'EUR',
+            type: 'income',
+            category: 'Dining Out', // User manually set this intentionally
+            institution: 'Commerzbank',
+          },
+          {
+            id: 'tx-informative',
+            date: '2025-09-22',
+            description: 'Kontomitteilung 0 Euro',
+            amount: 0,
+            currency: 'EUR',
+            type: 'income',
+            category: undefined,
+            institution: 'Commerzbank',
+          },
+        ],
+        importedAt: '2025-09-22T10:00:00Z',
+        importedFingerprints: ['fp-mixed'],
+      }
+
+      useAppStore.setState({
+        importedAccounts: [accountWithMixedCategories],
+        manualCategories: {
+          'tx-manual-locked': 'Dining Out',
+        },
+        appliedCategorizerVersion: 1, // Outdated version
+      })
+
+      // Run automatic migration as triggered on startup
+      useAppStore.getState().autoRecategorizeUneditedTransactions()
+
+      const state = useAppStore.getState()
+      expect(state.appliedCategorizerVersion).toBe(CATEGORIZER_RULES_VERSION)
+
+      // 1. Stale unedited transaction was updated to latest rules (Healthcare)
+      expect(state.importedAccounts[0].transactions[0].category).toBe('Healthcare')
+
+      // 2. User manual override was strictly preserved (Dining Out)
+      expect(state.importedAccounts[0].transactions[1].category).toBe('Dining Out')
+
+      // 3. Informative transaction remains uncategorized
+      expect(state.importedAccounts[0].transactions[2].category).toBeUndefined()
     })
   })
 })

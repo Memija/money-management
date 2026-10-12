@@ -1,13 +1,13 @@
 import { FaAws, FaMicrosoft } from 'react-icons/fa'
 import {
-  SiAcer, SiAirbnb, SiAircanada, SiAirfrance, SiAldisud, SiAliexpress, SiAllegro, SiAmd, SiAmericanairlines, SiApplepay, SiAsda, SiAsus, SiAuchan,
+  SiAcer, SiAirbnb, SiAircanada, SiAirfrance, SiAldisud, SiAliexpress, SiAllegro, SiAmd, SiAmericanairlines, SiAnthropic, SiApplepay, SiAsda, SiAsus, SiAuchan,
   SiBankofamerica, SiBarclays, SiBinance, SiBose, SiBritishairways, SiBunq, SiBurgerking, SiCarrefour,
-  SiCashapp, SiChase, SiCoop, SiCorsair, SiDazn, SiDeliveroo,
+  SiCashapp, SiChase, SiClaude, SiCoop, SiCorsair, SiCursor, SiDazn, SiDeliveroo,
   SiDelta, SiDeutschepost, SiDeutschetelekom, SiDhl, SiDigitalocean, SiDiscord, SiDm, SiDoordash, SiDuolingo, SiEasyjet, SiEdeka,
-  SiEmirates, SiEpicgames, SiEpson, SiEtihadairways, SiEtsy, SiExpedia, SiFiat, SiFord, SiFreenet, SiGithub, SiGlovo, SiGojek, SiGrab, SiHellofresh, SiHetzner, SiHilton, SiHonda, SiHotelsdotcom, SiHp, SiHsbc, SiHuawei, SiHyundai, SiIntel, SiIonos, SiJusteat, SiKaufland, SiKfc,
+  SiEmirates, SiEpicgames, SiEpson, SiEtihadairways, SiEtsy, SiExpedia, SiFiat, SiFord, SiFreenet, SiGithub, SiGlovo, SiGojek, SiGoogle, SiGooglegemini, SiGrab, SiHellofresh, SiHetzner, SiHilton, SiHonda, SiHotelsdotcom, SiHp, SiHsbc, SiHuawei, SiHyundai, SiIntel, SiIonos, SiJusteat, SiKaufland, SiKfc,
   SiKia, SiKlm, SiLenovo, SiLg, SiLidl, SiLufthansa, SiLyft, SiMarriott, SiMastercard, SiMazda, SiMoneygram, SiMonzo,
   SiMorrisons, SiMsi, SiN26, SiNetcup, SiNetto, SiNike, SiNissan, SiNvidia, SiOpel, SiOrange, SiOvh, SiPayoneer, SiPenny,
-  SiPeugeot, SiPlaystation, SiQantas, SiQatarairways, SiRazer, SiRenault, SiRevolut, SiRewe, SiRossmann, SiRyanair, SiSeagate, SiSeat, SiSennheiser, SiShopee, SiSingaporeairlines, SiSkoda, SiSky, SiSony, SiSouthwestairlines, SiSparkasse,
+  SiPerplexity, SiPeugeot, SiPlaystation, SiQantas, SiQatarairways, SiRazer, SiRenault, SiRevolut, SiRewe, SiRossmann, SiRyanair, SiSeagate, SiSeat, SiSennheiser, SiShopee, SiSingaporeairlines, SiSkoda, SiSky, SiSony, SiSouthwestairlines, SiSparkasse,
   SiSpotify, SiStarbucks, SiStarlingbank, SiSteam, SiStrava, SiStripe, SiTarget, SiTesco, SiToyota, SiTripadvisor, SiTrivago, SiTurkishairlines, SiTwitch,
   SiUbereats, SiUnitedairlines, SiVenmo, SiVercel, SiVinted, SiVisa, SiVolvo,
   SiWise, SiXiaomi, SiYoutube,
@@ -171,6 +171,8 @@ import {
   HpLogo,
   LogitechLogo,
   MicrosoftLogo,
+  MidjourneyLogo,
+  OpenAiLogo,
   PhilipsLogo,
 } from './tech-logos'
 import { O2Logo, TELECOM_LOGOS, VodafoneLogo } from './telecom-logos'
@@ -331,6 +333,30 @@ export const MERCHANT_LOGOS: Record<string, IconComponent> = {
   'gpay': GooglePayLogo,
   'GPay': GooglePayLogo,
   SiHsbc, SiMonzo, SiPayoneer, SiStripe, SiVenmo,
+  SiGoogle,
+  GoogleLogo: SiGoogle,
+  google: SiGoogle,
+  SiGooglegemini,
+  GoogleGeminiLogo: SiGooglegemini,
+  SiAnthropic,
+  AnthropicLogo: SiAnthropic,
+  anthropic: SiAnthropic,
+  SiClaude,
+  ClaudeLogo: SiClaude,
+  claude: SiClaude,
+  OpenAiLogo,
+  SiOpenai: OpenAiLogo,
+  openai: OpenAiLogo,
+  chatgpt: OpenAiLogo,
+  ChatGPTLogo: OpenAiLogo,
+  MidjourneyLogo,
+  midjourney: MidjourneyLogo,
+  SiPerplexity,
+  PerplexityLogo: SiPerplexity,
+  perplexity: SiPerplexity,
+  SiCursor,
+  CursorLogo: SiCursor,
+  cursor: SiCursor,
   SiRossmann,
   SiMediamarkt: MediaMarktLogo,
   MediaMarktLogo,
@@ -702,7 +728,7 @@ export { KinderplanetLogo } from './variety-store-logos'
 export { AmazonLogo, CaLogo, CAndALogo, EbayLogo, GooglePayLogo, IkeaLogo, IntratecLogo, PaypalLogo }
 export { LotharBraunLogo, SchreinereiBraunLogo, SchreinereiLotharBraunLogo } from './craft-logos'
 export { WesternUnionLogo } from './payment-logos'
-export { CloudflareLogo,HerokuLogo } from './tech-logos'
+export { CloudflareLogo, HerokuLogo, MidjourneyLogo, OpenAiLogo } from './tech-logos'
 export { O2Logo, VodafoneLogo } from './telecom-logos'
 export { UberLogo, UberRidesLogo } from './transit-logos'
 

@@ -34,6 +34,7 @@ interface CustomTooltipProps {
   label?: string
   formatCurrency: (n: number) => string
   formatSavingsRate: (n: number) => string
+  formatMonthYear: (d: string) => string
   t: Record<string, string>
   viewMode: 'monthly' | 'cumulative'
 }
@@ -44,6 +45,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
   label,
   formatCurrency,
   formatSavingsRate,
+  formatMonthYear,
   t,
   viewMode,
 }) => {
@@ -51,12 +53,14 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
     return null
   }
 
+  const formattedLabel = formatMonthYear ? formatMonthYear(label ?? '') : label
+
   if (viewMode === 'cumulative') {
     const cumulativeNet = Number(payload.find((p) => p.dataKey === 'cumulativeNet')?.value ?? 0)
     const isPositive = cumulativeNet >= 0
     return (
       <div className={styles.tooltipContainer}>
-        <p className={styles.tooltipHeader}>{label}</p>
+        <p className={styles.tooltipHeader}>{formattedLabel}</p>
         <div className={styles.tooltipRow}>
           <div className={styles.tooltipLabelGroup}>
             <span className={`${styles.tooltipDot} ${isPositive ? styles.pillDotIncome : styles.pillDotExpense}`} />
@@ -78,7 +82,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
 
   return (
     <div className={styles.tooltipContainer}>
-      <p className={styles.tooltipHeader}>{label}</p>
+      <p className={styles.tooltipHeader}>{formattedLabel}</p>
 
       {/* Income Row */}
       <div className={styles.tooltipRow}>
@@ -123,7 +127,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
   totalExpenses: propExpenses,
 }) => {
   const t = useLanguageStore((s) => s.t)
-  const { formatCurrency, formatSavingsRate } = useFormatters()
+  const { formatCurrency, formatSavingsRate, formatMonthYear } = useFormatters()
   const [viewMode, setViewMode] = useState<'monthly' | 'cumulative'>('monthly')
   const [hiddenSeries, setHiddenSeries] = useState<Record<string, boolean>>({})
 
@@ -235,8 +239,8 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
             {monthlyData.length > 0 && (
               <p className={styles.subtitle}>
                 {monthlyData.length === 1
-                  ? monthlyData[0].name
-                  : `${monthlyData[0].name} – ${monthlyData[monthlyData.length - 1].name}`}
+                  ? formatMonthYear(monthlyData[0].rawMonth || monthlyData[0].name)
+                  : `${formatMonthYear(monthlyData[0].rawMonth || monthlyData[0].name)} – ${formatMonthYear(monthlyData[monthlyData.length - 1].rawMonth || monthlyData[monthlyData.length - 1].name)}`}
               </p>
             )}
           </div>
@@ -306,10 +310,11 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
                 />
 
                 <XAxis
-                  dataKey="name"
+                  dataKey="rawMonth"
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: 'var(--text-dim)', fontSize: 11 }}
+                  tickFormatter={formatMonthYear}
                   dy={6}
                 />
 
@@ -325,6 +330,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
                     <CustomTooltip
                       formatCurrency={formatCurrency}
                       formatSavingsRate={formatSavingsRate}
+                      formatMonthYear={formatMonthYear}
                       t={t as unknown as Record<string, string>}
                       viewMode={viewMode}
                     />
@@ -407,10 +413,11 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
                   opacity={0.6}
                 />
                 <XAxis
-                  dataKey="name"
+                  dataKey="rawMonth"
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: 'var(--text-dim)', fontSize: 11 }}
+                  tickFormatter={formatMonthYear}
                   dy={6}
                 />
                 <YAxis
@@ -424,6 +431,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
                     <CustomTooltip
                       formatCurrency={formatCurrency}
                       formatSavingsRate={formatSavingsRate}
+                      formatMonthYear={formatMonthYear}
                       t={t as unknown as Record<string, string>}
                       viewMode={viewMode}
                     />

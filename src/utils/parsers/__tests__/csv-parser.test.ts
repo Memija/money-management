@@ -192,12 +192,48 @@ describe('csv-parser', () => {
           'Amount (EUR)',
         ],
         // Transfer from Main Account to Space (both sides recorded)
-        ['2023-05-10', '2023-05-10', 'Investment fund', '', 'Debit Transfer', 'To fund', 'Main Account', '-100.00'],
-        ['2023-05-10', '2023-05-10', 'Main Account', '', 'Credit Transfer', 'To fund', 'Investment fund', '100.00'],
+        [
+          '2023-05-10',
+          '2023-05-10',
+          'Investment fund',
+          '',
+          'Debit Transfer',
+          'To fund',
+          'Main Account',
+          '-100.00',
+        ],
+        [
+          '2023-05-10',
+          '2023-05-10',
+          'Main Account',
+          '',
+          'Credit Transfer',
+          'To fund',
+          'Investment fund',
+          '100.00',
+        ],
         // Real purchase in Main Account
-        ['2023-05-12', '2023-05-12', 'Supermarket GmbH', '', 'Presentment', '-', 'Main Account', '-45.50'],
+        [
+          '2023-05-12',
+          '2023-05-12',
+          'Supermarket GmbH',
+          '',
+          'Presentment',
+          '-',
+          'Main Account',
+          '-45.50',
+        ],
         // Real incoming salary in Main Account
-        ['2023-05-15', '2023-05-15', 'Employer AG', 'DE991234567890', 'Credit Transfer', 'Salary', 'Main Account', '2800.00'],
+        [
+          '2023-05-15',
+          '2023-05-15',
+          'Employer AG',
+          'DE991234567890',
+          'Credit Transfer',
+          'Salary',
+          'Main Account',
+          '2800.00',
+        ],
       ]
       const result = rowsToTransactions(rows, 'N26')
 
@@ -229,10 +265,37 @@ describe('csv-parser', () => {
           'Amount (EUR)',
         ],
         // Main Account side has historical space name 'Rente', space side has current name 'Pension fund'
-        ['2019-10-07', '2019-10-07', 'Rente', '', 'Debit Transfer', 'Zur Rente', 'Main Account', '-50.00'],
-        ['2019-10-07', '2019-10-07', 'Main Account', '', 'Credit Transfer', 'Zur Rente', 'Pension fund', '50.00'],
+        [
+          '2019-10-07',
+          '2019-10-07',
+          'Rente',
+          '',
+          'Debit Transfer',
+          'Zur Rente',
+          'Main Account',
+          '-50.00',
+        ],
+        [
+          '2019-10-07',
+          '2019-10-07',
+          'Main Account',
+          '',
+          'Credit Transfer',
+          'Zur Rente',
+          'Pension fund',
+          '50.00',
+        ],
         // Real external transfer with similar reference text is preserved
-        ['2019-10-07', '2019-10-07', 'External Sender', 'DE92500400000646293100', 'Credit Transfer', 'For spaces.', 'Main Account', '100.00'],
+        [
+          '2019-10-07',
+          '2019-10-07',
+          'External Sender',
+          'DE92500400000000000001',
+          'Credit Transfer',
+          'For spaces.',
+          'Main Account',
+          '100.00',
+        ],
       ]
       const result = rowsToTransactions(rows, 'N26')
 
@@ -245,73 +308,55 @@ describe('csv-parser', () => {
       })
     })
 
-    it('correctly parses instance CSV cfd1945d-b724-4ed0-9597-dca49169963c.csv discarding all 462 space transfers', async () => {
-      const fs = await import('fs')
-      const path = await import('path')
-      const csvPath = path.resolve(process.cwd(), 'data/cfd1945d-b724-4ed0-9597-dca49169963c.csv')
-      const content = fs.readFileSync(csvPath, 'utf-8')
-      const lines = content.split('\n').filter((l) => l.trim())
+    it('correctly parses N26 CSV discarding space transfers and preserving external transactions', () => {
+      const rows = [
+        ['Booking Date', 'Value Date', 'Partner Name', 'Partner Iban', 'Type', 'Payment Reference', 'Account Name', 'Amount (EUR)'],
+        ['2023-01-01', '2023-01-01', 'Main Account', '', 'Credit Transfer', 'Zur Rente', 'Pension fund', '50.00'],
+        ['2023-01-01', '2023-01-01', 'Pension fund', '', 'Credit Transfer', 'Zur Rente', 'Main Account', '-50.00'],
+        ['2023-01-02', '2023-01-02', 'WIZZ AIR', 'HU12345678901234567890123456', 'MasterCard Payment', 'Flight ticket', 'Main Account', '-120.00'],
+        ['2023-01-03', '2023-01-03', 'HEROKU', 'US12345678901234567890123456', 'MasterCard Payment', 'Cloud hosting', 'Main Account', '-25.00'],
+        ['2023-01-04', '2023-01-04', 'MAX MUSTERMANN', 'DE92500400000000000001', 'Credit Transfer', 'Transfer to Commerzbank', 'Main Account', '-200.00'],
+      ]
 
-      // Parse lines with quote-awareness
-      const parseCsvLine = (line: string): string[] => {
-        const result: string[] = []
-        let cur = ''
-        let inQuotes = false
-        for (let i = 0; i < line.length; i++) {
-          const c = line[i]
-          if (c === '"') inQuotes = !inQuotes
-          else if (c === ',' && !inQuotes) {
-            result.push(cur.trim().replace(/^"|"$/g, ''))
-            cur = ''
-          } else {
-            cur += c
-          }
-        }
-        result.push(cur.trim().replace(/^"|"$/g, ''))
-        return result
-      }
-
-      const rows = lines.map(parseCsvLine)
       const txs = rowsToTransactions(rows, 'N26')
+      expect(txs).toHaveLength(3)
 
-      // Total data rows is 681. 462 space transfers should be discarded, leaving 219 real transactions.
-      expect(txs).toHaveLength(219)
-
-      // Verify no discarded space names exist in the remaining descriptions
-      const spaceNames = ['Investment fund', 'Pension fund', 'Wohnung und Auto', 'Main Account', 'Gebäude und Wohnung', 'Rente']
+      const spaceNames = ['Pension fund', 'Main Account']
       for (const tx of txs) {
         expect(spaceNames).not.toContain(tx.description)
       }
 
-      // Verify sample real merchants are correctly parsed with proper descriptions
       const descriptions = txs.map((t) => t.description)
       expect(descriptions.some((d) => d.startsWith('WIZZ AIR'))).toBe(true)
       expect(descriptions.some((d) => d.startsWith('HEROKU'))).toBe(true)
-      expect(descriptions.some((d) => d.includes('ANEL MEMIC') || d.includes('Anel Memic'))).toBe(true)
+      expect(descriptions.some((d) => d.includes('MAX MUSTERMANN'))).toBe(true)
 
-      // Also verify rowsToTransactionsWithMeta returns metadata correctly
       const metaResult = rowsToTransactionsWithMeta(rows, 'N26')
-      expect(metaResult.transactions).toHaveLength(219)
-      expect(metaResult.discardedSpaceCount).toBe(462)
+      expect(metaResult.transactions).toHaveLength(3)
+      expect(metaResult.discardedSpaceCount).toBe(2)
 
-      // Verify counterpartyIban is preserved on transfers
       const cbTransfers = metaResult.transactions.filter(
-        (t) => t.counterpartyIban === 'DE92500400000646293100',
+        (t) => t.counterpartyIban === 'DE92500400000000000001',
       )
-      expect(cbTransfers).toHaveLength(177)
+      expect(cbTransfers).toHaveLength(1)
     })
 
     it('extracts own account IBANs and counterparty IBANs from Commerzbank-style CSV', () => {
       const rows = [
         ['Buchungstag', 'Buchungstext', 'Betrag', 'IBAN Kontoinhaber'],
-        ['15.09.2026', 'ANEL MEMIC Transfer DE35100110012621828092', '-200,00', 'DE92500400000646293100'],
-        ['16.09.2026', 'Supermarket', '-45,50', 'DE92500400000646293100'],
+        [
+          '15.09.2026',
+          'MAX MUSTERMANN Transfer DE35100110010000000001',
+          '-200,00',
+          'DE92500400000000000001',
+        ],
+        ['16.09.2026', 'Supermarket', '-45,50', 'DE92500400000000000001'],
       ]
 
       const meta = rowsToTransactionsWithMeta(rows, 'Commerzbank')
-      expect(meta.detectedAccountIbans).toEqual(['DE92500400000646293100'])
-      expect(meta.transactions[0].ownIban).toBe('DE92500400000646293100')
-      expect(meta.transactions[0].counterpartyIban).toBe('DE35100110012621828092')
+      expect(meta.detectedAccountIbans).toEqual(['DE92500400000000000001'])
+      expect(meta.transactions[0].ownIban).toBe('DE92500400000000000001')
+      expect(meta.transactions[0].counterpartyIban).toBe('DE35100110010000000001')
     })
 
     it('parses Commerzbank Reisespesen reimbursement with type income', () => {
@@ -334,7 +379,7 @@ describe('csv-parser', () => {
         ['Buchungstag', 'Buchungstext', 'Betrag'],
         [
           '15.05.2024',
-          'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 400 6462931/PERSNR: 6832901 End-to-End-Ref.: 2024-1-0035357 Kundenreferenz: 2024-1',
+          'Commerzbank AG Rueckverguetung fuer 2024/KDNR: 100 0000000/PERSNR: 0000000 End-to-End-Ref.: 2024-1-0000001 Kundenreferenz: 2024-1',
           '25,00',
         ],
       ]
@@ -343,6 +388,17 @@ describe('csv-parser', () => {
       expect(result[0].type).toBe('income')
       expect(result[0].amount).toBe(25)
     })
+
+    it('extracts partner from Sender column when Empfänger is empty on incoming transfers', () => {
+      const rows = [
+        ['Buchungstag', 'Buchungstext', 'Betrag', 'Sender', 'Empfänger'],
+        ['14.09.2026', 'Salary transfer', '5855,57', 'Commerzbank AG Zentrale Frankfurt', ''],
+        ['15.09.2026', 'Online payment', '-19,93', '', 'NNT*shop portraitnet'],
+      ]
+      const result = rowsToTransactions(rows, 'Commerzbank')
+      expect(result).toHaveLength(2)
+      expect(result[0].partner).toBe('Commerzbank AG Zentrale Frankfurt')
+      expect(result[1].partner).toBe('NNT*shop portraitnet')
+    })
   })
 })
-

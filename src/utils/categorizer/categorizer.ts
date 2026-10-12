@@ -3,7 +3,12 @@ import { type CategoryKeywords, translations } from '../../i18n/translations'
 import { createBoundedCache } from '../bounded-cache'
 import { getCandidateMerchants } from '../merchant-index'
 import { escapeRegExp, matchesLowercaseTerm } from '../regex-utils'
-import { isPaymentProcessorIntermediary, repairBrokenWords } from './description-cleaning'
+import {
+  isPaymentProcessorIntermediary,
+  isPaymentProcessorOnly,
+  NON_RETAIL_OTTO_REGEX,
+  repairBrokenWords,
+} from './description-cleaning'
 
 export interface CategorizeOptions {
   customKeywords?: Record<string, string[]>
@@ -11,6 +16,13 @@ export interface CategorizeOptions {
   type?: 'income' | 'expense'
   partner?: string
 }
+
+/**
+ * Version integer of the categorization engine.
+ * Bump this number whenever new merchants, regexes, keywords, or categorization priorities are updated.
+ * When bumped, the app automatically re-evaluates all unedited stored transactions on startup.
+ */
+export const CATEGORIZER_RULES_VERSION = 4
 
 const WORD_CHAR_START = /^[\p{L}\p{N}]/u
 const WORD_CHAR_END = /[\p{L}\p{N}]$/u
@@ -133,7 +145,8 @@ function findPopularMerchantCategory(textLower: string): string | undefined {
   let bestProcessorScore = 0
 
   for (const { merchant, keywordLower: kw, aliasesLower, nameLower } of getCandidateMerchants(textLower)) {
-    if (merchant.category === 'Transfers') continue
+    if (merchant.category === 'Transfers' && !REMITTANCE_TRANSFER_REGEX.test(merchant.keyword)) continue
+    if (merchant.id === 'otto' && NON_RETAIL_OTTO_REGEX.test(textLower)) continue
     let score = 0
     if (matchesLowercaseTerm(textLower, kw)) {
       score = kw.length
@@ -204,7 +217,7 @@ const POLISH_ATM_WITHDRAWAL_REGEX =
 // Regex to detect SEPA and credit transfer / standing order reference patterns
 // (e.g. 'CCB.321.UE.328580', 'MOB.210.EE.POS00026333', 'CD-SCT-12345', 'SEPA-Überweisung', 'Dauerauftrag', 'Umbuchung', 'End-to-End-Ref ... Kundenreferenz ...')
 const SEPA_TRANSFER_REGEX =
-  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da|ee|ta|sct|inst)(?:\.[a-z0-9_-]+)?\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref\b.*\bkundenreferenz\b|\bkundenreferenz\b.*\bend-to-end-ref\b)|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*(?:notprovided|null|\d{8}-[a-z0-9_-]+|[a-z0-9_.-]*(?:ue|da|ee|ta|sct|inst|mob|si)[a-z0-9_.-]*)\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?(?:transfer|back)|geld[- ]?zur[uü]ck|sent\s+from|echtzeit[uü]berweisung|echtzeit[- ]?[uü]berweisung|instant[- ]?transfer|instant[- ]?payment)\b|(?:\b[a-z]{4}[a-z]{2}[a-z0-9]{2}(?:[a-z0-9]{3})?\s+[a-z]{2}\d{2}[a-z0-9]{11,30}\b|\b[a-z]{2}\d{2}[a-z0-9]{11,30}\b).*\b(?:end-to-end-ref|kundenreferenz)\b|\b(?:anel(?:\s+memic)?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*biljana\s*memic|biljana(?:\s+memic)?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*anel\s*memic)\b)/i
+  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da|ee|ta|sct|inst)(?:\.[a-z0-9_-]+)?\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref\b.*\bkundenreferenz\b|\bkundenreferenz\b.*\bend-to-end-ref\b)|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*(?:notprovided|null|\d{8}-[a-z0-9_-]+|[a-z0-9_.-]*(?:ue|da|ee|ta|sct|inst|mob|si)[a-z0-9_.-]*)\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?(?:transfer|back)|geld[- ]?zur[uü]ck|sent\s+from|echtzeit[uü]berweisung|echtzeit[- ]?[uü]berweisung|instant[- ]?transfer|instant[- ]?payment)\b|(?:\b[a-z]{4}[a-z]{2}[a-z0-9]{2}(?:[a-z0-9]{3})?\s+[a-z]{2}\d{2}[a-z0-9]{11,30}\b|\b[a-z]{2}\d{2}[a-z0-9]{11,30}\b).*\b(?:end-to-end-ref|kundenreferenz)\b|\b(?:(?:max|anel)(?:\s+(?:mustermann|memic))?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*(?:erika|biljana)\s*(?:mustermann|memic)|(?:erika|biljana)(?:\s+(?:mustermann|memic))?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*(?:max|anel)\s*(?:mustermann|memic))\b)/i
 
 // Regex to detect commercial purchase / order indicators in SEPA payments
 // to prevent business invoices, orders, and corporate collections with End-to-End-Ref from falling into Transfers.
@@ -252,6 +265,7 @@ function compileCustomKeywords(customKeywords: Record<string, string[]>): Compil
     if (!words || words.length === 0) continue
     for (const word of words) {
       if (!word || !word.trim()) continue
+      if (isPaymentProcessorOnly(word)) continue
       const pattern = keywordToPattern(word)
       let regex: RegExp | undefined
       try {
@@ -299,12 +313,22 @@ const CHILDCARE_FEE_REGEX =
 // Regex to detect German health insurance context (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenvers', 'Krankenkasse', 'Zahnzusatzversicherung')
 // to categorize health insurance transactions as Healthcare rather than general Insurance even from multi-line insurers like AXA, Debeka, etc.
 export const GERMAN_HEALTH_INSURANCE_REGEX =
-  /(?:\b(?:kr(?:anke\s*n|anken)vers\w*|krankenkasse\w*|zahn(?:zu\s*)?satz\w*)\b)/i
+  /(?:\b(?:kr(?:anke[-\s]*n|anken)[-\s]*vers\w*|kranken[-\s]*kasse\w*|krankenkasse\w*|zahn[-\s]*(?:zu[-\s]*)?satz\w*|zahn[-\s]*vers\w*|dental[-\s]*vers\w*)\b)/i
 
 // Regex to detect German vehicle or general insurance context (e.g. 'KFZ Versicherung', 'Kfz-Versicherung', 'Autoversicherung', 'Haftpflichtversicherung')
 // to categorize policy payments, fees, or broker/comparison portal cashback (e.g. CHECK24 Gutscheinauszahlung) as Insurance.
 export const GERMAN_INSURANCE_PURPOSE_REGEX =
-  /(?:\b(?:kfz[- ]?vers\w*|auto[- ]?vers\w*|fahrzeug[- ]?vers\w*|motorrad[- ]?vers\w*|haftpflicht\w*|hausrat\w*|rechtsschutz\w*|unfallvers\w*|lebensvers\w*|risikolv\w*|sterbegeld\w*|tierhalterhaftpflicht\w*|hundehaftpflicht\w*|wohngeb[aä]udevers\w*|geb[aä]udevers\w*|versicherungs?(?:auszahlung|beitrag|pr[aä]mie)?)\b)/i
+  /(?:\b(?:kfz[- ]?vers\w*|auto[- ]?vers\w*|fahrzeug[- ]?vers\w*|motorrad[- ]?vers\w*|haftpflicht\w*|hausrat\w*|rechtsschutz\w*|unfallvers\w*|lebensvers\w*|risikolv\w*|sterbegeld\w*|tierhalterhaftpflicht\w*|hundehaftpflicht\w*|wohngeb[aä]udevers\w*|geb[aä]udevers\w*|restkreditvers\w*|restschuldvers\w*|ratenschutz\w*|kreditschutz\w*|darlehensschutz\w*|kreditvers\w*|iptiq\w*|versicherungs?(?:auszahlung|beitrag|pr[aä]mie)?)\b|\b[a-z]{2}\d{2}ver\d{10,25}\b)/i
+
+/**
+ * Regex to detect credit life, loan protection, and residual debt insurance
+ * (e.g. 'Restkreditversicherung', 'Restschuldversicherung', 'Ratenschutzversicherung', 'Ratenschutz',
+ * 'Kreditschutz', 'Darlehensschutz', 'Kreditversicherung', 'iptiQ Life', 'Aeguron', 'Cardif', 'Credit Life',
+ * 'Check 24 Alpha Kredit - 2', or German insurance creditor IDs like 'DE08VER...')
+ * to ensure loan protection policies categorize under Insurance rather than Loans even if they mention 'kredit'.
+ */
+export const CREDIT_INSURANCE_REGEX =
+  /(?:\b(?:restkreditvers\w*|restschuldvers\w*|ratenschutz(?:vers\w*)?|kreditschutz\w*|darlehensschutz\w*|kreditvers\w*|darlehensvers\w*|kreditleben\w*|credit\s*life\w*|iptiq(?:\s+life)?\b|aeguron\b|cardif\b|alpha\s*kredit\s*-\s*2\b|alpha\s*kredit\s+ratenschutz\w*)\b|\b[a-z]{2}\d{2}ver\d{10,25}\b)/i
 
 // Regex to detect German travel, vacation, booking, flight, and lodging context (e.g. 'Reise', 'Reisen', 'Reisebuchung', 'Urlaub', 'Pauschalreise', 'Hotel', 'Flug')
 // to categorize travel bookings, tour operator packages, or comparison portal cashback/refunds (e.g. CHECK24 Auszahlung Guthaben - fuer Ihre Reise) as Travel.
@@ -323,7 +347,31 @@ export const GERMAN_COMMUNICATION_PURPOSE_REGEX =
  * to ensure dining establishments located inside or affiliated with shopping centers or supermarket chains prioritize Dining Out over Groceries/Shopping.
  */
 export const DINING_ESTABLISHMENT_REGEX =
-  /(?:\b(?:restoran|restaurant|bistro|pizzeria|pizzaria|trattoria|osteria|konoba|gostionica|caffe\s*&?\s*restoran|kafana|[cć]evabd[zž]inica|grill\s*restoran|steakhouse|brasserie|bäckerei\w*|baeckerei\w*|feinbäckerei\w*|feinbaeckerei\w*|konditorei\w*|brotchen[- ]?macher\w*|brötchen[- ]?macher\w*|brothaus\w*|brot[- ]?haus\w*)\b)/i
+  /(?:\b(?:restoran|restaurant|resto|restos|bistro|pizzeria|pizzaria|trattoria|osteria|konoba|gostionica|caffe\s*&?\s*restoran|kafana|[cć]evabd[zž]inica|grill\s*restoran|steakhouse|brasserie|bäckerei\w*|baeckerei\w*|feinbäckerei\w*|feinbaeckerei\w*|konditorei\w*|brotchen[- ]?macher\w*|brötchen[- ]?macher\w*|brothaus\w*|brot[- ]?haus\w*)\b)/i
+
+/**
+ * Regex to detect butcher shops, meat markets, and charcuteries
+ * (e.g. 'Metzgerei', 'Fleischerei', 'Schlachterei', 'Landmetzgerei', 'Feinkostmetzgerei', 'Butcher', 'Meat Market', 'Mesnica', 'Mesara')
+ * to ensure meat shops processed through merchant terminals like SumUp prioritize Groceries over Shopping.
+ */
+export const BUTCHER_MEAT_SHOP_REGEX =
+  /(?:\b(?:metzgerei\w*|feinkostmetzgerei\w*|landmetzgerei\w*|fleischerei\w*|schlachterei\w*|metzger\w*|fleischer\w*|schlachter\w*|fleischmarkt\w*|fleischwaren\w*|wurstwaren\w*|butcher(?:s|\s+shop)?|meat\s*(?:shop|market|store)|mesnica\w*|mesara\w*|rze[zź]nik\w*|sklep\s+mi[eę]sny|toko\s+daging)\b)/i
+
+/**
+ * Regex to detect dedicated money transfer and remittance services
+ * (e.g. 'Western Union', 'MoneyGram', 'Ria Money Transfer', 'Remitly', 'WorldRemit', 'TransferWise')
+ * to ensure money transfers prioritize Transfers over generic payment terms like 'Kartenzahlung' or 'Kauf' in Shopping.
+ */
+export const REMITTANCE_TRANSFER_REGEX =
+  /(?:\b(?:western\s*union\w*|westernunion\w*|wu\.com|money[- ]?gram\w*|remitly\w*|ria\s+money\w*|world\s*remit\w*|small\s*world\s*money\w*|transferwise\b|money\s*transfer\w*|geldtransfer\w*|bargeldtransfer\w*|auslands[uü]berweisung\w*|auslandsueberweisung\w*|international\s+money\s+transfer\w*|remittance\w*|slanje\s+novca\w*|przelew\s+zagraniczny\w*|transfer\s+uang\w*)\b)/i
+
+/**
+ * Regex to detect dedicated AI, machine learning, and cloud software subscriptions
+ * (e.g. 'Google Payment Ireland', 'Google Ireland', 'Google Cloud', 'Google Gemini', 'Google One', 'OpenAI', 'ChatGPT', 'Claude.ai', 'Anthropic', 'Midjourney', 'Perplexity', 'Cursor AI')
+ * to ensure recurring AI and digital software tools prioritize Utilities over generic shopping terms like 'Einkauf' or payment processor defaults.
+ */
+export const AI_AND_SOFTWARE_SUBSCRIPTION_REGEX =
+  /(?:\b(?:openai\w*|chatgpt\w*|anthropic\w*|claude\.ai\w*|midjourney\w*|perplexity(?:\.ai)?\w*|cursor(?:\.sh|\.com)?\b|anysphere\w*|google\s+p\s*ayment\s+ireland\w*|google\s+payment\s+ireland\w*|google\s+ireland(?:\s+ltd)?\b|google\s+(?:gemini|one|workspace|cloud|storage)\b)\b)/i
 
 /**
  * Regex to detect card payments, POS purchases, and bank/service fee contexts
@@ -412,6 +460,16 @@ export function categorize(
     }
     const rx = categoryRegexes[cat]
     if (rx?.test(d)) {
+      if (cat === 'Loans') {
+        if (GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
+          defaultCategoryCache.set(cacheKey, 'Healthcare')
+          return 'Healthcare'
+        }
+        if (CREDIT_INSURANCE_REGEX.test(d) || GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
+          defaultCategoryCache.set(cacheKey, 'Insurance')
+          return 'Insurance'
+        }
+      }
       defaultCategoryCache.set(cacheKey, cat)
       return cat
     }
@@ -429,10 +487,25 @@ export function categorize(
     } else if ((popularCat === 'Groceries' || popularCat === 'Shopping') && DINING_ESTABLISHMENT_REGEX.test(d)) {
       defaultCategoryCache.set(cacheKey, 'Dining Out')
       return 'Dining Out'
+    } else if (
+      (popularCat === 'Shopping' || popularCat === 'Services' || popularCat === 'Other') &&
+      BUTCHER_MEAT_SHOP_REGEX.test(d)
+    ) {
+      defaultCategoryCache.set(cacheKey, 'Groceries')
+      return 'Groceries'
+    } else if (
+      (popularCat === 'Shopping' || popularCat === 'Services' || popularCat === 'Other') &&
+      REMITTANCE_TRANSFER_REGEX.test(d)
+    ) {
+      defaultCategoryCache.set(cacheKey, 'Transfers')
+      return 'Transfers'
     } else if (popularCat === 'Shopping' && GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
       defaultCategoryCache.set(cacheKey, 'Healthcare')
       return 'Healthcare'
-    } else if (popularCat === 'Shopping' && GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
+    } else if (
+      (popularCat === 'Shopping' || popularCat === 'Loans' || popularCat === 'Services') &&
+      (CREDIT_INSURANCE_REGEX.test(d) || GERMAN_INSURANCE_PURPOSE_REGEX.test(d))
+    ) {
       defaultCategoryCache.set(cacheKey, 'Insurance')
       return 'Insurance'
     } else if (
@@ -447,6 +520,12 @@ export function categorize(
     ) {
       defaultCategoryCache.set(cacheKey, 'Communication')
       return 'Communication'
+    } else if (
+      (popularCat === 'Shopping' || popularCat === 'Transfers' || popularCat === 'Other') &&
+      AI_AND_SOFTWARE_SUBSCRIPTION_REGEX.test(d)
+    ) {
+      defaultCategoryCache.set(cacheKey, 'Utilities')
+      return 'Utilities'
     } else {
       defaultCategoryCache.set(cacheKey, popularCat)
       return popularCat
@@ -460,9 +539,9 @@ export function categorize(
     return 'Healthcare'
   }
 
-  // General/vehicle insurance priority check (e.g. 'KFZ Versicherung', 'Kfz-Versicherung', 'Haftpflichtversicherung')
+  // General/vehicle/credit insurance priority check (e.g. 'KFZ Versicherung', 'Kfz-Versicherung', 'Restkreditversicherung')
   // categorized as Insurance rather than falling into general Shopping or Other
-  if (GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
+  if (CREDIT_INSURANCE_REGEX.test(d) || GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Insurance')
     return 'Insurance'
   }
@@ -486,6 +565,27 @@ export function categorize(
   if (DINING_ESTABLISHMENT_REGEX.test(d) && !GERMAN_CITY_ESSEN_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Dining Out')
     return 'Dining Out'
+  }
+
+  // Explicit butcher and meat market venue indicators (e.g. 'Metzgerei', 'Fleischerei', 'Schlachterei', 'Mesnica')
+  // take precedence over general shopping dictionaries
+  if (BUTCHER_MEAT_SHOP_REGEX.test(d)) {
+    defaultCategoryCache.set(cacheKey, 'Groceries')
+    return 'Groceries'
+  }
+
+  // Explicit remittance and money transfer providers (e.g. 'Western Union', 'MoneyGram', 'Ria Money Transfer', 'Remitly')
+  // take precedence over generic payment terms like 'Kartenzahlung' or 'Kauf' in Shopping
+  if (REMITTANCE_TRANSFER_REGEX.test(d)) {
+    defaultCategoryCache.set(cacheKey, 'Transfers')
+    return 'Transfers'
+  }
+
+  // Explicit AI and cloud software subscriptions (e.g. 'Google Payment Ireland', 'OpenAI', 'ChatGPT', 'Claude.ai', 'Anthropic', 'Midjourney', 'Perplexity', 'Cursor')
+  // take precedence over generic shopping terms like 'Einkauf' or payment processor intermediaries
+  if (AI_AND_SOFTWARE_SUBSCRIPTION_REGEX.test(d)) {
+    defaultCategoryCache.set(cacheKey, 'Utilities')
+    return 'Utilities'
   }
 
   // 4. General category matching

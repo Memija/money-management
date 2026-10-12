@@ -2,7 +2,11 @@ import { categoryI18nKeys } from '../i18n/categories'
 import { translations, type TranslationStrings } from '../i18n/translations'
 import type { CustomCategory, Transaction } from '../types'
 import { categorize } from './categorizer/categorizer'
-import { isInformativeTransaction } from './categorizer/description-cleaning'
+import {
+  extractCleanDescription,
+  isInformativeTransaction,
+  isPaymentProcessorOnly,
+} from './categorizer/description-cleaning'
 
 export * from './categorizer/categorizer'
 export * from './categorizer/description-cleaning'
@@ -24,6 +28,8 @@ for (const locale of Object.values(translations)) {
   }
 }
 
+const canonicalCategoryCache = new Map<string, string>()
+
 /**
  * Resolves any category input (canonical key, localized label, or raw keyword)
  * to its standardized canonical category key ('Salary', 'Rent', 'Groceries', 'Dining Out', etc.).
@@ -33,26 +39,37 @@ export function resolveCanonicalCategory(name: string): string {
   const trimmed = name.trim()
   if (!trimmed) return 'Other'
 
+  const cached = canonicalCategoryCache.get(trimmed)
+  if (cached !== undefined) return cached
+
+  let result = 'Other'
   // 1. Exact match against canonical category keys
   if (categoryI18nKeys[trimmed]) {
-    if (trimmed === 'DiningOut') return 'Dining Out'
-    if (trimmed === 'BankFees' || trimmed === 'Fees') return 'Bank Fees'
-    return trimmed
+    if (trimmed === 'DiningOut') {
+      result = 'Dining Out'
+    } else if (trimmed === 'BankFees' || trimmed === 'Fees') {
+      result = 'Bank Fees'
+    } else {
+      result = trimmed
+    }
+  } else {
+    // 2. Exact match against localized category labels across all languages
+    const lower = trimmed.toLowerCase()
+    if (localizedCategoryMap[lower]) {
+      result = localizedCategoryMap[lower]
+    } else {
+      // 3. Multilingual keyword categorization across all locales
+      const categorized = categorize(trimmed)
+      if (categorized && categorized !== 'Other') {
+        result = categorized
+      }
+    }
   }
 
-  // 2. Exact match against localized category labels across all languages
-  const lower = trimmed.toLowerCase()
-  if (localizedCategoryMap[lower]) {
-    return localizedCategoryMap[lower]
+  if (canonicalCategoryCache.size < 1000) {
+    canonicalCategoryCache.set(trimmed, result)
   }
-
-  // 3. Multilingual keyword categorization across all locales
-  const categorized = categorize(trimmed)
-  if (categorized && categorized !== 'Other') {
-    return categorized
-  }
-
-  return 'Other'
+  return result
 }
 
 /**
@@ -102,9 +119,16 @@ export function getTransactionCategory(
     return undefined
   }
   if (manualCategories && manualCategories[t.id]) {
-    return manualCategories[t.id]
+    const manualCat = manualCategories[t.id]
+    if (manualCat === 'Transport' && isPaymentProcessorOnly(extractCleanDescription(t.description))) {
+      // Guard against generic payment processors without merchant names having been
+      // accidentally lumped into Transport via legacy prefix-matching batch updates
+    } else {
+      return manualCat
+    }
   }
-  if (t.category) {
+  // User-modified transactions where user explicitly modified fields in import review
+  if (t.isModified && t.category) {
     return t.category
   }
   return categorize(t.description, {

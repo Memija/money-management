@@ -1,7 +1,14 @@
 import type { TranslationStrings } from '../../i18n/types'
 import type { Transaction } from '../../types'
 import { extractIbans, filterInternalSpaceTransfers } from '../account-transfers'
-import { EXPLICIT_INCOME_KEYWORDS_REGEX,generateId, inferType, isValidDateRaw, parseAmount, parseDate } from './helpers'
+import {
+  EXPLICIT_INCOME_KEYWORDS_REGEX,
+  generateId,
+  inferType,
+  isValidDateRaw,
+  parseAmount,
+  parseDate,
+} from './helpers'
 
 /**
  * Known preamble-row detection: some banks (ING, comdirect) emit metadata
@@ -51,6 +58,7 @@ interface ColumnIndices {
   habenIdx: number
   accountIdx: number
   partnerIdx: number
+  senderIdx: number
   ibanIdx: number
   ownIbanIdx: number
   counterpartyIbanIdx: number
@@ -121,6 +129,15 @@ function detectColumnIndices(header: string[]): ColumnIndices {
     ),
   )
 
+  // ── Dedicated Sender / Payer column ───────────────────────────────────────────
+  const senderIdx = header.findIndex((h) =>
+    headerMatches(
+      h,
+      ['sender', 'absender', 'auftraggeber', 'payer', 'zahlender'],
+      ['name des senders', 'name des auftraggebers'],
+    ),
+  )
+
   // ── Dedicated Account / Space Name column ─────────────────────────────────────
   const accountIdx = header.findIndex((h) => {
     // Avoid matching account number or IBAN headers
@@ -154,8 +171,24 @@ function detectColumnIndices(header: string[]): ColumnIndices {
   let ownIbanIdx = header.findIndex((h) =>
     headerMatches(
       h,
-      ['iban kontoinhaber', 'konto-iban', 'konto iban', 'kontonummer / iban', 'eigene iban', 'own iban', 'account iban'],
-      ['iban kontoinhaber', 'konto-iban', 'konto iban', 'kontonummer / iban', 'eigene iban', 'own iban', 'account iban'],
+      [
+        'iban kontoinhaber',
+        'konto-iban',
+        'konto iban',
+        'kontonummer / iban',
+        'eigene iban',
+        'own iban',
+        'account iban',
+      ],
+      [
+        'iban kontoinhaber',
+        'konto-iban',
+        'konto iban',
+        'kontonummer / iban',
+        'eigene iban',
+        'own iban',
+        'account iban',
+      ],
     ),
   )
 
@@ -163,8 +196,28 @@ function detectColumnIndices(header: string[]): ColumnIndices {
   let counterpartyIbanIdx = header.findIndex((h) =>
     headerMatches(
       h,
-      ['partner iban', 'partner-iban', 'iban des partners', 'gegenkonto iban', 'gegenkonto-iban', 'counterparty iban', 'empfänger iban', 'empfaenger iban', 'auftraggeber iban'],
-      ['partner iban', 'partner-iban', 'iban des partners', 'gegenkonto iban', 'gegenkonto-iban', 'counterparty iban', 'empfänger iban', 'empfaenger iban', 'auftraggeber iban'],
+      [
+        'partner iban',
+        'partner-iban',
+        'iban des partners',
+        'gegenkonto iban',
+        'gegenkonto-iban',
+        'counterparty iban',
+        'empfänger iban',
+        'empfaenger iban',
+        'auftraggeber iban',
+      ],
+      [
+        'partner iban',
+        'partner-iban',
+        'iban des partners',
+        'gegenkonto iban',
+        'gegenkonto-iban',
+        'counterparty iban',
+        'empfänger iban',
+        'empfaenger iban',
+        'auftraggeber iban',
+      ],
     ),
   )
 
@@ -225,13 +278,38 @@ function detectColumnIndices(header: string[]): ColumnIndices {
   if (amountIdx === -1 && sollIdx === -1 && habenIdx === -1)
     amountIdx = Math.min(header.length - 1, 2)
 
-  return { dateIdx, descIdx, amountIdx, sollIdx, habenIdx, accountIdx, partnerIdx, ibanIdx, ownIbanIdx, counterpartyIbanIdx, refIdx }
+  return {
+    dateIdx,
+    descIdx,
+    amountIdx,
+    sollIdx,
+    habenIdx,
+    accountIdx,
+    partnerIdx,
+    senderIdx,
+    ibanIdx,
+    ownIbanIdx,
+    counterpartyIbanIdx,
+    refIdx,
+  }
 }
 
 function parseRow(row: string[], indices: ColumnIndices, institution: string): Transaction | null {
   if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) return null
 
-  const { dateIdx, descIdx, amountIdx, sollIdx, habenIdx, refIdx, ownIbanIdx, counterpartyIbanIdx, accountIdx, partnerIdx } = indices
+  const {
+    dateIdx,
+    descIdx,
+    amountIdx,
+    sollIdx,
+    habenIdx,
+    refIdx,
+    ownIbanIdx,
+    counterpartyIbanIdx,
+    accountIdx,
+    partnerIdx,
+    senderIdx,
+  } = indices
 
   const rawAmount = row[amountIdx]
   const rawAmountStr = rawAmount?.toString().trim() ?? ''
@@ -257,6 +335,12 @@ function parseRow(row: string[], indices: ColumnIndices, institution: string): T
     const rawPartner = row[partnerIdx]?.toString?.()?.trim()
     if (rawPartner) {
       partner = rawPartner
+    }
+  }
+  if (!partner && senderIdx !== -1 && senderIdx !== descIdx) {
+    const rawSender = row[senderIdx]?.toString?.()?.trim()
+    if (rawSender) {
+      partner = rawSender
     }
   }
 
@@ -338,7 +422,8 @@ export function findSpaceTransferRowIndices(
   dataRows: string[][],
   indices: ColumnIndices,
 ): Set<number> {
-  const { accountIdx, partnerIdx, descIdx, ibanIdx, dateIdx, amountIdx, sollIdx, habenIdx } = indices
+  const { accountIdx, partnerIdx, descIdx, ibanIdx, dateIdx, amountIdx, sollIdx, habenIdx } =
+    indices
   const discarded = new Set<number>()
 
   if (accountIdx === -1) {
@@ -362,7 +447,8 @@ export function findSpaceTransferRowIndices(
   const hasSpaceAccounts =
     accountNames.size > 1 ||
     Array.from(accountNames).some(
-      (name) => name.includes('space') || name.includes('main account') || name.includes('hauptkonto'),
+      (name) =>
+        name.includes('space') || name.includes('main account') || name.includes('hauptkonto'),
     )
 
   if (!hasSpaceAccounts) {
@@ -460,12 +546,24 @@ export function rowsToTransactionsWithMeta(
   institution: string,
   t?: TranslationStrings,
 ): ParsedCsvTransactionsResult {
-  if (rows.length < 2) return { transactions: [], discardedSpaceCount: 0, detectedAccountIbans: [], excludedSpaceTransactions: [] }
+  if (rows.length < 2)
+    return {
+      transactions: [],
+      discardedSpaceCount: 0,
+      detectedAccountIbans: [],
+      excludedSpaceTransactions: [],
+    }
 
   // Skip preamble rows
   const headerRowIdx = findHeaderRowIndex(rows)
   const dataRows = rows.slice(headerRowIdx)
-  if (dataRows.length < 2) return { transactions: [], discardedSpaceCount: 0, detectedAccountIbans: [], excludedSpaceTransactions: [] }
+  if (dataRows.length < 2)
+    return {
+      transactions: [],
+      discardedSpaceCount: 0,
+      detectedAccountIbans: [],
+      excludedSpaceTransactions: [],
+    }
 
   // Normalise header cells: lowercase, strip surrounding quotes
   const header = dataRows[0].map((h) => h?.toString().toLowerCase().trim() ?? '')
@@ -485,7 +583,7 @@ export function rowsToTransactionsWithMeta(
       if (transaction) {
         if (!transaction.subAccount && indices.accountIdx !== -1) {
           const pIdx = indices.partnerIdx !== -1 ? indices.partnerIdx : indices.descIdx
-          const rawPartner = pIdx !== -1 ? row[pIdx]?.toString().trim() ?? '' : ''
+          const rawPartner = pIdx !== -1 ? (row[pIdx]?.toString().trim() ?? '') : ''
           const isMain = (s?: string) =>
             !s ||
             s.toLowerCase() === 'main account' ||
@@ -544,9 +642,7 @@ export function rowsToTransactionsWithMeta(
 
   const detectedAccountIbans = Array.from(
     new Set(
-      finalTransactions
-        .map((tx) => tx.ownIban)
-        .filter((iban): iban is string => Boolean(iban)),
+      finalTransactions.map((tx) => tx.ownIban).filter((iban): iban is string => Boolean(iban)),
     ),
   )
 
@@ -565,4 +661,3 @@ export function rowsToTransactions(
 ): Transaction[] {
   return rowsToTransactionsWithMeta(rows, institution, t).transactions
 }
-

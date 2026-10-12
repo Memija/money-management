@@ -17,7 +17,7 @@ interface CustomPeriodPickerProps {
   ariaLabel?: string
 }
 
-export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
+export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = React.memo(({
   mode,
   value,
   options,
@@ -27,7 +27,7 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const { locale } = useLanguageStore()
+  const locale = useLanguageStore((s) => s.locale)
 
   useDropdownPosition({
     isOpen,
@@ -228,4 +228,4 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = ({
         )}
     </div>
   )
-}
+})

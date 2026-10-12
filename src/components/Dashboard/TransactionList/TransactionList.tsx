@@ -26,6 +26,7 @@ import {
   findRelatedTransactions,
   getCategoryLabel,
   isInformativeTransaction,
+  isPaymentProcessorOnly,
 } from '../../../utils/category-utils'
 import { getVisiblePages } from '../../../utils/pagination-utils'
 import { BatchCategoryModal } from '../../shared/BatchCategoryModal'
@@ -395,7 +396,9 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
         setManualCategory(tx.id, newCategory)
         const cleanDesc = extractCleanDescription(tx.description)
         const merchantKeyword = extractMerchantKeyword(tx.description)
-        const candidates = [merchantKeyword, cleanDesc].filter((kw) => kw && kw.trim().length >= 3)
+        const candidates = [merchantKeyword, cleanDesc].filter(
+          (kw) => kw && kw.trim().length >= 3 && !isPaymentProcessorOnly(kw),
+        )
         if (candidates.length > 0) {
           const existingKeywords = customKeywords[newCategory] || []
           const updated = [...existingKeywords]
@@ -437,7 +440,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
           const cleanDesc = extractCleanDescription(targetTx.description)
           const merchantKeyword = extractMerchantKeyword(targetTx.description)
           const candidates = [merchantKeyword, cleanDesc].filter(
-            (kw) => kw && kw.trim().length >= 3,
+            (kw) => kw && kw.trim().length >= 3 && !isPaymentProcessorOnly(kw),
           )
           if (candidates.length > 0) {
             const existingKeywords = customKeywords[newCat] || []

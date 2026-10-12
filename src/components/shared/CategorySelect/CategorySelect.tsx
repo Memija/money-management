@@ -21,7 +21,7 @@ interface CategorySelectProps {
   onOpenChange?: (isOpen: boolean) => void
 }
 
-export const CategorySelect: React.FC<CategorySelectProps> = ({ 
+export const CategorySelect: React.FC<CategorySelectProps> = React.memo(({ 
   value, 
   onChange, 
   variant = 'default',
@@ -34,7 +34,8 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   
-  const { t, locale: currentLocale } = useLanguageStore()
+  const t = useLanguageStore((state) => state.t)
+  const currentLocale = useLanguageStore((state) => state.locale)
   const customCategories = useAppStore((state) => state.customCategories)
   const setStep = useAppStore((state) => state.setStep)
 
@@ -198,4 +199,6 @@ export const CategorySelect: React.FC<CategorySelectProps> = ({
       )}
     </div>
   )
-}
+})
+
+CategorySelect.displayName = 'CategorySelect'

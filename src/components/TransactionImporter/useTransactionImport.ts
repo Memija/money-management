@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
-import * as XLSX from 'xlsx'
 
 import type { TranslationStrings } from '../../i18n/types'
 import type { ImportMethod, Transaction } from '../../types'
@@ -43,6 +42,8 @@ export const useTransactionImport = (
         if (method === 'spreadsheet' || file.name.match(/\.(xlsx|xls|csv)$/i)) {
           if (file.name.match(/\.(xlsx|xls)$/i)) {
             const data = await file.arrayBuffer()
+            // Dynamically import xlsx so the parser is only downloaded when needed
+            const XLSX = await import('xlsx')
             const workbook = XLSX.read(data, { type: 'array' })
             const sheetName = workbook.SheetNames[0]
             const sheet = workbook.Sheets[sheetName]

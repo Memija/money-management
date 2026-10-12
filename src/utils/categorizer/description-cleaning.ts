@@ -10,6 +10,13 @@ export function isInformativeTransaction(tx?: { amount?: number } | null): boole
   return tx.amount === 0
 }
 
+/**
+ * Non-retail contexts for the personal name "Otto" (e.g. "Heinz Otto GbR", "Miete/Nebenkosten", "Kaution")
+ * to prevent rental, tenancy, and personal landlord transactions from misclassifying as the online retailer OTTO.
+ */
+export const NON_RETAIL_OTTO_REGEX =
+  /(?:\b(?:heinz|klaus|hans|karl|frank|jan|michael|peter|wolfgang|johann)\s+otto\b|\botto\s+(?:christoph|barth|schmidt|m[uü]ller|becker|meier|meyer|schulz|wagner|fischer)\b|\b(?:gbr|miete|nebenkosten|kautionsabrechnung|kaution|hausgeld|wohnung|vermiet(?:er|ung)?)\b)/i
+
 const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   // German line-break word splits
   [/(?:rg|rechnungs?)[-\s]+(?:n\s*r|nr)\.?/iu, 'RG-Nr.'],
@@ -137,11 +144,22 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\bbergfreun\s+de\b/iu, 'Bergfreunde'],
   [/\bgmb\s+h\b/iu, 'GmbH'],
   [/\btaunus\s+w\s+underland\b/iu, 'Taunus Wunderland'],
-  [/\bw\s+underland\b/iu, 'Wunderland'],
   [/\beink\s+auf\b/iu, 'Einkauf'],
+  [/\bp\s+ayment\b/iu, 'Payment'],
+  [/\bbe\s+i\b/iu, 'bei'],
   [/(?:gutschein)[-\s]+(?:auszahlung)/iu, 'Gutscheinauszahlung'],
-  [/\bkranke\s+nversicher/iu, 'Krankenversicher'],
-  [/\bzahnzu\s+satzversicher/iu, 'Zahnzusatzversicher'],
+  [/(?:kr(?:anke)?)[-\s]+(?:n[-\s]*versicherungen)/iu, 'Krankenversicherungen'],
+  [/(?:kr(?:anke)?)[-\s]+(?:n[-\s]*versicherung)/iu, 'Krankenversicherung'],
+  [/(?:kranken)[-\s]+(?:versicherungen)/iu, 'Krankenversicherungen'],
+  [/(?:kranken)[-\s]+(?:versicherung)/iu, 'Krankenversicherung'],
+  [/(?:zahn(?:zu)?)[-\s]+(?:satz[-\s]*versicherungen)/iu, 'Zahnzusatzversicherungen'],
+  [/(?:zahn(?:zu)?)[-\s]+(?:satz[-\s]*versicherung)/iu, 'Zahnzusatzversicherung'],
+  [/(?:zahn)[-\s]+(?:zusatzversicherungen)/iu, 'Zahnzusatzversicherungen'],
+  [/(?:zahn)[-\s]+(?:zusatzversicherung)/iu, 'Zahnzusatzversicherung'],
+  [/(?:zahnzusatz)[-\s]+(?:versicherungen)/iu, 'Zahnzusatzversicherungen'],
+  [/(?:zahnzusatz)[-\s]+(?:versicherung)/iu, 'Zahnzusatzversicherung'],
+  [/(?:zahn)[-\s]+(?:versicherungen)/iu, 'Zahnversicherungen'],
+  [/(?:zahn)[-\s]+(?:versicherung)/iu, 'Zahnversicherung'],
   [/\bgermany\s+rel\b/iu, 'Dell Germany'],
   [/\breisesp\.(?=\d)/iu, 'Reisespesen '],
   [/\breisesp\b\.?/iu, 'Reisespesen'],
@@ -369,7 +387,7 @@ export function extractCleanDescription(desc: string): string {
   cleaned = cleaned.replace(/\bGIR\s+\d+(?:\/\/[A-Za-z0-9]+)?\b/gi, ' ')
   cleaned = cleaned.replace(/\bFil\.?\s*\d+\b/gi, ' ')
   cleaned = cleaned.replace(/\bKFN\s+\d+\s+VJ\s+\d+\b/gi, ' ')
-  cleaned = cleaned.replace(/\b(?:ELV\d*|ME\d+)\b/gi, ' ')
+  cleaned = cleaned.replace(/\b(?:ELV\d*|ME\d+|PP\.[0-9\s]*\.?PP)\b/gi, ' ')
   cleaned = cleaned.replace(/\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz|KARTENZAHL\.?)\b/gi, ' ')
   cleaned = cleaned.replace(/\b(?:NYA|NNT)\*\s*/gi, ' ')
   cleaned = cleaned.replace(/\bsagt\s+danke\b/gi, ' ')
@@ -444,6 +462,22 @@ export function isPaymentProcessorIntermediary(text: string): boolean {
 }
 
 /**
+ * Detects whether a string or description contains exclusively payment processor company names,
+ * corporate legal forms, SEPA clearing references, and punctuation without any underlying merchant name.
+ * Such terms must never be learned as category rules or matched across different transactions as shared prefixes.
+ */
+export function isPaymentProcessorOnly(text: string): boolean {
+  if (!text || typeof text !== 'string') return false
+  const stripped = text
+    .replace(
+      /(?:\by?paypal(?:\s*\([^)]*\))?|\bklarna(?:\s+bank|\s+payments?)?|\bsumup(?:\s+payments?|\s+ltd\.?|\s+limited)?|\bstripe(?:\s+payments?)?|\bpayoneer\b|\bpayone\b|s\.?\s*a\.?\s*r\.?\s*l\.?|et\s*cie|s\.?\s*c\.?\s*a\.?|\bsc\b|\beurope\b|\beuropa\b|\bgmbh\b|\bag\b|\bse\b|\bltd\.?\b|\blimited\b|\bab\b|\bbv\b|\bpp\b|\bpp\.[0-9\s]*\.?pp\b|\b\d+\b|[.,/:\s*-])/giu,
+      ' ',
+    )
+    .trim()
+  return stripped.length === 0
+}
+
+/**
  * Extracts a concise, reusable merchant keyword from a transaction description
  * by stripping banking prefixes, corporate legal forms, branch/terminal codes, and noise.
  * Useful for learning smart category rules that match future transactions from the same merchant.
@@ -458,12 +492,13 @@ export function extractMerchantKeyword(desc: string): string {
   // Direct PayPal account debit or direct transaction with PayPal itself
   if (
     /\b(?:abbuchung\s+vom\s+paypal[- ]konto|paypal[- ]konto\s+abbuchung)\b/i.test(merchant) ||
-    !merchant
-      .replace(
-        /(?:\by?paypal(?:\s*\([^)]*\))?|\bpp\.\d+\.pp\b|\b\d+\b|s\.?\s*a\.?\s*r\.?\s*l\.?|et\s*cie|s\.?\s*c\.?\s*a\.?|\bsc\b|\beurope\b|\beuropa\b|[.,/:-])/giu,
-        ' ',
-      )
-      .trim()
+    (!isPaymentProcessorIntermediary(desc) &&
+      !merchant
+        .replace(
+          /(?:\by?paypal(?:\s*\([^)]*\))?|\bpp\.\d+\.pp\b|\b\d+\b|s\.?\s*a\.?\s*r\.?\s*l\.?|et\s*cie|s\.?\s*c\.?\s*a\.?|\bsc\b|\beurope\b|\beuropa\b|[.,/:-])/giu,
+          ' ',
+        )
+        .trim())
   ) {
     return 'PayPal'
   }
@@ -591,22 +626,30 @@ export function isRelatedTransaction(descA: string, descB: string): boolean {
   const cleanB = extractCleanDescription(descB).toLowerCase()
 
   // 1. Exact match on clean description (if length >= 3)
-  if (cleanA.length >= 3 && cleanA === cleanB) return true
+  // Transactions that are purely generic payment processors without merchant must not match
+  if (cleanA.length >= 3 && cleanA === cleanB) {
+    if (!isPaymentProcessorOnly(cleanA)) return true
+  }
 
   // 2. Normalized description fallback
   const normA = normalizeDescription(descA)
   const normB = normalizeDescription(descB)
-  if (normA.length >= 3 && normA === normB) return true
+  if (normA.length >= 3 && normA === normB) {
+    if (!isPaymentProcessorOnly(normA)) return true
+  }
 
   // 3. Prefix matching: if one clean string starts with the other on a word boundary
   // Require at least 8 characters for the shorter string to avoid false positives (e.g. "Bar", "Apple")
+  // Payment processor intermediary headers (e.g. "PayPal Europe S.a.r.l.") must never prefix-match across different transactions
   if (cleanA.length >= 8 && cleanB.length >= 8) {
     const shorter = cleanA.length <= cleanB.length ? cleanA : cleanB
     const longer = cleanA.length <= cleanB.length ? cleanB : cleanA
-    if (longer.startsWith(shorter)) {
-      const nextChar = longer.charAt(shorter.length)
-      if (nextChar === '' || nextChar === ' ' || nextChar === '-' || nextChar === '/') {
-        return true
+    if (!isPaymentProcessorOnly(shorter)) {
+      if (longer.startsWith(shorter)) {
+        const nextChar = longer.charAt(shorter.length)
+        if (nextChar === '' || nextChar === ' ' || nextChar === '-' || nextChar === '/') {
+          return true
+        }
       }
     }
   }

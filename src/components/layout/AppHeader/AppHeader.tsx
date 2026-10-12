@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { startTransition, useEffect, useRef, useState } from 'react'
 import { ChevronDown, Eye, EyeOff, Monitor, Moon, PieChart, PlusCircle, Settings, Sun } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 
 import { localeLabels, localeOrder } from '../../../i18n/translations'
 import { useAppStore } from '../../../store/useAppStore'
@@ -12,7 +13,15 @@ import styles from './AppHeader.module.css'
 const AppHeader: React.FC = () => {
   const { theme, resolvedTheme, setTheme } = useThemeStore()
   const { locale, t, setLocale } = useLanguageStore()
-  const { importedAccounts, currentStep, cancelImport, resetImport, setStep } = useAppStore()
+  const { hasImportedAccounts, currentStep, cancelImport, resetImport, setStep } = useAppStore(
+    useShallow((s) => ({
+      hasImportedAccounts: (s.importedAccounts || []).length > 0,
+      currentStep: s.currentStep,
+      cancelImport: s.cancelImport,
+      resetImport: s.resetImport,
+      setStep: s.setStep,
+    })),
+  )
   const { isPrivacyMode, togglePrivacyMode } = usePrivacyStore()
   const [isThemeOpen, setIsThemeOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
@@ -77,7 +86,7 @@ const AppHeader: React.FC = () => {
     return () => window.removeEventListener('keydown', handlePrivacyKey)
   }, [togglePrivacyMode])
 
-  const showDashboardNav = (importedAccounts || []).length > 0 && currentStep !== 'dashboard'
+  const showDashboardNav = hasImportedAccounts && currentStep !== 'dashboard'
   const showNewImportNav = currentStep === 'dashboard' || currentStep === 'settings'
   const showSettingsNav = currentStep !== 'settings'
 
@@ -188,8 +197,10 @@ const AppHeader: React.FC = () => {
                       key={loc}
                       className={`${styles['theme-dropdown-item']} ${isSelected ? styles.active : ''}`}
                       onClick={() => {
-                        setLocale(loc)
                         setIsLangOpen(false)
+                        startTransition(() => {
+                          setLocale(loc)
+                        })
                       }}
                       role="option"
                       {...{ 'aria-selected': isSelected ? 'true' : 'false' }}

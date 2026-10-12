@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 
-import { useAppStore } from '../store/useAppStore'
+import { sanitizeCustomKeywords, useAppStore } from '../store/useAppStore'
 import { useLanguageStore } from '../store/useLanguageStore'
 import {
   formatBackupError,
@@ -92,7 +92,7 @@ export const useBackupRestore = (options?: UseBackupRestoreOptions): UseBackupRe
 
       useAppStore.setState({
         importedAccounts: data.importedAccounts ?? [],
-        customKeywords: data.customKeywords ?? {},
+        customKeywords: sanitizeCustomKeywords(data.customKeywords ?? {}),
         manualCategories: data.manualCategories ?? {},
         customCategories: data.customCategories ?? [],
         duplicateOverrideRules: data.duplicateOverrideRules ?? [],

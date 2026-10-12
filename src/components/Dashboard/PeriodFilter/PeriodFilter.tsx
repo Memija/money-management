@@ -24,7 +24,7 @@ export const PeriodFilter: React.FC<PeriodFilterProps> = React.memo(({
   availableQuarters,
   availableMonths,
 }) => {
-  const { t } = useLanguageStore()
+  const t = useLanguageStore((s) => s.t)
 
   const modeLabels: Record<PeriodMode, string> = {
     all: t.periodAll,

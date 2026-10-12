@@ -145,7 +145,7 @@ export const filterByPeriod = (txs: Transaction[], period: PeriodFilter): Transa
 export const useAnalytics = (
   allRawTransactions: Transaction[],
   period: PeriodFilter,
-  formatMonthYear: (dateString: string) => string,
+  formatMonthYear?: (dateString: string) => string,
   catColorClassPrefix: string = 'cat-color-',
   includeGhosts: boolean = false,
 ): AnalyticsData => {
@@ -352,7 +352,7 @@ export const useAnalytics = (
     return Object.entries(map)
       .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
       .map(([month, data]) => ({
-        name: formatMonthYear(month),
+        name: formatMonthYear ? formatMonthYear(month) : month,
         rawMonth: month,
         income: Math.round(data.income),
         expenses: Math.round(data.expense),
@@ -419,7 +419,9 @@ export const useAnalytics = (
     return Object.entries(map)
       .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
       .map(([month, cats]) => {
-        const entry: MonthlyCategoryEntry = { month: formatMonthYear(month) }
+        const entry: MonthlyCategoryEntry = {
+          month: formatMonthYear ? formatMonthYear(month) : month,
+        }
         for (const [cat, val] of Object.entries(cats)) {
           entry[cat] = Math.round(val)
         }
@@ -427,29 +429,55 @@ export const useAnalytics = (
       })
   }, [periodTransactions, formatMonthYear])
 
-  return {
-    periodTransactions,
-    totalIncome,
-    totalExpenses,
-    balance,
-    transactionCount: periodTransactions.length,
-    incomeCount,
-    expenseCount,
-    avgExpense,
-    avgIncome,
-    avgTransaction,
-    medianExpense,
-    medianIncome,
-    medianTransaction,
-    topCategory,
-    topCategories,
-    savingsRate,
-    categoryBreakdown,
-    monthlyData,
-    topMerchants,
-    monthlyCategoryData,
-    availableYears,
-    availableQuarters,
-    availableMonths,
-  }
+  return useMemo(
+    () => ({
+      periodTransactions,
+      totalIncome,
+      totalExpenses,
+      balance,
+      transactionCount: periodTransactions.length,
+      incomeCount,
+      expenseCount,
+      avgExpense,
+      avgIncome,
+      avgTransaction,
+      medianExpense,
+      medianIncome,
+      medianTransaction,
+      topCategory,
+      topCategories,
+      savingsRate,
+      categoryBreakdown,
+      monthlyData,
+      topMerchants,
+      monthlyCategoryData,
+      availableYears,
+      availableQuarters,
+      availableMonths,
+    }),
+    [
+      periodTransactions,
+      totalIncome,
+      totalExpenses,
+      balance,
+      incomeCount,
+      expenseCount,
+      avgExpense,
+      avgIncome,
+      avgTransaction,
+      medianExpense,
+      medianIncome,
+      medianTransaction,
+      topCategory,
+      topCategories,
+      savingsRate,
+      categoryBreakdown,
+      monthlyData,
+      topMerchants,
+      monthlyCategoryData,
+      availableYears,
+      availableQuarters,
+      availableMonths,
+    ],
+  )
 }

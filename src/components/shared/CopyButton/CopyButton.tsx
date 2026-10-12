@@ -30,7 +30,8 @@ export const CopyButton: React.FC<CopyButtonProps> = React.memo(
     disabled = false,
     onCopy,
   }) => {
-    const t = useLanguageStore((s) => s.t)
+    const storeCopyText = useLanguageStore((s) => s.t?.copyTransactionText)
+    const storeCopied = useLanguageStore((s) => s.t?.copied)
     const [isCopied, setIsCopied] = useState(false)
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -64,8 +65,8 @@ export const CopyButton: React.FC<CopyButtonProps> = React.memo(
       [text, disabled, onCopy],
     )
 
-    const resolvedTitle = title || t?.copyTransactionText || 'Copy transaction text'
-    const resolvedCopiedTitle = copiedTitle || t?.copied || 'Copied!'
+    const resolvedTitle = title || storeCopyText || 'Copy transaction text'
+    const resolvedCopiedTitle = copiedTitle || storeCopied || 'Copied!'
     const currentTitle = isCopied ? resolvedCopiedTitle : resolvedTitle
 
     return (

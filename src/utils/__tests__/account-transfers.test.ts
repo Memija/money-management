@@ -20,7 +20,7 @@ import {
 describe('account-transfers utility', () => {
   describe('normalizeTransferText', () => {
     it('normalizes text by lowercasing and trimming punctuation', () => {
-      expect(normalizeTransferText('ANEL MEMIC - N26!')).toBe('anel memic n26')
+      expect(normalizeTransferText('MAX MUSTERMANN - N26!')).toBe('max mustermann n26')
     })
   })
 
@@ -34,9 +34,9 @@ describe('account-transfers utility', () => {
 
   describe('extractIbans', () => {
     it('extracts IBANs from descriptions', () => {
-      const text = 'ANEL MEMIC NTSBDEB1XXX DE35100110012621828092 FOR SPACES'
+      const text = 'MAX MUSTERMANN NTSBDEB1XXX DE35100110010000000001 FOR SPACES'
       const ibans = extractIbans(text)
-      expect(ibans).toContain('DE35100110012621828092')
+      expect(ibans).toContain('DE35100110010000000001')
     })
   })
 
@@ -84,7 +84,7 @@ describe('account-transfers utility', () => {
       const txA: Transaction = {
         id: 'tx1',
         date: '2026-09-01',
-        description: 'ANEL MEMIC Dauerauftrag',
+        description: 'MAX MUSTERMANN Dauerauftrag',
         amount: -300,
         currency: 'EUR',
         type: 'expense',
@@ -93,7 +93,7 @@ describe('account-transfers utility', () => {
       const txB: Transaction = {
         id: 'tx2',
         date: '2026-09-02',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: 300,
         currency: 'EUR',
         type: 'income',
@@ -107,7 +107,7 @@ describe('account-transfers utility', () => {
       const txA: Transaction = {
         id: 'tx1',
         date: '2026-09-01',
-        description: 'Transfer DE35100110012621828092',
+        description: 'Transfer DE35100110010000000001',
         amount: -500,
         currency: 'EUR',
         type: 'expense',
@@ -116,7 +116,7 @@ describe('account-transfers utility', () => {
       const txB: Transaction = {
         id: 'tx2',
         date: '2026-09-01',
-        description: 'Salary advance DE35100110012621828092',
+        description: 'Salary advance DE35100110010000000001',
         amount: 500,
         currency: 'EUR',
         type: 'income',
@@ -130,7 +130,7 @@ describe('account-transfers utility', () => {
       const txA: Transaction = {
         id: 'tx1',
         date: '2026-09-01',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: -100,
         currency: 'EUR',
         type: 'expense',
@@ -139,7 +139,7 @@ describe('account-transfers utility', () => {
       const txB: Transaction = {
         id: 'tx2',
         date: '2026-09-01',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: -100,
         currency: 'EUR',
         type: 'expense',
@@ -153,7 +153,7 @@ describe('account-transfers utility', () => {
       const txA: Transaction = {
         id: 'tx1',
         date: '2026-09-01',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: -100,
         currency: 'EUR',
         type: 'expense',
@@ -162,7 +162,7 @@ describe('account-transfers utility', () => {
       const txB: Transaction = {
         id: 'tx2',
         date: '2026-09-10',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: 100,
         currency: 'EUR',
         type: 'income',
@@ -176,7 +176,7 @@ describe('account-transfers utility', () => {
       const txA: Transaction = {
         id: 'tx1',
         date: '2026-09-01',
-        description: 'Transfer to DE35 1001 1001 2621 8280 92',
+        description: 'Transfer to DE35 1001 1001 0000 0000 01',
         amount: -400,
         currency: 'EUR',
         type: 'expense',
@@ -185,7 +185,7 @@ describe('account-transfers utility', () => {
       const txB: Transaction = {
         id: 'tx2',
         date: '2026-09-02',
-        description: 'Credit from DE35100110012621828092',
+        description: 'Credit from DE35100110010000000001',
         amount: 400,
         currency: 'EUR',
         type: 'income',
@@ -229,7 +229,7 @@ describe('account-transfers utility', () => {
       const txA: Transaction = {
         id: 'tx1',
         date: '2026-09-04',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: -200,
         currency: 'EUR',
         type: 'expense',
@@ -238,7 +238,7 @@ describe('account-transfers utility', () => {
       const txB: Transaction = {
         id: 'tx2',
         date: '2026-09-08',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: 200,
         currency: 'EUR',
         type: 'income',
@@ -252,7 +252,7 @@ describe('account-transfers utility', () => {
       const txA: Transaction = {
         id: 'tx1',
         date: '2026-09-01',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: -100,
         currency: 'EUR',
         type: 'expense',
@@ -261,7 +261,7 @@ describe('account-transfers utility', () => {
       const txB: Transaction = {
         id: 'tx2',
         date: '2026-09-01',
-        description: 'ANEL MEMIC',
+        description: 'MAX MUSTERMANN',
         amount: 100,
         currency: 'USD',
         type: 'income',
@@ -304,7 +304,7 @@ describe('account-transfers utility', () => {
           {
             id: 'cb-1',
             date: '2026-08-21',
-            description: 'ANEL MEMIC NTSBDEB1XXX DE35100110012621828092 FOR SPACES',
+            description: 'MAX MUSTERMANN NTSBDEB1XXX DE35100110010000000001 FOR SPACES',
             amount: -1500,
             currency: 'EUR',
             type: 'expense',
@@ -331,7 +331,7 @@ describe('account-transfers utility', () => {
           {
             id: 'n26-1',
             date: '2026-08-21',
-            description: 'ANEL MEMIC',
+            description: 'MAX MUSTERMANN',
             amount: 1500,
             currency: 'EUR',
             type: 'income',
@@ -379,7 +379,7 @@ describe('account-transfers utility', () => {
           {
             id: 'cb-1',
             date: '2026-08-21',
-            description: 'ANEL MEMIC N26 Transfer',
+            description: 'MAX MUSTERMANN N26 Transfer',
             amount: -500,
             currency: 'EUR',
             type: 'expense',
@@ -397,7 +397,7 @@ describe('account-transfers utility', () => {
           {
             id: 'n26-1',
             date: '2026-08-22',
-            description: 'ANEL MEMIC Commerzbank Transfer',
+            description: 'MAX MUSTERMANN Commerzbank Transfer',
             amount: 500,
             currency: 'EUR',
             type: 'income',
@@ -428,7 +428,7 @@ describe('account-transfers utility', () => {
           {
             id: 'cb-1',
             date: '2026-08-21',
-            description: 'ANEL MEMIC N26 Transfer',
+            description: 'MAX MUSTERMANN N26 Transfer',
             amount: -500,
             currency: 'EUR',
             type: 'expense',
@@ -450,7 +450,7 @@ describe('account-transfers utility', () => {
       const accCb: ImportedAccount = {
         institutionId: 'commerzbank',
         institutionName: 'Commerzbank',
-        accountIbans: ['DE92500400000646293100'],
+        accountIbans: ['DE92500400000000000001'],
         transactions: [
           {
             id: 'cb-2026',
@@ -473,12 +473,12 @@ describe('account-transfers utility', () => {
           {
             id: 'n26-historical-1',
             date: '2021-02-22',
-            description: 'ANEL MEMIC',
+            description: 'MAX MUSTERMANN',
             amount: 200,
             currency: 'EUR',
             type: 'income',
             institution: 'N26',
-            counterpartyIban: 'DE92500400000646293100',
+            counterpartyIban: 'DE92500400000000000001',
           },
           {
             id: 'n26-external',
@@ -517,7 +517,7 @@ describe('account-transfers utility', () => {
           {
             id: 'cb-2026',
             date: '2026-08-21',
-            description: 'ANEL MEMIC Sent from N26',
+            description: 'MAX MUSTERMANN Sent from N26',
             amount: -200,
             currency: 'EUR',
             type: 'expense',
@@ -532,27 +532,27 @@ describe('account-transfers utility', () => {
         institutionId: 'n26',
         institutionName: 'N26',
         transactions: [
-          // 2026 paired transfer: establishes that DE92500400000646293100 belongs to Commerzbank
+          // 2026 paired transfer: establishes that DE92500400000000000001 belongs to Commerzbank
           {
             id: 'n26-2026',
             date: '2026-08-21',
-            description: 'ANEL MEMIC',
+            description: 'MAX MUSTERMANN',
             amount: 200,
             currency: 'EUR',
             type: 'income',
             institution: 'N26',
-            counterpartyIban: 'DE92500400000646293100',
+            counterpartyIban: 'DE92500400000000000001',
           },
           // 2021 historical transfer (outside Commerzbank export range)
           {
             id: 'n26-2021-02-22',
             date: '2021-02-22',
-            description: 'ANEL MEMIC',
+            description: 'MAX MUSTERMANN',
             amount: 200,
             currency: 'EUR',
             type: 'income',
             institution: 'N26',
-            counterpartyIban: 'DE92500400000646293100',
+            counterpartyIban: 'DE92500400000000000001',
           },
         ],
         importedAt: '2026-09-15T10:05:00Z',
@@ -577,23 +577,23 @@ describe('account-transfers utility', () => {
       const accCb: ImportedAccount = {
         institutionId: 'commerzbank',
         institutionName: 'Commerzbank',
-        accountIbans: ['DE92500400000646293100'],
+        accountIbans: ['DE92500400000000000001'],
         transactions: [
-          // Unrelated transaction 3 days before: shares surname 'Memic' but is external
+          // Unrelated transaction 3 days before: shares surname 'Mustermann' but is external
           {
-            id: 'cb-biljana-aug5',
+            id: 'cb-erika-aug5',
             date: '2025-08-05',
-            description: 'Biljana Memic Help for my husband End-to-End-Ref.: NOTPROVIDED',
+            description: 'Erika Mustermann Help for my husband End-to-End-Ref.: NOTPROVIDED',
             amount: 100,
             currency: 'EUR',
             type: 'income',
             institution: 'Commerzbank',
           },
-          // Real reciprocal transfer: same date, mentions N26 and Anel Memic
+          // Real reciprocal transfer: same date, mentions N26 and Max Mustermann
           {
-            id: 'cb-anel-aug8',
+            id: 'cb-transfer-aug8',
             date: '2025-08-08',
-            description: 'Anel Memic Sent from N26 End-to-End-Ref.: NOTPROVIDED',
+            description: 'Max Mustermann Sent from N26 End-to-End-Ref.: NOTPROVIDED',
             amount: 100,
             currency: 'EUR',
             type: 'income',
@@ -609,14 +609,14 @@ describe('account-transfers utility', () => {
         institutionName: 'N26',
         transactions: [
           {
-            id: 'n26-anel-aug8',
+            id: 'n26-transfer-aug8',
             date: '2025-08-08',
-            description: 'Anel Memic',
+            description: 'Max Mustermann',
             amount: -100,
             currency: 'EUR',
             type: 'expense',
             institution: 'N26',
-            counterpartyIban: 'DE92500400000646293100',
+            counterpartyIban: 'DE92500400000000000001',
           },
         ],
         importedAt: '2026-09-15T10:05:00Z',
@@ -628,38 +628,38 @@ describe('account-transfers utility', () => {
       const n26Reconciled = reconciled.find((a) => a.institutionId === 'n26')!
 
       // Real transfer should be paired with N26
-      const realTransfer = cbReconciled.transactions.find((t) => t.id === 'cb-anel-aug8')!
+      const realTransfer = cbReconciled.transactions.find((t) => t.id === 'cb-transfer-aug8')!
       expect(realTransfer.isGhost).toBe(true)
-      expect(realTransfer.linkedTransactionId).toBe('n26-anel-aug8')
+      expect(realTransfer.linkedTransactionId).toBe('n26-transfer-aug8')
 
-      // Unrelated payment from Biljana should NOT be a ghost
-      const unrelatedPayment = cbReconciled.transactions.find((t) => t.id === 'cb-biljana-aug5')!
+      // Unrelated payment from Erika should NOT be a ghost
+      const unrelatedPayment = cbReconciled.transactions.find((t) => t.id === 'cb-erika-aug5')!
       expect(unrelatedPayment.isGhost).toBeFalsy()
 
-      const n26Tx = n26Reconciled.transactions.find((t) => t.id === 'n26-anel-aug8')!
+      const n26Tx = n26Reconciled.transactions.find((t) => t.id === 'n26-transfer-aug8')!
       expect(n26Tx.isGhost).toBe(true)
-      expect(n26Tx.linkedTransactionId).toBe('cb-anel-aug8')
+      expect(n26Tx.linkedTransactionId).toBe('cb-transfer-aug8')
     })
 
     it('reconciles transfers seamlessly across mixed formats: CSV, PDF, and Copy-Paste', () => {
       // 1. Account 1: CSV Export (e.g. Commerzbank)
       const csvContent = `Buchungstag;Wertstellung;Umsatzart;Begünstigter / Auftraggeber;Verwendungszweck;IBAN;Betrag;Währung
-15.05.2024;15.05.2024;Überweisung;Anel Memic;Sent to N26;DE35100110012621828092;-250,00;EUR
-18.05.2024;18.05.2024;Überweisung;Anel Memic;From Sparkasse;DE89370400440532013000;100,00;EUR`
+15.05.2024;15.05.2024;Überweisung;Max Mustermann;Sent to N26;DE35100110010000000001;-250,00;EUR
+18.05.2024;18.05.2024;Überweisung;Max Mustermann;From Sparkasse;DE89370400440000000001;100,00;EUR`
       const csvRows = csvContent.split('\n').map((l) => splitCsvLine(l, ';'))
       const csvParsed = rowsToTransactionsWithMeta(csvRows, 'Commerzbank')
       const accCsv: ImportedAccount = {
         institutionId: 'commerzbank',
         institutionName: 'Commerzbank',
         transactions: csvParsed.transactions,
-        accountIbans: ['DE92500400000646293100'],
+        accountIbans: ['DE92500400000000000001'],
         importedAt: '2026-05-15T10:00:00Z',
         importedFingerprints: ['csv-1'],
       }
 
       // 2. Account 2: PDF Statement (e.g. N26)
-      const pdfText = `Kontoauszug IBAN: DE35100110012621828092
-15.05.2024 15.05.2024 Anel Memic Top up from Commerzbank DE92500400000646293100 +250,00 EUR`
+      const pdfText = `Kontoauszug IBAN: DE35100110010000000001
+15.05.2024 15.05.2024 Max Mustermann Top up from Commerzbank DE92500400000000000001 +250,00 EUR`
       const pdfTxs = parsePdfText(pdfText, 'N26')
       const pdfIbans = extractAccountIbansFromPdf(pdfText)
       const accPdf: ImportedAccount = {
@@ -672,10 +672,10 @@ describe('account-transfers utility', () => {
       }
 
       // 3. Account 3: Copy-Paste statement (e.g. Sparkasse)
-      const pasteText = `IBAN: DE89370400440532013000
+      const pasteText = `IBAN: DE89370400440000000001
 18.05.2024
-Anel Memic
-Transfer to Commerzbank DE92500400000646293100
+Max Mustermann
+Transfer to Commerzbank DE92500400000000000001
 Überweisung
 -100,00 EUR`
       const pasteTxs = parseBankStatementPaste(pasteText, 'Sparkasse')

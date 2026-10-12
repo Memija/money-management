@@ -10,7 +10,7 @@ const mockImportedAccounts: ImportedAccount[] = [
     institutionName: 'N26',
     importedAt: '2026-03-01T10:00:00Z',
     importedFingerprints: [],
-    accountIbans: ['DE89370400440532013000'],
+    accountIbans: ['DE89370400440000000001'],
     transactions: [
       {
         id: 'tx-n26-1',

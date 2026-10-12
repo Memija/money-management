@@ -128,7 +128,7 @@ const Dashboard: React.FC = () => {
   const analytics = useAnalytics(
     dashboardTransactions,
     period,
-    formatMonthYear,
+    undefined,
     'cat-color-',
     isSingleAccountView,
   )
@@ -486,4 +486,4 @@ const Dashboard: React.FC = () => {
   )
 }
 
-export default Dashboard
+export default React.memo(Dashboard)

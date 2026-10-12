@@ -177,11 +177,11 @@ describe('parsePdfText', () => {
 
   it('extracts counterpartyIban when present in transaction description', () => {
     const rawText = `
-    01.12.2023 02.12.2023 Transfer to DE89370400440532013000 -150,00 EUR
+    01.12.2023 02.12.2023 Transfer to DE89370400440000000001 -150,00 EUR
     `
     const result = parsePdfText(rawText, 'TestBank')
     expect(result).toHaveLength(1)
-    expect(result[0].counterpartyIban).toBe('DE89370400440532013000')
+    expect(result[0].counterpartyIban).toBe('DE89370400440000000001')
   })
 
   it('parses Commerzbank REISESP business trip reimbursement with type income', () => {
@@ -196,7 +196,7 @@ describe('parsePdfText', () => {
 
   it('parses Commerzbank Rueckverguetung fee refund with type income', () => {
     const rawText = `
-    15.05.2024 15.05.2024 Commerzbank AG Rueckverguetung fuer 2024/KDNR: 400 6462931/PERSNR: 6832901 End-to-End-Ref.: 2024-1-0035357 Kundenreferenz: 2024-1 25,00 EUR
+    15.05.2024 15.05.2024 Commerzbank AG Rueckverguetung fuer 2024/KDNR: 100 0000000/PERSNR: 0000000 End-to-End-Ref.: 2024-1-0000001 Kundenreferenz: 2024-1 25,00 EUR
     `
     const result = parsePdfText(rawText, 'Commerzbank')
     expect(result).toHaveLength(1)
@@ -207,13 +207,13 @@ describe('parsePdfText', () => {
 
 describe('extractAccountIbansFromPdf', () => {
   it('extracts IBAN from file name', () => {
-    const ibans = extractAccountIbansFromPdf('Some body text', 'Umsaetze_DE92500400000646293100_EUR.pdf')
-    expect(ibans).toContain('DE92500400000646293100')
+    const ibans = extractAccountIbansFromPdf('Some body text', 'Umsaetze_DE92500400000000000001_EUR.pdf')
+    expect(ibans).toContain('DE92500400000000000001')
   })
 
   it('extracts IBAN from header text', () => {
-    const text = 'Kontoauszug\nIBAN: DE35 1001 1001 2621 8280 92\nDatum: 01.01.2024'
+    const text = 'Kontoauszug\nIBAN: DE35 1001 1001 0000 0000 01\nDatum: 01.01.2024'
     const ibans = extractAccountIbansFromPdf(text)
-    expect(ibans).toContain('DE35100110012621828092')
+    expect(ibans).toContain('DE35100110010000000001')
   })
 })

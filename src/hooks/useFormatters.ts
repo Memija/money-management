@@ -14,6 +14,8 @@ import { formatMonthYearLocalized } from '../utils/date-utils'
 // Pre-cached Intl formatters to avoid expensive constructor calls (60x faster)
 const currencyFormatterCache = new Map<string, Intl.NumberFormat>()
 const dateFormatterCache = new Map<string, Intl.DateTimeFormat>()
+const formattedCurrencyCache = new Map<string, string>()
+const formattedDateCache = new Map<string, string>()
 
 function getCurrencyFormatter(locale: string, maximumFractionDigits?: number): Intl.NumberFormat {
   const key = `${locale}_${maximumFractionDigits ?? 'default'}`
@@ -54,7 +56,15 @@ export const useFormatters = () => {
 
   const formatCurrency = useCallback(
     (amount: number, maximumFractionDigits?: number) => {
-      return getCurrencyFormatter(intlLocale, maximumFractionDigits).format(amount)
+      const key = `${amount}_${intlLocale}_${maximumFractionDigits ?? 'default'}`
+      let formatted = formattedCurrencyCache.get(key)
+      if (formatted === undefined) {
+        formatted = getCurrencyFormatter(intlLocale, maximumFractionDigits).format(amount)
+        if (formattedCurrencyCache.size < 5000) {
+          formattedCurrencyCache.set(key, formatted)
+        }
+      }
+      return formatted
     },
     [intlLocale],
   )
@@ -62,6 +72,11 @@ export const useFormatters = () => {
   const formatDate = useCallback(
     (dateString: string) => {
       if (!dateString) return ''
+      const key = `${dateString}_${intlLocale}`
+      let formatted = formattedDateCache.get(key)
+      if (formatted !== undefined) {
+        return formatted
+      }
       const dateToParse = dateString.includes('T') ? dateString : `${dateString}T00:00:00`
       let d = new Date(dateToParse)
       if (isNaN(d.getTime())) {
@@ -70,14 +85,19 @@ export const useFormatters = () => {
       if (isNaN(d.getTime())) {
         return dateString
       }
-      return getDateFormatter(intlLocale).format(d)
+      formatted = getDateFormatter(intlLocale).format(d)
+      if (formattedDateCache.size < 5000) {
+        formattedDateCache.set(key, formatted)
+      }
+      return formatted
     },
     [intlLocale],
   )
 
   const formatMonthYear = useCallback(
-    (dateString: string, yearFormat: '2-digit' | 'numeric' = '2-digit') => {
-      return formatMonthYearLocalized(dateString, locale, yearFormat)
+    (dateString: string, yearFormat?: string) => {
+      const validYear = yearFormat === 'numeric' ? 'numeric' : '2-digit'
+      return formatMonthYearLocalized(dateString, locale, validYear)
     },
     [locale],
   )

@@ -45,6 +45,7 @@ interface CustomTooltipProps {
   }>
   label?: string
   formatCurrency: (val: number) => string
+  formatMonthYear?: (dateString: string) => string
   t: TranslationStrings
   customCategories: CustomCategory[]
   locale?: string
@@ -58,6 +59,7 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
   payload,
   label,
   formatCurrency,
+  formatMonthYear,
   t,
   customCategories,
   locale,
@@ -78,7 +80,7 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
   return (
     <div className={styles.tooltipContainer}>
       <div className={styles.tooltipHeader}>
-        <span className={styles.tooltipMonth}>{label}</span>
+        <span className={styles.tooltipMonth}>{formatMonthYear ? formatMonthYear(label ?? '') : label}</span>
         <span className={`${styles.tooltipTotalBadge} privacy-blur`}>{formatCurrency(totalMonth)}</span>
       </div>
       <div className={styles.tooltipList}>
@@ -139,7 +141,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(({
   const t = useLanguageStore((s) => s.t)
   const locale = useLanguageStore((s) => s.locale)
   const customCategories = useAppStore((s) => s.customCategories)
-  const { formatCurrency, formatCategoryCount } = useFormatters()
+  const { formatCurrency, formatCategoryCount, formatMonthYear } = useFormatters()
 
   const [viewMode, setViewMode] = useState<'stacked' | 'area'>('stacked')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -332,7 +334,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(({
               <div className={styles.statPill}>
                 <span className={styles.statLabel}>{t.peakMonth || 'Peak Month'}</span>
                 <span className={`${styles.statValue} ${styles.statValueHighlight} privacy-blur`}>
-                  {peakMonth.month} • {formatCurrency(peakMonth.amount)}
+                  {formatMonthYear(peakMonth.month)} • {formatCurrency(peakMonth.amount)}
                 </span>
               </div>
             )}
@@ -413,6 +415,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(({
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: 'var(--text-dim)', fontSize: 11 }}
+                tickFormatter={formatMonthYear}
               />
               <YAxis
                 axisLine={false}
@@ -425,6 +428,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(({
                 content={
                   <CustomTrendTooltip
                     formatCurrency={formatCurrency}
+                    formatMonthYear={formatMonthYear}
                     t={t}
                     customCategories={customCategories}
                     locale={locale}
@@ -489,6 +493,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(({
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: 'var(--text-dim)', fontSize: 11 }}
+                tickFormatter={formatMonthYear}
               />
               <YAxis
                 axisLine={false}
@@ -501,6 +506,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(({
                 content={
                   <CustomTrendTooltip
                     formatCurrency={formatCurrency}
+                    formatMonthYear={formatMonthYear}
                     t={t}
                     customCategories={customCategories}
                     locale={locale}

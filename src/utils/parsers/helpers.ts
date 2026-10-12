@@ -3,7 +3,7 @@ export function generateId(): string {
 }
 
 export const EXPLICIT_INCOME_KEYWORDS_REGEX =
-  /(?:\b(?:r[uü]ckverg[uü]tung\w*|rueckverguetung\w*|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*|geb[uü]hrenerstattung\w*|gebuehrenerstattung\w*|entgelterstattung\w*|reisesp\w*|reisekosten\w*|spesen\w*|auslagenerstattung|gehalt\w*|lohn\w*|bez[uü]ge|entgelt\w*|salary\w*|payroll\w*)\b)/i
+  /(?:\b(?:r[uü]ckverg[uü]tung\w*|rueckverguetung\w*|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*|geb[uü]hrenerstattung\w*|gebuehrenerstattung\w*|entgelterstattung\w*|reisesp\w*|reisekosten\w*|spesen\w*|auslagenerstattung|gehalt\w*|lohn\w*|bez[uü]ge|arbeitsentgelt\w*|salary\w*|payroll\w*)\b)/i
 
 export function inferType(amount: number, description?: string): 'income' | 'expense' {
   if (description && EXPLICIT_INCOME_KEYWORDS_REGEX.test(description)) {
@@ -124,4 +124,3 @@ export function splitCsvLine(line: string, sep: string): string[] {
   result.push(cur.trim().replace(/^"|"$/g, ''))
   return result
 }
-

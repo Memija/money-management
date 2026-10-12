@@ -34,7 +34,7 @@ describe('useAnalytics hook', () => {
       {
         id: 'tx-ghost-out',
         date: '2026-08-10',
-        description: 'ANEL MEMIC N26 Transfer',
+        description: 'MAX MUSTERMANN N26 Transfer',
         amount: -500,
         currency: 'EUR',
         type: 'expense',
@@ -44,7 +44,7 @@ describe('useAnalytics hook', () => {
       {
         id: 'tx-ghost-in',
         date: '2026-08-11',
-        description: 'ANEL MEMIC Commerzbank Top-up',
+        description: 'MAX MUSTERMANN Commerzbank Top-up',
         amount: 500,
         currency: 'EUR',
         type: 'income',
@@ -72,7 +72,7 @@ describe('useAnalytics hook', () => {
 
     // Top merchants should not include ghost counterparties
     const merchantNames = result.current.topMerchants.map((m) => m.name)
-    expect(merchantNames).not.toContain('ANEL MEMIC N26 Transfer')
+    expect(merchantNames).not.toContain('MAX MUSTERMANN N26 Transfer')
   })
 
   it('includes ghost transactions when includeGhosts is true for single account view', () => {

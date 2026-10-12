@@ -72,11 +72,12 @@ const MonthRow: React.FC<MonthRowProps> = ({ month, income, expenses, saved, rat
 }
 
 // Custom tooltip for the chart
-const ChartTooltip = ({ active, payload, label, formatCurrency }: {
+const ChartTooltip = ({ active, payload, label, formatCurrency, formatMonthYear }: {
   active?: boolean
   payload?: Array<{ value: number; name: string; color: string }>
   label?: string
   formatCurrency: (n: number) => string
+  formatMonthYear?: (d: string) => string
 }) => {
   if (!active || !payload?.length) {
     return null
@@ -85,7 +86,7 @@ const ChartTooltip = ({ active, payload, label, formatCurrency }: {
   const isPositive = saved >= 0
   return (
     <div className={styles['chart-tooltip']}>
-      <p className={styles['chart-tooltip-label']}>{label}</p>
+      <p className={styles['chart-tooltip-label']}>{formatMonthYear ? formatMonthYear(label ?? '') : label}</p>
       <p className={`${styles['chart-tooltip-value']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']}`}>
         {isPositive ? '+' : ''}{formatCurrency(saved)}
       </p>
@@ -102,7 +103,7 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
   savingsRate,
 }) => {
   const t = useLanguageStore((s) => s.t)
-  const { formatCurrency, formatSavingsRate } = useFormatters()
+  const { formatCurrency, formatSavingsRate, formatMonthYear } = useFormatters()
 
   const enriched = useMemo(() =>
     monthlyData.map((m) => ({
@@ -170,13 +171,13 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
             {bestMonth && (
               <div className={styles['highlight-pill-emerald']}>
                 <TrendingUp size={12} />
-                <span>{t.savingsBestMonth || 'Best'}: <strong>{bestMonth.name}</strong> (<span className="privacy-blur">+{formatCurrency(bestMonth.saved)}</span>)</span>
+                <span>{t.savingsBestMonth || 'Best'}: <strong>{formatMonthYear(bestMonth.rawMonth || bestMonth.name)}</strong> (<span className="privacy-blur">+{formatCurrency(bestMonth.saved)}</span>)</span>
               </div>
             )}
             {worstMonth && worstMonth.name !== bestMonth?.name && (
                <div className={styles['highlight-pill-rose']}>
                 <TrendingDown size={12} />
-                <span>{t.savingsWorstMonth || 'Worst'}: <strong>{worstMonth.name}</strong> (<span className="privacy-blur">{formatCurrency(worstMonth.saved)}</span>)</span>
+                <span>{t.savingsWorstMonth || 'Worst'}: <strong>{formatMonthYear(worstMonth.rawMonth || worstMonth.name)}</strong> (<span className="privacy-blur">{formatCurrency(worstMonth.saved)}</span>)</span>
               </div>
             )}
           </div>
@@ -201,10 +202,11 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis
-                  dataKey="name"
+                  dataKey="rawMonth"
                   tick={{ fontSize: 10, fill: 'var(--text-dim)' }}
                   axisLine={false}
                   tickLine={false}
+                  tickFormatter={formatMonthYear}
                 />
                 <YAxis
                   tick={{ fontSize: 10, fill: 'var(--text-dim)' }}
@@ -214,7 +216,7 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                   width={70}
                 />
                 <Tooltip
-                  content={<ChartTooltip formatCurrency={formatCurrency} />}
+                  content={<ChartTooltip formatCurrency={formatCurrency} formatMonthYear={formatMonthYear} />}
                 />
                 <Area
                   type="monotone"
@@ -273,7 +275,7 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                 {enriched.map((m, i) => (
                   <MonthRow
                     key={m.rawMonth}
-                    month={m.name}
+                    month={formatMonthYear(m.rawMonth || m.name)}
                     income={m.income}
                     expenses={m.expenses}
                     saved={m.saved}

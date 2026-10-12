@@ -1016,8 +1016,8 @@ Transfer from Bank B DE12345678901234567890
 
     // Transactions with matching reciprocal amounts that could trigger self-reconciliation
     const tsvData = `Date\tDescription\tAmount
-2026-04-01\tANEL O. BILJANA MEMIC KREDITRATE\t-1000
-2026-04-02\tANEL O. BILJANA MEMIC KREDITRATE\t1000
+2026-04-01\tMAX O. ERIKA MUSTERMANN KREDITRATE\t-1000
+2026-04-02\tMAX O. ERIKA MUSTERMANN KREDITRATE\t1000
 2026-04-03\tGroceries\t-50`
 
     const { rerender } = render(<TransactionImporter />)

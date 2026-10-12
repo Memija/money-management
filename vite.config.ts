@@ -8,20 +8,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('pdfjs-dist/build/pdf.worker')) {
-            return 'pdf-worker'
-          }
-          if (id.includes('pdfjs-dist')) {
-            return 'pdf'
-          }
-          if (id.includes('xlsx')) {
-            return 'xlsx'
-          }
           if (id.includes('recharts')) {
             return 'recharts'
-          }
-          if (id.includes('framer-motion')) {
-            return 'framer-motion'
           }
           if (
             id.includes('react/') ||

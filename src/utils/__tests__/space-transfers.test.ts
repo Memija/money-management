@@ -278,7 +278,7 @@ describe('filterInternalSpaceTransfers', () => {
       id: 'tx-cmz-1',
       date: '2026-02-01',
       description:
-        'Anel Memic Sent from N26 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 4bf2726750a14accace9800b5ce2d73a',
+        'Max Mustermann Sent from N26 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: e0000000000000000000000000000001',
       amount: 250,
       type: 'income',
       institution: 'Commerzbank',
@@ -287,11 +287,11 @@ describe('filterInternalSpaceTransfers', () => {
       id: 'tx-cmz-2',
       date: '2026-02-01',
       description:
-        'ARTUR MEMIC COBADEHD077 DE97200411770239797400 JUNIOR DEPOT End-to-End-Ref.: NOTPROVIDED Dauerauftrag',
+        'FELIX MUSTERMANN COBADEHD077 DE97200411770000000001 JUNIOR DEPOT End-to-End-Ref.: NOTPROVIDED Dauerauftrag',
       amount: -250,
       type: 'expense',
       institution: 'Commerzbank',
-      counterpartyIban: 'DE97200411770239797400',
+      counterpartyIban: 'DE97200411770000000001',
     })
 
     // 11/03/2025 pair
@@ -299,17 +299,17 @@ describe('filterInternalSpaceTransfers', () => {
       id: 'tx-cmz-3',
       date: '2025-03-11',
       description:
-        'ARTUR MEMIC COBADEHD077 DE97200411770239797400 JUNIOR DEPOT End-to-End-Ref.: NOTPROVIDED Dauerauftrag',
+        'FELIX MUSTERMANN COBADEHD077 DE97200411770000000001 JUNIOR DEPOT End-to-End-Ref.: NOTPROVIDED Dauerauftrag',
       amount: -250,
       type: 'expense',
       institution: 'Commerzbank',
-      counterpartyIban: 'DE97200411770239797400',
+      counterpartyIban: 'DE97200411770000000001',
     })
     const tx4 = createTx({
       id: 'tx-cmz-4',
       date: '2025-03-11',
       description:
-        'Biljana Memic Hilfe End-to-End-Ref.: NOTPROVIDED Kundenreferenz: CD-SCT-676910088',
+        'Erika Mustermann Hilfe End-to-End-Ref.: NOTPROVIDED Kundenreferenz: CD-SCT-676910088',
       amount: 250,
       type: 'income',
       institution: 'Commerzbank',

@@ -45,7 +45,7 @@ export const ShareSnapshotModal: React.FC<ShareSnapshotModalProps> = ({
   savingsRate,
   topCategories,
 }) => {
-  const { t } = useLanguageStore()
+  const t = useLanguageStore((s) => s.t)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const [maskAmounts, setMaskAmounts] = useState<boolean>(true)

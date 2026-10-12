@@ -1,8 +1,16 @@
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 import type { AppStep, Country, CustomCategory, DuplicateDeleteMode, DuplicateOverrideRule, FinancialInstitution, ImportedAccount, Transaction } from '../types'
 import { reconcileCrossAccountTransfers } from '../utils/account-transfers'
+import {
+  categorize,
+  CATEGORIZER_RULES_VERSION,
+  extractCleanDescription,
+  isInformativeTransaction,
+  isPaymentProcessorOnly,
+} from '../utils/category-utils'
+import { createDebouncedJSONStorage } from '../utils/storage/debounced-json-storage'
 import { idbStorage } from '../utils/storage/idb-storage'
 
 export interface AppState {
@@ -60,6 +68,17 @@ export interface AppState {
    * Cleans up duplicate transactions in imported accounts and recalculates balances.
    */
   resetDuplicateTransactions: () => { removedCount: number }
+  appliedCategorizerVersion?: number
+  /**
+   * Automatically re-evaluates all stored unedited transactions against the latest
+   * categorization rules whenever CATEGORIZER_RULES_VERSION has been bumped, preserving
+   * all manual user category overrides.
+   */
+  autoRecategorizeUneditedTransactions: (force?: boolean) => void
+  /**
+   * Automatically migrates legacy Insurance categories for health/dental insurance to Healthcare.
+   */
+  migrateHealthInsurance: () => void
 }
 
 export const toCanonicalTransactionKey = (t: { date: string; amount: number; description: string }) => {
@@ -239,6 +258,114 @@ export const countDuplicateTransactionsInAccounts = (
   return count
 }
 
+export const sanitizeCustomKeywords = (
+  keywords?: Record<string, string[]>,
+): Record<string, string[]> => {
+  if (!keywords || typeof keywords !== 'object') return {}
+  const sanitized: Record<string, string[]> = {}
+  for (const [category, words] of Object.entries(keywords)) {
+    if (!Array.isArray(words)) continue
+    const cleaned = words.filter(
+      (w) => typeof w === 'string' && w.trim().length >= 2 && !isPaymentProcessorOnly(w),
+    )
+    if (cleaned.length > 0) {
+      sanitized[category] = cleaned
+    }
+  }
+  return sanitized
+}
+
+export const sanitizeManualCategories = (
+  manualCategories?: Record<string, string>,
+  importedAccounts?: ImportedAccount[],
+): Record<string, string> => {
+  if (!manualCategories || typeof manualCategories !== 'object') return {}
+  if (!importedAccounts || !Array.isArray(importedAccounts) || importedAccounts.length === 0) {
+    return manualCategories
+  }
+
+  const txMap = new Map<string, Transaction>()
+  for (const acc of importedAccounts) {
+    for (const tx of acc.transactions || []) txMap.set(tx.id, tx)
+    for (const tx of acc.duplicateTransactions || []) txMap.set(tx.id, tx)
+    for (const tx of acc.modifiedTransactions || []) txMap.set(tx.id, tx)
+  }
+
+  const cleaned: Record<string, string> = {}
+  for (const [txId, cat] of Object.entries(manualCategories)) {
+    const tx = txMap.get(txId)
+    if (tx) {
+      const cleanDesc = extractCleanDescription(tx.description)
+      if (cat === 'Transport' && isPaymentProcessorOnly(cleanDesc)) {
+        continue
+      }
+    }
+    cleaned[txId] = cat
+  }
+  return cleaned
+}
+
+/**
+ * Automatically re-evaluates all stored unedited transactions against the latest
+ * categorization rules, strictly preserving all manual user category overrides.
+ */
+export function recategorizeAccounts(
+  accounts: ImportedAccount[],
+  manualCategories?: Record<string, string>,
+  customKeywords?: Record<string, string[]>,
+  _customCategories?: CustomCategory[],
+): { accounts: ImportedAccount[]; changed: boolean } {
+  let changed = false
+  const updatedAccounts = accounts.map((account) => {
+    let accountChanged = false
+    const recatList = (txs?: Transaction[]) => {
+      if (!txs) return txs
+      return txs.map((tx) => {
+        if (isInformativeTransaction(tx)) return tx
+        // Preserve manual user categories
+        if (manualCategories && manualCategories[tx.id]) return tx
+        // Preserve user-modified items with explicit category
+        if (tx.isModified && tx.category) return tx
+
+        const newCategory = categorize(tx.description, {
+          customKeywords,
+          amount: tx.amount,
+          type: tx.type,
+          partner: tx.partner,
+        })
+
+        if (newCategory !== tx.category) {
+          accountChanged = true
+          changed = true
+          return { ...tx, category: newCategory }
+        }
+        return tx
+      })
+    }
+
+    const newTransactions = recatList(account.transactions) || []
+    const newDuplicates = recatList(account.duplicateTransactions)
+    const newModified = recatList(account.modifiedTransactions)
+
+    if (!accountChanged) return account
+    return {
+      ...account,
+      transactions: newTransactions,
+      duplicateTransactions: newDuplicates,
+      modifiedTransactions: newModified,
+    }
+  })
+
+  return { accounts: changed ? updatedAccounts : accounts, changed }
+}
+
+/**
+ * Backwards-compatible delegate for historical migrations.
+ */
+export function migrateHealthInsuranceCategories(accounts: ImportedAccount[]): ImportedAccount[] {
+  return recategorizeAccounts(accounts).accounts
+}
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -252,6 +379,44 @@ export const useAppStore = create<AppState>()(
       customCategories: [],
       duplicateOverrideRules: [],
       filterTransactionsWithoutLogos: false,
+      appliedCategorizerVersion: CATEGORIZER_RULES_VERSION,
+
+      autoRecategorizeUneditedTransactions: (force = false) => {
+        const {
+          importedAccounts,
+          manualCategories,
+          customKeywords,
+          customCategories,
+          appliedCategorizerVersion,
+        } = get()
+        if (force || (appliedCategorizerVersion ?? 0) < CATEGORIZER_RULES_VERSION) {
+          const { accounts, changed } = recategorizeAccounts(
+            importedAccounts,
+            manualCategories,
+            customKeywords,
+            customCategories,
+          )
+          if (changed) {
+            set({
+              importedAccounts: accounts,
+              appliedCategorizerVersion: CATEGORIZER_RULES_VERSION,
+            })
+          } else {
+            set({ appliedCategorizerVersion: CATEGORIZER_RULES_VERSION })
+          }
+        }
+      },
+
+      migrateHealthInsurance: () => {
+        get().autoRecategorizeUneditedTransactions(true)
+        try {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            window.localStorage.removeItem('mm-app-storage')
+          }
+        } catch {
+          // ignore
+        }
+      },
 
       setFilterTransactionsWithoutLogos: (enabled) =>
         set({ filterTransactionsWithoutLogos: enabled }),
@@ -507,12 +672,20 @@ export const useAppStore = create<AppState>()(
       },
 
       setCustomKeywords: (category, keywords) =>
-        set((state) => ({
-          customKeywords: {
-            ...state.customKeywords,
-            [category]: keywords,
-          },
-        })),
+        set((state) => {
+          const cleaned = Array.isArray(keywords)
+            ? keywords.filter(
+                (w) => typeof w === 'string' && w.trim().length >= 2 && !isPaymentProcessorOnly(w),
+              )
+            : []
+          const next = { ...state.customKeywords }
+          if (cleaned.length > 0) {
+            next[category] = cleaned
+          } else {
+            delete next[category]
+          }
+          return { customKeywords: next }
+        }),
 
       setManualCategory: (transactionId, category) =>
         set((state) => ({
@@ -954,10 +1127,36 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'saldio-app-storage',
-      storage: createJSONStorage(() => idbStorage),
+      storage: createDebouncedJSONStorage<AppState>(() => idbStorage),
       onRehydrateStorage: () => (state) => {
-        if (state && Array.isArray(state.duplicateOverrideRules)) {
-          state.duplicateOverrideRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
+        if (state) {
+          if (Array.isArray(state.duplicateOverrideRules)) {
+            state.duplicateOverrideRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
+          }
+          if (state.customKeywords) {
+            state.customKeywords = sanitizeCustomKeywords(state.customKeywords)
+          }
+          if (state.manualCategories && state.importedAccounts) {
+            state.manualCategories = sanitizeManualCategories(
+              state.manualCategories,
+              state.importedAccounts,
+            )
+          }
+          if (
+            state.importedAccounts &&
+            (state.appliedCategorizerVersion ?? 0) < CATEGORIZER_RULES_VERSION
+          ) {
+            const { accounts, changed } = recategorizeAccounts(
+              state.importedAccounts,
+              state.manualCategories,
+              state.customKeywords,
+              state.customCategories,
+            )
+            if (changed) {
+              state.importedAccounts = accounts
+            }
+            state.appliedCategorizerVersion = CATEGORIZER_RULES_VERSION
+          }
         }
       },
     },
