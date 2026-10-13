@@ -40,7 +40,10 @@
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .card::before {
@@ -72,10 +75,22 @@
 }
 
 /* Subtle glow tint per card accent */
-.card-blue::before  { background: radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.07), transparent 70%); opacity: 1; }
-.card-rose::before  { background: radial-gradient(ellipse at top left, rgba(244, 63, 94, 0.07), transparent 70%); opacity: 1; }
-.card-amber::before { background: radial-gradient(ellipse at top left, rgba(245, 158, 11, 0.07), transparent 70%); opacity: 1; }
-.card-emerald::before { background: radial-gradient(ellipse at top left, rgba(16, 185, 129, 0.07), transparent 70%); opacity: 1; }
+.card-blue::before {
+  background: radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.07), transparent 70%);
+  opacity: 1;
+}
+.card-rose::before {
+  background: radial-gradient(ellipse at top left, rgba(244, 63, 94, 0.07), transparent 70%);
+  opacity: 1;
+}
+.card-amber::before {
+  background: radial-gradient(ellipse at top left, rgba(245, 158, 11, 0.07), transparent 70%);
+  opacity: 1;
+}
+.card-emerald::before {
+  background: radial-gradient(ellipse at top left, rgba(16, 185, 129, 0.07), transparent 70%);
+  opacity: 1;
+}
 
 .card-clickable {
   cursor: pointer;
@@ -175,7 +190,9 @@
   opacity: 0.55;
   margin-left: 6px;
   color: var(--text-dim);
-  transition: opacity 0.2s ease, color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease;
 }
 
 .info-tooltip-wrapper:hover .tooltip-icon {
@@ -184,11 +201,18 @@
 }
 
 /* Value gradient tints per accent */
-.card-blue   .value { color: var(--text-main); }
-.card-rose   .value { color: var(--text-main); }
-.card-amber  .value { color: var(--text-main); }
-.card-emerald .value { color: var(--text-main); }
-
+.card-blue .value {
+  color: var(--text-main);
+}
+.card-rose .value {
+  color: var(--text-main);
+}
+.card-amber .value {
+  color: var(--text-main);
+}
+.card-emerald .value {
+  color: var(--text-main);
+}
 
 /* ─────────────────────────────────────────────────
    Card bottom
@@ -249,7 +273,9 @@
   color: var(--text-dim);
   opacity: 0;
   transform: translateX(-4px);
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .avg-row-clickable:hover .avg-row-chevron {
@@ -267,10 +293,22 @@
   justify-content: center;
 }
 
-.avg-icon-emerald { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-.avg-icon-rose    { background: rgba(244, 63, 94, 0.18); color: #f43f5e; }
-.avg-icon-blue    { background: rgba(59, 130, 246, 0.18); color: #3b82f6; }
-.avg-icon-amber   { background: rgba(245, 158, 11, 0.18); color: #f59e0b; }
+.avg-icon-emerald {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+.avg-icon-rose {
+  background: rgba(244, 63, 94, 0.18);
+  color: #f43f5e;
+}
+.avg-icon-blue {
+  background: rgba(59, 130, 246, 0.18);
+  color: #3b82f6;
+}
+.avg-icon-amber {
+  background: rgba(245, 158, 11, 0.18);
+  color: #f59e0b;
+}
 
 .avg-row-content {
   flex: 1;
@@ -305,10 +343,18 @@
   letter-spacing: -0.01em;
 }
 
-.avg-value-emerald { color: #10b981; }
-.avg-value-rose    { color: #f43f5e; }
-.avg-value-blue    { color: #60a5fa; }
-.avg-value-amber   { color: #f59e0b; }
+.avg-value-emerald {
+  color: #10b981;
+}
+.avg-value-rose {
+  color: #f43f5e;
+}
+.avg-value-blue {
+  color: #60a5fa;
+}
+.avg-value-amber {
+  color: #f59e0b;
+}
 
 .avg-bar-track {
   height: 3px;
@@ -326,10 +372,18 @@
   border-radius: 99px;
 }
 
-.avg-bar-emerald { background: linear-gradient(90deg, #10b981, #34d399); }
-.avg-bar-rose    { background: linear-gradient(90deg, #f43f5e, #fb7185); }
-.avg-bar-blue    { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-.avg-bar-amber   { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.avg-bar-emerald {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+.avg-bar-rose {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+}
+.avg-bar-blue {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+.avg-bar-amber {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
 
 .avg-ratio {
   font-size: 0.62rem;
@@ -383,7 +437,10 @@
   cursor: pointer;
   border: none;
   font-family: inherit;
-  transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+  transition:
+    filter 0.15s ease,
+    transform 0.12s ease,
+    box-shadow 0.15s ease;
 }
 
 .pill-clickable:hover {

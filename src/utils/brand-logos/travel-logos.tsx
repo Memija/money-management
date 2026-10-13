@@ -141,5 +141,3 @@ export {
   EurowingsLogo as HolidaysLogo,
   WizzAirLogo as WizzLogo,
 }
-
-

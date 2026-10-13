@@ -49,8 +49,10 @@ vi.mock('../../store/useLanguageStore', () => ({
         addAnotherInstitution: 'Add Another',
         proceedToAnalysis: 'Proceed',
         internalTransfersReconciledTitle: 'Internal Transfers Reconciled',
-        internalTransfersReconciledDesc: '{count} transfers between your accounts were recognized, excluded from income and expenses, and hidden from standard views.',
-        internalTransfersReconciledDescSingular: '1 transfer between your accounts was recognized, excluded from income and expenses, and hidden from standard views.',
+        internalTransfersReconciledDesc:
+          '{count} transfers between your accounts were recognized, excluded from income and expenses, and hidden from standard views.',
+        internalTransfersReconciledDescSingular:
+          '1 transfer between your accounts was recognized, excluded from income and expenses, and hidden from standard views.',
         accountInternalTransfers: '{count} internal transfers',
         accountInternalTransfersSingular: '1 internal transfer',
       } as unknown as TranslationStrings,
@@ -501,5 +503,3 @@ describe('ImportReview', () => {
     expect(logos.some((img) => img.getAttribute('src')?.includes('n26'))).toBe(true)
   })
 })
-
-

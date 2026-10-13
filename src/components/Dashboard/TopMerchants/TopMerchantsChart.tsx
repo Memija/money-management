@@ -37,7 +37,13 @@ interface MerchantYAxisTickProps {
   isMobile?: boolean
 }
 
-const MerchantYAxisTick: React.FC<MerchantYAxisTickProps> = ({ x = 0, y = 0, payload, onHoverTick, isMobile = false }) => {
+const MerchantYAxisTick: React.FC<MerchantYAxisTickProps> = ({
+  x = 0,
+  y = 0,
+  payload,
+  onHoverTick,
+  isMobile = false,
+}) => {
   const fullName = payload?.value ?? ''
   const limits = isMobile ? LABEL_LIMITS.mobile : LABEL_LIMITS.desktop
   const isTruncated = fullName.length > limits.maxChars
@@ -90,20 +96,40 @@ export const TopMerchantsChart: React.FC<TopMerchantsChartProps> = React.memo(
     const isAnimationActive = useChartAnimation(merchants)
 
     const margin = useMemo(
-      () => ({ left: 8, right: isMobile ? CHART_RIGHT_MARGIN.mobile : CHART_RIGHT_MARGIN.desktop, top: 4, bottom: 4 }),
+      () => ({
+        left: 8,
+        right: isMobile ? CHART_RIGHT_MARGIN.mobile : CHART_RIGHT_MARGIN.desktop,
+        top: 4,
+        bottom: 4,
+      }),
       [isMobile],
     )
-    const yAxisTick = useMemo(() => <MerchantYAxisTick onHoverTick={setHoveredLabel} isMobile={isMobile} />, [isMobile])
+    const yAxisTick = useMemo(
+      () => <MerchantYAxisTick onHoverTick={setHoveredLabel} isMobile={isMobile} />,
+      [isMobile],
+    )
     const tooltipContent = useMemo(
-      () => <TopMerchantsTooltip totalExpenses={totalExpenses} isMobile={isMobile} onMerchantClick={onMerchantClick} />,
+      () => (
+        <TopMerchantsTooltip
+          totalExpenses={totalExpenses}
+          isMobile={isMobile}
+          onMerchantClick={onMerchantClick}
+        />
+      ),
       [totalExpenses, isMobile, onMerchantClick],
     )
     const tooltipWrapperStyle = useMemo(
-      () => ({ zIndex: TOOLTIP_Z_INDEX, pointerEvents: isMobile ? ('auto' as const) : ('none' as const) }),
+      () => ({
+        zIndex: TOOLTIP_Z_INDEX,
+        pointerEvents: isMobile ? ('auto' as const) : ('none' as const),
+      }),
       [isMobile],
     )
     const cells = useMemo(
-      () => merchants.map((entry) => <Cell key={entry.name} fill={brandInfos.get(entry.name)?.brandColor} />),
+      () =>
+        merchants.map((entry) => (
+          <Cell key={entry.name} fill={brandInfos.get(entry.name)?.brandColor} />
+        )),
       [merchants, brandInfos],
     )
 
@@ -127,7 +153,10 @@ export const TopMerchantsChart: React.FC<TopMerchantsChartProps> = React.memo(
     return (
       <div className={styles.chartContainer} onMouseLeave={handleMouseLeave}>
         {!isMobile && hoveredLabel && (
-          <div className={styles.axisTooltip} style={{ '--tooltip-top': `${hoveredLabel.y}px` } as React.CSSProperties}>
+          <div
+            className={styles.axisTooltip}
+            style={{ '--tooltip-top': `${hoveredLabel.y}px` } as React.CSSProperties}
+          >
             {hoveredLabel.name}
           </div>
         )}

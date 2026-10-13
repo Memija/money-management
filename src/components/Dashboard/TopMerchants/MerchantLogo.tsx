@@ -15,12 +15,14 @@ interface MerchantLogoProps {
  * Memoized merchant brand logo with an initials fallback. Skips re-rendering the logo SVG
  * when its parent re-renders for unrelated reasons (e.g. a language switch).
  */
-export const MerchantLogo: React.FC<MerchantLogoProps> = React.memo(({ brand, size, initialsClassName }) => {
-  const LogoComp = brand.logoComponent
-  if (LogoComp) {
-    return <LogoComp size={size} color={brand.brandColor} />
-  }
-  return <span className={initialsClassName}>{brand.initials}</span>
-})
+export const MerchantLogo: React.FC<MerchantLogoProps> = React.memo(
+  ({ brand, size, initialsClassName }) => {
+    const LogoComp = brand.logoComponent
+    if (LogoComp) {
+      return <LogoComp size={size} color={brand.brandColor} />
+    }
+    return <span className={initialsClassName}>{brand.initials}</span>
+  },
+)
 
 MerchantLogo.displayName = 'MerchantLogo'

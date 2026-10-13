@@ -149,9 +149,7 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
           }}
           disabled={(excludedCount ?? 0) === 0 && scopeFilter !== 'excluded'}
           title={
-            scopeFilter === 'excluded'
-              ? t.filterAll || 'Show all'
-              : t.filterExcluded || 'Excluded'
+            scopeFilter === 'excluded' ? t.filterAll || 'Show all' : t.filterExcluded || 'Excluded'
           }
           aria-label={t.filterExcluded || 'Excluded'}
           aria-pressed={scopeFilter === 'excluded'}
@@ -165,129 +163,137 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
         </button>
       )}
 
-      {showScopeFilters && (hasDuplicates || (duplicateCount ?? 0) > 0 || scopeFilter === 'duplicates') && (
-        <button
-          type="button"
-          className={`${styles['duplicate-filter-btn']} ${
-            scopeFilter === 'duplicates' ? styles['duplicate-filter-btn-active'] : ''
-          } ${(duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates' ? styles['duplicate-filter-btn-disabled'] : ''}`}
-          onClick={() => {
-            if ((duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates') return
-            onScopeFilterChange?.(scopeFilter === 'duplicates' ? 'all' : 'duplicates')
-          }}
-          disabled={(duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates'}
-          title={
-            scopeFilter === 'duplicates'
-              ? t.filterAll || 'Show all'
-              : t.filterDuplicates || 'Duplicates'
-          }
-          aria-label={t.filterDuplicates || 'Duplicates'}
-          aria-pressed={scopeFilter === 'duplicates'}
-          data-testid="filter-duplicates-btn"
-        >
-          <Copy size={13} aria-hidden="true" />
-          <span>{t.filterDuplicates || 'Duplicates'}</span>
-          {duplicateCount !== undefined && (
-            <span className={styles['duplicate-filter-badge']}>{duplicateCount}</span>
-          )}
-        </button>
-      )}
+      {showScopeFilters &&
+        (hasDuplicates || (duplicateCount ?? 0) > 0 || scopeFilter === 'duplicates') && (
+          <button
+            type="button"
+            className={`${styles['duplicate-filter-btn']} ${
+              scopeFilter === 'duplicates' ? styles['duplicate-filter-btn-active'] : ''
+            } ${(duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates' ? styles['duplicate-filter-btn-disabled'] : ''}`}
+            onClick={() => {
+              if ((duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates')
+                return
+              onScopeFilterChange?.(scopeFilter === 'duplicates' ? 'all' : 'duplicates')
+            }}
+            disabled={(duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates'}
+            title={
+              scopeFilter === 'duplicates'
+                ? t.filterAll || 'Show all'
+                : t.filterDuplicates || 'Duplicates'
+            }
+            aria-label={t.filterDuplicates || 'Duplicates'}
+            aria-pressed={scopeFilter === 'duplicates'}
+            data-testid="filter-duplicates-btn"
+          >
+            <Copy size={13} aria-hidden="true" />
+            <span>{t.filterDuplicates || 'Duplicates'}</span>
+            {duplicateCount !== undefined && (
+              <span className={styles['duplicate-filter-badge']}>{duplicateCount}</span>
+            )}
+          </button>
+        )}
 
-      {showScopeFilters && ((alreadyDuplicatedCount ?? 0) > 0 || scopeFilter === 'already-duplicated') && (
-        <button
-          type="button"
-          className={`${styles['already-duplicated-filter-btn']} ${
-            scopeFilter === 'already-duplicated'
-              ? styles['already-duplicated-filter-btn-active']
-              : ''
-          } ${(alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated' ? styles['already-duplicated-filter-btn-disabled'] : ''}`}
-          onClick={() => {
-            if ((alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated') return
-            onScopeFilterChange?.(
-              scopeFilter === 'already-duplicated' ? 'all' : 'already-duplicated',
-            )
-          }}
-          disabled={
-            (alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated'
-          }
-          title={
-            scopeFilter === 'already-duplicated'
-              ? t.filterAll || 'Show all'
-              : t.filterAlreadyDuplicated || 'Already Duplicated'
-          }
-          aria-label={t.filterAlreadyDuplicated || 'Already Duplicated'}
-          aria-pressed={scopeFilter === 'already-duplicated'}
-          data-testid="filter-already-duplicated-btn"
-        >
-          <Lock size={13} aria-hidden="true" />
-          <span>{t.filterAlreadyDuplicated || 'Already Duplicated'}</span>
-          {alreadyDuplicatedCount !== undefined && (
-            <span className={styles['already-duplicated-filter-badge']}>
-              {alreadyDuplicatedCount}
-            </span>
-          )}
-        </button>
-      )}
+      {showScopeFilters &&
+        ((alreadyDuplicatedCount ?? 0) > 0 || scopeFilter === 'already-duplicated') && (
+          <button
+            type="button"
+            className={`${styles['already-duplicated-filter-btn']} ${
+              scopeFilter === 'already-duplicated'
+                ? styles['already-duplicated-filter-btn-active']
+                : ''
+            } ${(alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated' ? styles['already-duplicated-filter-btn-disabled'] : ''}`}
+            onClick={() => {
+              if ((alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated')
+                return
+              onScopeFilterChange?.(
+                scopeFilter === 'already-duplicated' ? 'all' : 'already-duplicated',
+              )
+            }}
+            disabled={(alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated'}
+            title={
+              scopeFilter === 'already-duplicated'
+                ? t.filterAll || 'Show all'
+                : t.filterAlreadyDuplicated || 'Already Duplicated'
+            }
+            aria-label={t.filterAlreadyDuplicated || 'Already Duplicated'}
+            aria-pressed={scopeFilter === 'already-duplicated'}
+            data-testid="filter-already-duplicated-btn"
+          >
+            <Lock size={13} aria-hidden="true" />
+            <span>{t.filterAlreadyDuplicated || 'Already Duplicated'}</span>
+            {alreadyDuplicatedCount !== undefined && (
+              <span className={styles['already-duplicated-filter-badge']}>
+                {alreadyDuplicatedCount}
+              </span>
+            )}
+          </button>
+        )}
 
-      {showScopeFilters && isImport && ((spaceTransferCount ?? 0) > 0 || scopeFilter === 'space-transfers') && (
-        <button
-          type="button"
-          className={`${styles['space-transfers-filter-btn']} ${
-            scopeFilter === 'space-transfers' ? styles['space-transfers-filter-btn-active'] : ''
-          } ${(spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers' ? styles['space-transfers-filter-btn-disabled'] : ''}`}
-          onClick={() => {
-            if ((spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers') return
-            onScopeFilterChange?.(scopeFilter === 'space-transfers' ? 'all' : 'space-transfers')
-          }}
-          disabled={(spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers'}
-          title={
-            scopeFilter === 'space-transfers'
-              ? t.filterAll || 'Show all'
-              : t.filterSpaceTransfers || 'Sub-account'
-          }
-          aria-label={t.filterSpaceTransfers || 'Sub-account Transfers'}
-          aria-pressed={scopeFilter === 'space-transfers'}
-          data-testid="filter-space-transfers-btn"
-        >
-          <Layers size={13} aria-hidden="true" />
-          <span>{t.filterSpaceTransfers || 'Sub-account'}</span>
-          {spaceTransferCount !== undefined && (
-            <span className={styles['space-transfers-filter-badge']}>
-              {spaceTransferCount}
-            </span>
-          )}
-        </button>
-      )}
+      {showScopeFilters &&
+        isImport &&
+        ((spaceTransferCount ?? 0) > 0 || scopeFilter === 'space-transfers') && (
+          <button
+            type="button"
+            className={`${styles['space-transfers-filter-btn']} ${
+              scopeFilter === 'space-transfers' ? styles['space-transfers-filter-btn-active'] : ''
+            } ${(spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers' ? styles['space-transfers-filter-btn-disabled'] : ''}`}
+            onClick={() => {
+              if ((spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers') return
+              onScopeFilterChange?.(scopeFilter === 'space-transfers' ? 'all' : 'space-transfers')
+            }}
+            disabled={(spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers'}
+            title={
+              scopeFilter === 'space-transfers'
+                ? t.filterAll || 'Show all'
+                : t.filterSpaceTransfers || 'Sub-account'
+            }
+            aria-label={t.filterSpaceTransfers || 'Sub-account Transfers'}
+            aria-pressed={scopeFilter === 'space-transfers'}
+            data-testid="filter-space-transfers-btn"
+          >
+            <Layers size={13} aria-hidden="true" />
+            <span>{t.filterSpaceTransfers || 'Sub-account'}</span>
+            {spaceTransferCount !== undefined && (
+              <span className={styles['space-transfers-filter-badge']}>{spaceTransferCount}</span>
+            )}
+          </button>
+        )}
 
-      {showScopeFilters && isImport && ((internalTransferCount ?? 0) > 0 || scopeFilter === 'internal-transfers') && (
-        <button
-          type="button"
-          className={`${styles['internal-transfers-filter-btn']} ${
-            scopeFilter === 'internal-transfers' ? styles['internal-transfers-filter-btn-active'] : ''
-          } ${(internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers' ? styles['internal-transfers-filter-btn-disabled'] : ''}`}
-          onClick={() => {
-            if ((internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers') return
-            onScopeFilterChange?.(scopeFilter === 'internal-transfers' ? 'all' : 'internal-transfers')
-          }}
-          disabled={(internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers'}
-          title={
-            scopeFilter === 'internal-transfers'
-              ? t.filterAll || 'Show all'
-              : t.filterInternalTransfers || 'Internal Transfers'
-          }
-          aria-label={t.filterInternalTransfers || 'Internal Transfers'}
-          aria-pressed={scopeFilter === 'internal-transfers'}
-          data-testid="filter-internal-transfers-btn"
-        >
-          <Ghost size={13} aria-hidden="true" />
-          <span>{t.filterInternalTransfers || 'Internal Transfers'}</span>
-          {internalTransferCount !== undefined && (
-            <span className={styles['internal-transfers-filter-badge']}>
-              {internalTransferCount}
-            </span>
-          )}
-        </button>
-      )}
+      {showScopeFilters &&
+        isImport &&
+        ((internalTransferCount ?? 0) > 0 || scopeFilter === 'internal-transfers') && (
+          <button
+            type="button"
+            className={`${styles['internal-transfers-filter-btn']} ${
+              scopeFilter === 'internal-transfers'
+                ? styles['internal-transfers-filter-btn-active']
+                : ''
+            } ${(internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers' ? styles['internal-transfers-filter-btn-disabled'] : ''}`}
+            onClick={() => {
+              if ((internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers') return
+              onScopeFilterChange?.(
+                scopeFilter === 'internal-transfers' ? 'all' : 'internal-transfers',
+              )
+            }}
+            disabled={(internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers'}
+            title={
+              scopeFilter === 'internal-transfers'
+                ? t.filterAll || 'Show all'
+                : t.filterInternalTransfers || 'Internal Transfers'
+            }
+            aria-label={t.filterInternalTransfers || 'Internal Transfers'}
+            aria-pressed={scopeFilter === 'internal-transfers'}
+            data-testid="filter-internal-transfers-btn"
+          >
+            <Ghost size={13} aria-hidden="true" />
+            <span>{t.filterInternalTransfers || 'Internal Transfers'}</span>
+            {internalTransferCount !== undefined && (
+              <span className={styles['internal-transfers-filter-badge']}>
+                {internalTransferCount}
+              </span>
+            )}
+          </button>
+        )}
 
       {showScopeFilters && ((modifiedCount ?? 0) > 0 || scopeFilter === 'modified') && (
         <button
@@ -301,9 +307,7 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
           }}
           disabled={(modifiedCount ?? 0) === 0 && scopeFilter !== 'modified'}
           title={
-            scopeFilter === 'modified'
-              ? t.filterAll || 'Show all'
-              : t.filterModified || 'Modified'
+            scopeFilter === 'modified' ? t.filterAll || 'Show all' : t.filterModified || 'Modified'
           }
           aria-label={t.filterModified || 'Modified'}
           aria-pressed={scopeFilter === 'modified'}
@@ -317,33 +321,35 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
         </button>
       )}
 
-      {showScopeFilters && isImport && (hasDuplicates || unlockedCount > 0 || scopeFilter === 'unlocked') && (
-        <button
-          type="button"
-          className={`${styles['unlocked-filter-btn']} ${
-            scopeFilter === 'unlocked' ? styles['unlocked-filter-btn-active'] : ''
-          } ${unlockedCount === 0 ? styles['unlocked-filter-btn-disabled'] : ''}`}
-          onClick={() => {
-            if (unlockedCount === 0) return
-            onScopeFilterChange?.(scopeFilter === 'unlocked' ? 'all' : 'unlocked')
-          }}
-          disabled={unlockedCount === 0}
-          title={
-            unlockedCount === 0
-              ? t.filterUnlocked || 'No unlocked transactions'
-              : scopeFilter === 'unlocked'
-              ? t.filterAll || 'Show all'
-              : t.filterUnlocked || 'Unlocked'
-          }
-          aria-label={t.filterUnlocked || 'Unlocked'}
-          aria-pressed={scopeFilter === 'unlocked'}
-          data-testid="filter-unlocked-btn"
-        >
-          <Unlock size={13} aria-hidden="true" />
-          <span>{t.filterUnlocked || 'Unlocked'}</span>
-          <span className={styles['unlocked-filter-badge']}>{unlockedCount}</span>
-        </button>
-      )}
+      {showScopeFilters &&
+        isImport &&
+        (hasDuplicates || unlockedCount > 0 || scopeFilter === 'unlocked') && (
+          <button
+            type="button"
+            className={`${styles['unlocked-filter-btn']} ${
+              scopeFilter === 'unlocked' ? styles['unlocked-filter-btn-active'] : ''
+            } ${unlockedCount === 0 ? styles['unlocked-filter-btn-disabled'] : ''}`}
+            onClick={() => {
+              if (unlockedCount === 0) return
+              onScopeFilterChange?.(scopeFilter === 'unlocked' ? 'all' : 'unlocked')
+            }}
+            disabled={unlockedCount === 0}
+            title={
+              unlockedCount === 0
+                ? t.filterUnlocked || 'No unlocked transactions'
+                : scopeFilter === 'unlocked'
+                  ? t.filterAll || 'Show all'
+                  : t.filterUnlocked || 'Unlocked'
+            }
+            aria-label={t.filterUnlocked || 'Unlocked'}
+            aria-pressed={scopeFilter === 'unlocked'}
+            data-testid="filter-unlocked-btn"
+          >
+            <Unlock size={13} aria-hidden="true" />
+            <span>{t.filterUnlocked || 'Unlocked'}</span>
+            <span className={styles['unlocked-filter-badge']}>{unlockedCount}</span>
+          </button>
+        )}
 
       {isFilterActive && (
         <button

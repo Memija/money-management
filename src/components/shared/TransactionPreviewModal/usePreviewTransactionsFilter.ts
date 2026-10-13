@@ -26,15 +26,15 @@ export function usePreviewTransactionsFilter({
   formatCurrency,
   t,
 }: UsePreviewTransactionsFilterProps) {
-  const [sortConfig, setSortConfig] = useState<{ key: SortColumn; direction: SortDirection } | null>(null)
+  const [sortConfig, setSortConfig] = useState<{
+    key: SortColumn
+    direction: SortDirection
+  } | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
-  const isFilterActive =
-    searchQuery.trim().length > 0 ||
-    startDate.length > 0 ||
-    endDate.length > 0
+  const isFilterActive = searchQuery.trim().length > 0 || startDate.length > 0 || endDate.length > 0
 
   const handleClearFilters = () => {
     setSearchQuery('')

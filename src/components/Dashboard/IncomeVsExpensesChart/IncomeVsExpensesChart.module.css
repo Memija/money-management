@@ -55,7 +55,6 @@
   opacity: 0.6;
 }
 
-
 /* ── View Toggle ── */
 .viewToggle {
   display: flex;
@@ -121,7 +120,9 @@
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .metricPill:hover {

@@ -305,4 +305,3 @@ export const MidjourneyLogo: IconComponent = ({ size = 16, className, color = '#
   </svg>
 )
 MidjourneyLogo.displayName = 'MidjourneyLogo'
-

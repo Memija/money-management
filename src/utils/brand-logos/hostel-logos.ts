@@ -86,6 +86,5 @@ export const HOSTEL_LOGOS: Record<string, IconComponent> = {
   HotelNeckarluxLogo,
   hotelNeckarluxLogo: HotelNeckarluxLogo,
   'hotel-neckarlux': HotelNeckarluxLogo,
-  'neckarlux': HotelNeckarluxLogo,
+  neckarlux: HotelNeckarluxLogo,
 }
-

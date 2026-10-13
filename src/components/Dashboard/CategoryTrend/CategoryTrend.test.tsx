@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useLanguageStore } from '../../../store/useLanguageStore'
@@ -7,14 +7,23 @@ import { CategoryTrend, CustomTrendTooltip } from './CategoryTrend'
 // Mock Recharts
 vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  BarChart: ({ children }: { children: React.ReactNode }) => <div data-testid="bar-chart">{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="bar-chart">{children}</div>
+  ),
   Bar: () => <div>Bar</div>,
-  AreaChart: ({ children }: { children: React.ReactNode }) => <div data-testid="area-chart">{children}</div>,
+  AreaChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="area-chart">{children}</div>
+  ),
   Area: () => <div>Area</div>,
   CartesianGrid: () => <div>CartesianGrid</div>,
   XAxis: () => <div>XAxis</div>,
   YAxis: () => <div>YAxis</div>,
   Tooltip: () => <div>Tooltip</div>,
+  Brush: (props: { startIndex?: number; endIndex?: number }) => (
+    <div data-testid="timeline-brush" data-start={props?.startIndex} data-end={props?.endIndex}>
+      Brush
+    </div>
+  ),
 }))
 
 const sampleMonthlyData = [
@@ -156,7 +165,7 @@ describe('CategoryTrend', () => {
           customCategories={[]}
           locale="en"
           activeCategory="Groceries"
-        />
+        />,
       )
 
       const rows = container.querySelectorAll('[role="button"]')
@@ -187,7 +196,7 @@ describe('CategoryTrend', () => {
           customCategories={[]}
           locale="en"
           onCategoryHover={onCategoryHover}
-        />
+        />,
       )
 
       const rentButton = screen.getByRole('button', { name: /Rent:/i })
@@ -210,7 +219,7 @@ describe('CategoryTrend', () => {
           customCategories={[]}
           locale="en"
           onCategoryClick={onCategoryClick}
-        />
+        />,
       )
 
       const rentButton = screen.getByRole('button', { name: /Rent:/i })
@@ -221,4 +230,110 @@ describe('CategoryTrend', () => {
       expect(onCategoryClick).toHaveBeenCalledTimes(2)
     })
   })
+
+  describe('timeline zooming and navigation', () => {
+    const twelveMonthsData = [
+      { month: 'Jan 24', Rent: 1000, Groceries: 400 },
+      { month: 'Feb 24', Rent: 1000, Groceries: 420 },
+      { month: 'Mar 24', Rent: 1000, Groceries: 450 },
+      { month: 'Apr 24', Rent: 1000, Groceries: 380 },
+      { month: 'May 24', Rent: 1000, Groceries: 410 },
+      { month: 'Jun 24', Rent: 1000, Groceries: 500 },
+      { month: 'Jul 24', Rent: 1000, Groceries: 460 },
+      { month: 'Aug 24', Rent: 1000, Groceries: 490 },
+      { month: 'Sep 24', Rent: 1000, Groceries: 430 },
+      { month: 'Oct 24', Rent: 1000, Groceries: 440 },
+      { month: 'Nov 24', Rent: 1000, Groceries: 470 },
+      { month: 'Dec 24', Rent: 1000, Groceries: 600 },
+    ]
+
+    it('does not render timeline navigation toolbar or brush when data is small', () => {
+      render(<CategoryTrend data={sampleMonthlyData} />)
+      expect(screen.queryByRole('region', { name: 'Timeline' })).not.toBeInTheDocument()
+      expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
+    })
+
+    it('renders timeline navigation toolbar and brush when lots of data points are present', () => {
+      render(<CategoryTrend data={twelveMonthsData} />)
+      expect(screen.getByRole('region', { name: 'Timeline' })).toBeInTheDocument()
+      expect(screen.getByTestId('timeline-brush')).toBeInTheDocument()
+      expect(screen.getByText('12 of 12 months')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Zoom in' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Zoom out' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Previous months' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Next months' })).toBeInTheDocument()
+    })
+
+    it('allows zooming in, zooming out and resetting zoom', () => {
+      render(<CategoryTrend data={twelveMonthsData} />)
+
+      const zoomInBtn = screen.getByRole('button', { name: 'Zoom in' })
+      fireEvent.click(zoomInBtn)
+
+      // Reset button should now be visible
+      const resetBtn = screen.getByRole('button', { name: 'Reset zoom' })
+      expect(resetBtn).toBeInTheDocument()
+
+      // Subtitle and pill update to show zoomed range
+      expect(screen.getAllByText(/of 12 months/).length).toBeGreaterThanOrEqual(1)
+
+      // Resetting zoom restores 12 of 12 months
+      fireEvent.click(resetBtn)
+      expect(screen.getByText('12 of 12 months')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Reset zoom' })).not.toBeInTheDocument()
+    })
+
+    it('allows selecting presets such as 3M and 6M', () => {
+      render(<CategoryTrend data={twelveMonthsData} />)
+
+      const preset3M = screen.getByRole('button', { name: '3M' })
+      fireEvent.click(preset3M)
+      expect(screen.getByText('3 of 12 months')).toBeInTheDocument()
+
+      const preset6M = screen.getByRole('button', { name: '6M' })
+      fireEvent.click(preset6M)
+      expect(screen.getByText('6 of 12 months')).toBeInTheDocument()
+    })
+
+    it('allows panning earlier and later through the timeline', () => {
+      render(<CategoryTrend data={twelveMonthsData} />)
+
+      // Choose 3M (starts at Oct-Dec 24, so is at end)
+      fireEvent.click(screen.getByRole('button', { name: '3M' }))
+      const nextBtn = screen.getByRole('button', { name: 'Next months' })
+      expect(nextBtn).toBeDisabled()
+
+      const prevBtn = screen.getByRole('button', { name: 'Previous months' })
+      expect(prevBtn).not.toBeDisabled()
+
+      fireEvent.click(prevBtn)
+      // Now it's not at the end anymore, nextBtn becomes enabled
+      expect(nextBtn).not.toBeDisabled()
+    })
+
+    it('allows opening and exiting full screen view', () => {
+      render(<CategoryTrend data={twelveMonthsData} />)
+
+      const fullscreenBtn = screen.getByTestId('category-trend-fullscreen-btn')
+      expect(fullscreenBtn).toBeInTheDocument()
+
+      // Fullscreen modal is not open initially
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+      // Click to open fullscreen
+      fireEvent.click(fullscreenBtn)
+
+      // Dialog is now rendered
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+      // Exit fullscreen via exit button
+      const exitBtn = screen.getByRole('button', { name: /Exit Full Screen/i })
+      fireEvent.click(exitBtn)
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      })
+    })
+  })
 })
+

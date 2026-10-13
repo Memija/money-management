@@ -98,7 +98,13 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
           {isZeroAmount ? (
             <Info size={18} color="var(--text-dim)" aria-hidden="true" />
           ) : (
-            getCategoryIcon(tx.category || 'Other', 18, customCategories, tx.description, tx.counterpartyIban)
+            getCategoryIcon(
+              tx.category || 'Other',
+              18,
+              customCategories,
+              tx.description,
+              tx.counterpartyIban,
+            )
           )}
         </div>
 

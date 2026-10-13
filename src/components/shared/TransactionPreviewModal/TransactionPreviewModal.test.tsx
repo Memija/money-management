@@ -60,7 +60,8 @@ vi.mock('../../../store/useLanguageStore', () => ({
         spaceTransfersExcluded: '{count} sub-account transfers were automatically excluded.',
         spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded.',
         internalTransfer: 'Internal Transfer',
-        internalTransfersNotice: 'These transactions are internal transfers between your own accounts.',
+        internalTransfersNotice:
+          'These transactions are internal transfers between your own accounts.',
         internalTransfersWithExistingDetected:
           '{count} internal transfer(s) detected • {existingCount} already imported transaction(s) will also be excluded.',
         internalTransfersWithExistingNotice:
@@ -215,12 +216,7 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('highlights internal transfer transactions with internal transfer badge', () => {
-    render(
-      <TransactionPreviewModal
-        {...defaultProps}
-        internalTransferIds={new Set(['tx-2'])}
-      />,
-    )
+    render(<TransactionPreviewModal {...defaultProps} internalTransferIds={new Set(['tx-2'])} />)
     expect(screen.queryByTestId('preview-internal-transfers-banner')).not.toBeInTheDocument()
     expect(screen.getByText('Internal Transfer')).toBeInTheDocument()
   })
@@ -423,10 +419,14 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(outflowChip).toHaveTextContent(/0\.00/)
 
     // The real transaction is editable
-    expect(screen.getByLabelText('Description', { selector: '#tx-desc-tx-real-income' })).toBeInTheDocument()
+    expect(
+      screen.getByLabelText('Description', { selector: '#tx-desc-tx-real-income' }),
+    ).toBeInTheDocument()
 
     // The internal transfer is read-only (rendered as static text, not an input)
-    expect(screen.queryByLabelText('Description', { selector: '#tx-desc-tx-internal-transfer' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText('Description', { selector: '#tx-desc-tx-internal-transfer' }),
+    ).not.toBeInTheDocument()
     expect(screen.getByText('Transfer to N26')).toBeInTheDocument()
 
     // Remove button should NOT exist for internal transfer
@@ -466,18 +466,24 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.queryByTestId('duplicates-notice')).not.toBeInTheDocument()
 
     // Redundant top duplicate-banner should NOT be shown in duplicates view
-    expect(screen.queryByText(/1 duplicate transaction detected and will be skipped/i)).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(/1 duplicate transaction detected and will be skipped/i),
+    ).not.toBeInTheDocument()
 
     // No type navigation tabs in toolbar
     expect(screen.queryByTestId('filter-tab-duplicates')).not.toBeInTheDocument()
     expect(screen.queryByTestId('filter-tab-all')).not.toBeInTheDocument()
 
     // The duplicate row is read-only in this view (static text, not editable inputs)
-    expect(screen.queryByLabelText('Description', { selector: '#tx-desc-tx-dup-1' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText('Description', { selector: '#tx-desc-tx-dup-1' }),
+    ).not.toBeInTheDocument()
     expect(screen.getByText('Duplicate Salary')).toBeInTheDocument()
 
     // Amount is read-only text, not editable input
-    expect(screen.queryByLabelText('Amount', { selector: '#tx-amount-tx-dup-1' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText('Amount', { selector: '#tx-amount-tx-dup-1' }),
+    ).not.toBeInTheDocument()
 
     // No remove trash button for duplicate transactions
     expect(screen.queryByRole('button', { name: 'Remove transaction' })).not.toBeInTheDocument()
@@ -581,8 +587,18 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('offers to bulk apply changes when an unlocked transaction is edited and matching identical transactions exist', () => {
-    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Gym Membership', amount: -45 }
-    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Gym Membership', amount: -45 }
+    const tx1 = {
+      ...mockTransactions[0],
+      id: 'tx-dup-1',
+      description: 'Gym Membership',
+      amount: -45,
+    }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-dup-2',
+      description: 'Gym Membership',
+      amount: -45,
+    }
     const tx3 = { ...mockTransactions[0], id: 'tx-other', description: 'Coffee', amount: -5 }
     const onUpdate = vi.fn()
     const onUnlock = vi.fn()
@@ -604,7 +620,9 @@ describe('TransactionPreviewModal (Shared)', () => {
 
     // Bulk apply banner appears offering to apply to 1 other identical transaction
     expect(screen.getByTestId('bulk-apply-banner')).toBeInTheDocument()
-    expect(screen.getByText(/Apply this change to 1 other identical transaction/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Apply this change to 1 other identical transaction/i),
+    ).toBeInTheDocument()
 
     // Clicking "Apply to all"
     const applyBtn = screen.getByTestId('apply-bulk-changes-btn')
@@ -622,9 +640,24 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('unlocks ALL identical transactions in bulk even if not in duplicateIds set', () => {
-    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Loan Repayment', amount: -502.58 }
-    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Loan Repayment', amount: -502.58 }
-    const tx3 = { ...mockTransactions[0], id: 'tx-dup-3', description: 'Loan Repayment', amount: -502.58 }
+    const tx1 = {
+      ...mockTransactions[0],
+      id: 'tx-dup-1',
+      description: 'Loan Repayment',
+      amount: -502.58,
+    }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-dup-2',
+      description: 'Loan Repayment',
+      amount: -502.58,
+    }
+    const tx3 = {
+      ...mockTransactions[0],
+      id: 'tx-dup-3',
+      description: 'Loan Repayment',
+      amount: -502.58,
+    }
     const onUpdate = vi.fn()
     const onUnlock = vi.fn()
 
@@ -650,7 +683,9 @@ describe('TransactionPreviewModal (Shared)', () => {
 
     // Bulk apply banner appears offering to apply to 2 other identical transactions
     expect(screen.getByTestId('bulk-apply-banner')).toBeInTheDocument()
-    expect(screen.getByText(/Apply this change to 2 other identical transaction/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Apply this change to 2 other identical transaction/i),
+    ).toBeInTheDocument()
 
     // Click "Apply to all"
     const applyBtn = screen.getByTestId('apply-bulk-changes-btn')
@@ -675,8 +710,18 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('offers to apply changes to all other unlocked transactions when an unlocked transaction is modified', () => {
-    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Credit Rate Loan', amount: -1000 }
-    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Gym Membership', amount: -45 }
+    const tx1 = {
+      ...mockTransactions[0],
+      id: 'tx-dup-1',
+      description: 'Credit Rate Loan',
+      amount: -1000,
+    }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-dup-2',
+      description: 'Gym Membership',
+      amount: -45,
+    }
     const onUpdate = vi.fn()
 
     render(
@@ -706,9 +751,27 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('allows granular bulk adjustments via modal selecting specific fields and target transactions', () => {
-    const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Monthly Retainer', amount: 2000, date: '2026-03-01' }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Consulting Fee', amount: 1500, date: '2026-03-02' }
-    const tx3 = { ...mockTransactions[0], id: 'tx-3', description: 'Advisory Fee', amount: 800, date: '2026-03-03' }
+    const tx1 = {
+      ...mockTransactions[0],
+      id: 'tx-1',
+      description: 'Monthly Retainer',
+      amount: 2000,
+      date: '2026-03-01',
+    }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Consulting Fee',
+      amount: 1500,
+      date: '2026-03-02',
+    }
+    const tx3 = {
+      ...mockTransactions[0],
+      id: 'tx-3',
+      description: 'Advisory Fee',
+      amount: 800,
+      date: '2026-03-03',
+    }
     const onUpdate = vi.fn()
 
     render(
@@ -752,8 +815,18 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('restores bulk apply offer when modal is closed and reopened with a modified unlocked transaction', () => {
-    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Netflix Subscription', amount: -15 }
-    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Netflix Subscription', amount: -15 }
+    const tx1 = {
+      ...mockTransactions[0],
+      id: 'tx-dup-1',
+      description: 'Netflix Subscription',
+      amount: -15,
+    }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-dup-2',
+      description: 'Netflix Subscription',
+      amount: -15,
+    }
     const onUpdate = vi.fn()
 
     const { rerender } = render(
@@ -807,8 +880,18 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('opens adjust modal from banner adjust button and verifies Select All orange style', () => {
-    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Monthly Cloud Storage', amount: -9.99 }
-    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Monthly Cloud Storage', amount: -9.99 }
+    const tx1 = {
+      ...mockTransactions[0],
+      id: 'tx-dup-1',
+      description: 'Monthly Cloud Storage',
+      amount: -9.99,
+    }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-dup-2',
+      description: 'Monthly Cloud Storage',
+      amount: -9.99,
+    }
     const onUpdate = vi.fn()
 
     render(
@@ -963,8 +1046,18 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('allows bulk resetting modified transactions from the banner button', () => {
-    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Gym Membership', amount: -50 }
-    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Gym Membership', amount: -50 }
+    const tx1 = {
+      ...mockTransactions[0],
+      id: 'tx-dup-1',
+      description: 'Gym Membership',
+      amount: -50,
+    }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-dup-2',
+      description: 'Gym Membership',
+      amount: -50,
+    }
     const onUpdate = vi.fn()
 
     render(
@@ -1009,8 +1102,18 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('unlocks all identical duplicates when user chooses to unlock all in UnlockDuplicateModal', () => {
-    const tx1 = { ...mockTransactions[0], id: 'tx-dup-1', description: 'Monthly Netflix', amount: -15.99 }
-    const tx2 = { ...mockTransactions[1], id: 'tx-dup-2', description: 'Monthly Netflix', amount: -15.99 }
+    const tx1 = {
+      ...mockTransactions[0],
+      id: 'tx-dup-1',
+      description: 'Monthly Netflix',
+      amount: -15.99,
+    }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-dup-2',
+      description: 'Monthly Netflix',
+      amount: -15.99,
+    }
     const onUnlock = vi.fn()
 
     render(
@@ -1132,7 +1235,12 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('renders duplicate filter button in toolbar and filters duplicates on click', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Groceries Dup',
+      isDuplicate: true,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1167,7 +1275,12 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('allows toggling between duplicates and all transactions when opened with initialFilter="duplicates"', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Normal Transaction' }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Duplicate Transaction', isDuplicate: true }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Duplicate Transaction',
+      isDuplicate: true,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1198,7 +1311,12 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('does not render Unlocked filter button when isImport is false, even if duplicate transactions exist', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Groceries Dup',
+      isDuplicate: true,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1218,7 +1336,12 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('renders Unlocked filter button during import when duplicates exist', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Groceries Dup',
+      isDuplicate: true,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1236,8 +1359,20 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('renders Modified filter button and filters to modified duplicates', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true, isModified: false }
-    const tx3 = { ...mockTransactions[1], id: 'tx-3', description: 'Groceries Modified', isDuplicate: true, isModified: true }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Groceries Dup',
+      isDuplicate: true,
+      isModified: false,
+    }
+    const tx3 = {
+      ...mockTransactions[1],
+      id: 'tx-3',
+      description: 'Groceries Modified',
+      isDuplicate: true,
+      isModified: true,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1263,8 +1398,20 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('renders duplicate pill on transaction level when filtered by duplicates, matching modified pill in modified view', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Dup', isDuplicate: true, isModified: false }
-    const tx3 = { ...mockTransactions[1], id: 'tx-3', description: 'Groceries Modified', isDuplicate: true, isModified: true }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Groceries Dup',
+      isDuplicate: true,
+      isModified: false,
+    }
+    const tx3 = {
+      ...mockTransactions[1],
+      id: 'tx-3',
+      description: 'Groceries Modified',
+      isDuplicate: true,
+      isModified: true,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1296,8 +1443,18 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('renders Already Duplicated filter button, filters list, and displays notice banner', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Normal Dup', isDuplicate: true }
-    const tx3 = { ...mockTransactions[1], id: 'tx-3', description: 'Groceries Already Dup', isDuplicate: true }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Groceries Normal Dup',
+      isDuplicate: true,
+    }
+    const tx3 = {
+      ...mockTransactions[1],
+      id: 'tx-3',
+      description: 'Groceries Already Dup',
+      isDuplicate: true,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1341,7 +1498,12 @@ describe('TransactionPreviewModal (Shared)', () => {
 
   it('displays alreadyDuplicated badge on transaction row when flagged in alreadyDuplicatedIds', () => {
     const tx1 = { ...mockTransactions[0], id: 'tx-1', description: 'Salary', isDuplicate: false }
-    const tx2 = { ...mockTransactions[1], id: 'tx-2', description: 'Groceries Already Dup', isDuplicate: true }
+    const tx2 = {
+      ...mockTransactions[1],
+      id: 'tx-2',
+      description: 'Groceries Already Dup',
+      isDuplicate: true,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1365,9 +1527,24 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('renders Excluded filter button with correct total count and filters all excluded transactions', () => {
-    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
-    const duplicateTx = { ...mockTransactions[1], id: 'tx-dup', description: 'Locked Duplicate', amount: -50 }
-    const internalTransferTx = { ...mockTransactions[1], id: 'tx-internal', description: 'Draft Transfer to Savings', amount: -100 }
+    const normalTx = {
+      ...mockTransactions[0],
+      id: 'tx-normal',
+      description: 'Normal Income',
+      amount: 500,
+    }
+    const duplicateTx = {
+      ...mockTransactions[1],
+      id: 'tx-dup',
+      description: 'Locked Duplicate',
+      amount: -50,
+    }
+    const internalTransferTx = {
+      ...mockTransactions[1],
+      id: 'tx-internal',
+      description: 'Draft Transfer to Savings',
+      amount: -100,
+    }
     const spaceTx: Transaction = {
       id: 'tx-space',
       date: '2026-03-01',
@@ -1448,8 +1625,18 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('filters specifically by Sub-account Transfers when clicked', () => {
-    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
-    const duplicateTx = { ...mockTransactions[1], id: 'tx-dup', description: 'Locked Duplicate', amount: -50 }
+    const normalTx = {
+      ...mockTransactions[0],
+      id: 'tx-normal',
+      description: 'Normal Income',
+      amount: 500,
+    }
+    const duplicateTx = {
+      ...mockTransactions[1],
+      id: 'tx-dup',
+      description: 'Locked Duplicate',
+      amount: -50,
+    }
     const spaceTx: Transaction = {
       id: 'tx-space',
       date: '2026-03-01',
@@ -1482,8 +1669,18 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('filters specifically by Internal Transfers when clicked', () => {
-    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
-    const internalTransferTx = { ...mockTransactions[1], id: 'tx-internal', description: 'Inter-Account Transfer', amount: -100 }
+    const normalTx = {
+      ...mockTransactions[0],
+      id: 'tx-normal',
+      description: 'Normal Income',
+      amount: 500,
+    }
+    const internalTransferTx = {
+      ...mockTransactions[1],
+      id: 'tx-internal',
+      description: 'Inter-Account Transfer',
+      amount: -100,
+    }
 
     render(
       <TransactionPreviewModal
@@ -1577,7 +1774,9 @@ describe('TransactionPreviewModal (Shared)', () => {
 
     // Notice banner updates for Commerzbank
     const noticeCb = screen.getByTestId('excluded-items-notice')
-    expect(noticeCb).toHaveTextContent(/These already imported items from Commerzbank will now be excluded from calculations/i)
+    expect(noticeCb).toHaveTextContent(
+      /These already imported items from Commerzbank will now be excluded from calculations/i,
+    )
 
     // 3. Switch back to All Accounts
     fireEvent.click(allPill)
@@ -1642,12 +1841,24 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(screen.queryByText('Out to Commerzbank')).not.toBeInTheDocument()
 
     const noticeCb = screen.getByTestId('internal-transfers-notice')
-    expect(noticeCb).toHaveTextContent(/These internal transfers from Commerzbank were already imported/i)
+    expect(noticeCb).toHaveTextContent(
+      /These internal transfers from Commerzbank were already imported/i,
+    )
   })
 
   it('hides all scope filter buttons and shows only sub-account transfers when opened with initialFilter="space-transfers"', () => {
-    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Salary Income', amount: 3000 }
-    const dupTx = { ...mockTransactions[1], id: 'tx-dup', description: 'Duplicated Expense', amount: -50 }
+    const normalTx = {
+      ...mockTransactions[0],
+      id: 'tx-normal',
+      description: 'Salary Income',
+      amount: 3000,
+    }
+    const dupTx = {
+      ...mockTransactions[1],
+      id: 'tx-dup',
+      description: 'Duplicated Expense',
+      amount: -50,
+    }
     const spaceTx: Transaction = {
       id: 'tx-space-1',
       date: '2026-03-01',
@@ -1689,7 +1900,12 @@ describe('TransactionPreviewModal (Shared)', () => {
   })
 
   it('hides scope filter buttons but keeps account filter bar when opened with initialFilter="internal-transfers"', () => {
-    const normalTx = { ...mockTransactions[0], id: 'tx-normal', description: 'Normal Income', amount: 500 }
+    const normalTx = {
+      ...mockTransactions[0],
+      id: 'tx-normal',
+      description: 'Normal Income',
+      amount: 500,
+    }
     const internalTx: Transaction = {
       id: 'tx-internal-1',
       date: '2026-03-01',
@@ -1808,7 +2024,9 @@ describe('TransactionPreviewModal (Shared)', () => {
 
     // Default notice
     expect(
-      screen.getByText('Sub-account transfers are automatically excluded to prevent double counting.'),
+      screen.getByText(
+        'Sub-account transfers are automatically excluded to prevent double counting.',
+      ),
     ).toBeInTheDocument()
 
     // Click on 'Investment fund' pill
@@ -1948,6 +2166,3 @@ describe('TransactionPreviewModal (Shared)', () => {
     expect(cbLogo).toHaveAttribute('src', '/banks/commerzbank.png')
   })
 })
-
-
-

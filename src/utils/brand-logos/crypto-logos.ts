@@ -106,16 +106,15 @@ CoinbaseLogo.displayName = 'CoinbaseLogo'
 export const CRYPTO_LOGOS: Record<string, IconComponent> = {
   CoinbaseLogo,
   coinbaseLogo: CoinbaseLogo,
-  'coinbase': CoinbaseLogo,
+  coinbase: CoinbaseLogo,
   GuardarianLogo,
-  'guardarian': GuardarianLogo,
+  guardarian: GuardarianLogo,
   KrakenLogo,
-  'kraken': KrakenLogo,
+  kraken: KrakenLogo,
   EtoroLogo,
-  'etoro': EtoroLogo,
+  etoro: EtoroLogo,
   NagaLogo,
   nagaLogo: NagaLogo,
-  'naga': NagaLogo,
+  naga: NagaLogo,
   'naga-markets': NagaLogo,
 }
-

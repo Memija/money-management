@@ -233,7 +233,9 @@ describe('BackupRestore', () => {
       render(<BackupRestore />)
 
       const fileInput = screen.getByTestId('restore-file-input')
-      const invalidFile = new File(['invalid content'], 'invalid.json', { type: 'application/json' })
+      const invalidFile = new File(['invalid content'], 'invalid.json', {
+        type: 'application/json',
+      })
 
       fireEvent.change(fileInput, { target: { files: [invalidFile] } })
 

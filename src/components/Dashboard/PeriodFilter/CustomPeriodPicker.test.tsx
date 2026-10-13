@@ -19,7 +19,7 @@ describe('CustomPeriodPicker', () => {
         options={defaultOptions}
         onChange={handleChange}
         ariaLabel="Filter by month"
-      />
+      />,
     )
 
     const trigger = screen.getByRole('button', { name: /Filter by month/i })
@@ -35,7 +35,7 @@ describe('CustomPeriodPicker', () => {
         options={defaultOptions}
         onChange={handleChange}
         ariaLabel="Filter by month"
-      />
+      />,
     )
 
     const trigger = screen.getByRole('button', { name: /Filter by month/i })

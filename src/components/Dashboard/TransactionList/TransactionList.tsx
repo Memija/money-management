@@ -371,7 +371,14 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
         })
       }
       return options
-    }, [availableCategories, categoryFilter, filterTransactionsWithoutLogos, t, locale, customCategories])
+    }, [
+      availableCategories,
+      categoryFilter,
+      filterTransactionsWithoutLogos,
+      t,
+      locale,
+      customCategories,
+    ])
 
     // Filter transactions by Type (All / Income / Expense / Transfers / Duplicates / Modified)
     // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', 'expense', 'duplicates', or 'modified'!

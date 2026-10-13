@@ -17,215 +17,214 @@ interface CustomPeriodPickerProps {
   ariaLabel?: string
 }
 
-export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = React.memo(({
-  mode,
-  value,
-  options,
-  onChange,
-  ariaLabel,
-}) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const locale = useLanguageStore((s) => s.locale)
+export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = React.memo(
+  ({ mode, value, options, onChange, ariaLabel }) => {
+    const [isOpen, setIsOpen] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
+    const dropdownRef = useRef<HTMLDivElement>(null)
+    const locale = useLanguageStore((s) => s.locale)
 
-  useDropdownPosition({
-    isOpen,
-    triggerRef: containerRef,
-    dropdownRef,
-    padding: 12,
-    estimatedHeight: 220,
-    usePortal: true,
-    align: 'right',
-  })
+    useDropdownPosition({
+      isOpen,
+      triggerRef: containerRef,
+      dropdownRef,
+      padding: 12,
+      estimatedHeight: 220,
+      usePortal: true,
+      align: 'right',
+    })
 
-  // Initialize view year based on selected value or the most recent option
-  const initialYear = useMemo(() => {
-    if (value) {
-      return parseInt(value.split('-')[0], 10)
-    }
-    if (options.length > 0) {
-      return parseInt(options[0].split('-')[0], 10)
-    }
-    return new Date().getFullYear()
-  }, [value, options])
-
-  const [viewYear, setViewYear] = useState<number>(initialYear)
-
-  useEffect(() => {
-    const handleClickOutside = (event: Event) => {
-      const target = event.target as Node
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(target) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(target)
-      ) {
-        setIsOpen(false)
+    // Initialize view year based on selected value or the most recent option
+    const initialYear = useMemo(() => {
+      if (value) {
+        return parseInt(value.split('-')[0], 10)
       }
+      if (options.length > 0) {
+        return parseInt(options[0].split('-')[0], 10)
+      }
+      return new Date().getFullYear()
+    }, [value, options])
+
+    const [viewYear, setViewYear] = useState<number>(initialYear)
+
+    useEffect(() => {
+      const handleClickOutside = (event: Event) => {
+        const target = event.target as Node
+        if (
+          containerRef.current &&
+          !containerRef.current.contains(target) &&
+          dropdownRef.current &&
+          !dropdownRef.current.contains(target)
+        ) {
+          setIsOpen(false)
+        }
+      }
+      document.addEventListener('pointerdown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('touchstart', handleClickOutside)
+      return () => {
+        document.removeEventListener('pointerdown', handleClickOutside)
+        document.removeEventListener('mousedown', handleClickOutside)
+        document.removeEventListener('touchstart', handleClickOutside)
+      }
+    }, [])
+
+    const toggleDropdown = () => {
+      if (!isOpen) {
+        setViewYear(initialYear)
+      }
+      setIsOpen(!isOpen)
     }
-    document.addEventListener('pointerdown', handleClickOutside)
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('touchstart', handleClickOutside)
-    return () => {
-      document.removeEventListener('pointerdown', handleClickOutside)
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside)
+
+    const handleSelect = (selectedValue: string) => {
+      onChange(selectedValue)
+      setIsOpen(false)
     }
-  }, [])
 
-  const toggleDropdown = () => {
-    if (!isOpen) {
-      setViewYear(initialYear)
-    }
-    setIsOpen(!isOpen)
-  }
+    // --- Display Label Formatting ---
+    const displayLabel = useMemo(() => {
+      if (!value) return ''
+      if (mode === 'year') return value
+      if (mode === 'quarter') {
+        const [y, q] = value.split('-')
+        return `${q} ${y}`
+      }
+      if (mode === 'month') {
+        return formatMonthYearLocalized(value, locale, 'numeric')
+      }
+      return value
+    }, [value, mode, locale])
 
-  const handleSelect = (selectedValue: string) => {
-    onChange(selectedValue)
-    setIsOpen(false)
-  }
+    // --- Grid Data Generation ---
+    const availableYears = useMemo(() => {
+      const years = new Set(options.map((opt) => parseInt(opt.split('-')[0], 10)))
+      return Array.from(years).sort((a, b) => b - a) // descending
+    }, [options])
 
-  // --- Display Label Formatting ---
-  const displayLabel = useMemo(() => {
-    if (!value) return ''
-    if (mode === 'year') return value
-    if (mode === 'quarter') {
-      const [y, q] = value.split('-')
-      return `${q} ${y}`
-    }
-    if (mode === 'month') {
-      return formatMonthYearLocalized(value, locale, 'numeric')
-    }
-    return value
-  }, [value, mode, locale])
+    const monthNames = useMemo(() => getLocalizedMonthNames(locale, 'short'), [locale])
 
-  // --- Grid Data Generation ---
-  const availableYears = useMemo(() => {
-    const years = new Set(options.map((opt) => parseInt(opt.split('-')[0], 10)))
-    return Array.from(years).sort((a, b) => b - a) // descending
-  }, [options])
-
-  const monthNames = useMemo(() => getLocalizedMonthNames(locale, 'short'), [locale])
-
-  // --- Rendering Grid Items ---
-  const renderYearGrid = () => {
-    return (
-      <div className={`${styles.grid} ${styles.years}`}>
-        {availableYears.map((year) => (
-          <button
-            key={year}
-            className={`${styles.item} ${value === year.toString() ? styles.selected : ''}`}
-            onClick={() => handleSelect(year.toString())}
-          >
-            {year}
-          </button>
-        ))}
-      </div>
-    )
-  }
-
-  const renderQuarterGrid = () => {
-    const quarters = ['Q1', 'Q2', 'Q3', 'Q4']
-    return (
-      <div className={styles.grid}>
-        {quarters.map((q) => {
-          const quarterValue = `${viewYear}-${q}`
-          const isAvailable = options.includes(quarterValue)
-          const isSelected = value === quarterValue
-          return (
+    // --- Rendering Grid Items ---
+    const renderYearGrid = () => {
+      return (
+        <div className={`${styles.grid} ${styles.years}`}>
+          {availableYears.map((year) => (
             <button
-              key={q}
-              className={`
+              key={year}
+              className={`${styles.item} ${value === year.toString() ? styles.selected : ''}`}
+              onClick={() => handleSelect(year.toString())}
+            >
+              {year}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    const renderQuarterGrid = () => {
+      const quarters = ['Q1', 'Q2', 'Q3', 'Q4']
+      return (
+        <div className={styles.grid}>
+          {quarters.map((q) => {
+            const quarterValue = `${viewYear}-${q}`
+            const isAvailable = options.includes(quarterValue)
+            const isSelected = value === quarterValue
+            return (
+              <button
+                key={q}
+                className={`
                 ${styles.item} 
                 ${isSelected ? styles.selected : ''} 
                 ${!isAvailable && !isSelected ? styles.disabled : ''}
               `}
-              disabled={!isAvailable && !isSelected}
-              onClick={() => handleSelect(quarterValue)}
-            >
-              {q}
-            </button>
-          )
-        })}
-      </div>
-    )
-  }
+                disabled={!isAvailable && !isSelected}
+                onClick={() => handleSelect(quarterValue)}
+              >
+                {q}
+              </button>
+            )
+          })}
+        </div>
+      )
+    }
 
-  const renderMonthGrid = () => {
-    return (
-      <div className={styles.grid}>
-        {monthNames.map((month, index) => {
-          const monthStr = String(index + 1).padStart(2, '0')
-          const monthValue = `${viewYear}-${monthStr}`
-          const isAvailable = options.includes(monthValue)
-          const isSelected = value === monthValue
-          return (
-            <button
-              key={monthValue}
-              className={`
+    const renderMonthGrid = () => {
+      return (
+        <div className={styles.grid}>
+          {monthNames.map((month, index) => {
+            const monthStr = String(index + 1).padStart(2, '0')
+            const monthValue = `${viewYear}-${monthStr}`
+            const isAvailable = options.includes(monthValue)
+            const isSelected = value === monthValue
+            return (
+              <button
+                key={monthValue}
+                className={`
                 ${styles.item} 
                 ${isSelected ? styles.selected : ''} 
                 ${!isAvailable && !isSelected ? styles.disabled : ''}
               `}
-              disabled={!isAvailable && !isSelected}
-              onClick={() => handleSelect(monthValue)}
-            >
-              {month}
-            </button>
-          )
-        })}
-      </div>
-    )
-  }
+                disabled={!isAvailable && !isSelected}
+                onClick={() => handleSelect(monthValue)}
+              >
+                {month}
+              </button>
+            )
+          })}
+        </div>
+      )
+    }
 
-  return (
-    <div className={`${styles.container} ${isOpen ? styles.containerOpen : ''}`} ref={containerRef}>
-      <button
-        className={styles.trigger}
-        onClick={toggleDropdown}
-        aria-label={ariaLabel}
-        title={ariaLabel}
+    return (
+      <div
+        className={`${styles.container} ${isOpen ? styles.containerOpen : ''}`}
+        ref={containerRef}
       >
-        <span>{displayLabel}</span>
-        <ChevronDown className={styles.icon} />
-      </button>
+        <button
+          className={styles.trigger}
+          onClick={toggleDropdown}
+          aria-label={ariaLabel}
+          title={ariaLabel}
+        >
+          <span>{displayLabel}</span>
+          <ChevronDown className={styles.icon} />
+        </button>
 
-      {isOpen &&
-        createPortal(
-          <div ref={dropdownRef} className={styles.dropdown}>
-            {mode !== 'year' && (
-              <div className={styles.header}>
-                <button
-                  className={styles['nav-button']}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setViewYear(viewYear - 1)
-                  }}
-                  disabled={!availableYears.includes(viewYear - 1)}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <span>{viewYear}</span>
-                <button
-                  className={styles['nav-button']}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setViewYear(viewYear + 1)
-                  }}
-                  disabled={!availableYears.includes(viewYear + 1)}
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            )}
+        {isOpen &&
+          createPortal(
+            <div ref={dropdownRef} className={styles.dropdown}>
+              {mode !== 'year' && (
+                <div className={styles.header}>
+                  <button
+                    className={styles['nav-button']}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setViewYear(viewYear - 1)
+                    }}
+                    disabled={!availableYears.includes(viewYear - 1)}
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <span>{viewYear}</span>
+                  <button
+                    className={styles['nav-button']}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setViewYear(viewYear + 1)
+                    }}
+                    disabled={!availableYears.includes(viewYear + 1)}
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
 
-            {mode === 'year' && renderYearGrid()}
-            {mode === 'quarter' && renderQuarterGrid()}
-            {mode === 'month' && renderMonthGrid()}
-          </div>,
-          document.body,
-        )}
-    </div>
-  )
-})
+              {mode === 'year' && renderYearGrid()}
+              {mode === 'quarter' && renderQuarterGrid()}
+              {mode === 'month' && renderMonthGrid()}
+            </div>,
+            document.body,
+          )}
+      </div>
+    )
+  },
+)

@@ -74,12 +74,7 @@ export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
 
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        title={t.quickCreateCategoryTitle}
-        maxWidth="440px"
-      >
+      <Modal isOpen={isOpen} onClose={onClose} title={t.quickCreateCategoryTitle} maxWidth="440px">
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
             <label htmlFor="quick-category-name" className={styles.label}>
@@ -98,20 +93,21 @@ export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
 
           <div className={styles.field}>
             <div className={styles.fieldHeader}>
-              <label className={styles.label}>
-                {t.chooseIconTitle || 'Choose Icon'}
-              </label>
+              <label className={styles.label}>{t.chooseIconTitle || 'Choose Icon'}</label>
               {selectedIcon && (
                 <span
                   className={styles.selectedIconChip}
-                  style={{
-                    '--chip-color': ICON_COLORS[selectedIcon] || '#8b5cf6',
-                  } as React.CSSProperties}
+                  style={
+                    {
+                      '--chip-color': ICON_COLORS[selectedIcon] || '#8b5cf6',
+                    } as React.CSSProperties
+                  }
                 >
-                  {SelectedIconComp && React.createElement(SelectedIconComp, {
-                    size: 13,
-                    color: ICON_COLORS[selectedIcon] || '#8b5cf6',
-                  })}
+                  {SelectedIconComp &&
+                    React.createElement(SelectedIconComp, {
+                      size: 13,
+                      color: ICON_COLORS[selectedIcon] || '#8b5cf6',
+                    })}
                   <span>{t.icons?.[selectedIcon] || selectedIcon}</span>
                 </span>
               )}
@@ -133,9 +129,11 @@ export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
                     onClick={() => setSelectedIcon(iconKey)}
                     title={localizedTitle}
                     aria-label={localizedTitle}
-                    style={{
-                      '--icon-color': color,
-                    } as React.CSSProperties}
+                    style={
+                      {
+                        '--icon-color': color,
+                      } as React.CSSProperties
+                    }
                   >
                     <IconComp size={18} color={color} />
                   </button>
@@ -154,18 +152,10 @@ export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
           </div>
 
           <div className={styles.actions}>
-            <button
-              type="button"
-              className={styles.cancelBtn}
-              onClick={onClose}
-            >
+            <button type="button" className={styles.cancelBtn} onClick={onClose}>
               {t.cancel || 'Cancel'}
             </button>
-            <button
-              type="submit"
-              disabled={!name.trim()}
-              className={styles.submitBtn}
-            >
+            <button type="submit" disabled={!name.trim()} className={styles.submitBtn}>
               <Sparkles size={14} />
               {t.createAndApply || 'Create & Apply'}
             </button>

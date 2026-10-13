@@ -16,7 +16,9 @@ export interface BoundedCache<V> {
  * Creates a bounded FIFO cache keyed by strings.
  * @param maxSize - Maximum number of entries kept before evicting the oldest
  */
-export const createBoundedCache = <V>(maxSize: number = DEFAULT_MAX_CACHE_SIZE): BoundedCache<V> => {
+export const createBoundedCache = <V>(
+  maxSize: number = DEFAULT_MAX_CACHE_SIZE,
+): BoundedCache<V> => {
   const store = new Map<string, V>()
   return {
     get: (key) => store.get(key),

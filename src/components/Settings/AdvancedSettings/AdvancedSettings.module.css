@@ -60,7 +60,9 @@
   justify-content: space-between;
   align-items: center;
   gap: 1.5rem;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .optionCard:hover {
@@ -150,7 +152,10 @@
   padding: 2px;
   display: inline-flex;
   align-items: center;
-  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.2s ease;
   outline: none;
 }
 

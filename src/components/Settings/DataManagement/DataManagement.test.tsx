@@ -52,7 +52,8 @@ vi.mock('../../../store/useLanguageStore', () => ({
         noConnectedBanks: 'No accounts imported yet',
         deleteBankTransactions: 'Delete Transactions',
         deleteBankTransactionsTitle: 'Delete {bank} Transactions',
-        deleteBankTransactionsConfirm: 'Are you sure you want to delete all transactions and data for {bank}?',
+        deleteBankTransactionsConfirm:
+          'Are you sure you want to delete all transactions and data for {bank}?',
         cancel: 'Cancel',
       },
     }
@@ -101,7 +102,9 @@ describe('DataManagement Component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
 
     await waitFor(() => {
-      expect(screen.queryByText('Are you sure you want to delete all data?')).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Are you sure you want to delete all data?'),
+      ).not.toBeInTheDocument()
     })
     expect(mockClearAllData).not.toHaveBeenCalled()
   })
@@ -171,7 +174,9 @@ describe('DataManagement Component', () => {
 
     expect(screen.getByText('Delete Commerzbank Transactions')).toBeInTheDocument()
     expect(
-      screen.getByText('Are you sure you want to delete all transactions and data for Commerzbank?'),
+      screen.getByText(
+        'Are you sure you want to delete all transactions and data for Commerzbank?',
+      ),
     ).toBeInTheDocument()
   })
 

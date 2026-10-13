@@ -226,7 +226,9 @@ const RawAnadoluSupermarktLogo = createImageLogo({
   label: 'Anadolu Supermarkt',
   displayName: 'AnadoluSupermarktLogo',
 })
-export const AnadoluSupermarktLogo: IconComponent = (props) => <RawAnadoluSupermarktLogo {...props} />
+export const AnadoluSupermarktLogo: IconComponent = (props) => (
+  <RawAnadoluSupermarktLogo {...props} />
+)
 AnadoluSupermarktLogo.displayName = 'AnadoluSupermarktLogo'
 
 // Transgourmet
@@ -380,7 +382,7 @@ export const GROCERY_LOGOS: Record<string, IconComponent> = {
   ZabkaLogo,
   zabkaLogo: ZabkaLogo,
   zabka: ZabkaLogo,
-  'żabka': ZabkaLogo,
+  żabka: ZabkaLogo,
   SiZabka: ZabkaLogo,
 
   // Carrefour

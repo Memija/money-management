@@ -57,8 +57,8 @@ describe('useRecurringTransactions hook', () => {
     expect(result.current.totalMonthly).toBe(15.99)
 
     // Ghost transfers must be completely excluded
-    expect(
-      result.current.recurringExpenses.some((r) => r.name.toLowerCase().includes('n26')),
-    ).toBe(false)
+    expect(result.current.recurringExpenses.some((r) => r.name.toLowerCase().includes('n26'))).toBe(
+      false,
+    )
   })
 })

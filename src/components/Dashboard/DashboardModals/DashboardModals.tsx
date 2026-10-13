@@ -59,7 +59,8 @@ const buildDetailModalConfig = (
   }
   if (modal.type === 'filter') {
     const { filter } = modal
-    const title = filter === 'income' ? t.income : filter === 'expense' ? t.expenses : t.allTransactions
+    const title =
+      filter === 'income' ? t.income : filter === 'expense' ? t.expenses : t.allTransactions
     const variant: 'expense' | 'income' = filter === 'expense' ? 'expense' : 'income'
     const transactions = periodTransactions.filter((tx) => filter === 'all' || tx.type === filter)
     return { title, variant, transactions }
@@ -84,106 +85,113 @@ const buildDetailModalConfig = (
  * (or playing its exit animation), so closed modals cost nothing when the Dashboard
  * re-renders, e.g. on a language switch.
  */
-export const DashboardModals: React.FC<DashboardModalsProps> = React.memo(({
-  period,
-  periodTransactions,
-  monthlyData,
-  categoryBreakdown,
-  totalIncome,
-  totalExpenses,
-  balance,
-  savingsRate,
-  showInstitution,
-  activeDetailModal,
-  onDetailModalClose,
-  avgDetailType,
-  onAvgDetailClose,
-  isSavingsTrendOpen,
-  onSavingsTrendClose,
-  isShareModalOpen,
-  onShareModalClose,
-}) => {
-  const t = useLanguageStore((s) => s.t)
-  const { formatMonthYear } = useFormatters()
+export const DashboardModals: React.FC<DashboardModalsProps> = React.memo(
+  ({
+    period,
+    periodTransactions,
+    monthlyData,
+    categoryBreakdown,
+    totalIncome,
+    totalExpenses,
+    balance,
+    savingsRate,
+    showInstitution,
+    activeDetailModal,
+    onDetailModalClose,
+    avgDetailType,
+    onAvgDetailClose,
+    isSavingsTrendOpen,
+    onSavingsTrendClose,
+    isShareModalOpen,
+    onShareModalClose,
+  }) => {
+    const t = useLanguageStore((s) => s.t)
+    const { formatMonthYear } = useFormatters()
 
-  const isDetailModalOpen = activeDetailModal !== null
-  const shouldRenderDetailModal = useDeferredUnmount(isDetailModalOpen)
-  const shouldRenderSavingsTrend = useDeferredUnmount(isSavingsTrendOpen)
-  const shouldRenderShareModal = useDeferredUnmount(isShareModalOpen)
+    const isDetailModalOpen = activeDetailModal !== null
+    const shouldRenderDetailModal = useDeferredUnmount(isDetailModalOpen)
+    const shouldRenderSavingsTrend = useDeferredUnmount(isSavingsTrendOpen)
+    const shouldRenderShareModal = useDeferredUnmount(isShareModalOpen)
 
-  const detailModalConfig = useMemo(
-    () => buildDetailModalConfig(activeDetailModal, periodTransactions, t),
-    [activeDetailModal, periodTransactions, t],
-  )
+    const detailModalConfig = useMemo(
+      () => buildDetailModalConfig(activeDetailModal, periodTransactions, t),
+      [activeDetailModal, periodTransactions, t],
+    )
 
-  const periodLabel = useMemo(() => {
-    if (period.mode === 'all') {
-      return t.periodAll || 'All'
-    }
-    if (period.mode === 'quarter') {
-      const [year, quarter] = period.value.split('-Q')
-      return `Q${quarter} ${year}`
-    }
-    if (period.mode === 'month') {
-      return formatMonthYear(period.value)
-    }
-    return period.value
-  }, [period, formatMonthYear, t])
+    const periodLabel = useMemo(() => {
+      if (period.mode === 'all') {
+        return t.periodAll || 'All'
+      }
+      if (period.mode === 'quarter') {
+        const [year, quarter] = period.value.split('-Q')
+        return `Q${quarter} ${year}`
+      }
+      if (period.mode === 'month') {
+        return formatMonthYear(period.value)
+      }
+      return period.value
+    }, [period, formatMonthYear, t])
 
-  const shareCardCategories = useMemo(
-    () =>
-      categoryBreakdown.slice(0, SHARE_CARD_CATEGORY_COUNT).map((c) => ({
-        name: getCategoryLabel(c.name, t),
-        amount: c.value,
-        percent: totalExpenses > 0 ? Math.round((c.value / totalExpenses) * 100) : 0,
-        color: c.color,
-      })),
-    [categoryBreakdown, totalExpenses, t],
-  )
+    const shareCardCategories = useMemo(
+      () =>
+        categoryBreakdown.slice(0, SHARE_CARD_CATEGORY_COUNT).map((c) => ({
+          name: getCategoryLabel(c.name, t),
+          amount: c.value,
+          percent: totalExpenses > 0 ? Math.round((c.value / totalExpenses) * 100) : 0,
+          color: c.color,
+        })),
+      [categoryBreakdown, totalExpenses, t],
+    )
 
-  return (
-    <>
-      {shouldRenderDetailModal && (
-        <TransactionPreviewModal
-          isOpen={isDetailModalOpen}
-          onClose={onDetailModalClose}
-          title={detailModalConfig?.title ?? ''}
-          variant={detailModalConfig?.variant ?? 'expense'}
-          transactions={detailModalConfig?.transactions ?? EMPTY_TRANSACTIONS}
-          showInstitution={showInstitution}
-          isImport={false}
-        />
-      )}
+    return (
+      <>
+        {shouldRenderDetailModal && (
+          <TransactionPreviewModal
+            isOpen={isDetailModalOpen}
+            onClose={onDetailModalClose}
+            title={detailModalConfig?.title ?? ''}
+            variant={detailModalConfig?.variant ?? 'expense'}
+            transactions={detailModalConfig?.transactions ?? EMPTY_TRANSACTIONS}
+            showInstitution={showInstitution}
+            isImport={false}
+          />
+        )}
 
-      {avgDetailType !== null && (
-        <AvgDetailModal isOpen onClose={onAvgDetailClose} type={avgDetailType} transactions={periodTransactions} />
-      )}
+        {avgDetailType !== null && (
+          <AvgDetailModal
+            isOpen
+            onClose={onAvgDetailClose}
+            type={avgDetailType}
+            transactions={periodTransactions}
+          />
+        )}
 
-      {shouldRenderSavingsTrend && (
-        <SavingsTrendModal
-          isOpen={isSavingsTrendOpen}
-          onClose={onSavingsTrendClose}
-          monthlyData={monthlyData}
-          totalIncome={totalIncome}
-          totalExpenses={totalExpenses}
-          savingsRate={savingsRate}
-        />
-      )}
+        {shouldRenderSavingsTrend && (
+          <SavingsTrendModal
+            isOpen={isSavingsTrendOpen}
+            onClose={onSavingsTrendClose}
+            monthlyData={monthlyData}
+            totalIncome={totalIncome}
+            totalExpenses={totalExpenses}
+            savingsRate={savingsRate}
+          />
+        )}
 
-      {shouldRenderShareModal && (
-        <ShareSnapshotModal
-          isOpen={isShareModalOpen}
-          onClose={onShareModalClose}
-          periodLabel={periodLabel}
-          totalIncome={totalIncome}
-          totalExpenses={totalExpenses}
-          netSavings={balance}
-          savingsRate={savingsRate}
-          topCategories={shareCardCategories}
-        />
-      )}
-    </>
-  )
-})
+        {shouldRenderShareModal && (
+          <ShareSnapshotModal
+            isOpen={isShareModalOpen}
+            onClose={onShareModalClose}
+            periodLabel={periodLabel}
+            totalIncome={totalIncome}
+            totalExpenses={totalExpenses}
+            netSavings={balance}
+            savingsRate={savingsRate}
+            topCategories={shareCardCategories}
+          />
+        )}
+      </>
+    )
+  },
+)
 
 DashboardModals.displayName = 'DashboardModals'

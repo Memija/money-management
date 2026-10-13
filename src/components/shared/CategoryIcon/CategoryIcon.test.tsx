@@ -18,7 +18,9 @@ describe('CategoryIcon', () => {
   })
 
   it('should render the icon resolved by getCategoryIcon with all inputs', () => {
-    const customCategories = [{ id: 'custom_pets', icon: 'Dog', color: '#fff', translations: { en: 'Pets' } }]
+    const customCategories = [
+      { id: 'custom_pets', icon: 'Dog', color: '#fff', translations: { en: 'Pets' } },
+    ]
     const { getByTestId } = render(
       <CategoryIcon
         category="Groceries"
@@ -30,12 +32,24 @@ describe('CategoryIcon', () => {
     )
 
     expect(getByTestId('category-icon').getAttribute('data-category')).toBe('Groceries')
-    expect(mockedGetCategoryIcon).toHaveBeenCalledWith('Groceries', 20, customCategories, 'REWE Markt', 'DE00')
+    expect(mockedGetCategoryIcon).toHaveBeenCalledWith(
+      'Groceries',
+      20,
+      customCategories,
+      'REWE Markt',
+      'DE00',
+    )
   })
 
   it('should use the default size when none is given', () => {
     render(<CategoryIcon category="Travel" />)
-    expect(mockedGetCategoryIcon).toHaveBeenCalledWith('Travel', 16, undefined, undefined, undefined)
+    expect(mockedGetCategoryIcon).toHaveBeenCalledWith(
+      'Travel',
+      16,
+      undefined,
+      undefined,
+      undefined,
+    )
   })
 
   it('should not resolve the icon again when re-rendered with the same props', () => {

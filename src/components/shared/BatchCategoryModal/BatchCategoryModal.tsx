@@ -243,9 +243,7 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
                   }}
                   onChange={handleToggleSelectAll}
                   aria-label={
-                    isAllSelected
-                      ? t.deselectAll || 'Deselect All'
-                      : t.selectAll || 'Select All'
+                    isAllSelected ? t.deselectAll || 'Deselect All' : t.selectAll || 'Select All'
                   }
                 />
                 <span className={styles.relatedSectionTitle}>
@@ -287,10 +285,7 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
                     handleToggleTx(tx.id)
                   }}
                 >
-                  <div
-                    className={styles.itemCheckboxWrapper}
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <div className={styles.itemCheckboxWrapper} onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
                       id={`batch-select-tx-${tx.id}`}

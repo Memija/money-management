@@ -154,10 +154,7 @@ export function normalizeGermanStateCode(input: string): GermanStateCode | undef
   }
 
   for (const [code, meta] of Object.entries(GERMAN_STATES)) {
-    if (
-      cleaned === meta.name.toLowerCase() ||
-      cleaned === meta.nameDe.toLowerCase()
-    ) {
+    if (cleaned === meta.name.toLowerCase() || cleaned === meta.nameDe.toLowerCase()) {
       return code as GermanStateCode
     }
   }
@@ -167,10 +164,7 @@ export function normalizeGermanStateCode(input: string): GermanStateCode | undef
 /**
  * Creates a standard IconComponent for a German federal state flag.
  */
-export function createGermanStateFlag(
-  code: GermanStateCode,
-  displayName: string,
-): IconComponent {
+export function createGermanStateFlag(code: GermanStateCode, displayName: string): IconComponent {
   const FlagIcon: IconComponent = ({ size = 16, className }) => {
     const stateMeta = GERMAN_STATES[code]
     return React.createElement('img', {
@@ -205,7 +199,10 @@ export const BrandenburgFlagLogo = createGermanStateFlag('bb', 'BrandenburgFlagL
 export const BremenFlagLogo = createGermanStateFlag('hb', 'BremenFlagLogo')
 export const HamburgFlagLogo = createGermanStateFlag('hh', 'HamburgFlagLogo')
 export const HessenStateFlagLogo = createGermanStateFlag('he', 'HessenStateFlagLogo')
-export const MecklenburgVorpommernFlagLogo = createGermanStateFlag('mv', 'MecklenburgVorpommernFlagLogo')
+export const MecklenburgVorpommernFlagLogo = createGermanStateFlag(
+  'mv',
+  'MecklenburgVorpommernFlagLogo',
+)
 export const NiedersachsenFlagLogo = createGermanStateFlag('ni', 'NiedersachsenFlagLogo')
 export const NordrheinWestfalenFlagLogo = createGermanStateFlag('nw', 'NordrheinWestfalenFlagLogo')
 export const RheinlandPfalzFlagLogo = createGermanStateFlag('rp', 'RheinlandPfalzFlagLogo')

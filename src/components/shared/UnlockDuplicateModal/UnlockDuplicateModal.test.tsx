@@ -72,9 +72,7 @@ describe('UnlockDuplicateModal', () => {
   it('renders warning details and transaction info when open', () => {
     render(<UnlockDuplicateModal {...defaultProps} />)
     expect(screen.getByText('Unlock Duplicate Transaction')).toBeInTheDocument()
-    expect(
-      screen.getByText(/This transaction was flagged as a duplicate/i),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/This transaction was flagged as a duplicate/i)).toBeInTheDocument()
     expect(screen.getByText('Starbucks Coffee')).toBeInTheDocument()
     expect(screen.getByText('2026-03-01')).toBeInTheDocument()
     expect(screen.getByText('€4.50')).toBeInTheDocument()
@@ -138,7 +136,9 @@ describe('UnlockDuplicateModal', () => {
 
     expect(screen.getByTestId('identical-duplicates-notice')).toBeInTheDocument()
     expect(screen.getByTestId('confirm-unlock-single-btn')).toHaveTextContent('Unlock only this')
-    expect(screen.getByTestId('confirm-unlock-all-btn')).toHaveTextContent('Unlock all 3 identical transactions')
+    expect(screen.getByTestId('confirm-unlock-all-btn')).toHaveTextContent(
+      'Unlock all 3 identical transactions',
+    )
 
     // Click "Unlock all 3 identical transactions"
     fireEvent.click(screen.getByTestId('confirm-unlock-all-btn'))

@@ -38,15 +38,29 @@ describe('computeImportFingerprint', () => {
   })
 
   it('is ID-independent — different IDs but same content yield the same fingerprint', () => {
-    const tx1 = makeTransaction({ id: 'aaa', date: '2025-03-01', amount: -100, description: 'Rent' })
-    const tx2 = makeTransaction({ id: 'bbb', date: '2025-03-01', amount: -100, description: 'Rent' })
+    const tx1 = makeTransaction({
+      id: 'aaa',
+      date: '2025-03-01',
+      amount: -100,
+      description: 'Rent',
+    })
+    const tx2 = makeTransaction({
+      id: 'bbb',
+      date: '2025-03-01',
+      amount: -100,
+      description: 'Rent',
+    })
 
     expect(computeImportFingerprint([tx1])).toBe(computeImportFingerprint([tx2]))
   })
 
   it('produces different fingerprints for different transaction sets', () => {
-    const set1 = [makeTransaction({ date: '2025-03-01', amount: -45.9, description: 'Supermarket' })]
-    const set2 = [makeTransaction({ date: '2025-03-01', amount: -50.0, description: 'Supermarket' })]
+    const set1 = [
+      makeTransaction({ date: '2025-03-01', amount: -45.9, description: 'Supermarket' }),
+    ]
+    const set2 = [
+      makeTransaction({ date: '2025-03-01', amount: -50.0, description: 'Supermarket' }),
+    ]
 
     expect(computeImportFingerprint(set1)).not.toBe(computeImportFingerprint(set2))
   })
@@ -59,7 +73,9 @@ describe('computeImportFingerprint', () => {
   })
 
   it('produces different fingerprints when a transaction is added', () => {
-    const base = [makeTransaction({ date: '2025-03-01', amount: -45.9, description: 'Supermarket' })]
+    const base = [
+      makeTransaction({ date: '2025-03-01', amount: -45.9, description: 'Supermarket' }),
+    ]
     const extended = [
       ...base,
       makeTransaction({ date: '2025-03-02', amount: 3500, description: 'Freelance' }),

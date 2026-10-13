@@ -1,10 +1,18 @@
 import type { Transaction } from '../../types'
 import { extractIbans } from '../account-transfers'
-import { EXPLICIT_INCOME_KEYWORDS_REGEX,generateId, inferType, parseAmount, parseDate } from './helpers'
+import {
+  EXPLICIT_INCOME_KEYWORDS_REGEX,
+  generateId,
+  inferType,
+  parseAmount,
+  parseDate,
+} from './helpers'
 
 export function extractAccountIbansFromPaste(rawText: string): string[] {
   const result = new Set<string>()
-  const headerMatch = rawText.match(/(?:iban|konto(?:nummer)?|account)[\s:]+([a-z]{2}\d{2}[a-z0-9\s]{11,32})/i)
+  const headerMatch = rawText.match(
+    /(?:iban|konto(?:nummer)?|account)[\s:]+([a-z]{2}\d{2}[a-z0-9\s]{11,32})/i,
+  )
   if (headerMatch) {
     for (const ib of extractIbans(headerMatch[1])) {
       result.add(ib)

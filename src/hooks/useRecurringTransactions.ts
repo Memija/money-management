@@ -2,7 +2,11 @@ import { useMemo } from 'react'
 
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
-import { getTransactionCategory, isInformativeTransaction, normalizeDescription } from '../utils/category-utils'
+import {
+  getTransactionCategory,
+  isInformativeTransaction,
+  normalizeDescription,
+} from '../utils/category-utils'
 
 export interface RecurringExpense {
   id: string
@@ -29,9 +33,7 @@ const getCachedNormalizedDescription = (desc: string): string => {
   return cached
 }
 
-export const useRecurringTransactions = (
-  allRawTransactions: Transaction[],
-): RecurringData => {
+export const useRecurringTransactions = (allRawTransactions: Transaction[]): RecurringData => {
   const customKeywords = useAppStore((s) => s.customKeywords)
   const manualCategories = useAppStore((s) => s.manualCategories)
 

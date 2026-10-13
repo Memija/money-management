@@ -7,9 +7,15 @@ import { IncomeVsExpensesChart } from './IncomeVsExpensesChart'
 // Mock Recharts
 vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  BarChart: ({ children }: { children: React.ReactNode }) => <div data-testid="bar-chart">{children}</div>,
-  ComposedChart: ({ children }: { children: React.ReactNode }) => <div data-testid="bar-chart">{children}</div>,
-  AreaChart: ({ children }: { children: React.ReactNode }) => <div data-testid="area-chart">{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="bar-chart">{children}</div>
+  ),
+  ComposedChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="bar-chart">{children}</div>
+  ),
+  AreaChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="area-chart">{children}</div>
+  ),
   Area: () => <div>Area</div>,
   Bar: () => <div>Bar</div>,
   Line: () => <div>Line</div>,
@@ -58,17 +64,19 @@ describe('IncomeVsExpensesChart', () => {
   })
 
   it('renders summary metric pill correctly', () => {
-    render(<IncomeVsExpensesChart monthlyData={sampleData} totalIncome={6500} totalExpenses={3500} />)
+    render(
+      <IncomeVsExpensesChart monthlyData={sampleData} totalIncome={6500} totalExpenses={3500} />,
+    )
 
     // Net Saved +€3,000.00
     expect(screen.getByTitle('Net Saved')).toBeInTheDocument()
   })
 
   it('renders deficit pill when expenses exceed income', () => {
-    const deficitData = [
-      { name: 'Jan 24', rawMonth: '2024-01', income: 1000, expenses: 2500 },
-    ]
-    render(<IncomeVsExpensesChart monthlyData={deficitData} totalIncome={1000} totalExpenses={2500} />)
+    const deficitData = [{ name: 'Jan 24', rawMonth: '2024-01', income: 1000, expenses: 2500 }]
+    render(
+      <IncomeVsExpensesChart monthlyData={deficitData} totalIncome={1000} totalExpenses={2500} />,
+    )
 
     expect(screen.getByTitle('Net Deficit')).toBeInTheDocument()
   })

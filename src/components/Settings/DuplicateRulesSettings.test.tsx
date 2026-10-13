@@ -21,7 +21,12 @@ let mockDuplicateRules: DuplicateOverrideRule[] = [
 
 let mockImportedAccounts: Array<{
   institutionId: string
-  transactions: Array<{ id: string; importedByRuleId?: string; description: string; amount: number }>
+  transactions: Array<{
+    id: string
+    importedByRuleId?: string
+    description: string
+    amount: number
+  }>
 }> = []
 
 vi.mock('../../store/useLanguageStore', () => ({
@@ -48,17 +53,23 @@ vi.mock('../../store/useLanguageStore', () => ({
         revokeRuleConfirmTitle: 'Revoke Duplicate Rule',
         deleteRuleTransactionsOption: 'Also delete {count} transaction(s) imported by this rule',
         deleteDuplicateBoth: 'Delete rule and imported data',
-        deleteDuplicateBothDesc: 'Revoke the rule and permanently delete {count} transaction(s) imported by it.',
+        deleteDuplicateBothDesc:
+          'Revoke the rule and permanently delete {count} transaction(s) imported by it.',
         deleteDuplicateRuleOnly: 'Delete rule only',
-        deleteDuplicateRuleOnlyDesc: 'Revoke the rule, but keep all {count} previously imported transaction(s) in your accounts.',
+        deleteDuplicateRuleOnlyDesc:
+          'Revoke the rule, but keep all {count} previously imported transaction(s) in your accounts.',
         deleteDuplicateDataOnly: 'Delete imported data only',
-        deleteDuplicateDataOnlyDesc: 'Permanently delete {count} transaction(s) imported by this rule, but keep the rule active for future imports.',
+        deleteDuplicateDataOnlyDesc:
+          'Permanently delete {count} transaction(s) imported by this rule, but keep the rule active for future imports.',
         deleteDuplicateBothBtn: 'Delete Rule and Data',
         deleteDuplicateRuleOnlyBtn: 'Delete Rule Only',
         deleteDuplicateDataOnlyBtn: 'Delete Imported Data Only',
-        clearAllDuplicateBothDesc: 'Delete all rules and permanently remove {count} transaction(s) imported by them.',
-        clearAllDuplicateRuleOnlyDesc: 'Delete all rules, but keep all {count} imported transaction(s) in your accounts.',
-        clearAllDuplicateDataOnlyDesc: 'Delete all {count} transaction(s) imported by rules, but keep all rules active.',
+        clearAllDuplicateBothDesc:
+          'Delete all rules and permanently remove {count} transaction(s) imported by them.',
+        clearAllDuplicateRuleOnlyDesc:
+          'Delete all rules, but keep all {count} imported transaction(s) in your accounts.',
+        clearAllDuplicateDataOnlyDesc:
+          'Delete all {count} transaction(s) imported by rules, but keep all rules active.',
         duplicateTransactionsDetectedTitle: 'Duplicate transactions detected',
         duplicateTransactionsDetectedDesc:
           'Found {count} duplicate transaction(s) in your accounts. Resetting will remove duplicates and recalculate your Dashboard balance.',
@@ -124,7 +135,9 @@ describe('DuplicateRulesSettings', () => {
     expect(screen.getByText('Gym Membership')).toBeInTheDocument()
     expect(screen.getByTestId('rule-amount-drule_1')).toHaveTextContent('€45.00')
     expect(screen.getByTestId('rule-inst-drule_1')).toHaveTextContent('Chase')
-    expect(screen.getByTestId('rule-applied-drule_1')).toHaveTextContent('Applied 3 times • Last: 2026-09-18')
+    expect(screen.getByTestId('rule-applied-drule_1')).toHaveTextContent(
+      'Applied 3 times • Last: 2026-09-18',
+    )
     expect(screen.getByTestId('duplicate-rules-count')).toHaveTextContent('1')
   })
 
@@ -137,15 +150,21 @@ describe('DuplicateRulesSettings', () => {
     // Modal opens with 3 options
     expect(screen.getByText('Revoke Duplicate Rule')).toBeInTheDocument()
     expect(screen.getByTestId('delete-mode-both-radio')).toBeChecked()
-    expect(screen.getByText('Revoke the rule and permanently delete 2 transaction(s) imported by it.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Revoke the rule and permanently delete 2 transaction(s) imported by it.'),
+    ).toBeInTheDocument()
 
     // Verify rule preview in modal is organized in the same manner as normal display:
     expect(screen.getByTestId('modal-rule-preview-drule_1')).toBeInTheDocument()
     expect(screen.getByTestId('modal-rule-inst-drule_1')).toHaveTextContent('Chase')
-    expect(screen.getByTestId('modal-rule-action-badge-drule_1')).toHaveTextContent('Allow duplicate')
+    expect(screen.getByTestId('modal-rule-action-badge-drule_1')).toHaveTextContent(
+      'Allow duplicate',
+    )
     expect(screen.getByTestId('modal-rule-pattern-drule_1')).toHaveTextContent('Gym Membership')
     expect(screen.getByTestId('modal-rule-amount-drule_1')).toHaveTextContent('€45.00')
-    expect(screen.getByTestId('modal-rule-applied-drule_1')).toHaveTextContent('Applied 3 times • Last: 2026-09-18')
+    expect(screen.getByTestId('modal-rule-applied-drule_1')).toHaveTextContent(
+      'Applied 3 times • Last: 2026-09-18',
+    )
 
     // Confirm revoke
     const confirmBtn = screen.getByTestId('confirm-revoke-rule-btn')
@@ -232,16 +251,22 @@ describe('DuplicateRulesSettings', () => {
     render(<DuplicateRulesSettings />)
 
     // Pill should say "Duplicated and modified" instead of "Allow duplicate"
-    expect(screen.getByTestId('rule-action-badge-drule_mod_1')).toHaveTextContent('Duplicated and modified')
+    expect(screen.getByTestId('rule-action-badge-drule_mod_1')).toHaveTextContent(
+      'Duplicated and modified',
+    )
     expect(screen.queryByText('Allow duplicate')).not.toBeInTheDocument()
 
     // Bank logo and name first on its own row
     expect(screen.getByTestId('rule-inst-drule_mod_1')).toHaveTextContent('Commerzbank')
 
     // Original transaction values shown
-    expect(screen.getByTestId('rule-pattern-drule_mod_1')).toHaveTextContent('MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE')
+    expect(screen.getByTestId('rule-pattern-drule_mod_1')).toHaveTextContent(
+      'MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE',
+    )
     expect(screen.getByTestId('rule-amount-drule_mod_1')).toHaveTextContent('€502.58')
-    expect(screen.getByTestId('rule-applied-drule_mod_1')).toHaveTextContent('Applied 57 times • Last: 2026-09-20')
+    expect(screen.getByTestId('rule-applied-drule_mod_1')).toHaveTextContent(
+      'Applied 57 times • Last: 2026-09-20',
+    )
 
     // Exact changes applied card
     expect(screen.getByTestId('rule-modifications-drule_mod_1')).toBeInTheDocument()
@@ -270,8 +295,12 @@ describe('DuplicateRulesSettings', () => {
     // Modal organizes data in the same manner as normal display
     expect(screen.getByTestId('modal-rule-preview-drule_mod_1')).toBeInTheDocument()
     expect(screen.getByTestId('modal-rule-inst-drule_mod_1')).toHaveTextContent('Commerzbank')
-    expect(screen.getByTestId('modal-rule-action-badge-drule_mod_1')).toHaveTextContent('Duplicated and modified')
-    expect(screen.getByTestId('modal-rule-pattern-drule_mod_1')).toHaveTextContent('MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE')
+    expect(screen.getByTestId('modal-rule-action-badge-drule_mod_1')).toHaveTextContent(
+      'Duplicated and modified',
+    )
+    expect(screen.getByTestId('modal-rule-pattern-drule_mod_1')).toHaveTextContent(
+      'MAX O. ERIKA MUSTERMANN GENODEF1S01 KREDITRATE',
+    )
     expect(screen.getByTestId('modal-rule-amount-drule_mod_1')).toHaveTextContent('€502.58')
     expect(screen.getByTestId('modal-rule-modifications-drule_mod_1')).toBeInTheDocument()
   })

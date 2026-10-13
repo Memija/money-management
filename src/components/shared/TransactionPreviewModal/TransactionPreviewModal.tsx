@@ -91,8 +91,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     isImport ??
     Boolean(
       onUnlockDuplicateTransaction ||
-        onRelockDuplicateTransaction ||
-        unlockedDuplicateIds !== undefined,
+      onRelockDuplicateTransaction ||
+      unlockedDuplicateIds !== undefined,
     )
   const t = useLanguageStore((s) => s.t)
   const locale = useLanguageStore((s) => s.locale)
@@ -210,9 +210,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         type: (orig.amount >= 0 ? 'income' : 'expense') as 'income' | 'expense',
       }
       onUpdateTransaction(id, resetData)
-      setLocalTransactions((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, ...resetData } : t)),
-      )
+      setLocalTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...resetData } : t)))
       if (alsoLock && effectiveUnlockedIds.has(id)) {
         setLocalUnlockedDuplicateIds((prev) => {
           const next = new Set(prev)
@@ -330,11 +328,12 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       const otherUnlockedTxs = activeTransactions.filter((other) => {
         if (other.id === txId || !effectiveUnlockedIds.has(other.id)) return false
         const matchesDesc =
-          cumulativeMods.description === undefined || other.description === cumulativeMods.description
-        const matchesDate =
-          cumulativeMods.date === undefined || other.date === cumulativeMods.date
+          cumulativeMods.description === undefined ||
+          other.description === cumulativeMods.description
+        const matchesDate = cumulativeMods.date === undefined || other.date === cumulativeMods.date
         const matchesAmount =
-          cumulativeMods.amount === undefined || Math.abs(other.amount - cumulativeMods.amount) < 0.005
+          cumulativeMods.amount === undefined ||
+          Math.abs(other.amount - cumulativeMods.amount) < 0.005
         return !(matchesDesc && matchesDate && matchesAmount)
       })
 
@@ -399,9 +398,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     ? (id: string, updates: Partial<Transaction>) => {
         if (alreadyDuplicatedIds.has(id)) return
         onUpdateTransaction(id, updates)
-        setLocalTransactions((prev) =>
-          prev.map((t) => (t.id === id ? { ...t, ...updates } : t)),
-        )
+        setLocalTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)))
 
         // If an unlocked duplicate is edited, offer to adjust other unlocked and identical transactions in bulk
         if (effectiveUnlockedIds.has(id)) {
@@ -455,10 +452,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       date: bulkApplyOffer.updates.date !== undefined,
       amount: bulkApplyOffer.updates.amount !== undefined,
     })
-    const allTargets = [
-      ...bulkApplyOffer.unlockedTargetIds,
-      ...bulkApplyOffer.identicalTargetIds,
-    ]
+    const allTargets = [...bulkApplyOffer.unlockedTargetIds, ...bulkApplyOffer.identicalTargetIds]
     setSelectedTargetIds(new Set(allTargets))
     setIsAdjustModalOpen(true)
   }
@@ -475,8 +469,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     if (selectedFieldsToApply.amount && bulkApplyOffer.updates.amount !== undefined) {
       filteredUpdates.amount = bulkApplyOffer.updates.amount
       filteredUpdates.type =
-        bulkApplyOffer.updates.type ??
-        (bulkApplyOffer.updates.amount >= 0 ? 'income' : 'expense')
+        bulkApplyOffer.updates.type ?? (bulkApplyOffer.updates.amount >= 0 ? 'income' : 'expense')
     }
 
     for (const txId of selectedTargetIds) {
@@ -530,7 +523,13 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         Math.abs(otherOrig.amount - origAmt) < 0.005
       )
     })
-  }, [unlockedTxToWarn, activeTransactions, effectiveUnlockedIds, duplicateIds, alreadyDuplicatedIds])
+  }, [
+    unlockedTxToWarn,
+    activeTransactions,
+    effectiveUnlockedIds,
+    duplicateIds,
+    alreadyDuplicatedIds,
+  ])
 
   const handleConfirmUnlockDuplicate = (
     tx: Transaction,
@@ -571,9 +570,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     return new Set(activeExcluded.map((tx) => tx.id))
   }, [activeExcluded])
 
-  const hasSpaceTransfers = Boolean(
-    activeExcluded.length > 0 || discardedSpaceCount > 0,
-  )
+  const hasSpaceTransfers = Boolean(activeExcluded.length > 0 || discardedSpaceCount > 0)
 
   const subAccounts = useMemo(() => {
     const names = new Set<string>()
@@ -841,7 +838,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         return `${base} • ${subAccountFilter}`
       }
       return base
-    } else if (scopeFilter === 'internal-transfers') base = t.filterInternalTransfers || 'Internal Transfers'
+    } else if (scopeFilter === 'internal-transfers')
+      base = t.filterInternalTransfers || 'Internal Transfers'
     else if (scopeFilter === 'duplicates') base = t.filterDuplicates || 'Duplicates'
     else if (scopeFilter === 'already-duplicated')
       base = t.filterAlreadyDuplicated || t.alreadyDuplicated || 'Already Duplicated'
@@ -862,10 +860,10 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const hasActions = Boolean(
     onRemoveTransaction ||
-      onUnlockDuplicateTransaction ||
-      onRelockDuplicateTransaction ||
-      effectiveUnlockedIds.size > 0 ||
-      modifiedTransactions.length > 0,
+    onUnlockDuplicateTransaction ||
+    onRelockDuplicateTransaction ||
+    effectiveUnlockedIds.size > 0 ||
+    modifiedTransactions.length > 0,
   )
 
   const rowContent = (index: number, tx: Transaction) => {
@@ -888,7 +886,10 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         isUnlockedDuplicate={isTxUnlockedDuplicate}
         isModified={isTxModified}
         hideDuplicateBadge={false}
-        isInternalTransfer={!isTxDuplicate && (tx.isGhost || internalTransferIds.has(tx.id) || isTxExistingAccountTransfer)}
+        isInternalTransfer={
+          !isTxDuplicate &&
+          (tx.isGhost || internalTransferIds.has(tx.id) || isTxExistingAccountTransfer)
+        }
         isSpaceTransfer={!isTxDuplicate && spaceTransferIds.has(tx.id)}
         isExistingAccountTransfer={isTxExistingAccountTransfer}
         showInstitution={showInstitution}
@@ -905,7 +906,11 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             ? handleRequestUnlockDuplicate
             : undefined
         }
-        onRelockDuplicate={onRelockDuplicateTransaction && !isTxExistingAccountTransfer ? handleRelockDuplicate : undefined}
+        onRelockDuplicate={
+          onRelockDuplicateTransaction && !isTxExistingAccountTransfer
+            ? handleRelockDuplicate
+            : undefined
+        }
         hasActions={hasActions && !isTxExistingAccountTransfer}
       />
     )
@@ -951,18 +956,17 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         scopeFilter !== 'already-duplicated' &&
         scopeFilter !== 'space-transfers' &&
         scopeFilter !== 'internal-transfers' && (
-        <div className={styles['duplicate-banner']}>
-          <AlertTriangle size={18} />
-          <span>
-            {duplicateIds.size - effectiveUnlockedIds.size === 1
-              ? t.duplicateTransactionsDetectedSingular || '1 duplicate transaction detected.'
-              : (t.duplicateTransactionsDetected || '{count} duplicate transactions detected.').replace(
-                  '{count}',
-                  String(duplicateIds.size - effectiveUnlockedIds.size),
-                )}
-          </span>
-        </div>
-      )}
+          <div className={styles['duplicate-banner']}>
+            <AlertTriangle size={18} />
+            <span>
+              {duplicateIds.size - effectiveUnlockedIds.size === 1
+                ? t.duplicateTransactionsDetectedSingular || '1 duplicate transaction detected.'
+                : (
+                    t.duplicateTransactionsDetected || '{count} duplicate transactions detected.'
+                  ).replace('{count}', String(duplicateIds.size - effectiveUnlockedIds.size))}
+            </span>
+          </div>
+        )}
 
       {bulkApplyOffer &&
         (bulkApplyOffer.unlockedTargetIds.length > 0 ||
@@ -973,15 +977,16 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
               <span>
                 {bulkApplyOffer.unlockedTargetIds.length > 0
                   ? bulkApplyOffer.unlockedTargetIds.length === 1
-                    ? t.bulkApplyUnlockedOfferSingular || 'Apply changes to 1 other unlocked transaction?'
-                    : (t.bulkApplyUnlockedOffer || 'Apply changes to {count} other unlocked transactions?').replace(
-                        '{count}',
-                        String(bulkApplyOffer.unlockedTargetIds.length),
-                      )
-                  : (t.bulkApplyOffer || 'Apply this change to {count} other identical transaction(s)?').replace(
-                      '{count}',
-                      String(bulkApplyOffer.identicalTargetIds.length),
-                    )}
+                    ? t.bulkApplyUnlockedOfferSingular ||
+                      'Apply changes to 1 other unlocked transaction?'
+                    : (
+                        t.bulkApplyUnlockedOffer ||
+                        'Apply changes to {count} other unlocked transactions?'
+                      ).replace('{count}', String(bulkApplyOffer.unlockedTargetIds.length))
+                  : (
+                      t.bulkApplyOffer ||
+                      'Apply this change to {count} other identical transaction(s)?'
+                    ).replace('{count}', String(bulkApplyOffer.identicalTargetIds.length))}
               </span>
             </div>
             <div className={styles['bulk-apply-actions']}>
@@ -1117,9 +1122,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                     : ''
                 }`}
                 onClick={() => setAccountFilter('current')}
-                aria-pressed={
-                  accountFilter === 'current' || accountFilter === currentAccountName
-                }
+                aria-pressed={accountFilter === 'current' || accountFilter === currentAccountName}
                 data-testid="account-filter-pill-current"
                 title={currentAccountName}
               >
@@ -1138,9 +1141,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                   <Landmark size={13} className={styles['account-pill-icon']} aria-hidden="true" />
                 )}
                 <span className={styles['account-pill-name']}>{currentAccountName}</span>
-                <span className={styles['account-pill-badge']}>
-                  {accountCounts.current ?? 0}
-                </span>
+                <span className={styles['account-pill-badge']}>{accountCounts.current ?? 0}</span>
               </button>
 
               {existingInstitutions.map((inst) => {
@@ -1170,12 +1171,14 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                         }}
                       />
                     ) : (
-                      <Landmark size={13} className={styles['account-pill-icon']} aria-hidden="true" />
+                      <Landmark
+                        size={13}
+                        className={styles['account-pill-icon']}
+                        aria-hidden="true"
+                      />
                     )}
                     <span className={styles['account-pill-name']}>{inst}</span>
-                    <span className={styles['account-pill-badge']}>
-                      {accountCounts[inst] ?? 0}
-                    </span>
+                    <span className={styles['account-pill-badge']}>{accountCounts[inst] ?? 0}</span>
                   </button>
                 )
               })}
@@ -1218,9 +1221,7 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
                 title={sa}
               >
                 <span className={styles['subaccount-pill-name']}>{sa}</span>
-                <span className={styles['subaccount-pill-badge']}>
-                  {subAccountCounts[sa] ?? 0}
-                </span>
+                <span className={styles['subaccount-pill-badge']}>{subAccountCounts[sa] ?? 0}</span>
               </button>
             ))}
           </div>
@@ -1276,7 +1277,10 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         )}
 
         {scopeFilter === 'internal-transfers' && (
-          <div className={styles['internal-transfers-notice']} data-testid="internal-transfers-notice">
+          <div
+            className={styles['internal-transfers-notice']}
+            data-testid="internal-transfers-notice"
+          >
             <Ghost size={15} aria-hidden="true" />
             <span>
               {accountFilter === 'current' || accountFilter === currentAccountName
@@ -1358,7 +1362,10 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           </div>
         ) : (
           (() => {
-            const maxH = Math.min(typeof window !== 'undefined' ? window.innerHeight * 0.52 : 520, 520)
+            const maxH = Math.min(
+              typeof window !== 'undefined' ? window.innerHeight * 0.52 : 520,
+              520,
+            )
             const totalH = filteredAndSortedTransactions.length * ROW_HEIGHT
             const isScrollable = totalH > maxH
             const listHeight = isScrollable ? maxH : totalH
@@ -1381,7 +1388,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       <UnlockDuplicateModal
         isOpen={Boolean(unlockedTxToWarn)}
         transaction={unlockedTxToWarn}
-        sameDuplicateCount={sameLockedDuplicates.length > 1 ? sameLockedDuplicates.length : undefined}
+        sameDuplicateCount={
+          sameLockedDuplicates.length > 1 ? sameLockedDuplicates.length : undefined
+        }
         onClose={() => setUnlockedTxToWarn(null)}
         onConfirmUnlock={handleConfirmUnlockDuplicate}
         formatCurrency={formatCurrency}
@@ -1426,179 +1435,187 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           </div>
         }
       >
-        {bulkApplyOffer && (() => {
-          const allTargetIds = [
-            ...bulkApplyOffer.unlockedTargetIds,
-            ...bulkApplyOffer.identicalTargetIds,
-          ]
-          const targetTxs = activeTransactions.filter((t) => allTargetIds.includes(t.id))
-          const allSelected = targetTxs.length > 0 && selectedTargetIds.size === targetTxs.length
+        {bulkApplyOffer &&
+          (() => {
+            const allTargetIds = [
+              ...bulkApplyOffer.unlockedTargetIds,
+              ...bulkApplyOffer.identicalTargetIds,
+            ]
+            const targetTxs = activeTransactions.filter((t) => allTargetIds.includes(t.id))
+            const allSelected = targetTxs.length > 0 && selectedTargetIds.size === targetTxs.length
 
-          const handleToggleSelectAll = () => {
-            if (allSelected) {
-              setSelectedTargetIds(new Set())
-            } else {
-              setSelectedTargetIds(new Set(targetTxs.map((t) => t.id)))
+            const handleToggleSelectAll = () => {
+              if (allSelected) {
+                setSelectedTargetIds(new Set())
+              } else {
+                setSelectedTargetIds(new Set(targetTxs.map((t) => t.id)))
+              }
             }
-          }
 
-          const handleToggleTarget = (txId: string) => {
-            setSelectedTargetIds((prev) => {
-              const next = new Set(prev)
-              if (next.has(txId)) next.delete(txId)
-              else next.add(txId)
-              return next
-            })
-          }
+            const handleToggleTarget = (txId: string) => {
+              setSelectedTargetIds((prev) => {
+                const next = new Set(prev)
+                if (next.has(txId)) next.delete(txId)
+                else next.add(txId)
+                return next
+              })
+            }
 
-          return (
-            <div className={styles['adjust-modal-body']}>
-              <div className={styles['adjust-section']}>
-                <span className={styles['adjust-section-title']}>
-                  {t.applyFieldsLabel || 'Modifications to apply'}
-                </span>
-                <div className={styles['adjust-fields-grid']}>
-                  {bulkApplyOffer.updates.description !== undefined && (
-                    <label
-                      className={`${styles['adjust-field-card']} ${
-                        selectedFieldsToApply.description ? styles['adjust-field-card-active'] : ''
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className={styles['adjust-field-checkbox']}
-                        checked={selectedFieldsToApply.description}
-                        data-testid="adjust-field-checkbox-description"
-                        onChange={(e) =>
-                          setSelectedFieldsToApply((prev) => ({
-                            ...prev,
-                            description: e.target.checked,
-                          }))
-                        }
-                      />
-                      <div className={styles['adjust-field-info']}>
-                        <span className={styles['adjust-field-name']}>{t.description || 'Description'}</span>
-                        <span className={styles['adjust-field-val']}>
-                          {bulkApplyOffer.updates.description}
-                        </span>
-                      </div>
-                    </label>
-                  )}
-
-                  {bulkApplyOffer.updates.date !== undefined && (
-                    <label
-                      className={`${styles['adjust-field-card']} ${
-                        selectedFieldsToApply.date ? styles['adjust-field-card-active'] : ''
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className={styles['adjust-field-checkbox']}
-                        checked={selectedFieldsToApply.date}
-                        data-testid="adjust-field-checkbox-date"
-                        onChange={(e) =>
-                          setSelectedFieldsToApply((prev) => ({
-                            ...prev,
-                            date: e.target.checked,
-                          }))
-                        }
-                      />
-                      <div className={styles['adjust-field-info']}>
-                        <span className={styles['adjust-field-name']}>{t.date || 'Date'}</span>
-                        <span className={styles['adjust-field-val']}>
-                          {formatDate(bulkApplyOffer.updates.date)}
-                        </span>
-                      </div>
-                    </label>
-                  )}
-
-                  {bulkApplyOffer.updates.amount !== undefined && (
-                    <label
-                      className={`${styles['adjust-field-card']} ${
-                        selectedFieldsToApply.amount ? styles['adjust-field-card-active'] : ''
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className={styles['adjust-field-checkbox']}
-                        checked={selectedFieldsToApply.amount}
-                        data-testid="adjust-field-checkbox-amount"
-                        onChange={(e) =>
-                          setSelectedFieldsToApply((prev) => ({
-                            ...prev,
-                            amount: e.target.checked,
-                          }))
-                        }
-                      />
-                      <div className={styles['adjust-field-info']}>
-                        <span className={styles['adjust-field-name']}>{t.amount || 'Amount'}</span>
-                        <span className={styles['adjust-field-val']}>
-                          {formatCurrency(bulkApplyOffer.updates.amount)}
-                        </span>
-                      </div>
-                    </label>
-                  )}
-                </div>
-              </div>
-
-              <div className={styles['adjust-section']}>
-                <div className={styles['adjust-section-header']}>
+            return (
+              <div className={styles['adjust-modal-body']}>
+                <div className={styles['adjust-section']}>
                   <span className={styles['adjust-section-title']}>
-                    {t.targetTransactionsLabel || 'Target transactions'} ({selectedTargetIds.size}/{targetTxs.length})
+                    {t.applyFieldsLabel || 'Modifications to apply'}
                   </span>
-                  <button
-                    type="button"
-                    className={`${styles['adjust-select-all-btn']} ${
-                      !allSelected ? styles['adjust-select-all-btn-orange'] : ''
-                    }`}
-                    onClick={handleToggleSelectAll}
-                    data-testid="adjust-select-all-btn"
-                  >
-                    {allSelected ? t.deselectAll || 'Deselect all' : t.selectAll || 'Select all'}
-                  </button>
-                </div>
-
-                <div className={styles['adjust-tx-list']}>
-                  {targetTxs.map((target) => {
-                    const isTargetSelected = selectedTargetIds.has(target.id)
-                    return (
+                  <div className={styles['adjust-fields-grid']}>
+                    {bulkApplyOffer.updates.description !== undefined && (
                       <label
-                        key={target.id}
-                        className={`${styles['adjust-tx-item']} ${
-                          isTargetSelected ? styles['adjust-tx-item-active'] : ''
+                        className={`${styles['adjust-field-card']} ${
+                          selectedFieldsToApply.description
+                            ? styles['adjust-field-card-active']
+                            : ''
                         }`}
-                        data-testid={`adjust-target-item-${target.id}`}
                       >
                         <input
                           type="checkbox"
-                          className={styles['adjust-tx-checkbox']}
-                          checked={isTargetSelected}
-                          data-testid={`adjust-target-checkbox-${target.id}`}
-                          onChange={() => handleToggleTarget(target.id)}
+                          className={styles['adjust-field-checkbox']}
+                          checked={selectedFieldsToApply.description}
+                          data-testid="adjust-field-checkbox-description"
+                          onChange={(e) =>
+                            setSelectedFieldsToApply((prev) => ({
+                              ...prev,
+                              description: e.target.checked,
+                            }))
+                          }
                         />
-                        <div className={styles['adjust-tx-content']}>
-                          <div className={styles['adjust-tx-main']}>
-                            <span className={styles['adjust-tx-desc']} title={target.description}>
-                              {target.description}
-                            </span>
-                            <span className={styles['adjust-tx-date']}>
-                              {formatDate(target.date)}
-                            </span>
-                          </div>
-                          <div className={styles['adjust-tx-right']}>
-                            <span className={styles['adjust-tx-amount']}>
-                              {formatCurrency(target.amount)}
-                            </span>
-                          </div>
+                        <div className={styles['adjust-field-info']}>
+                          <span className={styles['adjust-field-name']}>
+                            {t.description || 'Description'}
+                          </span>
+                          <span className={styles['adjust-field-val']}>
+                            {bulkApplyOffer.updates.description}
+                          </span>
                         </div>
                       </label>
-                    )
-                  })}
+                    )}
+
+                    {bulkApplyOffer.updates.date !== undefined && (
+                      <label
+                        className={`${styles['adjust-field-card']} ${
+                          selectedFieldsToApply.date ? styles['adjust-field-card-active'] : ''
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          className={styles['adjust-field-checkbox']}
+                          checked={selectedFieldsToApply.date}
+                          data-testid="adjust-field-checkbox-date"
+                          onChange={(e) =>
+                            setSelectedFieldsToApply((prev) => ({
+                              ...prev,
+                              date: e.target.checked,
+                            }))
+                          }
+                        />
+                        <div className={styles['adjust-field-info']}>
+                          <span className={styles['adjust-field-name']}>{t.date || 'Date'}</span>
+                          <span className={styles['adjust-field-val']}>
+                            {formatDate(bulkApplyOffer.updates.date)}
+                          </span>
+                        </div>
+                      </label>
+                    )}
+
+                    {bulkApplyOffer.updates.amount !== undefined && (
+                      <label
+                        className={`${styles['adjust-field-card']} ${
+                          selectedFieldsToApply.amount ? styles['adjust-field-card-active'] : ''
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          className={styles['adjust-field-checkbox']}
+                          checked={selectedFieldsToApply.amount}
+                          data-testid="adjust-field-checkbox-amount"
+                          onChange={(e) =>
+                            setSelectedFieldsToApply((prev) => ({
+                              ...prev,
+                              amount: e.target.checked,
+                            }))
+                          }
+                        />
+                        <div className={styles['adjust-field-info']}>
+                          <span className={styles['adjust-field-name']}>
+                            {t.amount || 'Amount'}
+                          </span>
+                          <span className={styles['adjust-field-val']}>
+                            {formatCurrency(bulkApplyOffer.updates.amount)}
+                          </span>
+                        </div>
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles['adjust-section']}>
+                  <div className={styles['adjust-section-header']}>
+                    <span className={styles['adjust-section-title']}>
+                      {t.targetTransactionsLabel || 'Target transactions'} ({selectedTargetIds.size}
+                      /{targetTxs.length})
+                    </span>
+                    <button
+                      type="button"
+                      className={`${styles['adjust-select-all-btn']} ${
+                        !allSelected ? styles['adjust-select-all-btn-orange'] : ''
+                      }`}
+                      onClick={handleToggleSelectAll}
+                      data-testid="adjust-select-all-btn"
+                    >
+                      {allSelected ? t.deselectAll || 'Deselect all' : t.selectAll || 'Select all'}
+                    </button>
+                  </div>
+
+                  <div className={styles['adjust-tx-list']}>
+                    {targetTxs.map((target) => {
+                      const isTargetSelected = selectedTargetIds.has(target.id)
+                      return (
+                        <label
+                          key={target.id}
+                          className={`${styles['adjust-tx-item']} ${
+                            isTargetSelected ? styles['adjust-tx-item-active'] : ''
+                          }`}
+                          data-testid={`adjust-target-item-${target.id}`}
+                        >
+                          <input
+                            type="checkbox"
+                            className={styles['adjust-tx-checkbox']}
+                            checked={isTargetSelected}
+                            data-testid={`adjust-target-checkbox-${target.id}`}
+                            onChange={() => handleToggleTarget(target.id)}
+                          />
+                          <div className={styles['adjust-tx-content']}>
+                            <div className={styles['adjust-tx-main']}>
+                              <span className={styles['adjust-tx-desc']} title={target.description}>
+                                {target.description}
+                              </span>
+                              <span className={styles['adjust-tx-date']}>
+                                {formatDate(target.date)}
+                              </span>
+                            </div>
+                            <div className={styles['adjust-tx-right']}>
+                              <span className={styles['adjust-tx-amount']}>
+                                {formatCurrency(target.amount)}
+                              </span>
+                            </div>
+                          </div>
+                        </label>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-        })()}
+            )
+          })()}
       </Modal>
 
       {/* Reset Confirmation Modal */}
@@ -1628,11 +1645,12 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
               }}
               data-testid="confirm-reset-single-btn"
             >
-              {alsoLockAsDuplicate && (pendingResetTxId ? effectiveUnlockedIds.has(pendingResetTxId) : false)
+              {alsoLockAsDuplicate &&
+              (pendingResetTxId ? effectiveUnlockedIds.has(pendingResetTxId) : false)
                 ? t.resetAndLockSingle || 'Reset and lock'
                 : modifiedTransactions.length > 1
-                ? t.resetOnlyThis || 'Reset only this'
-                : t.resetToOriginal || 'Reset'}
+                  ? t.resetOnlyThis || 'Reset only this'
+                  : t.resetToOriginal || 'Reset'}
             </button>
             {modifiedTransactions.length > 1 && (
               <button
@@ -1646,7 +1664,8 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
               >
                 <RotateCcw size={14} aria-hidden="true" />
                 <span>
-                  {alsoLockAsDuplicate && modifiedTransactions.some((t) => effectiveUnlockedIds.has(t.id))
+                  {alsoLockAsDuplicate &&
+                  modifiedTransactions.some((t) => effectiveUnlockedIds.has(t.id))
                     ? (t.resetAndLockBulkCount || 'Reset and lock all ({count})').replace(
                         '{count}',
                         String(modifiedTransactions.length),
@@ -1661,61 +1680,62 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
           </div>
         }
       >
-        {pendingResetTxId && (() => {
-          const targetTx = activeTransactions.find((t) => t.id === pendingResetTxId)
-          const isTargetUnlockedDuplicate = effectiveUnlockedIds.has(pendingResetTxId)
-          const hasAnyUnlockedDuplicates = modifiedTransactions.some((t) =>
-            effectiveUnlockedIds.has(t.id),
-          )
-          const showLockCheckbox = isTargetUnlockedDuplicate || hasAnyUnlockedDuplicates
+        {pendingResetTxId &&
+          (() => {
+            const targetTx = activeTransactions.find((t) => t.id === pendingResetTxId)
+            const isTargetUnlockedDuplicate = effectiveUnlockedIds.has(pendingResetTxId)
+            const hasAnyUnlockedDuplicates = modifiedTransactions.some((t) =>
+              effectiveUnlockedIds.has(t.id),
+            )
+            const showLockCheckbox = isTargetUnlockedDuplicate || hasAnyUnlockedDuplicates
 
-          return (
-            <div className={styles['reset-modal-body']}>
-              <div className={styles['reset-modal-icon-wrap']}>
-                <RotateCcw size={22} aria-hidden="true" />
+            return (
+              <div className={styles['reset-modal-body']}>
+                <div className={styles['reset-modal-icon-wrap']}>
+                  <RotateCcw size={22} aria-hidden="true" />
+                </div>
+                <div className={styles['reset-modal-text']}>
+                  <p className={styles['reset-modal-message']}>
+                    {modifiedTransactions.length > 1
+                      ? (
+                          t.resetBulkPrompt ||
+                          'You have modified {count} transactions. Would you like to reset only this transaction or reset all modified transactions in bulk back to their original values?'
+                        ).replace('{count}', String(modifiedTransactions.length))
+                      : t.resetSinglePrompt ||
+                        'Are you sure you want to reset this transaction back to its original values?'}
+                  </p>
+                  {targetTx && (
+                    <div className={styles['reset-modal-tx-preview']}>
+                      <span className={styles['reset-modal-tx-desc']} title={targetTx.description}>
+                        {targetTx.description}
+                      </span>
+                      <span className={styles['reset-modal-tx-amount']}>
+                        {formatCurrency(targetTx.amount)}
+                      </span>
+                    </div>
+                  )}
+                  {showLockCheckbox && (
+                    <label
+                      className={styles['reset-lock-checkbox-label']}
+                      data-testid="reset-also-lock-checkbox-label"
+                    >
+                      <input
+                        type="checkbox"
+                        className={styles['reset-lock-checkbox']}
+                        checked={alsoLockAsDuplicate}
+                        onChange={(e) => setAlsoLockAsDuplicate(e.target.checked)}
+                        data-testid="reset-also-lock-checkbox"
+                      />
+                      <Lock size={14} className={styles['reset-lock-icon']} aria-hidden="true" />
+                      <span className={styles['reset-lock-checkbox-text']}>
+                        {t.alsoLockAsDuplicate || 'Also lock as duplicate'}
+                      </span>
+                    </label>
+                  )}
+                </div>
               </div>
-              <div className={styles['reset-modal-text']}>
-                <p className={styles['reset-modal-message']}>
-                  {modifiedTransactions.length > 1
-                    ? (
-                        t.resetBulkPrompt ||
-                        'You have modified {count} transactions. Would you like to reset only this transaction or reset all modified transactions in bulk back to their original values?'
-                      ).replace('{count}', String(modifiedTransactions.length))
-                    : t.resetSinglePrompt ||
-                      'Are you sure you want to reset this transaction back to its original values?'}
-                </p>
-                {targetTx && (
-                  <div className={styles['reset-modal-tx-preview']}>
-                    <span className={styles['reset-modal-tx-desc']} title={targetTx.description}>
-                      {targetTx.description}
-                    </span>
-                    <span className={styles['reset-modal-tx-amount']}>
-                      {formatCurrency(targetTx.amount)}
-                    </span>
-                  </div>
-                )}
-                {showLockCheckbox && (
-                  <label
-                    className={styles['reset-lock-checkbox-label']}
-                    data-testid="reset-also-lock-checkbox-label"
-                  >
-                    <input
-                      type="checkbox"
-                      className={styles['reset-lock-checkbox']}
-                      checked={alsoLockAsDuplicate}
-                      onChange={(e) => setAlsoLockAsDuplicate(e.target.checked)}
-                      data-testid="reset-also-lock-checkbox"
-                    />
-                    <Lock size={14} className={styles['reset-lock-icon']} aria-hidden="true" />
-                    <span className={styles['reset-lock-checkbox-text']}>
-                      {t.alsoLockAsDuplicate || 'Also lock as duplicate'}
-                    </span>
-                  </label>
-                )}
-              </div>
-            </div>
-          )
-        })()}
+            )
+          })()}
       </Modal>
     </Modal>
   )

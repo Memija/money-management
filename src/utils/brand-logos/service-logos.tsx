@@ -13,14 +13,8 @@ export {
   StadtkasseKelkheimLogo,
   StadtKelkheimLogo,
 } from './civic-logos'
-export {
-  LotharBraunLogo,
-  SchreinereiBraunLogo,
-  SchreinereiLotharBraunLogo,
-} from './craft-logos'
-export {
-  GuardarianLogo,
-} from './crypto-logos'
+export { LotharBraunLogo, SchreinereiBraunLogo, SchreinereiLotharBraunLogo } from './craft-logos'
+export { GuardarianLogo } from './crypto-logos'
 export {
   AokLogo,
   BarmerLogo,
@@ -37,13 +31,7 @@ export {
   PaybackLogo,
   SumupLogo,
 } from './retail-logos'
-export {
-  ElsterLogo,
-  SmartsteuerLogo,
-  TaxfixLogo,
-  WisoSteuerLogo,
-  WundertaxLogo,
-} from './tax-logos'
+export { ElsterLogo, SmartsteuerLogo, TaxfixLogo, WisoSteuerLogo, WundertaxLogo } from './tax-logos'
 export {
   CanonLogo,
   HerokuLogo,

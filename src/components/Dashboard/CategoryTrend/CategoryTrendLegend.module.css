@@ -1,0 +1,95 @@
+/* ─────────────────────────────────────────────────
+   Interactive Custom Legend for Category Trend
+───────────────────────────────────────────────── */
+.legendContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--card-border);
+}
+
+.legendPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+[data-theme='light'] .legendPill {
+  background: rgba(15, 23, 42, 0.03);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.legendPill:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+[data-theme='light'] .legendPill:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.legendPillActive {
+  background: rgba(125, 125, 125, 0.12);
+  border-color: var(--pill-color, var(--primary));
+  color: var(--text-main);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .legendPillActive {
+    background: color-mix(in srgb, var(--pill-color, var(--primary)) 16%, transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--pill-color, var(--primary)) 25%, transparent);
+  }
+}
+
+.legendPillDimmed {
+  opacity: 0.35;
+}
+
+.legendDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 5px currentColor;
+}
+
+.resetPill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(125, 125, 125, 0.1);
+  border-color: rgba(125, 125, 125, 0.25);
+}
+
+.resetPill:hover {
+  background: rgba(125, 125, 125, 0.18);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .resetPill {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+
+  .resetPill:hover {
+    background: color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+}

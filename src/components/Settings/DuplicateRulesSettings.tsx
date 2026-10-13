@@ -2,10 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { CopyCheck, Sparkles, Trash2 } from 'lucide-react'
 
-import {
-  matchesDuplicateOverrideRule,
-  useAppStore,
-} from '../../store/useAppStore'
+import { matchesDuplicateOverrideRule, useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import type { DuplicateDeleteMode, DuplicateOverrideRule } from '../../types'
 import { Modal } from '../shared/Modal'
@@ -44,7 +41,10 @@ export const DuplicateRulesSettings: React.FC = () => {
       for (const tx of allTxs) {
         if (rule.id && tx.importedByRuleId === rule.id) {
           count++
-        } else if (!tx.importedByRuleId && matchesDuplicateOverrideRule(rule, tx, acc.institutionId)) {
+        } else if (
+          !tx.importedByRuleId &&
+          matchesDuplicateOverrideRule(rule, tx, acc.institutionId)
+        ) {
           count++
         }
       }
@@ -105,7 +105,9 @@ export const DuplicateRulesSettings: React.FC = () => {
           <div className={styles.headerTitleWrapper}>
             <div className={styles.titleRow}>
               <CopyCheck size={20} className={styles.titleIcon} aria-hidden="true" />
-              <h3 className={styles.title}>{t.duplicateRulesTitle || 'Duplicate Rules and Overrides'}</h3>
+              <h3 className={styles.title}>
+                {t.duplicateRulesTitle || 'Duplicate Rules and Overrides'}
+              </h3>
               <span className={styles.countBadge} data-testid="duplicate-rules-count">
                 {duplicateOverrideRules.length}
               </span>
@@ -199,96 +201,102 @@ export const DuplicateRulesSettings: React.FC = () => {
             <DuplicateRuleCard rule={ruleToRevoke.rule} isModalPreview />
 
             {ruleToRevoke.count > 0 ? (
-                <div
-                  className={styles.optionsList}
-                  role="radiogroup"
-                  aria-label={t.deleteDuplicateBoth || 'Deletion options'}
+              <div
+                className={styles.optionsList}
+                role="radiogroup"
+                aria-label={t.deleteDuplicateBoth || 'Deletion options'}
+              >
+                <label
+                  className={`${styles.optionCard} ${singleDeleteMode === 'both' ? styles.optionCardActive : ''}`}
+                  data-testid="delete-mode-both-label"
                 >
-                  <label
-                    className={`${styles.optionCard} ${singleDeleteMode === 'both' ? styles.optionCardActive : ''}`}
-                    data-testid="delete-mode-both-label"
-                  >
-                    <div className={styles.radioWrapper}>
-                      <input
-                        type="radio"
-                        name="single-delete-mode"
-                        value="both"
-                        checked={singleDeleteMode === 'both'}
-                        onChange={() => setSingleDeleteMode('both')}
-                        className={styles.radioInput}
-                        data-testid="delete-mode-both-radio"
-                      />
-                    </div>
-                    <div className={styles.optionContent}>
-                      <span className={styles.optionTitle}>{t.deleteDuplicateBoth || 'Delete rule and imported data'}</span>
-                      <span className={styles.optionDesc}>
-                        {(t.deleteDuplicateBothDesc || 'Revoke the rule and permanently delete {count} transaction(s) imported by it.').replace(
-                          '{count}',
-                          String(ruleToRevoke.count),
-                        )}
-                      </span>
-                    </div>
-                  </label>
+                  <div className={styles.radioWrapper}>
+                    <input
+                      type="radio"
+                      name="single-delete-mode"
+                      value="both"
+                      checked={singleDeleteMode === 'both'}
+                      onChange={() => setSingleDeleteMode('both')}
+                      className={styles.radioInput}
+                      data-testid="delete-mode-both-radio"
+                    />
+                  </div>
+                  <div className={styles.optionContent}>
+                    <span className={styles.optionTitle}>
+                      {t.deleteDuplicateBoth || 'Delete rule and imported data'}
+                    </span>
+                    <span className={styles.optionDesc}>
+                      {(
+                        t.deleteDuplicateBothDesc ||
+                        'Revoke the rule and permanently delete {count} transaction(s) imported by it.'
+                      ).replace('{count}', String(ruleToRevoke.count))}
+                    </span>
+                  </div>
+                </label>
 
-                  <label
-                    className={`${styles.optionCard} ${singleDeleteMode === 'rule_only' ? styles.optionCardActive : ''}`}
-                    data-testid="delete-mode-rule-only-label"
-                  >
-                    <div className={styles.radioWrapper}>
-                      <input
-                        type="radio"
-                        name="single-delete-mode"
-                        value="rule_only"
-                        checked={singleDeleteMode === 'rule_only'}
-                        onChange={() => setSingleDeleteMode('rule_only')}
-                        className={styles.radioInput}
-                        data-testid="delete-mode-rule-only-radio"
-                      />
-                    </div>
-                    <div className={styles.optionContent}>
-                      <span className={styles.optionTitle}>{t.deleteDuplicateRuleOnly || 'Delete rule only'}</span>
-                      <span className={styles.optionDesc}>
-                        {(t.deleteDuplicateRuleOnlyDesc || 'Revoke the rule, but keep all {count} previously imported transaction(s) in your accounts.').replace(
-                          '{count}',
-                          String(ruleToRevoke.count),
-                        )}
-                      </span>
-                    </div>
-                  </label>
+                <label
+                  className={`${styles.optionCard} ${singleDeleteMode === 'rule_only' ? styles.optionCardActive : ''}`}
+                  data-testid="delete-mode-rule-only-label"
+                >
+                  <div className={styles.radioWrapper}>
+                    <input
+                      type="radio"
+                      name="single-delete-mode"
+                      value="rule_only"
+                      checked={singleDeleteMode === 'rule_only'}
+                      onChange={() => setSingleDeleteMode('rule_only')}
+                      className={styles.radioInput}
+                      data-testid="delete-mode-rule-only-radio"
+                    />
+                  </div>
+                  <div className={styles.optionContent}>
+                    <span className={styles.optionTitle}>
+                      {t.deleteDuplicateRuleOnly || 'Delete rule only'}
+                    </span>
+                    <span className={styles.optionDesc}>
+                      {(
+                        t.deleteDuplicateRuleOnlyDesc ||
+                        'Revoke the rule, but keep all {count} previously imported transaction(s) in your accounts.'
+                      ).replace('{count}', String(ruleToRevoke.count))}
+                    </span>
+                  </div>
+                </label>
 
-                  <label
-                    className={`${styles.optionCard} ${singleDeleteMode === 'data_only' ? styles.optionCardActive : ''}`}
-                    data-testid="delete-mode-data-only-label"
-                  >
-                    <div className={styles.radioWrapper}>
-                      <input
-                        type="radio"
-                        name="single-delete-mode"
-                        value="data_only"
-                        checked={singleDeleteMode === 'data_only'}
-                        onChange={() => setSingleDeleteMode('data_only')}
-                        className={styles.radioInput}
-                        data-testid="delete-mode-data-only-radio"
-                      />
-                    </div>
-                    <div className={styles.optionContent}>
-                      <span className={styles.optionTitle}>{t.deleteDuplicateDataOnly || 'Delete imported data only'}</span>
-                      <span className={styles.optionDesc}>
-                        {(t.deleteDuplicateDataOnlyDesc || 'Permanently delete {count} transaction(s) imported by this rule, but keep the rule active for future imports.').replace(
-                          '{count}',
-                          String(ruleToRevoke.count),
-                        )}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-              ) : (
-                <p className={styles.modalNoTxNote}>
-                  {t.noTransactionsInPeriod ||
-                    'No transactions currently in your accounts were imported by this rule.'}
-                </p>
-              )}
-            </div>
+                <label
+                  className={`${styles.optionCard} ${singleDeleteMode === 'data_only' ? styles.optionCardActive : ''}`}
+                  data-testid="delete-mode-data-only-label"
+                >
+                  <div className={styles.radioWrapper}>
+                    <input
+                      type="radio"
+                      name="single-delete-mode"
+                      value="data_only"
+                      checked={singleDeleteMode === 'data_only'}
+                      onChange={() => setSingleDeleteMode('data_only')}
+                      className={styles.radioInput}
+                      data-testid="delete-mode-data-only-radio"
+                    />
+                  </div>
+                  <div className={styles.optionContent}>
+                    <span className={styles.optionTitle}>
+                      {t.deleteDuplicateDataOnly || 'Delete imported data only'}
+                    </span>
+                    <span className={styles.optionDesc}>
+                      {(
+                        t.deleteDuplicateDataOnlyDesc ||
+                        'Permanently delete {count} transaction(s) imported by this rule, but keep the rule active for future imports.'
+                      ).replace('{count}', String(ruleToRevoke.count))}
+                    </span>
+                  </div>
+                </label>
+              </div>
+            ) : (
+              <p className={styles.modalNoTxNote}>
+                {t.noTransactionsInPeriod ||
+                  'No transactions currently in your accounts were imported by this rule.'}
+              </p>
+            )}
+          </div>
         )}
       </Modal>
 
@@ -353,12 +361,14 @@ export const DuplicateRulesSettings: React.FC = () => {
                   />
                 </div>
                 <div className={styles.optionContent}>
-                  <span className={styles.optionTitle}>{t.deleteDuplicateBoth || 'Delete rules and imported data'}</span>
+                  <span className={styles.optionTitle}>
+                    {t.deleteDuplicateBoth || 'Delete rules and imported data'}
+                  </span>
                   <span className={styles.optionDesc}>
-                    {(t.clearAllDuplicateBothDesc || 'Delete all rules and permanently remove {count} transaction(s) imported by them.').replace(
-                      '{count}',
-                      String(getTotalRulesImportedCount()),
-                    )}
+                    {(
+                      t.clearAllDuplicateBothDesc ||
+                      'Delete all rules and permanently remove {count} transaction(s) imported by them.'
+                    ).replace('{count}', String(getTotalRulesImportedCount()))}
                   </span>
                 </div>
               </label>
@@ -379,12 +389,14 @@ export const DuplicateRulesSettings: React.FC = () => {
                   />
                 </div>
                 <div className={styles.optionContent}>
-                  <span className={styles.optionTitle}>{t.deleteDuplicateRuleOnly || 'Delete rules only'}</span>
+                  <span className={styles.optionTitle}>
+                    {t.deleteDuplicateRuleOnly || 'Delete rules only'}
+                  </span>
                   <span className={styles.optionDesc}>
-                    {(t.clearAllDuplicateRuleOnlyDesc || 'Delete all rules, but keep all {count} imported transaction(s) in your accounts.').replace(
-                      '{count}',
-                      String(getTotalRulesImportedCount()),
-                    )}
+                    {(
+                      t.clearAllDuplicateRuleOnlyDesc ||
+                      'Delete all rules, but keep all {count} imported transaction(s) in your accounts.'
+                    ).replace('{count}', String(getTotalRulesImportedCount()))}
                   </span>
                 </div>
               </label>
@@ -405,12 +417,14 @@ export const DuplicateRulesSettings: React.FC = () => {
                   />
                 </div>
                 <div className={styles.optionContent}>
-                  <span className={styles.optionTitle}>{t.deleteDuplicateDataOnly || 'Delete imported data only'}</span>
+                  <span className={styles.optionTitle}>
+                    {t.deleteDuplicateDataOnly || 'Delete imported data only'}
+                  </span>
                   <span className={styles.optionDesc}>
-                    {(t.clearAllDuplicateDataOnlyDesc || 'Delete all {count} transaction(s) imported by rules, but keep all rules active.').replace(
-                      '{count}',
-                      String(getTotalRulesImportedCount()),
-                    )}
+                    {(
+                      t.clearAllDuplicateDataOnlyDesc ||
+                      'Delete all {count} transaction(s) imported by rules, but keep all rules active.'
+                    ).replace('{count}', String(getTotalRulesImportedCount()))}
                   </span>
                 </div>
               </label>

@@ -248,8 +248,26 @@ describe('useAppStore', () => {
 
   it('should return correct stats when checking duplicate transactions', () => {
     const existingTransactions = [
-      { id: '1', date: '2023-01-01', amount: 100, description: 'Test 1', category: 'cat1', currency: 'USD', type: 'expense' as const, institution: 'chase' },
-      { id: '2', date: '2023-01-02', amount: 200, description: 'Test 2', category: 'cat2', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+      {
+        id: '1',
+        date: '2023-01-01',
+        amount: 100,
+        description: 'Test 1',
+        category: 'cat1',
+        currency: 'USD',
+        type: 'expense' as const,
+        institution: 'chase',
+      },
+      {
+        id: '2',
+        date: '2023-01-02',
+        amount: 200,
+        description: 'Test 2',
+        category: 'cat2',
+        currency: 'USD',
+        type: 'expense' as const,
+        institution: 'chase',
+      },
     ]
     const account: ImportedAccount = {
       institutionId: 'chase',
@@ -262,25 +280,73 @@ describe('useAppStore', () => {
 
     const incomingTransactions = [
       // Exact duplicate
-      { id: '1a', date: '2023-01-01', amount: 100, description: 'test 1 ', category: '', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+      {
+        id: '1a',
+        date: '2023-01-01',
+        amount: 100,
+        description: 'test 1 ',
+        category: '',
+        currency: 'USD',
+        type: 'expense' as const,
+        institution: 'chase',
+      },
       // New transaction
-      { id: '3', date: '2023-01-03', amount: 300, description: 'Test 3', category: '', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+      {
+        id: '3',
+        date: '2023-01-03',
+        amount: 300,
+        description: 'Test 3',
+        category: '',
+        currency: 'USD',
+        type: 'expense' as const,
+        institution: 'chase',
+      },
     ]
 
     // Check against 'chase'
-    const statsChase = useAppStore.getState().getDuplicateTransactionStats('chase', incomingTransactions)
-    expect(statsChase).toEqual({ duplicateCount: 1, newCount: 1, duplicateIds: ['1a'], alreadyDuplicatedIds: [] })
+    const statsChase = useAppStore
+      .getState()
+      .getDuplicateTransactionStats('chase', incomingTransactions)
+    expect(statsChase).toEqual({
+      duplicateCount: 1,
+      newCount: 1,
+      duplicateIds: ['1a'],
+      alreadyDuplicatedIds: [],
+    })
 
     // Check whitespace normalization and amount decimal equivalence
     const whitespaceTransactions = [
-      { id: '1b', date: '2023-01-01', amount: 100.00, description: 'Test   1', category: '', currency: 'USD', type: 'expense' as const, institution: 'chase' },
+      {
+        id: '1b',
+        date: '2023-01-01',
+        amount: 100.0,
+        description: 'Test   1',
+        category: '',
+        currency: 'USD',
+        type: 'expense' as const,
+        institution: 'chase',
+      },
     ]
-    const statsWhitespace = useAppStore.getState().getDuplicateTransactionStats('chase', whitespaceTransactions)
-    expect(statsWhitespace).toEqual({ duplicateCount: 1, newCount: 0, duplicateIds: ['1b'], alreadyDuplicatedIds: [] })
+    const statsWhitespace = useAppStore
+      .getState()
+      .getDuplicateTransactionStats('chase', whitespaceTransactions)
+    expect(statsWhitespace).toEqual({
+      duplicateCount: 1,
+      newCount: 0,
+      duplicateIds: ['1b'],
+      alreadyDuplicatedIds: [],
+    })
 
     // Check against unknown institution (all should be new)
-    const statsIng = useAppStore.getState().getDuplicateTransactionStats('ing', incomingTransactions)
-    expect(statsIng).toEqual({ duplicateCount: 0, newCount: 2, duplicateIds: [], alreadyDuplicatedIds: [] })
+    const statsIng = useAppStore
+      .getState()
+      .getDuplicateTransactionStats('ing', incomingTransactions)
+    expect(statsIng).toEqual({
+      duplicateCount: 0,
+      newCount: 2,
+      duplicateIds: [],
+      alreadyDuplicatedIds: [],
+    })
   })
 
   it('should reset import state', () => {
@@ -344,7 +410,12 @@ describe('useAppStore', () => {
     useAppStore.setState({
       currentStep: 'dashboard',
       selectedCountry: { code: 'de', name: 'Germany', flag: '🇩🇪', supported: true },
-      selectedInstitution: { id: 'sparkasse', name: 'Sparkasse', type: 'bank', category: 'sparkasse' },
+      selectedInstitution: {
+        id: 'sparkasse',
+        name: 'Sparkasse',
+        type: 'bank',
+        category: 'sparkasse',
+      },
       importedAccounts: [
         {
           institutionId: 'sparkasse',
@@ -1110,7 +1181,9 @@ describe('useAppStore', () => {
       expect(state.duplicateOverrideRules).toHaveLength(0)
       // Original 50 transactions remain strictly in place
       expect(state.importedAccounts[0].transactions).toHaveLength(50)
-      expect(state.importedAccounts[0].transactions.map((t) => t.id)).toEqual(origTxs.map((t) => t.id))
+      expect(state.importedAccounts[0].transactions.map((t) => t.id)).toEqual(
+        origTxs.map((t) => t.id),
+      )
       // 50 duplicate transactions completely removed from duplicateTransactions array and not moved anywhere else
       expect(state.importedAccounts[0].duplicateTransactions ?? []).toHaveLength(0)
     })
@@ -1310,7 +1383,10 @@ describe('useAppStore', () => {
       const state = useAppStore.getState()
       expect(state.duplicateOverrideRules).toHaveLength(2)
       expect(state.duplicateOverrideRules.map((r) => r.id)).toEqual(['rule-1', 'rule-3'])
-      expect(state.duplicateOverrideRules.map((r) => r.descriptionPattern)).toEqual(['Netflix', 'Gym Membership'])
+      expect(state.duplicateOverrideRules.map((r) => r.descriptionPattern)).toEqual([
+        'Netflix',
+        'Gym Membership',
+      ])
     })
 
     it('handles legacy rules with missing or duplicate IDs without deleting all rules', () => {
@@ -1502,7 +1578,10 @@ describe('useAppStore', () => {
       useAppStore.getState().removeDuplicateOverrideRule('non-existent-id')
 
       expect(useAppStore.getState().duplicateOverrideRules).toHaveLength(2)
-      expect(useAppStore.getState().duplicateOverrideRules.map((r) => r.id)).toEqual(['rule-a', 'rule-b'])
+      expect(useAppStore.getState().duplicateOverrideRules.map((r) => r.id)).toEqual([
+        'rule-a',
+        'rule-b',
+      ])
     })
   })
 
@@ -1654,7 +1733,9 @@ describe('useAppStore', () => {
       // Reset removes both
       const resetRes = useAppStore.getState().resetDuplicateTransactions()
       expect(resetRes.removedCount).toBe(2)
-      const afterReset = useAppStore.getState().importedAccounts.find((a) => a.institutionId === 'inst-test')
+      const afterReset = useAppStore
+        .getState()
+        .importedAccounts.find((a) => a.institutionId === 'inst-test')
       expect(afterReset?.duplicateTransactions).toHaveLength(0)
       expect(afterReset?.modifiedTransactions).toHaveLength(0)
     })
@@ -1666,7 +1747,15 @@ describe('useAppStore', () => {
         institutionId: 'de_commerzbank',
         institutionName: 'Commerzbank',
         transactions: [
-          { id: 'tx-1', amount: -50, date: '2026-09-01', description: 'Groceries', currency: 'EUR', type: 'expense', institution: 'de_commerzbank' },
+          {
+            id: 'tx-1',
+            amount: -50,
+            date: '2026-09-01',
+            description: 'Groceries',
+            currency: 'EUR',
+            type: 'expense',
+            institution: 'de_commerzbank',
+          },
         ],
         importedAt: '2026-09-01T10:00:00Z',
         importedFingerprints: ['fp-1'],
@@ -1675,7 +1764,15 @@ describe('useAppStore', () => {
         institutionId: 'de_n26',
         institutionName: 'N26',
         transactions: [
-          { id: 'tx-2', amount: 100, date: '2026-09-02', description: 'Income', currency: 'EUR', type: 'income', institution: 'de_n26' },
+          {
+            id: 'tx-2',
+            amount: 100,
+            date: '2026-09-02',
+            description: 'Income',
+            currency: 'EUR',
+            type: 'income',
+            institution: 'de_n26',
+          },
         ],
         importedAt: '2026-09-02T10:00:00Z',
         importedFingerprints: ['fp-2'],
@@ -1699,7 +1796,15 @@ describe('useAppStore', () => {
         institutionId: 'de_commerzbank',
         institutionName: 'Commerzbank',
         transactions: [
-          { id: 'tx-1', amount: -50, date: '2026-09-01', description: 'Groceries', currency: 'EUR', type: 'expense', institution: 'de_commerzbank' },
+          {
+            id: 'tx-1',
+            amount: -50,
+            date: '2026-09-01',
+            description: 'Groceries',
+            currency: 'EUR',
+            type: 'expense',
+            institution: 'de_commerzbank',
+          },
         ],
         importedAt: '2026-09-01T10:00:00Z',
         importedFingerprints: ['fp-1'],
@@ -1875,4 +1980,3 @@ describe('useAppStore', () => {
     })
   })
 })
-

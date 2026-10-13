@@ -14,7 +14,12 @@ interface MedianExplanationModalProps {
   transactions: Transaction[]
 }
 
-export const MedianExplanationModal: React.FC<MedianExplanationModalProps> = ({ isOpen, onClose, type, transactions }) => {
+export const MedianExplanationModal: React.FC<MedianExplanationModalProps> = ({
+  isOpen,
+  onClose,
+  type,
+  transactions,
+}) => {
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatDate } = useFormatters()
 
@@ -24,7 +29,7 @@ export const MedianExplanationModal: React.FC<MedianExplanationModalProps> = ({ 
     const filtered = transactions.filter((tx) => tx.type === type)
     // Sort ascending by absolute amount
     const sorted = [...filtered].sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount))
-    
+
     const len = sorted.length
     if (len === 0) return { sortedTransactions: [], medianValue: 0, medianIndices: [] }
 
@@ -61,20 +66,16 @@ export const MedianExplanationModal: React.FC<MedianExplanationModalProps> = ({ 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={t.median || 'Median'} maxWidth="400px">
       <div className={styles.container}>
-        <p className={styles.explanation}>
-          {t.medianInfo}
-        </p>
-        
-        <div className={styles['median-value']}>
-          {formatCurrency(medianValue)}
-        </div>
+        <p className={styles.explanation}>{t.medianInfo}</p>
+
+        <div className={styles['median-value']}>{formatCurrency(medianValue)}</div>
 
         <div className={styles.list} ref={listRef}>
           {sortedTransactions.map((tx, index) => {
             const isMedian = medianIndices.includes(index)
             return (
-              <div 
-                key={`${tx.id}-${index}`} 
+              <div
+                key={`${tx.id}-${index}`}
                 className={`${styles.row} ${isMedian ? styles['row-highlight'] : ''}`}
               >
                 <div className={styles['row-left']}>
@@ -87,7 +88,9 @@ export const MedianExplanationModal: React.FC<MedianExplanationModalProps> = ({ 
                       {medianIndices.length === 2 ? '1/2' : t.median || 'Median'}
                     </div>
                   )}
-                  <div className={`${styles['row-amount']} ${isMedian ? styles['amount-highlight'] : ''}`}>
+                  <div
+                    className={`${styles['row-amount']} ${isMedian ? styles['amount-highlight'] : ''}`}
+                  >
                     {formatCurrency(Math.abs(tx.amount))}
                   </div>
                 </div>

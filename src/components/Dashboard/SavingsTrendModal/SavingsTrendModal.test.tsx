@@ -52,8 +52,18 @@ vi.mock('recharts', () => ({
     dot,
     activeDot,
   }: {
-    dot?: (props: { cx?: number; cy?: number; payload?: { saved: number }; key?: React.Key | null }) => React.ReactNode
-    activeDot?: (props: { cx?: number; cy?: number; payload?: { saved: number }; key?: React.Key | null }) => React.ReactNode
+    dot?: (props: {
+      cx?: number
+      cy?: number
+      payload?: { saved: number }
+      key?: React.Key | null
+    }) => React.ReactNode
+    activeDot?: (props: {
+      cx?: number
+      cy?: number
+      payload?: { saved: number }
+      key?: React.Key | null
+    }) => React.ReactNode
   }) => (
     <g data-testid="area">
       {typeof dot === 'function' && (
@@ -77,37 +87,46 @@ vi.mock('recharts', () => ({
       {React.isValidElement(content) && (
         <>
           <div data-testid="tooltip-active-positive">
-            {React.cloneElement(content as React.ReactElement<{
-              active?: boolean
-              payload?: Array<{ value: number; name: string; color: string }>
-              label?: string
-            }>, {
-              active: true,
-              payload: [{ value: 750, name: 'saved', color: '#10b981' }],
-              label: 'Feb 24',
-            })}
+            {React.cloneElement(
+              content as React.ReactElement<{
+                active?: boolean
+                payload?: Array<{ value: number; name: string; color: string }>
+                label?: string
+              }>,
+              {
+                active: true,
+                payload: [{ value: 750, name: 'saved', color: '#10b981' }],
+                label: 'Feb 24',
+              },
+            )}
           </div>
           <div data-testid="tooltip-active-negative">
-            {React.cloneElement(content as React.ReactElement<{
-              active?: boolean
-              payload?: Array<{ value: number; name: string; color: string }>
-              label?: string
-            }>, {
-              active: true,
-              payload: [{ value: -400, name: 'saved', color: '#f43f5e' }],
-              label: 'Jan 24',
-            })}
+            {React.cloneElement(
+              content as React.ReactElement<{
+                active?: boolean
+                payload?: Array<{ value: number; name: string; color: string }>
+                label?: string
+              }>,
+              {
+                active: true,
+                payload: [{ value: -400, name: 'saved', color: '#f43f5e' }],
+                label: 'Jan 24',
+              },
+            )}
           </div>
           <div data-testid="tooltip-inactive">
-            {React.cloneElement(content as React.ReactElement<{
-              active?: boolean
-              payload?: Array<{ value: number; name: string; color: string }>
-              label?: string
-            }>, {
-              active: false,
-              payload: [],
-              label: 'Mar 24',
-            })}
+            {React.cloneElement(
+              content as React.ReactElement<{
+                active?: boolean
+                payload?: Array<{ value: number; name: string; color: string }>
+                label?: string
+              }>,
+              {
+                active: false,
+                payload: [],
+                label: 'Mar 24',
+              },
+            )}
           </div>
         </>
       )}
@@ -186,7 +205,7 @@ describe('SavingsTrendModal', () => {
           totalIncome={0}
           totalExpenses={0}
           savingsRate={0}
-        />
+        />,
       )
 
       const emptyMessage = useLanguageStore.getState().t.noTransactionsInPeriod
@@ -204,7 +223,7 @@ describe('SavingsTrendModal', () => {
           totalIncome={5000}
           totalExpenses={3000}
           savingsRate={40}
-        />
+        />,
       )
 
       const hero = document.querySelector('[class*="hero"]')
@@ -224,7 +243,7 @@ describe('SavingsTrendModal', () => {
           totalIncome={2000}
           totalExpenses={3500}
           savingsRate={-75}
-        />
+        />,
       )
 
       const hero = document.querySelector('[class*="hero"]')
@@ -244,7 +263,7 @@ describe('SavingsTrendModal', () => {
           totalIncome={1000}
           totalExpenses={3000}
           savingsRate={-200}
-        />
+        />,
       )
 
       const hero = document.querySelector('[class*="hero"]')
@@ -265,7 +284,7 @@ describe('SavingsTrendModal', () => {
           totalIncome={2000}
           totalExpenses={2500}
           savingsRate={-25}
-        />
+        />,
       )
 
       const hero = document.querySelector('[class*="hero"]')
@@ -302,12 +321,7 @@ describe('SavingsTrendModal', () => {
         { name: 'Feb 24', rawMonth: '2024-02', income: 3000, expenses: 2000 },
       ]
 
-      render(
-        <SavingsTrendModal
-          {...defaultProps}
-          monthlyData={identicalData}
-        />
-      )
+      render(<SavingsTrendModal {...defaultProps} monthlyData={identicalData} />)
 
       const highlightRow = document.querySelector('[class*="highlight-row"]')
       expect(highlightRow).toBeInTheDocument()
@@ -322,12 +336,7 @@ describe('SavingsTrendModal', () => {
         { name: 'Jan 24', rawMonth: '2024-01', income: 3000, expenses: 2000 },
       ]
 
-      render(
-        <SavingsTrendModal
-          {...defaultProps}
-          monthlyData={singleMonth}
-        />
-      )
+      render(<SavingsTrendModal {...defaultProps} monthlyData={singleMonth} />)
 
       const highlightRow = document.querySelector('[class*="highlight-row"]')
       expect(highlightRow).not.toBeInTheDocument()
@@ -342,7 +351,9 @@ describe('SavingsTrendModal', () => {
       expect(table).toBeInTheDocument()
       expect(within(table).getByRole('columnheader', { name: 'Month' })).toBeInTheDocument()
       expect(within(table).getByRole('columnheader', { name: 'Total Income' })).toBeInTheDocument()
-      expect(within(table).getByRole('columnheader', { name: 'Total Expenses' })).toBeInTheDocument()
+      expect(
+        within(table).getByRole('columnheader', { name: 'Total Expenses' }),
+      ).toBeInTheDocument()
       expect(within(table).getByRole('columnheader', { name: 'Net Saved' })).toBeInTheDocument()
       expect(within(table).getByRole('columnheader', { name: 'Savings Rate' })).toBeInTheDocument()
 
@@ -364,7 +375,7 @@ describe('SavingsTrendModal', () => {
           totalIncome={2000}
           totalExpenses={4000}
           savingsRate={-100}
-        />
+        />,
       )
 
       const table = screen.getByRole('table')
@@ -383,7 +394,7 @@ describe('SavingsTrendModal', () => {
           monthlyData={dataWithZeroIncome}
           totalIncome={0}
           totalExpenses={500}
-        />
+        />,
       )
 
       const table = screen.getByRole('table')
@@ -395,12 +406,7 @@ describe('SavingsTrendModal', () => {
         { name: 'Jan 24', rawMonth: '2024-01', income: 1000, expenses: 3000 },
       ]
 
-      render(
-        <SavingsTrendModal
-          {...defaultProps}
-          monthlyData={severeDeficitMonth}
-        />
-      )
+      render(<SavingsTrendModal {...defaultProps} monthlyData={severeDeficitMonth} />)
 
       const table = screen.getByRole('table')
       // Rate is -200%, formatted as 3.0x
@@ -427,12 +433,7 @@ describe('SavingsTrendModal', () => {
         { name: 'Jan 24', rawMonth: '2024-01', income: 3000, expenses: 2000 },
       ]
 
-      render(
-        <SavingsTrendModal
-          {...defaultProps}
-          monthlyData={singleMonth}
-        />
-      )
+      render(<SavingsTrendModal {...defaultProps} monthlyData={singleMonth} />)
 
       expect(screen.queryByTestId('area-chart')).not.toBeInTheDocument()
     })
@@ -443,12 +444,7 @@ describe('SavingsTrendModal', () => {
         { name: 'Feb 24', rawMonth: '2024-02', income: 4000, expenses: 2000 }, // +2000
       ]
 
-      render(
-        <SavingsTrendModal
-          {...defaultProps}
-          monthlyData={allPositive}
-        />
-      )
+      render(<SavingsTrendModal {...defaultProps} monthlyData={allPositive} />)
 
       const splitStroke = document.querySelector('#splitStroke')
       expect(splitStroke).toBeInTheDocument()
@@ -463,12 +459,7 @@ describe('SavingsTrendModal', () => {
         { name: 'Feb 24', rawMonth: '2024-02', income: 1500, expenses: 2500 }, // -1000
       ]
 
-      render(
-        <SavingsTrendModal
-          {...defaultProps}
-          monthlyData={allNegative}
-        />
-      )
+      render(<SavingsTrendModal {...defaultProps} monthlyData={allNegative} />)
 
       const splitStroke = document.querySelector('#splitStroke')
       expect(splitStroke).toBeInTheDocument()
@@ -483,12 +474,7 @@ describe('SavingsTrendModal', () => {
         { name: 'Feb 24', rawMonth: '2024-02', income: 1000, expenses: 3000 }, // -2000 (min)
       ]
 
-      render(
-        <SavingsTrendModal
-          {...defaultProps}
-          monthlyData={mixed}
-        />
-      )
+      render(<SavingsTrendModal {...defaultProps} monthlyData={mixed} />)
 
       const splitStroke = document.querySelector('#splitStroke')
       expect(splitStroke).toBeInTheDocument()
@@ -544,8 +530,12 @@ describe('SavingsTrendModal', () => {
 
       const table = screen.getByRole('table')
       expect(within(table).getByRole('columnheader', { name: 'Monat' })).toBeInTheDocument()
-      expect(within(table).getByRole('columnheader', { name: 'Gesamteinnahmen' })).toBeInTheDocument()
-      expect(within(table).getByRole('columnheader', { name: 'Gesamtausgaben' })).toBeInTheDocument()
+      expect(
+        within(table).getByRole('columnheader', { name: 'Gesamteinnahmen' }),
+      ).toBeInTheDocument()
+      expect(
+        within(table).getByRole('columnheader', { name: 'Gesamtausgaben' }),
+      ).toBeInTheDocument()
 
       const highlightRow = document.querySelector('[class*="highlight-row"]')
       expect(within(highlightRow as HTMLElement).getByText(/Bester/)).toBeInTheDocument()
@@ -564,8 +554,12 @@ describe('SavingsTrendModal', () => {
 
       const table = screen.getByRole('table')
       expect(within(table).getByRole('columnheader', { name: 'Miesiąc' })).toBeInTheDocument()
-      expect(within(table).getByRole('columnheader', { name: 'Łączny przychód' })).toBeInTheDocument()
-      expect(within(table).getByRole('columnheader', { name: 'Łączne wydatki' })).toBeInTheDocument()
+      expect(
+        within(table).getByRole('columnheader', { name: 'Łączny przychód' }),
+      ).toBeInTheDocument()
+      expect(
+        within(table).getByRole('columnheader', { name: 'Łączne wydatki' }),
+      ).toBeInTheDocument()
 
       const highlightRow = document.querySelector('[class*="highlight-row"]')
       expect(within(highlightRow as HTMLElement).getByText(/Najlepszy/)).toBeInTheDocument()

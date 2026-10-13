@@ -51,10 +51,7 @@ export const ImportUploadArea: React.FC<ImportUploadAreaProps> = ({
 
   return (
     <div className={styles['import-upload-area']}>
-      <button
-        className={`back-button ${styles['back-button-aligned']}`}
-        onClick={onBack}
-      >
+      <button className={`back-button ${styles['back-button-aligned']}`} onClick={onBack}>
         <ArrowLeft size={18} />
         <span>{t.chooseDifferentFormat}</span>
       </button>

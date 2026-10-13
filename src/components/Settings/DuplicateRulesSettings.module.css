@@ -145,8 +145,6 @@
   padding: 0.25rem 0;
 }
 
-
-
 .modalNoTxNote {
   margin: 0;
   font-size: 0.85rem;
@@ -169,7 +167,7 @@
   user-select: none;
 }
 
-.checkboxLabel input[type="checkbox"] {
+.checkboxLabel input[type='checkbox'] {
   width: 16px;
   height: 16px;
   accent-color: var(--danger);

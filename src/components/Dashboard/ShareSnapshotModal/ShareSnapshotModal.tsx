@@ -251,11 +251,7 @@ export const ShareSnapshotModal: React.FC<ShareSnapshotModalProps> = ({
           </button>
 
           {hasNativeShare && (
-            <button
-              type="button"
-              className={styles.btnSecondary}
-              onClick={handleNativeShare}
-            >
+            <button type="button" className={styles.btnSecondary} onClick={handleNativeShare}>
               <Share2 size={16} />
               <span>{t.shareNative || 'Share...'}</span>
             </button>

@@ -81,7 +81,6 @@
   align-items: center;
 }
 
-
 /* ── Highlight pills ── */
 .highlight-row {
   display: flex;
@@ -271,10 +270,18 @@
 }
 
 /* ── Colour tokens ── */
-.saved-positive { color: #10b981; }
-.saved-negative { color: #f43f5e; }
-.rate-positive  { color: #10b981; }
-.rate-negative  { color: #f43f5e; }
+.saved-positive {
+  color: #10b981;
+}
+.saved-negative {
+  color: #f43f5e;
+}
+.rate-positive {
+  color: #10b981;
+}
+.rate-negative {
+  color: #f43f5e;
+}
 @media (max-width: 480px) {
   .table-header th:nth-child(2),
   .month-row td:nth-child(2),

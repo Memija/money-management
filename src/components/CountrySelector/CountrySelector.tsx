@@ -49,11 +49,7 @@ const CountrySelector: React.FC = () => {
   return (
     <div className="onboarding-container">
       {(importedAccounts || []).length > 0 && (
-        <button
-          className="back-button"
-          onClick={cancelImport}
-          id="cancel-import"
-        >
+        <button className="back-button" onClick={cancelImport} id="cancel-import">
           <ArrowLeft size={18} />
           <span>{t.cancel}</span>
         </button>
@@ -124,8 +120,9 @@ const CountrySelector: React.FC = () => {
                   filtered.map((country) => (
                     <div
                       key={country.code}
-                      className={`${styles['country-option']} ${!country.supported ? styles.disabled : ''} ${selected?.code === country.code ? styles.selected : ''
-                        }`}
+                      className={`${styles['country-option']} ${!country.supported ? styles.disabled : ''} ${
+                        selected?.code === country.code ? styles.selected : ''
+                      }`}
                       onClick={() => handleSelect(country)}
                       id={`country-${country.code}`}
                     >

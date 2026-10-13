@@ -51,6 +51,6 @@ export const ENERGY_GRID_LOGOS: Record<string, IconComponent> = {
   GruenweltEnergieLogo: GruenweltLogo,
   RhenagLogo,
   rhenagLogo: RhenagLogo,
-  'rhenag': RhenagLogo,
+  rhenag: RhenagLogo,
   'rheinische-elektrizitaets-und-gasversorgungsgesellschaft': RhenagLogo,
 }

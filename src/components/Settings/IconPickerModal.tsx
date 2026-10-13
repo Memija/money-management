@@ -1,6 +1,6 @@
-import React, { useMemo,useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence,motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Search, X } from 'lucide-react'
 
 import { en } from '../../i18n/locales/en'
@@ -11,7 +11,6 @@ import { normalizeForSearch } from '../../utils/string-utils'
 
 import styles from './IconPickerModal.module.css'
 
-
 interface IconPickerModalProps {
   isOpen: boolean
   onClose: () => void
@@ -19,7 +18,12 @@ interface IconPickerModalProps {
   selectedIcon?: string
 }
 
-export const IconPickerModal: React.FC<IconPickerModalProps> = ({ isOpen, onClose, onSelectIcon, selectedIcon }) => {
+export const IconPickerModal: React.FC<IconPickerModalProps> = ({
+  isOpen,
+  onClose,
+  onSelectIcon,
+  selectedIcon,
+}) => {
   const { t } = useLanguageStore()
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -27,11 +31,12 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({ isOpen, onClos
     if (!searchQuery.trim()) return ICON_GROUPS
 
     const query = normalizeForSearch(searchQuery)
-    return ICON_GROUPS.map(group => {
+    return ICON_GROUPS.map((group) => {
       const localizedGroupName = t.iconGroups?.[group.name] || group.name
       const englishGroupName = en.iconGroups?.[group.name] || group.name
-      const groupMatches = normalizeForSearch(localizedGroupName).includes(query) || 
-                           normalizeForSearch(englishGroupName).includes(query)
+      const groupMatches =
+        normalizeForSearch(localizedGroupName).includes(query) ||
+        normalizeForSearch(englishGroupName).includes(query)
 
       if (groupMatches) {
         return { ...group }
@@ -39,15 +44,17 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({ isOpen, onClos
 
       return {
         ...group,
-        icons: group.icons.filter(icon => {
+        icons: group.icons.filter((icon) => {
           const localizedName = t.icons?.[icon] || icon
           const englishName = en.icons?.[icon] || icon
-          return normalizeForSearch(localizedName).includes(query) || 
-                 normalizeForSearch(englishName).includes(query) || 
-                 normalizeForSearch(icon).includes(query)
-        })
+          return (
+            normalizeForSearch(localizedName).includes(query) ||
+            normalizeForSearch(englishName).includes(query) ||
+            normalizeForSearch(icon).includes(query)
+          )
+        }),
       }
-    }).filter(group => group.icons.length > 0)
+    }).filter((group) => group.icons.length > 0)
   }, [searchQuery, t])
 
   if (!isOpen) return null
@@ -60,7 +67,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({ isOpen, onClos
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           className={styles.modal}
-          onClick={e => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className={styles.header}>
             <h3>{t.chooseIconTitle}</h3>
@@ -83,13 +90,15 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({ isOpen, onClos
 
           <div className={styles.scrollArea}>
             {filteredGroups.length === 0 ? (
-              <div className={styles.noResults}>{t.noIconsFound.replace('{query}', searchQuery)}</div>
+              <div className={styles.noResults}>
+                {t.noIconsFound.replace('{query}', searchQuery)}
+              </div>
             ) : (
-              filteredGroups.map(group => (
+              filteredGroups.map((group) => (
                 <div key={group.name} className={styles.group}>
                   <h4 className={styles.groupTitle}>{t.iconGroups?.[group.name] || group.name}</h4>
                   <div className={styles.iconGrid}>
-                    {group.icons.map(iconName => {
+                    {group.icons.map((iconName) => {
                       const IconComp = AVAILABLE_ICONS[iconName]
                       if (!IconComp) return null
                       const isSelected = selectedIcon === iconName

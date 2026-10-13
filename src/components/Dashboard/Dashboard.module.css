@@ -22,7 +22,9 @@
   z-index: 100;
   max-width: 100vw;
   overflow-x: clip;
-  transition: background 0.35s ease, border-color 0.35s ease;
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease;
 }
 
 .subheader-inner {
@@ -137,10 +139,18 @@
 }
 
 @keyframes orbDrift {
-  0%   { transform: translate(0, 0) scale(1); }
-  33%  { transform: translate(30px, -20px) scale(1.06); }
-  66%  { transform: translate(-20px, 30px) scale(0.95); }
-  100% { transform: translate(0, 0) scale(1); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -20px) scale(1.06);
+  }
+  66% {
+    transform: translate(-20px, 30px) scale(0.95);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -218,9 +228,15 @@
 /* ─────────────────────────────────────────────────
    Text helpers
 ───────────────────────────────────────────────── */
-.text-primary { color: var(--primary); }
-.text-danger  { color: #f43f5e; }
-.text-muted   { color: var(--text-muted); }
+.text-primary {
+  color: var(--primary);
+}
+.text-danger {
+  color: #f43f5e;
+}
+.text-muted {
+  color: var(--text-muted);
+}
 
 /* ─────────────────────────────────────────────────
    Dashboard grid
@@ -239,10 +255,18 @@
   z-index: 50;
 }
 
-.col-span-12 { grid-column: span 12; }
-.col-span-8  { grid-column: span 8; }
-.col-span-6  { grid-column: span 6; }
-.col-span-4  { grid-column: span 4; }
+.col-span-12 {
+  grid-column: span 12;
+}
+.col-span-8 {
+  grid-column: span 8;
+}
+.col-span-6 {
+  grid-column: span 6;
+}
+.col-span-4 {
+  grid-column: span 4;
+}
 
 @media (max-width: 1024px) {
   .col-span-8,
@@ -271,10 +295,12 @@
 
   /* Layered gradient background */
   background:
-    linear-gradient(135deg,
+    linear-gradient(
+      135deg,
       rgba(16, 185, 129, 0.08) 0%,
       rgba(99, 102, 241, 0.06) 50%,
-      rgba(245, 158, 11, 0.05) 100%),
+      rgba(245, 158, 11, 0.05) 100%
+    ),
     var(--card-bg);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
@@ -319,8 +345,12 @@
 }
 
 @keyframes heroShimmer {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .balance-hero.negative::before {
@@ -436,8 +466,6 @@
   color: var(--text-muted);
   margin-bottom: 0.25rem;
 }
-
-
 
 /* ─────────────────────────────────────────────────
    Transaction list (legacy classes used by TransactionList)
@@ -683,9 +711,18 @@
     height: 12px;
   }
 
-  .orb-1 { width: 350px; height: 350px; }
-  .orb-2 { width: 280px; height: 280px; }
-  .orb-3 { width: 240px; height: 240px; }
+  .orb-1 {
+    width: 350px;
+    height: 350px;
+  }
+  .orb-2 {
+    width: 280px;
+    height: 280px;
+  }
+  .orb-3 {
+    width: 240px;
+    height: 240px;
+  }
 }
 
 @media (max-width: 480px) {

@@ -48,11 +48,16 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
         <p className={styles.tooltipHeader}>{formattedLabel}</p>
         <div className={styles.tooltipRow}>
           <div className={styles.tooltipLabelGroup}>
-            <span className={`${styles.tooltipDot} ${isPositive ? styles.pillDotIncome : styles.pillDotExpense}`} />
+            <span
+              className={`${styles.tooltipDot} ${isPositive ? styles.pillDotIncome : styles.pillDotExpense}`}
+            />
             <span>{t.cumulativeBalance || 'Cumulative Balance'}</span>
           </div>
-          <span className={`${styles.tooltipValue} ${isPositive ? styles.tooltipIncomeValue : styles.tooltipExpenseValue}`}>
-            {isPositive ? '+' : ''}{formatCurrency(cumulativeNet)}
+          <span
+            className={`${styles.tooltipValue} ${isPositive ? styles.tooltipIncomeValue : styles.tooltipExpenseValue}`}
+          >
+            {isPositive ? '+' : ''}
+            {formatCurrency(cumulativeNet)}
           </span>
         </div>
       </div>
@@ -63,7 +68,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
   const expenses = Number(payload.find((p) => p.dataKey === 'expenses')?.value ?? 0)
   const net = income - expenses
   const isPositive = net >= 0
-  const monthlyRate = income > 0 ? Math.round((net / income) * 100) : (expenses > 0 ? -100 : 0)
+  const monthlyRate = income > 0 ? Math.round((net / income) * 100) : expenses > 0 ? -100 : 0
 
   return (
     <div className={styles.tooltipContainer}>
@@ -96,10 +101,13 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
       {/* Net Row */}
       <div className={styles.tooltipNetRow}>
         <span className={styles.tooltipNetLabel}>
-          {isPositive ? (t.netSavedLabel || 'Net Saved') : (t.netDeficitLabel || 'Net Deficit')}
+          {isPositive ? t.netSavedLabel || 'Net Saved' : t.netDeficitLabel || 'Net Deficit'}
         </span>
-        <span className={`${styles.tooltipValue} ${isPositive ? styles.netPositive : styles.netNegative} privacy-blur`}>
-          {isPositive ? '+' : ''}{formatCurrency(net)} ({formatSavingsRate(monthlyRate)})
+        <span
+          className={`${styles.tooltipValue} ${isPositive ? styles.netPositive : styles.netNegative} privacy-blur`}
+        >
+          {isPositive ? '+' : ''}
+          {formatCurrency(net)} ({formatSavingsRate(monthlyRate)})
         </span>
       </div>
     </div>

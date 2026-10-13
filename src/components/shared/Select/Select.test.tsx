@@ -18,7 +18,7 @@ describe('Select Component', () => {
         onChange={vi.fn()}
         options={options}
         aria-label="Select fruit"
-      />
+      />,
     )
 
     // Trigger button should show selected option label
@@ -34,7 +34,7 @@ describe('Select Component', () => {
         onChange={vi.fn()}
         options={options}
         aria-label="Select fruit"
-      />
+      />,
     )
 
     const trigger = screen.getByTestId('fruit-select-trigger')
@@ -66,7 +66,7 @@ describe('Select Component', () => {
         onChange={handleChange}
         options={options}
         aria-label="Select fruit"
-      />
+      />,
     )
 
     const trigger = screen.getByTestId('fruit-select-trigger')
@@ -96,7 +96,7 @@ describe('Select Component', () => {
         options={numOptions}
         size="sm"
         aria-label="Items per page"
-      />
+      />,
     )
 
     const trigger = screen.getByTestId('num-select-trigger')
@@ -119,7 +119,7 @@ describe('Select Component', () => {
         onChange={handleChange}
         options={options}
         aria-label="Select fruit"
-      />
+      />,
     )
 
     const trigger = screen.getByTestId('fruit-select-trigger')
@@ -146,7 +146,7 @@ describe('Select Component', () => {
         onChange={vi.fn()}
         options={options}
         aria-label="Select fruit"
-      />
+      />,
     )
 
     const trigger = screen.getByTestId('fruit-select-trigger')
@@ -166,7 +166,7 @@ describe('Select Component', () => {
         onChange={handleChange}
         options={options}
         aria-label="Select fruit"
-      />
+      />,
     )
 
     // Query native select via getByLabelText (standard testing-library way)
@@ -187,7 +187,7 @@ describe('Select Component', () => {
         options={options}
         disabled={true}
         aria-label="Select fruit"
-      />
+      />,
     )
 
     const trigger = screen.getByTestId('fruit-select-trigger')
@@ -206,7 +206,7 @@ describe('Select Component', () => {
         options={options}
         onOpenChange={handleOpenChange}
         aria-label="Select fruit"
-      />
+      />,
     )
 
     const trigger = screen.getByTestId('fruit-select-trigger')

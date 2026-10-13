@@ -14,7 +14,6 @@ import {
   rowsToTransactionsWithMeta,
 } from '../../utils/transaction-parsers'
 
-
 export const useTransactionImport = (
   institutionName: string,
   method: ImportMethod | null,
@@ -223,10 +222,7 @@ export const useTransactionImport = (
     setPasteText('')
   }, [])
 
-  const importFingerprint = useMemo(
-    () => computeImportFingerprint(transactions),
-    [transactions],
-  )
+  const importFingerprint = useMemo(() => computeImportFingerprint(transactions), [transactions])
 
   return {
     transactions,

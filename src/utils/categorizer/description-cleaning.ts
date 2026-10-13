@@ -71,7 +71,10 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/(?:vorab)[-\s]+(?:pauschale)/iu, 'Vorabpauschale'],
   [/(?:steuer)[-\s]+(?:abzug)/iu, 'Steuerabzug'],
   [/(?:steuer)[-\s]+(?:abrechnung)/iu, 'Steuerabrechnung'],
-  [/(?:kapital|kapitaler)[-\s]+(?:ertragsteuer|tragsteuer|ertragssteuer|tragssteuer)/iu, 'Kapitalertragsteuer'],
+  [
+    /(?:kapital|kapitaler)[-\s]+(?:ertragsteuer|tragsteuer|ertragssteuer|tragssteuer)/iu,
+    'Kapitalertragsteuer',
+  ],
   [/(?:solidaritäts|solidaritaets|soli)[-\s]+(?:zuschlag)/iu, 'Solidaritätszuschlag'],
   [/(?:kirchen)[-\s]+(?:steuer)/iu, 'Kirchensteuer'],
   [/(?:abgeltungs?)[-\s]+(?:steuer)/iu, 'Abgeltungsteuer'],
@@ -96,16 +99,16 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
     /(?:service|serviceg|servicege|serviceges)[-\s]+(?:gesellschaft|esellschaft|sellschaft|ellschaft)/iu,
     'Servicegesellschaft',
   ],
-  [/(?:verkehr|verkehrs|verkehrsve|verkehrsver)[-\s]+(?:verbund|erbund|rbund|bund)/iu, 'Verkehrsverbund'],
+  [
+    /(?:verkehr|verkehrs|verkehrsve|verkehrsver)[-\s]+(?:verbund|erbund|rbund|bund)/iu,
+    'Verkehrsverbund',
+  ],
   [/(?:reise|reisebu|reisebuch)[-\s]+(?:buchung|chung)/iu, 'Reisebuchung'],
   [
     /(?:rheinische)[-\s]+(?:elektrizit[aä]ts)[-\s]+(?:und)[-\s]+(?:gasve)\s+(?:rsorgungsgesellscha|rsorgungsgesellschaft)/iu,
     'Rheinische Elektrizitäts- und Gasversorgungsgesellschaft',
   ],
-  [
-    /(?:gasve)[-\s]+(?:rsorgungsgesellscha|rsorgungsgesellschaft)/iu,
-    'Gasversorgungsgesellschaft',
-  ],
+  [/(?:gasve)[-\s]+(?:rsorgungsgesellscha|rsorgungsgesellschaft)/iu, 'Gasversorgungsgesellschaft'],
   [/(?:financial\s+service)\s+(?:s)\s+(?:gmbh)/iu, 'Financial Services GmbH'],
   [/(?:lastschrif)\s+(?:t)\b/iu, 'Lastschrift'],
   [/(?:y)[-\s]*(?:pal)\b/iu, 'PayPal'],
@@ -209,7 +212,10 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/(?:bosnienherzegow|bosnienherzegowina|bosnien-herzegowina)\.?/iu, 'Bosnien und Herzegowina'],
   [/(?:selbstbesti)[-\s]+(?:mmtes|mmte|mmt)/iu, 'selbstbestimmtes'],
   [/(?:wgv)[-\s]+(?:wuertt|w\u00fcrtt)\.?/iu, 'WGV-Wuertt.'],
-  [/(?:privathaftpflicht)[-\s]+(?:v\s*ersicherungsnummer|versicherungsnummer)/iu, 'Privathaftpflicht-Versicherungsnummer'],
+  [
+    /(?:privathaftpflicht)[-\s]+(?:v\s*ersicherungsnummer|versicherungsnummer)/iu,
+    'Privathaftpflicht-Versicherungsnummer',
+  ],
   [/(?:v)[-\s]+(?:ersicherungsnummer)/iu, 'Versicherungsnummer'],
   [/(?:sc)[-\s]+(?:huhe|huh)/iu, 'Schuhe'],
   [/(?:i)[-\s]+(?:hre|hren|hrem|hrer)/iu, 'Ihre'],
@@ -232,7 +238,10 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/\b(?:out)[-\s]+(?:door)\b/iu, 'Outdoor'],
   // English line-break word splits
   [/(?:pu|pur|purch)[-\s]+(?:rchase|chase|ase)/iu, 'Purchase'],
-  [/(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu, 'Withdrawal'],
+  [
+    /(?:with)[-\s]+(?:draw)[-\s]+(?:al)|(?:with|withdr|withdra)[-\s]+(?:drawal|awal|wal)/iu,
+    'Withdrawal',
+  ],
   [/(?:pay)[-\s]+(?:roll)/iu, 'Payroll'],
   [/(?:grocer)[-\s]+(?:ies)|(?:groce)[-\s]+(?:ries)/iu, 'Groceries'],
   [/(?:trans)[-\s]+(?:fer)/iu, 'Transfer'],
@@ -258,10 +267,12 @@ const WORD_REPAIR_RULES: Array<[RegExp, string]> = [
   [/(?:trans)[-\s]+(?:aksi)/iu, 'Transaksi'],
 ]
 
-const COMPILED_WORD_REPAIR_RULES: Array<[RegExp, string]> = WORD_REPAIR_RULES.map(([regex, rep]) => [
-  new RegExp(`(?<![\\p{L}\\p{N}])(?:${regex.source})(?![\\p{L}\\p{N}])`, 'giu'),
-  rep,
-])
+const COMPILED_WORD_REPAIR_RULES: Array<[RegExp, string]> = WORD_REPAIR_RULES.map(
+  ([regex, rep]) => [
+    new RegExp(`(?<![\\p{L}\\p{N}])(?:${regex.source})(?![\\p{L}\\p{N}])`, 'giu'),
+    rep,
+  ],
+)
 
 /**
  * Matches if ANY repair rule would match. If none matches the input, every sequential
@@ -377,23 +388,38 @@ export function extractCleanDescription(desc: string): string {
   )
 
   // 6. Remove terminal transaction codes and payment method noise (e.g. KFN 0 VJ 2412, ELV68423401, ME0, Kartenzahlung, Virtual Debit...)
-  cleaned = cleaned.replace(/\b(?:RG|KD|VK)\s*[:.]?\s*\d+(?:\s*[/:]\s*(?:RG|KD|VK)\s*[:.]?\s*\d+)?\b/gi, ' ')
-  cleaned = cleaned.replace(/\bKarte\s+Nr\.?\s*(?:\d{4}|\d{2,4}[X\d\s]*)\s*(?:Kartenzahlung)?\s*(?:Virtual\s*(?:Debit(?:\s*C(?:ard)?)?|Debi|DB|Car|Card|C)?|Virtu\b).*$/gi, ' ')
+  cleaned = cleaned.replace(
+    /\b(?:RG|KD|VK)\s*[:.]?\s*\d+(?:\s*[/:]\s*(?:RG|KD|VK)\s*[:.]?\s*\d+)?\b/gi,
+    ' ',
+  )
+  cleaned = cleaned.replace(
+    /\bKarte\s+Nr\.?\s*(?:\d{4}|\d{2,4}[X\d\s]*)\s*(?:Kartenzahlung)?\s*(?:Virtual\s*(?:Debit(?:\s*C(?:ard)?)?|Debi|DB|Car|Card|C)?|Virtu\b).*$/gi,
+    ' ',
+  )
   cleaned = cleaned.replace(
     /\bKarte\s+Nr\.?\s*(?:\d{4}|\d{2,4}[X\d\s]*)\s*(?:Kartenzahlung)?(?:\s*Virtual\s*(?:Debit(?:\s*C(?:ard)?)?|Debi|DB|Car|Card|C)?|\s*Virtu\b)?(?:\s*PH\s*\d+\s+[A-Za-z]+\s+[A-Za-z]+)?(?:\s*\d+)?\b/gi,
     ' ',
   )
-  cleaned = cleaned.replace(/\b(?:Virtual\s*(?:Debit(?:\s*C(?:ard)?)?|Debi|DB|Car|Card|C)?|Virtu)\b/gi, ' ')
+  cleaned = cleaned.replace(
+    /\b(?:Virtual\s*(?:Debit(?:\s*C(?:ard)?)?|Debi|DB|Car|Card|C)?|Virtu)\b/gi,
+    ' ',
+  )
   cleaned = cleaned.replace(/\bGIR\s+\d+(?:\/\/[A-Za-z0-9]+)?\b/gi, ' ')
   cleaned = cleaned.replace(/\bFil\.?\s*\d+\b/gi, ' ')
   cleaned = cleaned.replace(/\bKFN\s+\d+\s+VJ\s+\d+\b/gi, ' ')
   cleaned = cleaned.replace(/\b(?:ELV\d*|ME\d+|PP\.[0-9\s]*\.?PP)\b/gi, ' ')
-  cleaned = cleaned.replace(/\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz|KARTENZAHL\.?)\b/gi, ' ')
+  cleaned = cleaned.replace(
+    /\b(?:Kartenzahlung|Kartenabrechnung|Karteneinsatz|KARTENZAHL\.?)\b/gi,
+    ' ',
+  )
   cleaned = cleaned.replace(/\b(?:NYA|NNT)\*\s*/gi, ' ')
   cleaned = cleaned.replace(/\bsagt\s+danke\b/gi, ' ')
 
   // 5. Remove standalone IBANs (compact or spaced) and SWIFT BICs
-  cleaned = cleaned.replace(/\b[A-Za-z]{2}\d{2}(?:\s*[A-Za-z0-9]{4}){2,7}(?:\s*[A-Za-z0-9]{1,4})?\b/g, ' ')
+  cleaned = cleaned.replace(
+    /\b[A-Za-z]{2}\d{2}(?:\s*[A-Za-z0-9]{4}){2,7}(?:\s*[A-Za-z0-9]{1,4})?\b/g,
+    ' ',
+  )
   cleaned = cleaned.replace(/\b[A-Za-z]{6}[A-Za-z0-9]{2}(?:[A-Za-z0-9]{3})?\b/gi, (match) => {
     return /XXX$/i.test(match) || /\d/.test(match) ? ' ' : match
   })
@@ -525,7 +551,10 @@ export function extractMerchantKeyword(desc: string): string {
     /\b(?:Ihr\s+E(?:in)?[- ]?kauf(?:\s+bei)?|Ihr\s+E(?:in)?k(?:auf|au|a|f)?(?:\s+bei)?|Ihr\s+Ein(?:\s+bei)?|I\s*hr\s+E(?:in)?k(?:auf|au|a|f)?(?:\s+bei)?|Your\s+purchase\s+(?:at|from)|Tw[oó]j\s+zakup\s+w|Va[sš]a\s+kupovina\s+kod|Ваша\s+куповина\s+код|Pembelian\s+Anda\s+di)\s*(.*)$/i,
   )
   if (purchaseMatch) {
-    const beforePurchase = merchant.slice(0, purchaseMatch.index).replace(/[,.:;/-]+\s*$/, '').trim()
+    const beforePurchase = merchant
+      .slice(0, purchaseMatch.index)
+      .replace(/[,.:;/-]+\s*$/, '')
+      .trim()
     const rawAfter = purchaseMatch[1].trim()
     const cleanAfter = rawAfter
       .replace(/\s+(?:en|end|end-t|end-to)\b.*$/i, '')
@@ -533,7 +562,10 @@ export function extractMerchantKeyword(desc: string): string {
       .trim()
 
     // Determine the most complete merchant name (avoid taking truncated merchant after purchase phrase)
-    if (beforePurchase && (!cleanAfter || beforePurchase.length >= cleanAfter.length || cleanAfter.length <= 4)) {
+    if (
+      beforePurchase &&
+      (!cleanAfter || beforePurchase.length >= cleanAfter.length || cleanAfter.length <= 4)
+    ) {
       merchant = beforePurchase
     } else if (cleanAfter) {
       merchant = cleanAfter
@@ -557,7 +589,11 @@ export function extractMerchantKeyword(desc: string): string {
   merchant = merchant.replace(/\s*\(?\s*(?:eur|euro)\b.*$/i, '')
 
   // If the extracted text is just processor remnants or purchase phrases, clear it
-  if (/^(?:pp\b|sc\b|i\b|ih\b|ihr\b|ihr\s+e\b|ihr\s+ei\b|ihr\s+ein\b|ihr\s+eink\b|ihr\s+einkauf\b|be\b|bei\b|einkauf\b)/i.test(merchant.trim())) {
+  if (
+    /^(?:pp\b|sc\b|i\b|ih\b|ihr\b|ihr\s+e\b|ihr\s+ei\b|ihr\s+ein\b|ihr\s+eink\b|ihr\s+einkauf\b|be\b|bei\b|einkauf\b)/i.test(
+      merchant.trim(),
+    )
+  ) {
     merchant = ''
   }
 
@@ -666,13 +702,24 @@ export function findRelatedTransactions(
   allTransactions: Transaction[],
   targetCategory?: string,
 ): Transaction[] {
-  if (!targetTx || !allTransactions || allTransactions.length === 0 || isInformativeTransaction(targetTx)) return []
+  if (
+    !targetTx ||
+    !allTransactions ||
+    allTransactions.length === 0 ||
+    isInformativeTransaction(targetTx)
+  )
+    return []
 
   const seenIds = new Set<string>()
   const results: Transaction[] = []
 
   for (const candidate of allTransactions) {
-    if (!candidate || candidate.id === targetTx.id || candidate.isGhost || isInformativeTransaction(candidate)) {
+    if (
+      !candidate ||
+      candidate.id === targetTx.id ||
+      candidate.isGhost ||
+      isInformativeTransaction(candidate)
+    ) {
       continue
     }
 

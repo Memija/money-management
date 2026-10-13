@@ -22,10 +22,9 @@ describe('merchants data', () => {
       for (const merchant of POPULAR_MERCHANTS) {
         expect(merchant.name.trim().length).toBeGreaterThan(0)
         expect(merchant.keyword.trim().length).toBeGreaterThan(0)
-        expect(
-          merchant.keyword,
-          `Merchant "${merchant.id}" keyword must be lowercase`,
-        ).toBe(merchant.keyword.toLowerCase())
+        expect(merchant.keyword, `Merchant "${merchant.id}" keyword must be lowercase`).toBe(
+          merchant.keyword.toLowerCase(),
+        )
       }
     })
   })

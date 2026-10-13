@@ -73,7 +73,8 @@ const categoryTranslationKeys: Record<
 }
 
 const InstitutionSelector: React.FC = () => {
-  const { selectedCountry, selectInstitution, setStep, importedAccounts, cancelImport } = useAppStore()
+  const { selectedCountry, selectInstitution, setStep, importedAccounts, cancelImport } =
+    useAppStore()
   const t = useLanguageStore((s) => s.t)
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<InstitutionCategory | 'all'>('all')
@@ -114,12 +115,20 @@ const InstitutionSelector: React.FC = () => {
   return (
     <div className="onboarding-container">
       <div className={styles['nav-actions-wrapper']}>
-        <button className={`back-button ${styles['back-button-clean']}`} onClick={() => setStep('country')} id="back-to-country">
+        <button
+          className={`back-button ${styles['back-button-clean']}`}
+          onClick={() => setStep('country')}
+          id="back-to-country"
+        >
           <ArrowLeft size={18} />
           <span>{t.back}</span>
         </button>
         {(importedAccounts || []).length > 0 && (
-          <button className={`back-button ${styles['back-button-clean']}`} onClick={() => cancelImport?.()} id="cancel-import">
+          <button
+            className={`back-button ${styles['back-button-clean']}`}
+            onClick={() => cancelImport?.()}
+            id="cancel-import"
+          >
             <ArrowLeft size={18} />
             <span>{t.cancel}</span>
           </button>

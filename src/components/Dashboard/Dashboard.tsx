@@ -1,5 +1,5 @@
 import React, { startTransition, useCallback, useMemo, useRef, useState } from 'react'
-import { AnimatePresence,motion, useInView } from 'framer-motion'
+import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { Share2, TrendingDown, TrendingUp } from 'lucide-react'
 
 import { useAccountBalances } from '../../hooks/useAccountBalances'
@@ -127,7 +127,9 @@ const Dashboard: React.FC = () => {
   } = useTransactions(period)
 
   const detachTransactionsFromDashboard = useAppStore((s) => s.detachTransactionsFromDashboard)
-  const setDetachTransactionsFromDashboard = useAppStore((s) => s.setDetachTransactionsFromDashboard)
+  const setDetachTransactionsFromDashboard = useAppStore(
+    (s) => s.setDetachTransactionsFromDashboard,
+  )
 
   const isSingleAccountView = selectedInstitution !== 'all'
 
@@ -218,16 +220,16 @@ const Dashboard: React.FC = () => {
     return hasExtensiveCategoryData(analytics.monthlyCategoryData)
   }, [analytics.monthlyCategoryData, analytics.topMerchants.length])
 
-  const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(effectiveDashboardTransactions)
+  const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(
+    effectiveDashboardTransactions,
+  )
 
   const selectedAccountInfo = useMemo(() => {
     if (selectedInstitution === 'all') {
       if (bankAccounts.length === 1) return bankAccounts[0]
       return null
     }
-    return bankAccounts.find(
-      (a) => a.id === selectedInstitution || a.name === selectedInstitution,
-    )
+    return bankAccounts.find((a) => a.id === selectedInstitution || a.name === selectedInstitution)
   }, [bankAccounts, selectedInstitution])
 
   // Current display balance: ensures complete ledger balance for 'all' period matches AccountSelector exactly
@@ -284,7 +286,9 @@ const Dashboard: React.FC = () => {
               data-testid="dashboard-share-snapshot-btn"
             >
               <Share2 size={15} />
-              <span className={styles['share-btn-text']}>{t.shareSnapshot || 'Share Snapshot'}</span>
+              <span className={styles['share-btn-text']}>
+                {t.shareSnapshot || 'Share Snapshot'}
+              </span>
             </button>
           </div>
 
@@ -316,13 +320,17 @@ const Dashboard: React.FC = () => {
                     <div className={styles['sticky-stat-item']}>
                       <TrendingUp size={14} className={styles['text-primary']} />
                       <span className={styles['sticky-stat-label']}>{t.income}:</span>
-                      <span className={`${styles['sticky-stat-value']} privacy-blur`}>{formatCurrency(analytics.totalIncome)}</span>
+                      <span className={`${styles['sticky-stat-value']} privacy-blur`}>
+                        {formatCurrency(analytics.totalIncome)}
+                      </span>
                     </div>
                     <div className={styles['sticky-stat-divider']} />
                     <div className={styles['sticky-stat-item']}>
                       <TrendingDown size={14} className={styles['text-danger']} />
                       <span className={styles['sticky-stat-label']}>{t.expenses}:</span>
-                      <span className={`${styles['sticky-stat-value']} privacy-blur`}>{formatCurrency(analytics.totalExpenses)}</span>
+                      <span className={`${styles['sticky-stat-value']} privacy-blur`}>
+                        {formatCurrency(analytics.totalExpenses)}
+                      </span>
                     </div>
                   </motion.div>
                 )}
@@ -341,7 +349,6 @@ const Dashboard: React.FC = () => {
           <div className={styles['orb-3']} />
         </div>
         <main className="container">
-
           <motion.section
             ref={heroRef}
             initial={{ opacity: 0, y: 24 }}
@@ -349,107 +356,112 @@ const Dashboard: React.FC = () => {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className={`${styles['balance-hero']} ${displayBalance < 0 ? styles.negative : ''}`}
           >
-            <h1 className={`${styles['balance-amount']} privacy-blur`}>{formatCurrency(displayBalance)}</h1>
-          <div className={styles['balance-stats']}>
-            <div className={styles['stat-item']}>
-              <div className={`${styles['icon-box']} ${styles['icon-income']}`}>
-                <TrendingUp size={18} />
+            <h1 className={`${styles['balance-amount']} privacy-blur`}>
+              {formatCurrency(displayBalance)}
+            </h1>
+            <div className={styles['balance-stats']}>
+              <div className={styles['stat-item']}>
+                <div className={`${styles['icon-box']} ${styles['icon-income']}`}>
+                  <TrendingUp size={18} />
+                </div>
+                <div className={styles['stat-text-container']}>
+                  <p className={styles['stat-label']}>{t.income}</p>
+                  <p className={`${styles['stat-value']} privacy-blur`}>
+                    {formatCurrency(analytics.totalIncome)}
+                  </p>
+                </div>
               </div>
-              <div className={styles['stat-text-container']}>
-                <p className={styles['stat-label']}>{t.income}</p>
-                <p className={`${styles['stat-value']} privacy-blur`}>{formatCurrency(analytics.totalIncome)}</p>
+              <div className={styles['stat-item']}>
+                <div className={`${styles['icon-box']} ${styles['icon-expense']}`}>
+                  <TrendingDown size={18} />
+                </div>
+                <div className={styles['stat-text-container']}>
+                  <p className={styles['stat-label']}>{t.expenses}</p>
+                  <p className={`${styles['stat-value']} privacy-blur`}>
+                    {formatCurrency(analytics.totalExpenses)}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className={styles['stat-item']}>
-              <div className={`${styles['icon-box']} ${styles['icon-expense']}`}>
-                <TrendingDown size={18} />
-              </div>
-              <div className={styles['stat-text-container']}>
-                <p className={styles['stat-label']}>{t.expenses}</p>
-                <p className={`${styles['stat-value']} privacy-blur`}>{formatCurrency(analytics.totalExpenses)}</p>
-              </div>
-            </div>
-          </div>
-        </motion.section>
+          </motion.section>
 
-        {/* Insight Cards */}
-        <InsightCards
-          transactionCount={analytics.transactionCount}
-          incomeCount={analytics.incomeCount}
-          expenseCount={analytics.expenseCount}
-          avgExpense={analytics.avgExpense}
-          avgIncome={analytics.avgIncome}
-          avgTransaction={analytics.avgTransaction}
-          totalIncome={analytics.totalIncome}
-          totalExpenses={analytics.totalExpenses}
-          balance={displayBalance}
-          topCategory={analytics.topCategory}
-          topCategories={analytics.topCategories}
-          savingsRate={analytics.savingsRate}
-          onIncomeClick={handleIncomeDetailClick}
-          onExpenseClick={handleExpenseDetailClick}
-          onAllClick={handleSavingsTrendOpen}
-          onAvgIncomeClick={handleAvgIncomeClick}
-          onAvgExpenseClick={handleAvgExpenseClick}
-          onCategoryClick={handleCategoryDetailClick}
-        />
-
-        {/* Charts Grid */}
-        <div className={styles['dashboard-grid']}>
-          {/* Income vs Expenses Chart */}
-          <IncomeVsExpensesChart
-            monthlyData={analytics.monthlyData}
+          {/* Insight Cards */}
+          <InsightCards
+            transactionCount={analytics.transactionCount}
+            incomeCount={analytics.incomeCount}
+            expenseCount={analytics.expenseCount}
+            avgExpense={analytics.avgExpense}
+            avgIncome={analytics.avgIncome}
+            avgTransaction={analytics.avgTransaction}
             totalIncome={analytics.totalIncome}
             totalExpenses={analytics.totalExpenses}
-          />
-
-          {/* Expense Categories full-row interactive breakdown */}
-          <ExpenseCategories
-            categoryBreakdown={analytics.categoryBreakdown}
-            totalExpenses={analytics.totalExpenses}
+            balance={displayBalance}
+            topCategory={analytics.topCategory}
+            topCategories={analytics.topCategories}
+            savingsRate={analytics.savingsRate}
+            onIncomeClick={handleIncomeDetailClick}
+            onExpenseClick={handleExpenseDetailClick}
+            onAllClick={handleSavingsTrendOpen}
+            onAvgIncomeClick={handleAvgIncomeClick}
+            onAvgExpenseClick={handleAvgExpenseClick}
             onCategoryClick={handleCategoryDetailClick}
           />
 
-          {/* Recurring Expenses */}
-          <RecurringExpenses
-            recurringExpenses={recurringExpenses}
-            totalMonthly={recurringMonthlyTotal}
-          />
+          {/* Charts Grid */}
+          <div className={styles['dashboard-grid']}>
+            {/* Income vs Expenses Chart */}
+            <IncomeVsExpensesChart
+              monthlyData={analytics.monthlyData}
+              totalIncome={analytics.totalIncome}
+              totalExpenses={analytics.totalExpenses}
+            />
 
-          {/* Top Merchants + Category Trend (side-by-side or full row when lots of data are present) */}
-          <TopMerchants
-            merchants={analytics.topMerchants}
-            totalExpenses={analytics.totalExpenses}
-            onMerchantClick={handleMerchantDetailClick}
-            fullWidth={isCategoryTrendFullWidth}
-          />
-          <CategoryTrend
-            data={analytics.monthlyCategoryData}
-            fullWidth={isCategoryTrendFullWidth}
-          />
+            {/* Expense Categories full-row interactive breakdown */}
+            <ExpenseCategories
+              categoryBreakdown={analytics.categoryBreakdown}
+              totalExpenses={analytics.totalExpenses}
+              onCategoryClick={handleCategoryDetailClick}
+            />
 
+            {/* Recurring Expenses */}
+            <RecurringExpenses
+              recurringExpenses={recurringExpenses}
+              totalMonthly={recurringMonthlyTotal}
+            />
 
-          {/* Transactions Table */}
-          <TransactionList
-            filteredTx={filteredTx}
-            allTransactions={allTransactions}
-            institutionNames={institutionNames}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            typeFilter={typeFilter}
-            setTypeFilter={setTypeFilter}
-            selectedInstitution={selectedInstitution}
-            sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
-            setShowGhost={setShowGhost}
-            ghostCount={ghostCount}
-            showBankName={hasMultipleAccounts && selectedInstitution === 'all'}
-            detachTransactionsFromDashboard={detachTransactionsFromDashboard}
-            setDetachTransactionsFromDashboard={setDetachTransactionsFromDashboard}
-          />
-        </div>
+            {/* Top Merchants + Category Trend (side-by-side or full row when lots of data are present) */}
+            <TopMerchants
+              merchants={analytics.topMerchants}
+              totalExpenses={analytics.totalExpenses}
+              onMerchantClick={handleMerchantDetailClick}
+              fullWidth={isCategoryTrendFullWidth}
+            />
+            <CategoryTrend
+              data={analytics.monthlyCategoryData}
+              fullWidth={isCategoryTrendFullWidth}
+            />
+
+            {/* Transactions Table */}
+            <TransactionList
+              filteredTx={filteredTx}
+              allTransactions={allTransactions}
+              institutionNames={institutionNames}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              typeFilter={typeFilter}
+              setTypeFilter={setTypeFilter}
+              selectedInstitution={selectedInstitution}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+              setShowGhost={setShowGhost}
+              ghostCount={ghostCount}
+              showBankName={hasMultipleAccounts && selectedInstitution === 'all'}
+              detachTransactionsFromDashboard={detachTransactionsFromDashboard}
+              setDetachTransactionsFromDashboard={setDetachTransactionsFromDashboard}
+            />
+          </div>
         </main>
       </div>
 

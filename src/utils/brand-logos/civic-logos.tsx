@@ -659,12 +659,7 @@ export const EdukativniCentarLogo: IconComponent = ({ size = 16, className }) =>
       fill="#E0E7FF"
     />
     {/* Book spine line & center fold */}
-    <path
-      d="M24 33.5 L24 40.2"
-      stroke="#2563EB"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-    />
+    <path d="M24 33.5 L24 40.2" stroke="#2563EB" strokeWidth="1.2" strokeLinecap="round" />
 
     {/* Seedling Sprout - Early Childhood Development (Rani Razvoj) */}
     {/* Central Stem */}
@@ -680,10 +675,7 @@ export const EdukativniCentarLogo: IconComponent = ({ size = 16, className }) =>
       fill="url(#ecrrSprout)"
     />
     {/* Right Leaf */}
-    <path
-      d="M24 22 C30 20.5 34 15 31.5 10.5 C26.5 11 24.5 17 24 22 Z"
-      fill="url(#ecrrLeafRight)"
-    />
+    <path d="M24 22 C30 20.5 34 15 31.5 10.5 C26.5 11 24.5 17 24 22 Z" fill="url(#ecrrLeafRight)" />
 
     {/* Radiant Star of Discovery & Achievement */}
     <path
@@ -703,6 +695,3 @@ export {
   EdukativniCentarLogo as EdukativniCentarRaniRazvojLogo,
   EdukativniCentarLogo as RaniRazvojLogo,
 }
-
-
-

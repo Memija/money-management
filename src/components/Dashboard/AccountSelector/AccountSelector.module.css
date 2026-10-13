@@ -108,8 +108,7 @@
 
 :global([data-theme='light']) .accountCardActive {
   background:
-    linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(16, 185, 129, 0.05) 100%),
-    #ffffff;
+    linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(16, 185, 129, 0.05) 100%), #ffffff;
   box-shadow:
     0 0 0 1px var(--primary),
     0 6px 20px rgba(99, 102, 241, 0.18);

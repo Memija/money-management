@@ -7,8 +7,7 @@ const SYSTEM_FONT_STACK =
 const LOGO_VIEWBOX_SIZE = 48
 const DEFAULT_LOGO_SIZE = 16
 
-const toCssSize = (size: number | string): string =>
-  typeof size === 'number' ? `${size}px` : size
+const toCssSize = (size: number | string): string => (typeof size === 'number' ? `${size}px` : size)
 
 const toAttrSize = (size: number | string): number | undefined =>
   typeof size === 'number' ? size : undefined
@@ -95,7 +94,14 @@ export const createWordmarkLogo = ({
         fill: background,
       }),
       accentColor &&
-        createElement('rect', { x: 10, y: 33, width: 28, height: 3.5, rx: 1.75, fill: accentColor }),
+        createElement('rect', {
+          x: 10,
+          y: 33,
+          width: 28,
+          height: 3.5,
+          rx: 1.75,
+          fill: accentColor,
+        }),
       createElement(
         'text',
         {

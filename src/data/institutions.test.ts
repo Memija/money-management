@@ -14,7 +14,13 @@ import {
 
 const banksDir = path.resolve(__dirname, '../../public/banks')
 
-const VALID_INSTITUTION_TYPES = ['bank', 'neobank', 'credit_union', 'brokerage', 'insurance'] as const
+const VALID_INSTITUTION_TYPES = [
+  'bank',
+  'neobank',
+  'credit_union',
+  'brokerage',
+  'insurance',
+] as const
 
 describe('institutions data', () => {
   describe('supported country parity', () => {

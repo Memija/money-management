@@ -85,9 +85,7 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
         {pendingRestore.summary.exportedAt && (
           <div className={styles.exportMeta}>
             <span>Backup timestamp:</span>{' '}
-            <strong>
-              {new Date(pendingRestore.summary.exportedAt).toLocaleString()}
-            </strong>
+            <strong>{new Date(pendingRestore.summary.exportedAt).toLocaleString()}</strong>
           </div>
         )}
       </div>

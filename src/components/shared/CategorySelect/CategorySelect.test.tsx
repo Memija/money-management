@@ -111,7 +111,7 @@ describe('CategorySelect', () => {
         translations: expect.objectContaining({
           en: 'Streaming Services',
         }),
-      })
+      }),
     )
     expect(handleChange).toHaveBeenCalledWith(expect.stringMatching(/^custom_/))
   })

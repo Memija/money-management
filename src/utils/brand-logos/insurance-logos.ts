@@ -116,7 +116,6 @@ export const WgvLogo = createImageLogo({
   displayName: 'WgvLogo',
 })
 
-
 /** Aeguron — digital term life insurance (iptiQ Life / Aurum Protect). */
 export const AeguronLogo = createImageLogo({
   src: '/brands/aeguron.png',
@@ -190,7 +189,7 @@ export const JanitosLogo = createImageLogo({
 export const INSURANCE_LOGOS: Record<string, IconComponent> = {
   JanitosLogo,
   janitosLogo: JanitosLogo,
-  'janitos': JanitosLogo,
+  janitos: JanitosLogo,
   HaftpflichtkasseLogo,
   DebekaLogo,
   ErgoLogo,
@@ -218,7 +217,7 @@ export const INSURANCE_LOGOS: Record<string, IconComponent> = {
   AEGURONLogo: AeguronLogo,
   IptiqLogo: SwissReLogo,
   iptiqLogo: SwissReLogo,
-  'iptiq': SwissReLogo,
+  iptiq: SwissReLogo,
   SwissReLogo,
   HannoverscheLogo,
   ProvinzialLogo,
@@ -228,9 +227,7 @@ export const INSURANCE_LOGOS: Record<string, IconComponent> = {
   VkbLogo,
   VKBLogo: VkbLogo,
   NeodigitalLogo,
-  'neodigital': NeodigitalLogo,
+  neodigital: NeodigitalLogo,
   OttonovaLogo,
-  'ottonova': OttonovaLogo,
+  ottonova: OttonovaLogo,
 }
-
-

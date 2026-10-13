@@ -1,7 +1,14 @@
 import type { Transaction } from '../../types'
 import { extractIbans } from '../account-transfers'
 import { repairBrokenWords } from '../categorizer/description-cleaning'
-import { EXPLICIT_INCOME_KEYWORDS_REGEX,generateId, inferType, parseAmount, parseCurrency, parseDate } from './helpers'
+import {
+  EXPLICIT_INCOME_KEYWORDS_REGEX,
+  generateId,
+  inferType,
+  parseAmount,
+  parseCurrency,
+  parseDate,
+} from './helpers'
 import { ALL_SUMMARY_KEYWORDS } from './parser-i18n'
 
 export function extractAccountIbansFromPdf(fullText: string, fileName?: string): string[] {
@@ -11,7 +18,9 @@ export function extractAccountIbansFromPdf(fullText: string, fileName?: string):
       result.add(ib)
     }
   }
-  const headerMatch = fullText.match(/(?:iban|konto(?:nummer)?|account)[\s:]+([a-z]{2}\d{2}[a-z0-9\s]{11,32})/i)
+  const headerMatch = fullText.match(
+    /(?:iban|konto(?:nummer)?|account)[\s:]+([a-z]{2}\d{2}[a-z0-9\s]{11,32})/i,
+  )
   if (headerMatch) {
     for (const ib of extractIbans(headerMatch[1])) {
       result.add(ib)
@@ -134,7 +143,9 @@ function parseFallbackStrategy(text: string, institution: string): Transaction[]
     if (dMatch && aMatch) {
       const amountStr = aMatch[1].replace(/\s/g, '')
       let amount = parseAmount(amountStr)
-      const desc = repairBrokenWords(line.replace(dMatch[0], '').replace(aMatch[0], '').replace(/\s+/g, ' ').trim())
+      const desc = repairBrokenWords(
+        line.replace(dMatch[0], '').replace(aMatch[0], '').replace(/\s+/g, ' ').trim(),
+      )
       if (EXPLICIT_INCOME_KEYWORDS_REGEX.test(desc) && amount < 0) {
         amount = Math.abs(amount)
       }

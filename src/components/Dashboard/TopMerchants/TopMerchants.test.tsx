@@ -28,7 +28,9 @@ vi.mock('framer-motion', () => ({
 // Mock Recharts
 vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  BarChart: ({ children }: { children: React.ReactNode }) => <div data-testid="barchart">{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="barchart">{children}</div>
+  ),
   Bar: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
   Cell: () => <div data-testid="bar-cell" />,
   XAxis: () => <div />,

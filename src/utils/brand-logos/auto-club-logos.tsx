@@ -124,8 +124,4 @@ export const AvdLogo: IconComponent = ({ size = 16, className }) => (
 )
 AvdLogo.displayName = 'AvdLogo'
 
-export {
-  AdacLogo as AdacEvLogo,
-  AceLogo as AutoClubEuropaLogo,
-}
-
+export { AdacLogo as AdacEvLogo, AceLogo as AutoClubEuropaLogo }

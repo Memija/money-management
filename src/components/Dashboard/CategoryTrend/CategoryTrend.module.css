@@ -5,7 +5,10 @@
   position: relative;
   overflow: visible !important;
   z-index: 2;
-  transition: z-index 0s, border-color var(--transition), box-shadow var(--transition);
+  transition:
+    z-index 0s,
+    border-color var(--transition),
+    box-shadow var(--transition);
 }
 
 .container:hover,
@@ -167,6 +170,38 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
+.fullscreenBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+[data-theme='light'] .fullscreenBtn {
+  background: rgba(15, 23, 42, 0.035);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.fullscreenBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  border-color: #818cf8;
+  transform: translateY(-1px);
+}
+
+[data-theme='light'] .fullscreenBtn:hover {
+  background: rgba(15, 23, 42, 0.07);
+  color: #4f46e5;
+  border-color: #6366f1;
+}
+
 /* ─────────────────────────────────────────────────
    Chart Container
 ───────────────────────────────────────────────── */
@@ -176,6 +211,12 @@
   width: 100%;
   position: relative;
   margin-top: 0.5rem;
+}
+
+.chartInnerWrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 /* Eradicate any black focus borders/outlines on chart click */
@@ -414,7 +455,11 @@
 
 @supports (color: color-mix(in srgb, red, blue)) {
   .tooltipRowActive {
-    background: color-mix(in srgb, var(--cat-accent, var(--primary)) 18%, rgba(255, 255, 255, 0.05));
+    background: color-mix(
+      in srgb,
+      var(--cat-accent, var(--primary)) 18%,
+      rgba(255, 255, 255, 0.05)
+    );
     border-color: color-mix(in srgb, var(--cat-accent, var(--primary)) 45%, transparent);
     box-shadow: 0 0 12px color-mix(in srgb, var(--cat-accent, var(--primary)) 22%, transparent);
   }
@@ -450,7 +495,9 @@
 .tooltipRowDimmed {
   opacity: 0.32;
   filter: saturate(0.5);
-  transition: opacity 0.25s ease, filter 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    filter 0.25s ease;
 }
 
 .tooltipRowDimmed:hover {
@@ -489,7 +536,9 @@
   flex-shrink: 0;
   margin-left: 2px;
   box-shadow: 0 0 6px currentColor;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @supports (color: color-mix(in srgb, red, blue)) {
@@ -526,28 +575,18 @@
 }
 
 /* ─────────────────────────────────────────────────
-   Enhanced 3D Depth & Hover Reaction on Stacked Bars
+   Hover Reaction on Stacked Bars
 ───────────────────────────────────────────────── */
-.chartContainer :global(.recharts-bar-rectangles) {
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
-}
-
-[data-theme='light'] .chartContainer :global(.recharts-bar-rectangles) {
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
-}
-
 .chartContainer :global(.recharts-bar-rectangle) {
-  transition: filter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 
 .barSegmentGroup {
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 
 .barSegmentHovered {
-  filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.45));
+  filter: brightness(1.2);
 }
 
 .barSegmentDimmed {
@@ -555,5 +594,5 @@
 }
 
 .chartContainer :global(.recharts-bar-rectangle:hover) {
-  filter: brightness(1.25) drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+  filter: brightness(1.25);
 }

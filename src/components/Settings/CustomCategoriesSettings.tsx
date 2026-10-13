@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { AnimatePresence,motion } from 'framer-motion'
-import { Globe, Pencil,Plus, Tag, X } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Globe, Pencil, Plus, Tag, X } from 'lucide-react'
 
 import { localeLabels } from '../../i18n/locale-meta'
 import { useAppStore } from '../../store/useAppStore'
@@ -17,12 +17,8 @@ import styles from './CustomCategoriesSettings.module.css'
 export const CustomCategoriesSettings: React.FC = () => {
   const t = useLanguageStore((s) => s.t)
   const currentLocale = useLanguageStore((s) => s.locale)
-  const {
-    customCategories,
-    addCustomCategory,
-    updateCustomCategory,
-    deleteCustomCategory,
-  } = useAppStore()
+  const { customCategories, addCustomCategory, updateCustomCategory, deleteCustomCategory } =
+    useAppStore()
 
   const [newCatName, setNewCatName] = useState('')
   const [newIcon, setNewIcon] = useState<string>('')
@@ -122,11 +118,7 @@ export const CustomCategoriesSettings: React.FC = () => {
             >
               <Globe size={18} />
             </button>
-            <button
-              type="submit"
-              className={styles.addButton}
-              disabled={!newCatName.trim()}
-            >
+            <button type="submit" className={styles.addButton} disabled={!newCatName.trim()}>
               <Plus size={16} /> {t.add}
             </button>
           </div>

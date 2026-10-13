@@ -51,24 +51,20 @@ export const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> =
             {effectiveTitle}
           </h2>
           <div className={styles['summary-chips']}>
-            <span className={styles['summary-chip']}>
-              {formatTransactionCount(totalCount)}
-            </span>
+            <span className={styles['summary-chip']}>{formatTransactionCount(totalCount)}</span>
             {isIncome ? (
               <span
                 className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-income']} privacy-blur`}
                 data-testid="modal-total-income"
               >
-                <TrendingUp size={12} aria-hidden="true" />
-                +{formatCurrency(totalInflows)}
+                <TrendingUp size={12} aria-hidden="true" />+{formatCurrency(totalInflows)}
               </span>
             ) : isExpense ? (
               <span
                 className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']} privacy-blur`}
                 data-testid="modal-total-expense"
               >
-                <TrendingDown size={12} aria-hidden="true" />
-                -{formatCurrency(totalOutflows)}
+                <TrendingDown size={12} aria-hidden="true" />-{formatCurrency(totalOutflows)}
               </span>
             ) : (
               <>
@@ -77,16 +73,14 @@ export const TransactionPreviewHeader: React.FC<TransactionPreviewHeaderProps> =
                   title={`${t.inflows || 'Inflows'}: +${formatCurrency(totalInflows)}`}
                   data-testid="modal-total-inflow"
                 >
-                  <TrendingUp size={12} aria-hidden="true" />
-                  +{formatCurrency(totalInflows)}
+                  <TrendingUp size={12} aria-hidden="true" />+{formatCurrency(totalInflows)}
                 </span>
                 <span
                   className={`${styles['summary-chip']} ${styles['summary-amount-chip']} ${styles['summary-chip-expense']} privacy-blur`}
                   title={`${t.outflows || 'Outflows'}: -${formatCurrency(totalOutflows)}`}
                   data-testid="modal-total-outflow"
                 >
-                  <TrendingDown size={12} aria-hidden="true" />
-                  -{formatCurrency(totalOutflows)}
+                  <TrendingDown size={12} aria-hidden="true" />-{formatCurrency(totalOutflows)}
                 </span>
               </>
             )}

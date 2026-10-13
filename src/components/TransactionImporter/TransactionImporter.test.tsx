@@ -7,10 +7,24 @@ import { type LanguageState, useLanguageStore } from '../../store/useLanguageSto
 import type { ImportedAccount } from '../../types'
 import TransactionImporter from './TransactionImporter'
 
-const { mockAddImportedAccount, mockSetStep, mockGetDuplicateTransactionStats, mockReplaceImportedAccount, mockImportedAccounts, mockAddDuplicateOverrideRule } = vi.hoisted(() => ({
+const {
+  mockAddImportedAccount,
+  mockSetStep,
+  mockGetDuplicateTransactionStats,
+  mockReplaceImportedAccount,
+  mockImportedAccounts,
+  mockAddDuplicateOverrideRule,
+} = vi.hoisted(() => ({
   mockAddImportedAccount: vi.fn(),
   mockSetStep: vi.fn(),
-  mockGetDuplicateTransactionStats: vi.fn().mockReturnValue({ duplicateCount: 0, newCount: 0, duplicateIds: [], alreadyDuplicatedIds: [] }),
+  mockGetDuplicateTransactionStats: vi
+    .fn()
+    .mockReturnValue({
+      duplicateCount: 0,
+      newCount: 0,
+      duplicateIds: [],
+      alreadyDuplicatedIds: [],
+    }),
   mockReplaceImportedAccount: vi.fn(),
   mockImportedAccounts: { current: [] as unknown[] },
   mockAddDuplicateOverrideRule: vi.fn(),
@@ -69,30 +83,42 @@ vi.mock('../../store/useLanguageStore', () => ({
         cancel: 'Cancel',
         reviewTransactions: 'Review',
         duplicateImportTitle: 'Duplicate Import Detected',
-        duplicateImportMessageAll: 'All {duplicateCount} transactions have already been imported. There are no new transactions to add.',
-        duplicateImportMessagePartial: 'We found {duplicateCount} duplicate transactions which will be skipped. Only {newCount} new transactions will be imported. Do you want to proceed?',
+        duplicateImportMessageAll:
+          'All {duplicateCount} transactions have already been imported. There are no new transactions to add.',
+        duplicateImportMessagePartial:
+          'We found {duplicateCount} duplicate transactions which will be skipped. Only {newCount} new transactions will be imported. Do you want to proceed?',
         duplicateImportProceed: 'Proceed with {newCount} transactions',
         duplicateImportCancel: 'Cancel',
         duplicateImportOk: 'OK',
-        duplicateImportAllBannerSingular: '1 duplicate transaction detected. This transaction has already been imported.',
-        duplicateImportAllBanner: 'All {count} transactions in this file have already been imported (duplicates).',
-        duplicateImportPartialBanner: '{duplicateCount} duplicate transactions detected and will be skipped. {newCount} new transactions will be imported.',
+        duplicateImportAllBannerSingular:
+          '1 duplicate transaction detected. This transaction has already been imported.',
+        duplicateImportAllBanner:
+          'All {count} transactions in this file have already been imported (duplicates).',
+        duplicateImportPartialBanner:
+          '{duplicateCount} duplicate transactions detected and will be skipped. {newCount} new transactions will be imported.',
         allTransactionsAlreadyImported: 'All transactions already imported',
         importNewTransactions: 'Import {count} new transactions',
         filterDuplicates: 'Duplicates',
-        duplicatesSkippedNotice: 'These transactions already exist in your records and will be skipped to prevent double counting.',
+        duplicatesSkippedNotice:
+          'These transactions already exist in your records and will be skipped to prevent double counting.',
         viewDuplicates: 'View duplicates',
-        spaceTransfersExcluded: '{count} sub-account transfers were automatically excluded to prevent double counting.',
-        spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded to prevent double counting.',
-        internalTransfersDetectedSingular: '1 internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
-        internalTransfersDetected: '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
+        spaceTransfersExcluded:
+          '{count} sub-account transfers were automatically excluded to prevent double counting.',
+        spaceTransfersExcludedSingular:
+          '1 sub-account transfer was automatically excluded to prevent double counting.',
+        internalTransfersDetectedSingular:
+          '1 internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
+        internalTransfersDetected:
+          '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
         internalTransfersWithExistingDetected:
           '{count} internal transfer(s) detected • {existingCount} already imported transaction(s) will also be excluded.',
         internalTransfersWithExistingNotice:
           'These transactions are internal transfers between your own accounts. {existingCount} already imported transaction(s) will also be excluded from income/expenses and hidden from the transaction list.',
         alreadyImported: 'Already Imported',
-        internalTransfersDetectedBannerSingular: '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
-        internalTransfersDetectedBanner: '{count} internal transfers between your accounts detected (marked with an internal transfer badge).',
+        internalTransfersDetectedBannerSingular:
+          '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
+        internalTransfersDetectedBanner:
+          '{count} internal transfers between your accounts detected (marked with an internal transfer badge).',
         filterAll: 'All',
         filterIncluded: 'To Import',
         filterExcluded: 'Excluded',
@@ -103,19 +129,26 @@ vi.mock('../../store/useLanguageStore', () => ({
         viewExcludedSpaceTransfers: 'View excluded',
         viewInternalTransfers: 'View transfers',
         viewTheseTransactions: 'View these transactions',
-        internalTransfersNotice: 'These transactions are internal transfers between your own accounts.',
+        internalTransfersNotice:
+          'These transactions are internal transfers between your own accounts.',
         inflows: 'Inflows',
         outflows: 'Outflows',
         acceptedFormats: 'Accepted formats: {accepted}',
         transferWarningModalTitle: 'Internal Transfers Detected',
-        transferWarningModalSpaceMessage: '{count} transfers between your sub-accounts or spaces were detected.',
-        transferWarningModalSpaceMessageSingular: '1 transfer between your sub-accounts or spaces was detected.',
-        transferWarningModalInternalMessage: '{count} transfers between your accounts were detected.',
-        transferWarningModalInternalMessageSingular: '1 transfer between your accounts was detected.',
-        transferWarningModalBothMessage: '{count} transfers involving sub-accounts or your other accounts were detected.',
+        transferWarningModalSpaceMessage:
+          '{count} transfers between your sub-accounts or spaces were detected.',
+        transferWarningModalSpaceMessageSingular:
+          '1 transfer between your sub-accounts or spaces was detected.',
+        transferWarningModalInternalMessage:
+          '{count} transfers between your accounts were detected.',
+        transferWarningModalInternalMessageSingular:
+          '1 transfer between your accounts was detected.',
+        transferWarningModalBothMessage:
+          '{count} transfers involving sub-accounts or your other accounts were detected.',
         transferWarningModalReview: 'Review Details',
         transferWarningModalProceed: 'Proceed with Import',
-        transferWarningModalNotice: 'These transactions are reconciled internally and will not affect your net totals.',
+        transferWarningModalNotice:
+          'These transactions are reconciled internally and will not affect your net totals.',
         done: 'Done',
         unlockDuplicate: 'Unlock duplicate',
         unlockDuplicateTitle: 'Unlock Duplicate Transaction',
@@ -125,7 +158,8 @@ vi.mock('../../store/useLanguageStore', () => ({
         unlockedDuplicateBadge: 'Unlocked',
         filterAlreadyDuplicated: 'Already Duplicated',
         alreadyDuplicated: 'Already Duplicated',
-        alreadyDuplicatedNotice: 'This duplicate was already imported and cannot be unlocked again.',
+        alreadyDuplicatedNotice:
+          'This duplicate was already imported and cannot be unlocked again.',
         alreadyDuplicatedFilterNotice:
           'These duplicate transactions were already imported previously and cannot be modified or unlocked again.',
       } as unknown as TranslationStrings,
@@ -205,43 +239,61 @@ describe('TransactionImporter', () => {
     removeTransaction: 'Remove transaction',
     reviewTransactions: 'Review',
     duplicateImportTitle: 'Duplicate Import Detected',
-    duplicateImportMessageAll: 'All {duplicateCount} transactions have already been imported. There are no new transactions to add.',
-    duplicateImportMessagePartial: 'We found {duplicateCount} duplicate transactions which will be skipped. Only {newCount} new transactions will be imported. Do you want to proceed?',
+    duplicateImportMessageAll:
+      'All {duplicateCount} transactions have already been imported. There are no new transactions to add.',
+    duplicateImportMessagePartial:
+      'We found {duplicateCount} duplicate transactions which will be skipped. Only {newCount} new transactions will be imported. Do you want to proceed?',
     duplicateImportProceed: 'Proceed with {newCount} transactions',
     duplicateImportCancel: 'Cancel',
     duplicateImportOk: 'OK',
-    duplicateImportAllBannerSingular: '1 duplicate transaction detected. This transaction has already been imported.',
-    duplicateImportAllBanner: 'All {count} transactions in this file have already been imported (duplicates).',
-    duplicateTransactionsDetectedSingular: '1 duplicate transaction detected (highlighted in yellow).',
-    duplicateTransactionsDetected: '{count} duplicate transactions detected (highlighted in yellow).',
-    duplicateImportPartialBanner: '{duplicateCount} duplicate transactions detected and will be skipped. {newCount} new transactions will be imported.',
+    duplicateImportAllBannerSingular:
+      '1 duplicate transaction detected. This transaction has already been imported.',
+    duplicateImportAllBanner:
+      'All {count} transactions in this file have already been imported (duplicates).',
+    duplicateTransactionsDetectedSingular:
+      '1 duplicate transaction detected (highlighted in yellow).',
+    duplicateTransactionsDetected:
+      '{count} duplicate transactions detected (highlighted in yellow).',
+    duplicateImportPartialBanner:
+      '{duplicateCount} duplicate transactions detected and will be skipped. {newCount} new transactions will be imported.',
     allTransactionsAlreadyImported: 'All transactions already imported',
     importNewTransactions: 'Import {count} new transactions',
     filterDuplicates: 'Duplicates',
-    duplicatesSkippedNotice: 'These transactions already exist in your records and will be skipped to prevent double counting.',
+    duplicatesSkippedNotice:
+      'These transactions already exist in your records and will be skipped to prevent double counting.',
     viewDuplicates: 'View duplicates',
-    spaceTransfersExcluded: '{count} sub-account transfers were automatically excluded to prevent double counting.',
-    spaceTransfersExcludedSingular: '1 sub-account transfer was automatically excluded to prevent double counting.',
+    spaceTransfersExcluded:
+      '{count} sub-account transfers were automatically excluded to prevent double counting.',
+    spaceTransfersExcludedSingular:
+      '1 sub-account transfer was automatically excluded to prevent double counting.',
     filterExcluded: 'Excluded',
     excludedItemsNotice:
       'These items are excluded from import or calculations (sub-account transfers, internal transfers, and duplicates).',
     viewExcludedSpaceTransfers: 'View excluded',
-    internalTransfersDetectedSingular: '{count} internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
-    internalTransfersDetected: '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
-    internalTransfersDetectedBannerSingular: '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
-    internalTransfersDetectedBanner: '{count} internal transfers between your accounts detected (marked with an internal transfer badge).',
+    internalTransfersDetectedSingular:
+      '{count} internal transfer with your other accounts detected (excluded from income/expenses and hidden from standard views).',
+    internalTransfersDetected:
+      '{count} internal transfers with your other accounts detected (excluded from income/expenses and hidden from standard views).',
+    internalTransfersDetectedBannerSingular:
+      '1 internal transfer between your accounts detected (marked with an internal transfer badge).',
+    internalTransfersDetectedBanner:
+      '{count} internal transfers between your accounts detected (marked with an internal transfer badge).',
     inflows: 'Inflows',
     outflows: 'Outflows',
     acceptedFormats: 'Accepted formats: {accepted}',
     transferWarningModalTitle: 'Internal Transfers Detected',
-    transferWarningModalSpaceMessage: '{count} transfers between your sub-accounts or spaces were detected.',
-    transferWarningModalSpaceMessageSingular: '1 transfer between your sub-accounts or spaces was detected.',
+    transferWarningModalSpaceMessage:
+      '{count} transfers between your sub-accounts or spaces were detected.',
+    transferWarningModalSpaceMessageSingular:
+      '1 transfer between your sub-accounts or spaces was detected.',
     transferWarningModalInternalMessage: '{count} transfers between your accounts were detected.',
     transferWarningModalInternalMessageSingular: '1 transfer between your accounts was detected.',
-    transferWarningModalBothMessage: '{count} transfers involving sub-accounts or your other accounts were detected.',
+    transferWarningModalBothMessage:
+      '{count} transfers involving sub-accounts or your other accounts were detected.',
     transferWarningModalReview: 'Review Details',
     transferWarningModalProceed: 'Proceed with Import',
-    transferWarningModalNotice: 'These transactions are reconciled internally and will not affect your net totals.',
+    transferWarningModalNotice:
+      'These transactions are reconciled internally and will not affect your net totals.',
     done: 'Done',
     unlockDuplicate: 'Unlock',
     unlockDuplicateTitle: 'Unlock Duplicate Transaction',
@@ -260,7 +312,12 @@ describe('TransactionImporter', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockImportedAccounts.current = []
-    mockGetDuplicateTransactionStats.mockReturnValue({ duplicateCount: 0, newCount: 0, duplicateIds: [], alreadyDuplicatedIds: [] })
+    mockGetDuplicateTransactionStats.mockReturnValue({
+      duplicateCount: 0,
+      newCount: 0,
+      duplicateIds: [],
+      alreadyDuplicatedIds: [],
+    })
     vi.mocked(useLanguageStore).mockImplementation((selector) => {
       const state = {
         t: mockT as unknown as TranslationStrings,
@@ -386,7 +443,9 @@ describe('TransactionImporter', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/sub-account transfers were automatically excluded/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/sub-account transfers were automatically excluded/i),
+      ).toBeInTheDocument()
     })
   })
 
@@ -413,13 +472,18 @@ describe('TransactionImporter', () => {
     render(<TransactionImporter />)
     fireEvent.click(screen.getByText('Paste'))
     fireEvent.change(screen.getByPlaceholderText('Paste here'), {
-      target: { value: 'Date,Description,Amount\n2024-01-01,Transfer from Bank B DE12345678901234567890,100' },
+      target: {
+        value:
+          'Date,Description,Amount\n2024-01-01,Transfer from Bank B DE12345678901234567890,100',
+      },
     })
     fireEvent.click(screen.getByText('Parse'))
 
     await waitFor(() => {
       expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/already imported transaction\(s\) will also be excluded/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/already imported transaction\(s\) will also be excluded/i),
+      ).toBeInTheDocument()
     })
   })
 
@@ -492,9 +556,13 @@ describe('TransactionImporter', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/sub-account transfers were automatically excluded/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/sub-account transfers were automatically excluded/i),
+      ).toBeInTheDocument()
       expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/already imported transaction\(s\) will also be excluded/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/already imported transaction\(s\) will also be excluded/i),
+      ).toBeInTheDocument()
     })
   })
 
@@ -540,9 +608,13 @@ Transfer from Bank B DE12345678901234567890
 
     await waitFor(() => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/sub-account transfers were automatically excluded/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/sub-account transfers were automatically excluded/i),
+      ).toBeInTheDocument()
       expect(screen.getByTestId('internal-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/already imported transaction\(s\) will also be excluded/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/already imported transaction\(s\) will also be excluded/i),
+      ).toBeInTheDocument()
     })
   })
 
@@ -774,7 +846,9 @@ Transfer from Bank B DE12345678901234567890
       expect(screen.getByTestId('duplicate-all-banner')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('All 2 transactions in this file have already been imported (duplicates).')).toBeInTheDocument()
+    expect(
+      screen.getByText('All 2 transactions in this file have already been imported (duplicates).'),
+    ).toBeInTheDocument()
     expect(screen.getByTestId('view-duplicates-button')).toBeInTheDocument()
     expect(screen.queryByTestId('space-transfers-banner')).not.toBeInTheDocument()
 
@@ -842,7 +916,9 @@ Transfer from Bank B DE12345678901234567890
     // Row preview is read-only in this view:
     // Has static description text (not editable input)
     expect(screen.getByText('Transfer from Bank B DE12345678901234567890')).toBeInTheDocument()
-    expect(screen.queryByDisplayValue('Transfer from Bank B DE12345678901234567890')).not.toBeInTheDocument()
+    expect(
+      screen.queryByDisplayValue('Transfer from Bank B DE12345678901234567890'),
+    ).not.toBeInTheDocument()
     // No internal transfer badge
     expect(screen.queryByText('Internal Transfer')).not.toBeInTheDocument()
     // No include button
@@ -852,14 +928,16 @@ Transfer from Bank B DE12345678901234567890
   })
 
   it('shows duplicate-partial-banner and imports only non-duplicate transactions', async () => {
-    mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: { id: string }[]) => {
-      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
-      return {
-        duplicateCount: 1,
-        newCount: txs.length - 1,
-        duplicateIds: [txs[0].id],
-      }
-    })
+    mockGetDuplicateTransactionStats.mockImplementation(
+      (_instId: string, txs: { id: string }[]) => {
+        if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        return {
+          duplicateCount: 1,
+          newCount: txs.length - 1,
+          duplicateIds: [txs[0].id],
+        }
+      },
+    )
 
     const tsvData = `Date\tDescription\tAmount
 2026-03-01\tGroceries\t-50
@@ -876,7 +954,9 @@ Transfer from Bank B DE12345678901234567890
       expect(screen.getByTestId('duplicate-partial-banner')).toBeInTheDocument()
     })
 
-    expect(screen.getByText(/1 duplicate transactions detected and will be skipped/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/1 duplicate transactions detected and will be skipped/i),
+    ).toBeInTheDocument()
 
     const confirmBtn = screen.getByRole('button', { name: /Import 1 new transactions/i })
     expect(confirmBtn).toBeEnabled()
@@ -915,7 +995,9 @@ Transfer from Bank B DE12345678901234567890
 
     await waitFor(() => {
       expect(screen.getByTestId('space-transfers-banner')).toBeInTheDocument()
-      expect(screen.getByText(/2 sub-account transfers were automatically excluded/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/2 sub-account transfers were automatically excluded/i),
+      ).toBeInTheDocument()
     })
 
     // Click "View excluded" on the banner
@@ -964,14 +1046,16 @@ Transfer from Bank B DE12345678901234567890
   })
 
   it('proceeds directly with import after resolving duplicate warning even if space transfers exist', async () => {
-    mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: { id: string }[]) => {
-      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
-      return {
-        duplicateCount: 1,
-        newCount: txs.length - 1,
-        duplicateIds: [txs[0].id],
-      }
-    })
+    mockGetDuplicateTransactionStats.mockImplementation(
+      (_instId: string, txs: { id: string }[]) => {
+        if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        return {
+          duplicateCount: 1,
+          newCount: txs.length - 1,
+          duplicateIds: [txs[0].id],
+        }
+      },
+    )
 
     const tsvData = `Date\tDescription\tAmount
 2026-04-01\tInvestment fund\t-150
@@ -1049,14 +1133,16 @@ Transfer from Bank B DE12345678901234567890
   })
 
   it('allows unlocking duplicate transactions, updating stats and enabling import with forceImport', async () => {
-    mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: { id: string }[]) => {
-      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
-      return {
-        duplicateCount: txs.length,
-        newCount: 0,
-        duplicateIds: txs.map((tx) => tx.id),
-      }
-    })
+    mockGetDuplicateTransactionStats.mockImplementation(
+      (_instId: string, txs: { id: string }[]) => {
+        if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        return {
+          duplicateCount: txs.length,
+          newCount: 0,
+          duplicateIds: txs.map((tx) => tx.id),
+        }
+      },
+    )
 
     const tsvData = `Date\tDescription\tAmount
 2026-04-01\tCoffee Shop\t-4.5
@@ -1151,14 +1237,16 @@ Transfer from Bank B DE12345678901234567890
   })
 
   it('does not save duplicate override rules if the import is canceled or cleared', async () => {
-    mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: { id: string }[]) => {
-      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
-      return {
-        duplicateCount: txs.length,
-        newCount: 0,
-        duplicateIds: txs.map((tx) => tx.id),
-      }
-    })
+    mockGetDuplicateTransactionStats.mockImplementation(
+      (_instId: string, txs: { id: string }[]) => {
+        if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        return {
+          duplicateCount: txs.length,
+          newCount: 0,
+          duplicateIds: txs.map((tx) => tx.id),
+        }
+      },
+    )
 
     const { unmount } = render(<TransactionImporter />)
 
@@ -1212,15 +1300,18 @@ Transfer from Bank B DE12345678901234567890
   })
 
   it('renders already duplicated transactions as non-interactable with disabled lock button and alreadyDuplicated badge', async () => {
-    mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: { id: string }[]) => {
-      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [], alreadyDuplicatedIds: [] }
-      return {
-        duplicateCount: txs.length,
-        newCount: 0,
-        duplicateIds: txs.map((tx) => tx.id),
-        alreadyDuplicatedIds: txs.map((tx) => tx.id),
-      }
-    })
+    mockGetDuplicateTransactionStats.mockImplementation(
+      (_instId: string, txs: { id: string }[]) => {
+        if (!txs || txs.length === 0)
+          return { duplicateCount: 0, newCount: 0, duplicateIds: [], alreadyDuplicatedIds: [] }
+        return {
+          duplicateCount: txs.length,
+          newCount: 0,
+          duplicateIds: txs.map((tx) => tx.id),
+          alreadyDuplicatedIds: txs.map((tx) => tx.id),
+        }
+      },
+    )
 
     render(<TransactionImporter />)
 
@@ -1250,7 +1341,9 @@ Transfer from Bank B DE12345678901234567890
 
     // Notice that unlock buttons are NOT available, instead disabled lock buttons with alreadyDuplicated notice are present
     expect(screen.queryByTitle('Unlock')).not.toBeInTheDocument()
-    const disabledLocks = screen.getAllByTitle('This duplicate was already imported and cannot be unlocked again.')
+    const disabledLocks = screen.getAllByTitle(
+      'This duplicate was already imported and cannot be unlocked again.',
+    )
     expect(disabledLocks.length).toBeGreaterThan(0)
     expect(disabledLocks[0]).toBeDisabled()
 
@@ -1264,5 +1357,3 @@ Transfer from Bank B DE12345678901234567890
     expect(screen.getByTestId('already-duplicated-notice')).toBeInTheDocument()
   })
 })
-
-

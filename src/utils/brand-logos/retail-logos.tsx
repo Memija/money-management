@@ -218,4 +218,3 @@ export const MediaMarktLogo: IconComponent = ({ size = 16, className }) => (
 MediaMarktLogo.displayName = 'MediaMarktLogo'
 
 export { MediaMarktLogo as MediamarktLogo }
-

@@ -122,7 +122,10 @@ export function getTransactionCategory(
   }
   if (manualCategories && manualCategories[t.id]) {
     const manualCat = manualCategories[t.id]
-    if (manualCat === 'Transport' && isPaymentProcessorOnly(extractCleanDescription(t.description))) {
+    if (
+      manualCat === 'Transport' &&
+      isPaymentProcessorOnly(extractCleanDescription(t.description))
+    ) {
       // Guard against generic payment processors without merchant names having been
       // accidentally lumped into Transport via legacy prefix-matching batch updates
     } else {

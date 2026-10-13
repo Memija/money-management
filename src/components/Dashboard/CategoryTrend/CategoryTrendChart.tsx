@@ -21,7 +21,7 @@ import { LocalizedTrendTooltip } from './CategoryTrendTooltip'
 
 import styles from './CategoryTrend.module.css'
 
-const CHART_ANIMATION_MS = 400
+const CHART_ANIMATION_MS = 350
 const AXIS_TICK_STYLE = { fill: 'var(--text-dim)', fontSize: 11 }
 const MONTH_TICK = <MonthYearAxisTick fill="var(--text-dim)" fontSize={11} />
 const STACKED_MARGIN = { top: 16, right: 12, left: -10, bottom: 4 }
@@ -37,7 +37,8 @@ const formatEuroThousands = (v: number): string => {
   return Number.isInteger(inK) ? `€${inK}k` : `€${inK.toFixed(1)}k`
 }
 
-const toGradientId = (prefix: string, cat: string): string => `${prefix}-${cat.replace(/\s+/g, '-')}`
+const toGradientId = (prefix: string, cat: string): string =>
+  `${prefix}-${cat.replace(/\s+/g, '-')}`
 
 interface BarShapeProps {
   x?: number
@@ -57,17 +58,35 @@ interface CategoryTrendChartProps {
   activeCategory: string | null
   onCategoryHover: (catKey: string | null) => void
   onCategorySelect: (catKey: string) => void
+  /**
+   * Identity that replays the entrance animation when changed. Pass the full dataset so
+   * timeline navigation (which only slices `data`) never restarts the tween.
+   */
+  animationKey?: unknown
 }
 
 /**
- * Recharts canvas for the category trend card. Deliberately receives no locale-dependent
- * props: month labels and tooltips localize themselves, so a language switch never
- * re-renders the (potentially 900+) bar segments.
+ * Recharts canvas for the category trend card. Renders the visible data slice with
+ * ultra-fast responsiveness. Deliberately receives no locale-dependent props: month
+ * labels and tooltips localize themselves, so a language switch never re-renders the bars.
  */
 export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
-  ({ data, categories, customCategories, viewMode, activeCategory, onCategoryHover, onCategorySelect }) => {
+  ({
+    data,
+    categories,
+    customCategories,
+    viewMode,
+    activeCategory,
+    onCategoryHover,
+    onCategorySelect,
+    animationKey,
+  }) => {
     const [hoveredMonth, setHoveredMonth] = useState<string | null>(null)
-    const animationTrigger = useMemo(() => ({ data, viewMode }), [data, viewMode])
+    const animationSource = animationKey ?? data
+    const animationTrigger = useMemo(
+      () => ({ animationSource, viewMode }),
+      [animationSource, viewMode],
+    )
     const isAnimationActive = useChartAnimation(animationTrigger, CHART_ANIMATION_MS)
 
     const categoryColors = useMemo(
@@ -78,8 +97,9 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
     // Precompute top/bottom category per month to avoid O(N*M) loops in renderStackedBar
     const monthBoundsMap = useMemo(() => {
       const map = new Map<string, { top: string; bottom: string }>()
+      const reversed = [...categories].reverse()
       for (const entry of data) {
-        const top = [...categories].reverse().find((cat) => Number(entry[cat]) > 0) ?? ''
+        const top = reversed.find((cat) => Number(entry[cat]) > 0) ?? ''
         const bottom = categories.find((cat) => Number(entry[cat]) > 0) ?? ''
         map.set(String(entry.month), { top, bottom })
       }
@@ -153,88 +173,119 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
 
     const sharedAxes = (
       <>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--card-border)" opacity={0.6} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="var(--card-border)"
+          opacity={0.6}
+        />
         <XAxis dataKey="month" axisLine={false} tickLine={false} tick={MONTH_TICK} />
-        <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK_STYLE} tickFormatter={formatEuroThousands} />
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={AXIS_TICK_STYLE}
+          tickFormatter={formatEuroThousands}
+        />
       </>
     )
 
     return (
-      <ResponsiveContainer width="100%" height="100%">
-        {viewMode === 'stacked' ? (
-          <BarChart
-            data={data}
-            margin={STACKED_MARGIN}
-            maxBarSize={44}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-          >
-            <defs>
-              {categoryColors.map(({ cat, color }) => (
-                <linearGradient key={`cat-bar-grad-${cat}`} id={toGradientId('cat-bar-grad', cat)} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={adjustColor(color, 42)} stopOpacity={1} />
-                  <stop offset="42%" stopColor={color} stopOpacity={1} />
-                  <stop offset="100%" stopColor={adjustColor(color, -22)} stopOpacity={1} />
-                </linearGradient>
-              ))}
-            </defs>
-            {sharedAxes}
-            <Tooltip wrapperStyle={TOOLTIP_WRAPPER_STYLE} content={tooltipContent} cursor={STACKED_CURSOR} offset={14} />
-            {categoryColors.map(({ cat, color }) => {
-              const isCatActive = activeCategory === cat
-              const isCatDimmed = activeCategory !== null && !isCatActive
-              return (
-                <Bar
-                  key={cat}
-                  dataKey={cat}
-                  stackId="categories"
-                  fill={`url(#${toGradientId('cat-bar-grad', cat)})`}
-                  stroke={isCatActive ? color : 'transparent'}
-                  strokeWidth={isCatActive ? 2 : 0}
-                  opacity={isCatDimmed ? 0.22 : 1}
-                  shape={renderStackedBar}
-                  isAnimationActive={isAnimationActive}
-                  animationDuration={CHART_ANIMATION_MS}
-                  onMouseEnter={() => onCategoryHover(cat)}
-                  onMouseLeave={() => onCategoryHover(null)}
-                  onClick={() => onCategorySelect(cat)}
-                />
-              )
-            })}
-          </BarChart>
-        ) : (
-          <AreaChart data={data} margin={AREA_MARGIN}>
-            <defs>
-              {categoryColors.map(({ cat, color }) => (
-                <linearGradient key={`cat-area-grad-${cat}`} id={toGradientId('cat-area-grad', cat)} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={color} stopOpacity={0.75} />
-                  <stop offset="95%" stopColor={color} stopOpacity={0.08} />
-                </linearGradient>
-              ))}
-            </defs>
-            {sharedAxes}
-            <Tooltip wrapperStyle={TOOLTIP_WRAPPER_STYLE} content={tooltipContent} />
-            {categoryColors.map(({ cat, color }) => {
-              const isCatActive = activeCategory === cat
-              const isCatDimmed = activeCategory !== null && !isCatActive
-              return (
-                <Area
-                  key={cat}
-                  type="monotone"
-                  dataKey={cat}
-                  stackId="categories"
-                  stroke={color}
-                  strokeWidth={isCatActive ? 2.5 : 1.5}
-                  fill={`url(#${toGradientId('cat-area-grad', cat)})`}
-                  opacity={isCatDimmed ? 0.15 : 1}
-                  isAnimationActive={isAnimationActive}
-                  animationDuration={CHART_ANIMATION_MS}
-                />
-              )
-            })}
-          </AreaChart>
-        )}
-      </ResponsiveContainer>
+      <div className={styles.chartInnerWrapper}>
+        <ResponsiveContainer width="100%" height="100%">
+          {viewMode === 'stacked' ? (
+            <BarChart
+              data={data}
+              margin={STACKED_MARGIN}
+              maxBarSize={44}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              <defs>
+                {categoryColors.map(({ cat, color }) => (
+                  <linearGradient
+                    key={`cat-bar-grad-${cat}`}
+                    id={toGradientId('cat-bar-grad', cat)}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor={adjustColor(color, 42)} stopOpacity={1} />
+                    <stop offset="42%" stopColor={color} stopOpacity={1} />
+                    <stop offset="100%" stopColor={adjustColor(color, -22)} stopOpacity={1} />
+                  </linearGradient>
+                ))}
+              </defs>
+              {sharedAxes}
+              <Tooltip
+                wrapperStyle={TOOLTIP_WRAPPER_STYLE}
+                content={tooltipContent}
+                cursor={STACKED_CURSOR}
+                offset={14}
+              />
+              {categoryColors.map(({ cat, color }) => {
+                const isCatActive = activeCategory === cat
+                const isCatDimmed = activeCategory !== null && !isCatActive
+                return (
+                  <Bar
+                    key={cat}
+                    dataKey={cat}
+                    stackId="categories"
+                    fill={`url(#${toGradientId('cat-bar-grad', cat)})`}
+                    stroke={isCatActive ? color : 'transparent'}
+                    strokeWidth={isCatActive ? 2 : 0}
+                    opacity={isCatDimmed ? 0.22 : 1}
+                    shape={renderStackedBar}
+                    isAnimationActive={isAnimationActive}
+                    animationDuration={CHART_ANIMATION_MS}
+                    onMouseEnter={() => onCategoryHover(cat)}
+                    onMouseLeave={() => onCategoryHover(null)}
+                    onClick={() => onCategorySelect(cat)}
+                  />
+                )
+              })}
+            </BarChart>
+          ) : (
+            <AreaChart data={data} margin={AREA_MARGIN}>
+              <defs>
+                {categoryColors.map(({ cat, color }) => (
+                  <linearGradient
+                    key={`cat-area-grad-${cat}`}
+                    id={toGradientId('cat-area-grad', cat)}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor={color} stopOpacity={0.75} />
+                    <stop offset="95%" stopColor={color} stopOpacity={0.08} />
+                  </linearGradient>
+                ))}
+              </defs>
+              {sharedAxes}
+              <Tooltip wrapperStyle={TOOLTIP_WRAPPER_STYLE} content={tooltipContent} />
+              {categoryColors.map(({ cat, color }) => {
+                const isCatActive = activeCategory === cat
+                const isCatDimmed = activeCategory !== null && !isCatActive
+                return (
+                  <Area
+                    key={cat}
+                    type="monotone"
+                    dataKey={cat}
+                    stackId="categories"
+                    stroke={color}
+                    strokeWidth={isCatActive ? 2.5 : 1.5}
+                    fill={`url(#${toGradientId('cat-area-grad', cat)})`}
+                    opacity={isCatDimmed ? 0.15 : 1}
+                    isAnimationActive={isAnimationActive}
+                    animationDuration={CHART_ANIMATION_MS}
+                  />
+                )
+              })}
+            </AreaChart>
+          )}
+        </ResponsiveContainer>
+      </div>
     )
   },
 )

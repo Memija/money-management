@@ -22,188 +22,187 @@ interface CategorySelectProps {
   onOpenChange?: (isOpen: boolean) => void
 }
 
-export const CategorySelect: React.FC<CategorySelectProps> = React.memo(({ 
-  value, 
-  onChange, 
-  variant = 'default',
-  className = '',
-  align = 'left',
-  onOpenChange,
-}) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  
-  const t = useLanguageStore((state) => state.t)
-  const currentLocale = useLanguageStore((state) => state.locale)
-  const customCategories = useAppStore((state) => state.customCategories)
-  const setStep = useAppStore((state) => state.setStep)
+export const CategorySelect: React.FC<CategorySelectProps> = React.memo(
+  ({ value, onChange, variant = 'default', className = '', align = 'left', onOpenChange }) => {
+    const [isOpen, setIsOpen] = useState(false)
+    const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
+    const dropdownRef = useRef<HTMLDivElement>(null)
 
-  useDropdownPosition({
-    isOpen,
-    triggerRef: containerRef,
-    dropdownRef,
-    padding: 12,
-  })
+    const t = useLanguageStore((state) => state.t)
+    const currentLocale = useLanguageStore((state) => state.locale)
+    const customCategories = useAppStore((state) => state.customCategories)
+    const setStep = useAppStore((state) => state.setStep)
 
-  const handleToggle = () => {
-    const next = !isOpen
-    setIsOpen(next)
-    onOpenChange?.(next)
-  }
+    useDropdownPosition({
+      isOpen,
+      triggerRef: containerRef,
+      dropdownRef,
+      padding: 12,
+    })
 
-  // Handle click outside to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: Event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-        onOpenChange?.(false)
+    const handleToggle = () => {
+      const next = !isOpen
+      setIsOpen(next)
+      onOpenChange?.(next)
+    }
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+      const handleClickOutside = (event: Event) => {
+        if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+          setIsOpen(false)
+          onOpenChange?.(false)
+        }
       }
-    }
-    
-    if (isOpen) {
-      document.addEventListener('pointerdown', handleClickOutside)
-      document.addEventListener('mousedown', handleClickOutside)
-      document.addEventListener('touchstart', handleClickOutside)
-    }
-    return () => {
-      document.removeEventListener('pointerdown', handleClickOutside)
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside)
-    }
-  }, [isOpen, onOpenChange])
 
-  const handleSelect = (newValue: string) => {
-    onChange(newValue)
-    setIsOpen(false)
-    onOpenChange?.(false)
-  }
+      if (isOpen) {
+        document.addEventListener('pointerdown', handleClickOutside)
+        document.addEventListener('mousedown', handleClickOutside)
+        document.addEventListener('touchstart', handleClickOutside)
+      }
+      return () => {
+        document.removeEventListener('pointerdown', handleClickOutside)
+        document.removeEventListener('mousedown', handleClickOutside)
+        document.removeEventListener('touchstart', handleClickOutside)
+      }
+    }, [isOpen, onOpenChange])
 
-  const defaultKeys = DEFAULT_CATEGORY_KEYS
-  const categoryColor = getCategoryColor(value || 'Other', customCategories)
+    const handleSelect = (newValue: string) => {
+      onChange(newValue)
+      setIsOpen(false)
+      onOpenChange?.(false)
+    }
 
-  return (
-    <div 
-      className={`${styles.container} ${variant === 'badge' ? styles.badgeContainer : ''} ${isOpen ? styles.containerOpen : ''} ${className}`}
-      ref={containerRef}
-      style={{ '--badge-color': categoryColor } as React.CSSProperties}
-    >
-      <button 
-        type="button" 
-        className={`${styles.button} ${isOpen ? styles.buttonOpen : ''}`}
-        onClick={handleToggle}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
+    const defaultKeys = DEFAULT_CATEGORY_KEYS
+    const categoryColor = getCategoryColor(value || 'Other', customCategories)
+
+    return (
+      <div
+        className={`${styles.container} ${variant === 'badge' ? styles.badgeContainer : ''} ${isOpen ? styles.containerOpen : ''} ${className}`}
+        ref={containerRef}
+        style={{ '--badge-color': categoryColor } as React.CSSProperties}
       >
-        <div className={styles.buttonContent}>
-          <div className={styles.iconWrapper}>
-            <CategoryIcon
-              category={value || 'Other'}
-              size={variant === 'badge' ? 14 : 16}
-              customCategories={customCategories}
-            />
-          </div>
-          <span className={styles.buttonLabel}>
-            {getCategoryLabel(value || 'Other', t, currentLocale, customCategories)}
-          </span>
-        </div>
-        <ChevronDown 
-          size={variant === 'badge' ? 13 : 14} 
-          className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`} 
-        />
-      </button>
-
-      {isOpen && (
-        <div 
-          ref={dropdownRef}
-          className={`${styles.dropdown} ${align === 'right' ? styles.dropdownAlignRight : styles.dropdownAlignLeft}`} 
-          role="listbox"
+        <button
+          type="button"
+          className={`${styles.button} ${isOpen ? styles.buttonOpen : ''}`}
+          onClick={handleToggle}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
         >
-          <div className={styles.optgroupLabel}>{t.defaultCategoriesGroup || 'Default Categories'}</div>
-          {defaultKeys.map((catKey) => (
-            <button
-              key={catKey}
-              className={`${styles.option} ${value === catKey ? styles.optionSelected : ''}`}
-              role="option"
-              aria-selected={value === catKey}
-              onClick={() => handleSelect(catKey)}
-            >
-              <div className={styles.iconWrapper}>
-                {getCategoryIcon(catKey, 14, customCategories)}
-              </div>
-              <span className={styles.optionLabel}>
-                {getCategoryLabel(catKey, t, currentLocale, customCategories)}
-              </span>
-            </button>
-          ))}
-
-          {customCategories.length > 0 && (
-            <>
-              <div className={styles.optgroupLabel}>{t.customCategoriesGroup || 'Custom Categories'}</div>
-              {customCategories.map((c) => (
-                <button
-                  key={c.id}
-                  className={`${styles.option} ${value === c.id ? styles.optionSelected : ''}`}
-                  role="option"
-                  aria-selected={value === c.id}
-                  onClick={() => handleSelect(c.id)}
-                >
-                  <div className={styles.iconWrapper}>
-                    {getCategoryIcon(c.id, 14, customCategories)}
-                  </div>
-                  <span className={styles.optionLabel}>
-                    {getCategoryLabel(c.id, t, currentLocale, customCategories)}
-                  </span>
-                </button>
-              ))}
-            </>
-          )}
-
-          <div className={styles.dropdownDivider} />
-          <div className={styles.dropdownFooter}>
-            <button
-              type="button"
-              className={styles.footerActionBtn}
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsOpen(false)
-                onOpenChange?.(false)
-                setIsQuickCreateOpen(true)
-              }}
-            >
-              <Plus size={14} className={styles.footerIcon} />
-              <span>{t.addNewCategory || 'Add New Category'}</span>
-            </button>
-            <button
-              type="button"
-              className={styles.footerActionBtn}
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsOpen(false)
-                onOpenChange?.(false)
-                setStep('settings')
-              }}
-            >
-              <Settings size={13} className={styles.footerIcon} />
-              <span>{t.manageInSettings || 'Manage in Settings'}</span>
-            </button>
+          <div className={styles.buttonContent}>
+            <div className={styles.iconWrapper}>
+              <CategoryIcon
+                category={value || 'Other'}
+                size={variant === 'badge' ? 14 : 16}
+                customCategories={customCategories}
+              />
+            </div>
+            <span className={styles.buttonLabel}>
+              {getCategoryLabel(value || 'Other', t, currentLocale, customCategories)}
+            </span>
           </div>
-        </div>
-      )}
+          <ChevronDown
+            size={variant === 'badge' ? 13 : 14}
+            className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
+          />
+        </button>
 
-      {isQuickCreateOpen && (
-        <QuickCategoryModal
-          isOpen={isQuickCreateOpen}
-          onClose={() => setIsQuickCreateOpen(false)}
-          onCreatedAndSelected={(newId) => {
-            handleSelect(newId)
-            setIsQuickCreateOpen(false)
-          }}
-        />
-      )}
-    </div>
-  )
-})
+        {isOpen && (
+          <div
+            ref={dropdownRef}
+            className={`${styles.dropdown} ${align === 'right' ? styles.dropdownAlignRight : styles.dropdownAlignLeft}`}
+            role="listbox"
+          >
+            <div className={styles.optgroupLabel}>
+              {t.defaultCategoriesGroup || 'Default Categories'}
+            </div>
+            {defaultKeys.map((catKey) => (
+              <button
+                key={catKey}
+                className={`${styles.option} ${value === catKey ? styles.optionSelected : ''}`}
+                role="option"
+                aria-selected={value === catKey}
+                onClick={() => handleSelect(catKey)}
+              >
+                <div className={styles.iconWrapper}>
+                  {getCategoryIcon(catKey, 14, customCategories)}
+                </div>
+                <span className={styles.optionLabel}>
+                  {getCategoryLabel(catKey, t, currentLocale, customCategories)}
+                </span>
+              </button>
+            ))}
+
+            {customCategories.length > 0 && (
+              <>
+                <div className={styles.optgroupLabel}>
+                  {t.customCategoriesGroup || 'Custom Categories'}
+                </div>
+                {customCategories.map((c) => (
+                  <button
+                    key={c.id}
+                    className={`${styles.option} ${value === c.id ? styles.optionSelected : ''}`}
+                    role="option"
+                    aria-selected={value === c.id}
+                    onClick={() => handleSelect(c.id)}
+                  >
+                    <div className={styles.iconWrapper}>
+                      {getCategoryIcon(c.id, 14, customCategories)}
+                    </div>
+                    <span className={styles.optionLabel}>
+                      {getCategoryLabel(c.id, t, currentLocale, customCategories)}
+                    </span>
+                  </button>
+                ))}
+              </>
+            )}
+
+            <div className={styles.dropdownDivider} />
+            <div className={styles.dropdownFooter}>
+              <button
+                type="button"
+                className={styles.footerActionBtn}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpen(false)
+                  onOpenChange?.(false)
+                  setIsQuickCreateOpen(true)
+                }}
+              >
+                <Plus size={14} className={styles.footerIcon} />
+                <span>{t.addNewCategory || 'Add New Category'}</span>
+              </button>
+              <button
+                type="button"
+                className={styles.footerActionBtn}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpen(false)
+                  onOpenChange?.(false)
+                  setStep('settings')
+                }}
+              >
+                <Settings size={13} className={styles.footerIcon} />
+                <span>{t.manageInSettings || 'Manage in Settings'}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isQuickCreateOpen && (
+          <QuickCategoryModal
+            isOpen={isQuickCreateOpen}
+            onClose={() => setIsQuickCreateOpen(false)}
+            onCreatedAndSelected={(newId) => {
+              handleSelect(newId)
+              setIsQuickCreateOpen(false)
+            }}
+          />
+        )}
+      </div>
+    )
+  },
+)
 
 CategorySelect.displayName = 'CategorySelect'

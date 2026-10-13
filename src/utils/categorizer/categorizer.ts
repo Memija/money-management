@@ -145,8 +145,11 @@ function findPopularMerchantCategory(textLower: string): string | undefined {
   let bestProcessorCategory: string | undefined
   let bestProcessorScore = 0
 
-  for (const { merchant, keywordLower: kw, aliasesLower, nameLower } of getCandidateMerchants(textLower)) {
-    if (merchant.category === 'Transfers' && !REMITTANCE_TRANSFER_REGEX.test(merchant.keyword)) continue
+  for (const { merchant, keywordLower: kw, aliasesLower, nameLower } of getCandidateMerchants(
+    textLower,
+  )) {
+    if (merchant.category === 'Transfers' && !REMITTANCE_TRANSFER_REGEX.test(merchant.keyword))
+      continue
     if (merchant.id === 'otto' && NON_RETAIL_OTTO_REGEX.test(textLower)) continue
     let score = 0
     if (matchesLowercaseTerm(textLower, kw)) {
@@ -296,7 +299,10 @@ function toDisplayCategory(cat: string): string {
   return cat
 }
 
-function matchCustomKeywords(d: string, customKeywords: Record<string, string[]>): string | undefined {
+function matchCustomKeywords(
+  d: string,
+  customKeywords: Record<string, string[]>,
+): string | undefined {
   const { entries, anyMatch } = compileCustomKeywords(customKeywords)
   if (anyMatch && !anyMatch.test(d)) return undefined
   for (const { category, word, regex } of entries) {
@@ -398,7 +404,12 @@ export function categorize(
   let options: CategorizeOptions | undefined
 
   if (customKeywordsOrOptions) {
-    if ('customKeywords' in customKeywordsOrOptions || 'amount' in customKeywordsOrOptions || 'type' in customKeywordsOrOptions || 'partner' in customKeywordsOrOptions) {
+    if (
+      'customKeywords' in customKeywordsOrOptions ||
+      'amount' in customKeywordsOrOptions ||
+      'type' in customKeywordsOrOptions ||
+      'partner' in customKeywordsOrOptions
+    ) {
       options = customKeywordsOrOptions as CategorizeOptions
       customKeywords = options.customKeywords
     } else {
@@ -408,9 +419,7 @@ export function categorize(
   }
 
   // Combine partner and description if partner is available, repairing broken line-wrap words
-  const rawText = options?.partner
-    ? `${options.partner} ${desc}`.trim()
-    : desc.trim()
+  const rawText = options?.partner ? `${options.partner} ${desc}`.trim() : desc.trim()
 
   const fullText = repairBrokenWords(rawText)
   const d = fullText.toLowerCase()
@@ -423,8 +432,10 @@ export function categorize(
 
   // Check cache for default evaluations. Everything below is independent of custom keywords,
   // so results are safely cached regardless of whether custom keywords were supplied.
-  const isExpense = options?.type === 'expense' || (typeof options?.amount === 'number' && options.amount < 0)
-  const isIncome = options?.type === 'income' || (typeof options?.amount === 'number' && options.amount > 0)
+  const isExpense =
+    options?.type === 'expense' || (typeof options?.amount === 'number' && options.amount < 0)
+  const isIncome =
+    options?.type === 'income' || (typeof options?.amount === 'number' && options.amount > 0)
   const cacheKey = `${d}:${isExpense ? 'exp' : isIncome ? 'inc' : 'any'}`
 
   const cachedCategory = defaultCategoryCache.get(cacheKey)
@@ -439,7 +450,9 @@ export function categorize(
       if (INCOME_TAX_REGEX.test(d)) continue
       if (POLISH_ATM_WITHDRAWAL_REGEX.test(d)) continue
       const isExplicitSalaryPayment =
-        /\b(?:salary\s+payment|monthly\s+salary|gehaltszahlung|lohnauszahlung|reisespesen|reisesp|reisekosten|spesenabrechnung|spesenerstattung|auslagenerstattung|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*)\b/i.test(d)
+        /\b(?:salary\s+payment|monthly\s+salary|gehaltszahlung|lohnauszahlung|reisespesen|reisesp|reisekosten|spesenabrechnung|spesenerstattung|auslagenerstattung|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*)\b/i.test(
+          d,
+        )
       if (isExpense && !isExplicitSalaryPayment) {
         continue
       }
@@ -485,7 +498,10 @@ export function categorize(
     } else if (popularCat === 'Insurance' && GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
       defaultCategoryCache.set(cacheKey, 'Healthcare')
       return 'Healthcare'
-    } else if ((popularCat === 'Groceries' || popularCat === 'Shopping') && DINING_ESTABLISHMENT_REGEX.test(d)) {
+    } else if (
+      (popularCat === 'Groceries' || popularCat === 'Shopping') &&
+      DINING_ESTABLISHMENT_REGEX.test(d)
+    ) {
       defaultCategoryCache.set(cacheKey, 'Dining Out')
       return 'Dining Out'
     } else if (
@@ -516,7 +532,10 @@ export function categorize(
       defaultCategoryCache.set(cacheKey, 'Travel')
       return 'Travel'
     } else if (
-      (popularCat === 'Shopping' || popularCat === 'Services' || popularCat === 'Insurance' || popularCat === 'Other') &&
+      (popularCat === 'Shopping' ||
+        popularCat === 'Services' ||
+        popularCat === 'Insurance' ||
+        popularCat === 'Other') &&
       GERMAN_COMMUNICATION_PURPOSE_REGEX.test(d)
     ) {
       defaultCategoryCache.set(cacheKey, 'Communication')

@@ -35,7 +35,10 @@ export const RestoreBackupPrompt: React.FC<RestoreBackupPromptProps> = ({
   const resolvedLabel = buttonLabel || t.restoreFromBackup || 'Restore from backup'
 
   return (
-    <div className={`${styles.container} ${className || ''}`} data-testid={`${idPrefix}-prompt-container`}>
+    <div
+      className={`${styles.container} ${className || ''}`}
+      data-testid={`${idPrefix}-prompt-container`}
+    >
       {showDivider && (
         <div className={styles.divider} role="separator" aria-label="Divider">
           <span>{t.orDivider || 'or'}</span>
@@ -66,11 +69,7 @@ export const RestoreBackupPrompt: React.FC<RestoreBackupPromptProps> = ({
       </button>
 
       {feedback && feedback.type === 'error' && (
-        <div
-          className={styles.errorBanner}
-          role="alert"
-          data-testid={`${idPrefix}-restore-error`}
-        >
+        <div className={styles.errorBanner} role="alert" data-testid={`${idPrefix}-restore-error`}>
           <AlertCircle size={16} className={styles.errorIcon} aria-hidden="true" />
           <span>{feedback.message}</span>
         </div>

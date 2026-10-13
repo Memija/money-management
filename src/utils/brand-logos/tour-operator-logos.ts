@@ -31,13 +31,13 @@ export const FtiLogo = createImageLogo({
 
 export const TOUR_OPERATOR_LOGOS: Record<string, IconComponent> = {
   AurumToursLogo,
-  'aurumtours': AurumToursLogo,
+  aurumtours: AurumToursLogo,
   LastMinuteExpressLogo,
   'last-minute-express': LastMinuteExpressLogo,
-  'lastminute': LastMinuteExpressLogo,
+  lastminute: LastMinuteExpressLogo,
   LastminuteLogo: LastMinuteExpressLogo,
   LturLogo,
-  'ltur': LturLogo,
+  ltur: LturLogo,
   FtiLogo,
-  'fti': FtiLogo,
+  fti: FtiLogo,
 }

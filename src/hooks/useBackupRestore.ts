@@ -31,7 +31,9 @@ export const useBackupRestore = (options?: UseBackupRestoreOptions): UseBackupRe
   const t = useLanguageStore((s) => s.t)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
+    null,
+  )
   const [pendingRestore, setPendingRestore] = useState<ValidatedBackupResult | null>(null)
   const [isRestoring, setIsRestoring] = useState(false)
 
@@ -102,10 +104,7 @@ export const useBackupRestore = (options?: UseBackupRestoreOptions): UseBackupRe
           data.currentStep ?? ((data.importedAccounts?.length ?? 0) > 0 ? 'dashboard' : 'country'),
       })
 
-      showFeedback(
-        'success',
-        t.restoreBackupSuccess || 'Backup restored successfully.',
-      )
+      showFeedback('success', t.restoreBackupSuccess || 'Backup restored successfully.')
       setPendingRestore(null)
       options?.onRestoreSuccess?.()
     } catch (err) {

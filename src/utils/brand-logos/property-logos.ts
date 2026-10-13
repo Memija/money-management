@@ -14,5 +14,3 @@ export const PROPERTY_LOGOS: Record<string, IconComponent> = {
   'kmk-immobilien': KmkImmobilienLogo,
   'kmk-immobilienverwaltung': KmkImmobilienLogo,
 }
-
-

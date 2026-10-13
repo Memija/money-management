@@ -207,7 +207,10 @@ describe('parsePdfText', () => {
 
 describe('extractAccountIbansFromPdf', () => {
   it('extracts IBAN from file name', () => {
-    const ibans = extractAccountIbansFromPdf('Some body text', 'Umsaetze_DE92500400000000000001_EUR.pdf')
+    const ibans = extractAccountIbansFromPdf(
+      'Some body text',
+      'Umsaetze_DE92500400000000000001_EUR.pdf',
+    )
     expect(ibans).toContain('DE92500400000000000001')
   })
 

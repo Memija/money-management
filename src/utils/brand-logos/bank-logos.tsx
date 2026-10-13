@@ -51,12 +51,22 @@ export const PostbankLogo: IconComponent = ({ size = 16, className }) => (
 PostbankLogo.displayName = 'PostbankLogo'
 
 export const TradeRepublicLogo: IconComponent = ({ size = 16, className }) => (
-  <BankImage src="/banks/trade-republic.png" alt="Trade Republic" size={size} className={className} />
+  <BankImage
+    src="/banks/trade-republic.png"
+    alt="Trade Republic"
+    size={size}
+    className={className}
+  />
 )
 TradeRepublicLogo.displayName = 'TradeRepublicLogo'
 
 export const ScalableCapitalLogo: IconComponent = ({ size = 16, className }) => (
-  <BankImage src="/banks/scalable-capital.png" alt="Scalable Capital" size={size} className={className} />
+  <BankImage
+    src="/banks/scalable-capital.png"
+    alt="Scalable Capital"
+    size={size}
+    className={className}
+  />
 )
 ScalableCapitalLogo.displayName = 'ScalableCapitalLogo'
 
@@ -96,7 +106,12 @@ export const Direkt1822Logo: IconComponent = ({ size = 16, className }) => (
 Direkt1822Logo.displayName = 'Direkt1822Logo'
 
 export const HypoVereinsbankLogo: IconComponent = ({ size = 16, className }) => (
-  <BankImage src="/banks/hypovereinsbank.png" alt="HypoVereinsbank" size={size} className={className} />
+  <BankImage
+    src="/banks/hypovereinsbank.png"
+    alt="HypoVereinsbank"
+    size={size}
+    className={className}
+  />
 )
 HypoVereinsbankLogo.displayName = 'HypoVereinsbankLogo'
 
@@ -307,6 +322,3 @@ export const KlarnaLogo: IconComponent = ({ size = 16, className }) => (
 KlarnaLogo.displayName = 'KlarnaLogo'
 
 export { KlarnaLogo as KlarnaBankLogo }
-
-
-

@@ -25,7 +25,9 @@
   color: var(--text-main);
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input:focus {
@@ -83,7 +85,9 @@
 .quickIconBtnSelected {
   border-color: var(--icon-color, var(--primary)) !important;
   background: rgba(99, 102, 241, 0.18) !important;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.45), 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+  box-shadow:
+    0 0 0 2px rgba(99, 102, 241, 0.45),
+    0 2px 8px rgba(99, 102, 241, 0.3) !important;
   transform: scale(1.08);
 }
 
@@ -95,7 +99,9 @@
 
   .quickIconBtnSelected {
     background: color-mix(in srgb, var(--icon-color, var(--primary)) 18%, transparent) !important;
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--icon-color, var(--primary)) 45%, transparent), 0 2px 8px color-mix(in srgb, var(--icon-color, var(--primary)) 30%, transparent) !important;
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--icon-color, var(--primary)) 45%, transparent),
+      0 2px 8px color-mix(in srgb, var(--icon-color, var(--primary)) 30%, transparent) !important;
   }
 }
 

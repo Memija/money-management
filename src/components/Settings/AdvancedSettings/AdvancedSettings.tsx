@@ -13,7 +13,9 @@ export const AdvancedSettings: React.FC = () => {
   const filterTransactionsWithoutLogos = useAppStore((s) => s.filterTransactionsWithoutLogos)
   const setFilterTransactionsWithoutLogos = useAppStore((s) => s.setFilterTransactionsWithoutLogos)
   const detachTransactionsFromDashboard = useAppStore((s) => s.detachTransactionsFromDashboard)
-  const setDetachTransactionsFromDashboard = useAppStore((s) => s.setDetachTransactionsFromDashboard)
+  const setDetachTransactionsFromDashboard = useAppStore(
+    (s) => s.setDetachTransactionsFromDashboard,
+  )
 
   // Calculate live statistics across imported transactions
   const { totalTxs, withoutLogoCount } = useMemo(() => {
@@ -43,7 +45,8 @@ export const AdvancedSettings: React.FC = () => {
             <h3 className={styles.title}>{t.advancedSettingsTitle || 'Advanced Settings'}</h3>
           </div>
           <p className={styles.description}>
-            {t.advancedSettingsDesc || 'Configure advanced options and specialized transaction filters.'}
+            {t.advancedSettingsDesc ||
+              'Configure advanced options and specialized transaction filters.'}
           </p>
         </div>
 
@@ -70,7 +73,8 @@ export const AdvancedSettings: React.FC = () => {
                     <span className={styles.statPill}>
                       <span className={styles.statHighlight}>{withoutLogoCount}</span>
                       <span>
-                        / {totalTxs} {t.transactions || 'transactions'} {t.filterWithoutLogosBadge?.toLowerCase() || 'without logos'}
+                        / {totalTxs} {t.transactions || 'transactions'}{' '}
+                        {t.filterWithoutLogosBadge?.toLowerCase() || 'without logos'}
                       </span>
                     </span>
                   </div>
@@ -84,7 +88,7 @@ export const AdvancedSettings: React.FC = () => {
                   filterTransactionsWithoutLogos ? styles.statusActive : styles.statusInactive
                 }`}
               >
-                {filterTransactionsWithoutLogos ? (t.active || 'Active') : (t.inactive || 'Inactive')}
+                {filterTransactionsWithoutLogos ? t.active || 'Active' : t.inactive || 'Inactive'}
               </span>
               <button
                 type="button"
@@ -132,7 +136,7 @@ export const AdvancedSettings: React.FC = () => {
                   detachTransactionsFromDashboard ? styles.statusActive : styles.statusInactive
                 }`}
               >
-                {detachTransactionsFromDashboard ? (t.active || 'Active') : (t.inactive || 'Inactive')}
+                {detachTransactionsFromDashboard ? t.active || 'Active' : t.inactive || 'Inactive'}
               </span>
               <button
                 type="button"

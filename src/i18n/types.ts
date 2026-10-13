@@ -378,6 +378,20 @@ export interface TranslationStrings {
   viewTrendArea: string
   allCategories: string
   monthsTracked: string
+  fullscreen: string
+  exitFullscreen: string
+  // Category Trend Zoom & Timeline Navigation
+  zoomIn: string
+  zoomOut: string
+  resetZoom: string
+  panEarlier: string
+  panLater: string
+  timelineRange: string
+  showingMonths: string // "{visible} of {total} months"
+  preset3M: string
+  preset6M: string
+  preset1Y: string
+  presetAll: string
   periodAll: string
   periodYear: string
   periodQuarter: string

@@ -115,7 +115,7 @@ export const useDropdownPosition = ({
         const availableSpace = shouldFlip ? spaceAbove : spaceBelow
         const maxAllowedHeight = Math.max(
           120,
-          Math.min(estimatedHeight, Math.floor(availableSpace - 4))
+          Math.min(estimatedHeight, Math.floor(availableSpace - 4)),
         )
         dropdown.style.maxHeight = `${maxAllowedHeight}px`
         dropdown.style.setProperty('--dropdown-max-height', `${maxAllowedHeight}px`)
@@ -133,7 +133,7 @@ export const useDropdownPosition = ({
       // 2. Horizontal bounds clamping: ensure strictly between padding and viewportWidth - padding
       let shiftX = 0
       if (dropdownRect.right > viewportWidth - padding) {
-        shiftX = (viewportWidth - padding) - dropdownRect.right
+        shiftX = viewportWidth - padding - dropdownRect.right
       }
       if (dropdownRect.left + shiftX < padding) {
         shiftX = padding - dropdownRect.left
@@ -158,7 +158,7 @@ export const useDropdownPosition = ({
       const availableSpace = shouldFlip ? spaceAbove : spaceBelow
       const maxAllowedHeight = Math.max(
         120,
-        Math.min(estimatedHeight, Math.floor(availableSpace - 4))
+        Math.min(estimatedHeight, Math.floor(availableSpace - 4)),
       )
       dropdown.style.setProperty('--dropdown-max-height', `${maxAllowedHeight}px`)
     }
@@ -172,6 +172,14 @@ export const useDropdownPosition = ({
       window.removeEventListener('resize', updatePosition)
       window.removeEventListener('scroll', updatePosition, true)
     }
-  }, [isOpen, triggerRef, dropdownRef, padding, estimatedHeight, topObstructionSelector, usePortal, align])
+  }, [
+    isOpen,
+    triggerRef,
+    dropdownRef,
+    padding,
+    estimatedHeight,
+    topObstructionSelector,
+    usePortal,
+    align,
+  ])
 }
-

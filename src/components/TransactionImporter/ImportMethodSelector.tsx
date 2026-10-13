@@ -12,12 +12,26 @@ interface ImportMethodSelectorProps {
   onSelectMethod: (method: ImportMethod) => void
 }
 
-export const ImportMethodSelector: React.FC<ImportMethodSelectorProps> = ({ t, onSelectMethod }) => {
-  const importMethods: { key: ImportMethod; label: string; icon: React.ReactNode; desc: string }[] = [
-    { key: 'spreadsheet', label: t.spreadsheetFile, icon: <FileSpreadsheet size={24} />, desc: t.spreadsheetFileDesc },
-    { key: 'pdf', label: t.pdfStatement, icon: <FileType size={24} />, desc: t.pdfStatementDesc },
-    { key: 'paste', label: t.copyPaste, icon: <ClipboardPaste size={24} />, desc: t.copyPasteDesc },
-  ]
+export const ImportMethodSelector: React.FC<ImportMethodSelectorProps> = ({
+  t,
+  onSelectMethod,
+}) => {
+  const importMethods: { key: ImportMethod; label: string; icon: React.ReactNode; desc: string }[] =
+    [
+      {
+        key: 'spreadsheet',
+        label: t.spreadsheetFile,
+        icon: <FileSpreadsheet size={24} />,
+        desc: t.spreadsheetFileDesc,
+      },
+      { key: 'pdf', label: t.pdfStatement, icon: <FileType size={24} />, desc: t.pdfStatementDesc },
+      {
+        key: 'paste',
+        label: t.copyPaste,
+        icon: <ClipboardPaste size={24} />,
+        desc: t.copyPasteDesc,
+      },
+    ]
 
   return (
     <div className={styles['import-methods-grid']}>

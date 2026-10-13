@@ -124,15 +124,14 @@ export const TELECOM_LOGOS: Record<string, IconComponent> = {
   teranetLogo: TeranetLogo,
   MobilezoneLogo,
   mobilezoneLogo: MobilezoneLogo,
-  'mobilezone': MobilezoneLogo,
+  mobilezone: MobilezoneLogo,
   'high-mobile': MobilezoneLogo,
   VodafoneLogo,
   vodafoneLogo: VodafoneLogo,
-  'vodafone': VodafoneLogo,
+  vodafone: VodafoneLogo,
   SiVodafone: VodafoneLogo,
   O2Logo,
   o2Logo: O2Logo,
-  'o2': O2Logo,
+  o2: O2Logo,
   SiO2: O2Logo,
 }
-

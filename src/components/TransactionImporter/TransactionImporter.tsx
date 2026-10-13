@@ -1,8 +1,17 @@
 import React, { useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  AlertTriangle, ArrowLeft, CheckCircle2,
-  Ghost, Info, Layers, Loader2, TrendingDown, TrendingUp, Upload, X,
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  Ghost,
+  Info,
+  Layers,
+  Loader2,
+  TrendingDown,
+  TrendingUp,
+  Upload,
+  X,
 } from 'lucide-react'
 
 import { useFormatters } from '../../hooks/useFormatters'
@@ -40,7 +49,9 @@ const TransactionImporter: React.FC = () => {
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [unlockedDuplicateIds, setUnlockedDuplicateIds] = useState<Set<string>>(new Set())
-  const [pendingOverrideRules, setPendingOverrideRules] = useState<Map<string, Transaction>>(new Map())
+  const [pendingOverrideRules, setPendingOverrideRules] = useState<Map<string, Transaction>>(
+    new Map(),
+  )
   const originalTransactionsRef = React.useRef<Map<string, Transaction>>(new Map())
 
   const {
@@ -164,7 +175,13 @@ const TransactionImporter: React.FC = () => {
     }
 
     return { count: transferTxIds.size, transferTxIds, existingAccountTransfers }
-  }, [nonDuplicateTransactions, otherImportedAccounts, selectedInstitution?.id, institutionName, detectedAccountIbans])
+  }, [
+    nonDuplicateTransactions,
+    otherImportedAccounts,
+    selectedInstitution?.id,
+    institutionName,
+    detectedAccountIbans,
+  ])
 
   const previewModalTitle = React.useMemo(() => {
     if (previewFilter === 'excluded') {
@@ -307,7 +324,11 @@ const TransactionImporter: React.FC = () => {
       if (finalTx.description && origTx.description && finalTx.description !== origTx.description) {
         mods.description = finalTx.description
       }
-      if (finalTx.amount !== undefined && origTx.amount !== undefined && Math.abs(finalTx.amount - origTx.amount) >= 0.005) {
+      if (
+        finalTx.amount !== undefined &&
+        origTx.amount !== undefined &&
+        Math.abs(finalTx.amount - origTx.amount) >= 0.005
+      ) {
         mods.amount = finalTx.amount
       }
       if (finalTx.category && origTx.category && finalTx.category !== origTx.category) {
@@ -506,16 +527,15 @@ const TransactionImporter: React.FC = () => {
                   title={`${t.inflows || 'Inflows'}: +${formatCurrency(importFlows.inflows)}`}
                   data-testid="import-inflow-badge"
                 >
-                  <TrendingUp size={13} aria-hidden="true" />
-                  +{formatCurrency(importFlows.inflows)}
+                  <TrendingUp size={13} aria-hidden="true" />+{formatCurrency(importFlows.inflows)}
                 </span>
                 <span
                   className={styles['flow-badge-outflow']}
                   title={`${t.outflows || 'Outflows'}: -${formatCurrency(importFlows.outflows)}`}
                   data-testid="import-outflow-badge"
                 >
-                  <TrendingDown size={13} aria-hidden="true" />
-                  -{formatCurrency(importFlows.outflows)}
+                  <TrendingDown size={13} aria-hidden="true" />-
+                  {formatCurrency(importFlows.outflows)}
                 </span>
               </div>
             </div>
@@ -536,8 +556,12 @@ const TransactionImporter: React.FC = () => {
                 <AlertTriangle size={18} className={styles['duplicate-banner-icon']} />
                 <span>
                   {duplicateStats.duplicateCount === 1
-                    ? t.duplicateImportAllBannerSingular || '1 duplicate transaction detected. This transaction has already been imported.'
-                    : (t.duplicateImportAllBanner || 'All {count} transactions in this file have already been imported (duplicates).').replace('{count}', String(duplicateStats.duplicateCount))}
+                    ? t.duplicateImportAllBannerSingular ||
+                      '1 duplicate transaction detected. This transaction has already been imported.'
+                    : (
+                        t.duplicateImportAllBanner ||
+                        'All {count} transactions in this file have already been imported (duplicates).'
+                      ).replace('{count}', String(duplicateStats.duplicateCount))}
                 </span>
               </div>
               <button
@@ -557,11 +581,17 @@ const TransactionImporter: React.FC = () => {
           )}
 
           {isPartialDuplicates && (
-            <div className={styles['duplicate-partial-banner']} data-testid="duplicate-partial-banner">
+            <div
+              className={styles['duplicate-partial-banner']}
+              data-testid="duplicate-partial-banner"
+            >
               <div className={styles['duplicate-banner-content']}>
                 <AlertTriangle size={18} className={styles['duplicate-banner-icon']} />
                 <span>
-                  {(t.duplicateImportPartialBanner || '{duplicateCount} duplicate transactions detected and will be skipped. {newCount} new transactions will be imported.')
+                  {(
+                    t.duplicateImportPartialBanner ||
+                    '{duplicateCount} duplicate transactions detected and will be skipped. {newCount} new transactions will be imported.'
+                  )
                     .replace('{duplicateCount}', String(duplicateStats.duplicateCount))
                     .replace('{newCount}', String(duplicateStats.newCount))}
                 </span>
@@ -602,7 +632,11 @@ const TransactionImporter: React.FC = () => {
               title={t.viewExcludedSpaceTransfers || 'View excluded'}
             >
               <div className={styles['transfer-info-content']}>
-                <Layers size={16} className={styles['space-transfers-banner-icon']} aria-hidden="true" />
+                <Layers
+                  size={16}
+                  className={styles['space-transfers-banner-icon']}
+                  aria-hidden="true"
+                />
                 <span>
                   {discardedSpaceCount === 1
                     ? t.spaceTransfersExcludedSingular
@@ -662,8 +696,8 @@ const TransactionImporter: React.FC = () => {
                             String(internalTransferStats.existingAccountTransfers.length),
                           )
                       : internalTransferStats.count === 1
-                        ? (t.internalTransfersDetectedSingular ||
-                          '1 internal transfer with your other accounts detected.')
+                        ? t.internalTransfersDetectedSingular ||
+                          '1 internal transfer with your other accounts detected.'
                         : (
                             t.internalTransfersDetected ||
                             '{count} internal transfers with your other accounts detected.'
@@ -700,9 +734,7 @@ const TransactionImporter: React.FC = () => {
 
             <button
               className={`primary-button ${styles['no-margin-top']} ${
-                isDuplicateFlow
-                  ? styles['button-warning-orange']
-                  : styles['button-clean-green']
+                isDuplicateFlow ? styles['button-warning-orange'] : styles['button-clean-green']
               }`}
               onClick={handleConfirmImport}
               id="confirm-import"
@@ -715,16 +747,16 @@ const TransactionImporter: React.FC = () => {
                 isAllDuplicates && unlockedDuplicateIds.size === 0
                   ? t.allTransactionsAlreadyImported
                   : isPartialDuplicates
-                  ? t.importNewTransactions.replace('{count}', String(duplicateStats.newCount))
-                  : t.confirmImport
+                    ? t.importNewTransactions.replace('{count}', String(duplicateStats.newCount))
+                    : t.confirmImport
               }
             >
               <CheckCircle2 size={18} />
               {isAllDuplicates && unlockedDuplicateIds.size === 0
                 ? t.allTransactionsAlreadyImported
                 : isPartialDuplicates
-                ? t.importNewTransactions.replace('{count}', String(duplicateStats.newCount))
-                : t.confirmImport}
+                  ? t.importNewTransactions.replace('{count}', String(duplicateStats.newCount))
+                  : t.confirmImport}
             </button>
           </div>
         </motion.div>
@@ -788,8 +820,13 @@ const TransactionImporter: React.FC = () => {
         title={t.duplicateImportTitle}
         message={
           duplicateStats?.newCount === 0
-            ? t.duplicateImportMessageAll.replace('{duplicateCount}', String(duplicateStats.duplicateCount))
-            : t.duplicateImportMessagePartial.replace('{duplicateCount}', String(duplicateStats?.duplicateCount)).replace('{newCount}', String(duplicateStats?.newCount))
+            ? t.duplicateImportMessageAll.replace(
+                '{duplicateCount}',
+                String(duplicateStats.duplicateCount),
+              )
+            : t.duplicateImportMessagePartial
+                .replace('{duplicateCount}', String(duplicateStats?.duplicateCount))
+                .replace('{newCount}', String(duplicateStats?.newCount))
         }
         proceedText={
           duplicateStats?.newCount === 0

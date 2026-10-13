@@ -1,4 +1,4 @@
-import { useEffect,useState } from 'react'
+import { useEffect, useState } from 'react'
 
 /**
  * Custom hook that returns whether the current window width is less than or equal to a given breakpoint.

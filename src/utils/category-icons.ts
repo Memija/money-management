@@ -49,7 +49,10 @@ export interface MerchantBrandInfo {
   initials: string
 }
 
-function getMerchantMatchScore({ keywordLower: kw, aliasesLower }: IndexedMerchant, textLower: string): number {
+function getMerchantMatchScore(
+  { keywordLower: kw, aliasesLower }: IndexedMerchant,
+  textLower: string,
+): number {
   let best = 0
   if (kw.length <= 4) {
     if (matchesLowercaseTerm(textLower, kw)) {
@@ -121,7 +124,9 @@ function computeMatchingMerchant(text: string): MerchantSuggestion | undefined {
       }
     } else {
       if (
-        (textLower.length >= 3 ? nameLower.includes(textLower) : matchesLowercaseTerm(nameLower, textLower)) &&
+        (textLower.length >= 3
+          ? nameLower.includes(textLower)
+          : matchesLowercaseTerm(nameLower, textLower)) &&
         textLower.length > score
       ) {
         score = textLower.length
@@ -210,9 +215,14 @@ export function getCategoryIcon(
   // 1. Check if it's a custom category with a selected icon
   if (customCategories) {
     const customMatch = customCategories.find((c) => c.id === categoryName)
-    if (customMatch && customMatch.icon && AVAILABLE_ICONS[customMatch.icon as keyof typeof AVAILABLE_ICONS]) {
+    if (
+      customMatch &&
+      customMatch.icon &&
+      AVAILABLE_ICONS[customMatch.icon as keyof typeof AVAILABLE_ICONS]
+    ) {
       const IconComp = AVAILABLE_ICONS[customMatch.icon as keyof typeof AVAILABLE_ICONS]
-      const color = ICON_COLORS[customMatch.icon] || getCategoryColor(categoryName, customCategories)
+      const color =
+        ICON_COLORS[customMatch.icon] || getCategoryColor(categoryName, customCategories)
       return React.createElement(IconComp, { size, color })
     }
   }
@@ -229,11 +239,17 @@ export function getCategoryIcon(
   if (merchant) {
     if (merchant.logo && MERCHANT_LOGOS[merchant.logo]) {
       const LogoComp = MERCHANT_LOGOS[merchant.logo]
-      return React.createElement(LogoComp, { size, color: merchant.brandColor || 'var(--text-main)' })
+      return React.createElement(LogoComp, {
+        size,
+        color: merchant.brandColor || 'var(--text-main)',
+      })
     }
     if (AVAILABLE_ICONS[merchant.icon]) {
       const IconComp = AVAILABLE_ICONS[merchant.icon]
-      const color = merchant.brandColor || ICON_COLORS[merchant.icon] || getCategoryColor(categoryName, customCategories)
+      const color =
+        merchant.brandColor ||
+        ICON_COLORS[merchant.icon] ||
+        getCategoryColor(categoryName, customCategories)
       return React.createElement(IconComp, { size, color })
     }
   }
@@ -257,11 +273,16 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
   const merchant = findMatchingMerchant(nameTrimmed)
 
   if (merchant) {
-    const cleanMerchantName = merchant.name.replace(/[()[\]{}]/g, ' ').replace(/\s+/g, ' ').trim()
+    const cleanMerchantName = merchant.name
+      .replace(/[()[\]{}]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
     const mWords = cleanMerchantName.split(/\s+/)
     const initials =
       mWords.length > 1
-        ? (mWords[0].length >= 2 && mWords[0] === mWords[0].toUpperCase() && merchant.name.includes('('))
+        ? mWords[0].length >= 2 &&
+          mWords[0] === mWords[0].toUpperCase() &&
+          merchant.name.includes('(')
           ? mWords[0].slice(0, 2).toUpperCase()
           : `${mWords[0][0] || ''}${mWords[1][0] || ''}`.toUpperCase()
         : (cleanMerchantName.slice(0, 2) || 'TX').toUpperCase()
@@ -273,9 +294,7 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
           ? AVAILABLE_ICONS[merchant.icon]
           : undefined
     const brandColor =
-      merchant.brandColor ||
-      (merchant.icon ? ICON_COLORS[merchant.icon] : undefined) ||
-      '#6366f1'
+      merchant.brandColor || (merchant.icon ? ICON_COLORS[merchant.icon] : undefined) || '#6366f1'
 
     const isSalaryOrSpesen =
       /(?:\b(?:reisesp(?:esen)?|reisekosten(?:erstattung|abrechnung)?|spesen(?:erstattung|abrechnung)?|auslagenerstattung|gehalt(?:szahlung)?|lohn(?:auszahlung)?|r[üu]ck[üu]berweisung\w*|rueckueberweisung\w*)\b)/i.test(
@@ -303,22 +322,33 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
           ? 'Bank Fees'
           : (merchant.category === 'Insurance' || merchant.id === 'check24') && isHealthInsurance
             ? 'Healthcare'
-            : (merchant.category === 'Insurance' || merchant.id === 'check24' || merchant.category === 'Shopping' || merchant.category === 'Loans') &&
+            : (merchant.category === 'Insurance' ||
+                  merchant.id === 'check24' ||
+                  merchant.category === 'Shopping' ||
+                  merchant.category === 'Loans') &&
                 (isGeneralInsurance || isCreditInsurance)
               ? 'Insurance'
-              : (merchant.category === 'Shopping' || merchant.id === 'check24' || merchant.category === 'Services') &&
+              : (merchant.category === 'Shopping' ||
+                    merchant.id === 'check24' ||
+                    merchant.category === 'Services') &&
                   isTravelPurpose
                 ? 'Travel'
-                : (merchant.category === 'Shopping' || merchant.id === 'check24' || merchant.category === 'Services') &&
+                : (merchant.category === 'Shopping' ||
+                      merchant.id === 'check24' ||
+                      merchant.category === 'Services') &&
                     isCommunicationPurpose
                   ? 'Communication'
                   : (merchant.category === 'Groceries' || merchant.category === 'Shopping') &&
                       DINING_ESTABLISHMENT_REGEX.test(nameTrimmed)
                     ? 'Dining Out'
-                    : (merchant.category === 'Shopping' || merchant.id === 'sumup' || merchant.category === 'Services') &&
+                    : (merchant.category === 'Shopping' ||
+                          merchant.id === 'sumup' ||
+                          merchant.category === 'Services') &&
                         BUTCHER_MEAT_SHOP_REGEX.test(nameTrimmed)
                       ? 'Groceries'
-                      : (merchant.category === 'Shopping' || merchant.id === 'sumup' || merchant.category === 'Services') &&
+                      : (merchant.category === 'Shopping' ||
+                            merchant.id === 'sumup' ||
+                            merchant.category === 'Services') &&
                           REMITTANCE_TRANSFER_REGEX.test(nameTrimmed)
                         ? 'Transfers'
                         : merchant.category,
@@ -329,11 +359,12 @@ export function getMerchantBrandInfo(name: string): MerchantBrandInfo {
   // For unrecognized transactions, derive clean display name if it went through an intermediary processor
   const isIntermediary = isPaymentProcessorIntermediary(nameTrimmed)
   const extracted = isIntermediary ? extractMerchantKeyword(nameTrimmed) : ''
-  const displayLabel = isIntermediary
-    ? (extracted || 'Shopping')
-    : nameTrimmed
+  const displayLabel = isIntermediary ? extracted || 'Shopping' : nameTrimmed
 
-  const cleanLabel = displayLabel.replace(/[()[\]{}]/g, ' ').replace(/\s+/g, ' ').trim()
+  const cleanLabel = displayLabel
+    .replace(/[()[\]{}]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
   const words = cleanLabel.split(/\s+/)
   const initials =
     words.length > 1

@@ -87,11 +87,7 @@ function drawRoundedRect(
 /**
  * Formats currency amount or returns masked placeholder
  */
-function formatAmount(
-  amount: number,
-  currencySymbol: string,
-  masked: boolean,
-): string {
+function formatAmount(amount: number, currencySymbol: string, masked: boolean): string {
   if (masked) {
     return `${currencySymbol}••••`
   }
@@ -259,7 +255,11 @@ export function renderShareCardToCanvas(
   ctx.fillText('Total Income', leftX + 28, flowY + 36)
   ctx.fillStyle = '#10b981'
   ctx.font = '700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillText(formatAmount(data.totalIncome, data.currencySymbol, data.maskAmounts), leftX + 28, flowY + 64)
+  ctx.fillText(
+    formatAmount(data.totalIncome, data.currencySymbol, data.maskAmounts),
+    leftX + 28,
+    flowY + 64,
+  )
 
   // Expense stat
   ctx.fillStyle = '#94a3b8'
@@ -267,7 +267,11 @@ export function renderShareCardToCanvas(
   ctx.fillText('Total Expenses', leftX + 190, flowY + 36)
   ctx.fillStyle = '#f43f5e'
   ctx.font = '700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillText(formatAmount(data.totalExpenses, data.currencySymbol, data.maskAmounts), leftX + 190, flowY + 64)
+  ctx.fillText(
+    formatAmount(data.totalExpenses, data.currencySymbol, data.maskAmounts),
+    leftX + 190,
+    flowY + 64,
+  )
 
   // Net Result stat
   ctx.fillStyle = '#94a3b8'
@@ -289,9 +293,8 @@ export function renderShareCardToCanvas(
   ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
   ctx.fill()
 
-  const expenseRatio = data.totalIncome > 0
-    ? Math.min(1, Math.max(0, data.totalExpenses / data.totalIncome))
-    : 1
+  const expenseRatio =
+    data.totalIncome > 0 ? Math.min(1, Math.max(0, data.totalExpenses / data.totalIncome)) : 1
   const expenseBarW = Math.round(barW * expenseRatio)
 
   if (expenseBarW > 0) {
@@ -387,7 +390,10 @@ export function getShareCardBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 /**
  * Triggers a direct download of the snapshot image
  */
-export function downloadShareCard(canvas: HTMLCanvasElement, filename = 'saldio-snapshot.png'): void {
+export function downloadShareCard(
+  canvas: HTMLCanvasElement,
+  filename = 'saldio-snapshot.png',
+): void {
   const link = document.createElement('a')
   link.download = filename
   link.href = canvas.toDataURL('image/png')
@@ -403,9 +409,7 @@ export async function copyShareCardImage(canvas: HTMLCanvasElement): Promise<boo
   }
 
   const blob = await getShareCardBlob(canvas)
-  await navigator.clipboard.write([
-    new ClipboardItem({ 'image/png': blob }),
-  ])
+  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
   return true
 }
 

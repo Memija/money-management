@@ -1,9 +1,9 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence,motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 
-import { localeLabels,localeOrder } from '../../i18n/locale-meta'
+import { localeLabels, localeOrder } from '../../i18n/locale-meta'
 import { useLanguageStore } from '../../store/useLanguageStore'
 
 import styles from './TranslationsModal.module.css'
@@ -16,12 +16,12 @@ interface TranslationsModalProps {
   newCatName: string
 }
 
-export const TranslationsModal: React.FC<TranslationsModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  translations, 
+export const TranslationsModal: React.FC<TranslationsModalProps> = ({
+  isOpen,
+  onClose,
+  translations,
   onTranslationChange,
-  newCatName
+  newCatName,
 }) => {
   const t = useLanguageStore((s) => s.t)
   const currentLocale = useLanguageStore((s) => s.locale)
@@ -36,7 +36,7 @@ export const TranslationsModal: React.FC<TranslationsModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           className={styles.modal}
-          onClick={e => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className={styles.header}>
             <h3>{t.addTranslationsTitle}</h3>
@@ -46,12 +46,10 @@ export const TranslationsModal: React.FC<TranslationsModalProps> = ({
           </div>
 
           <div className={styles.scrollArea}>
-            <div className={styles.translationsHelp}>
-              {t.optionalTranslationsHelp}
-            </div>
-            
+            <div className={styles.translationsHelp}>{t.optionalTranslationsHelp}</div>
+
             <div className={styles.translationsGrid}>
-              {localeOrder.map(loc => (
+              {localeOrder.map((loc) => (
                 <div key={loc} className={styles.translationRow}>
                   <img src={localeLabels[loc].flag} alt="" className={styles.flagIcon} />
                   <span className={styles.langLabel}>{localeLabels[loc].native}</span>
@@ -65,7 +63,7 @@ export const TranslationsModal: React.FC<TranslationsModalProps> = ({
                 </div>
               ))}
             </div>
-            
+
             <div className={styles.footer}>
               <button type="button" onClick={onClose} className={styles.doneBtn}>
                 {t.done}

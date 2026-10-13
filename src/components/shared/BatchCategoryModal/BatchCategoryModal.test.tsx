@@ -172,12 +172,7 @@ describe('BatchCategoryModal', () => {
     )
 
     fireEvent.click(screen.getByTestId('batch-category-update-all-btn'))
-    expect(onConfirmAll).toHaveBeenCalledWith(
-      mockTargetTx,
-      mockRelatedTx,
-      'Communication',
-      true,
-    )
+    expect(onConfirmAll).toHaveBeenCalledWith(mockTargetTx, mockRelatedTx, 'Communication', true)
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
@@ -203,12 +198,7 @@ describe('BatchCategoryModal', () => {
     expect(checkbox).not.toBeChecked()
 
     fireEvent.click(screen.getByTestId('batch-category-update-all-btn'))
-    expect(onConfirmAll).toHaveBeenCalledWith(
-      mockTargetTx,
-      mockRelatedTx,
-      'Communication',
-      false,
-    )
+    expect(onConfirmAll).toHaveBeenCalledWith(mockTargetTx, mockRelatedTx, 'Communication', false)
   })
 
   it('allows unchecking a transaction to only update selected related transactions', () => {

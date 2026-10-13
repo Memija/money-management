@@ -220,7 +220,16 @@ export const PorscheLogo: IconComponent = ({ size = 16, className }) => (
     <path d="M 14 24 L 23.5 24 L 23.5 35 C 19 32 15 28 14 24 Z" fill="#1A1A1A" />
     <path d="M 24.5 24 L 34 24 C 33 28 29 32 24.5 35 Z" fill="#D5001C" />
     {/* Stuttgart center shield */}
-    <rect x="21" y="17" width="6" height="8" rx="1.5" fill="#B1975B" stroke="#000000" strokeWidth="0.6" />
+    <rect
+      x="21"
+      y="17"
+      width="6"
+      height="8"
+      rx="1.5"
+      fill="#B1975B"
+      stroke="#000000"
+      strokeWidth="0.6"
+    />
     {/* Porsche banner text */}
     <text
       x="24"

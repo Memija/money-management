@@ -158,7 +158,9 @@
   cursor: pointer;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
-  transition: opacity 0.15s ease, background 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
 }
 
 .selectAllBtn:hover {
@@ -204,7 +206,11 @@
 
 .relatedItemSelected {
   border-color: color-mix(in srgb, var(--primary, #3b82f6) 50%, var(--border-color));
-  background: color-mix(in srgb, var(--primary, #3b82f6) 8%, var(--bg-hover, rgba(255, 255, 255, 0.04)));
+  background: color-mix(
+    in srgb,
+    var(--primary, #3b82f6) 8%,
+    var(--bg-hover, rgba(255, 255, 255, 0.04))
+  );
 }
 
 .relatedItem:hover {
@@ -212,7 +218,11 @@
 }
 
 .relatedItemSelected:hover {
-  background: color-mix(in srgb, var(--primary, #3b82f6) 12%, var(--bg-active, rgba(255, 255, 255, 0.08)));
+  background: color-mix(
+    in srgb,
+    var(--primary, #3b82f6) 12%,
+    var(--bg-active, rgba(255, 255, 255, 0.08))
+  );
 }
 
 .itemCheckboxWrapper {

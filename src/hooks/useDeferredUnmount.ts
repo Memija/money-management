@@ -13,7 +13,10 @@ export const DEFAULT_UNMOUNT_DELAY_MS = 600
  * @param delayMs - How long to stay mounted after closing
  * @returns Whether the component should be rendered
  */
-export const useDeferredUnmount = (isOpen: boolean, delayMs: number = DEFAULT_UNMOUNT_DELAY_MS): boolean => {
+export const useDeferredUnmount = (
+  isOpen: boolean,
+  delayMs: number = DEFAULT_UNMOUNT_DELAY_MS,
+): boolean => {
   const [shouldRender, setShouldRender] = useState(isOpen)
 
   if (isOpen && !shouldRender) {

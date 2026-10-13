@@ -97,23 +97,16 @@ describe('RecurringExpenses', () => {
   })
 
   it('renders null when there are no recurring expenses', () => {
-    const { container } = render(
-      <RecurringExpenses recurringExpenses={[]} totalMonthly={0} />
-    )
+    const { container } = render(<RecurringExpenses recurringExpenses={[]} totalMonthly={0} />)
     expect(container.firstChild).toBeNull()
   })
 
   it('renders recurring expense cards with full row header and KPI stats', () => {
-    render(
-      <RecurringExpenses
-        recurringExpenses={sampleRecurring}
-        totalMonthly={50.99}
-      />
-    )
+    render(<RecurringExpenses recurringExpenses={sampleRecurring} totalMonthly={50.99} />)
 
     expect(screen.getByText('Recurring Expenses and Subscriptions')).toBeInTheDocument()
     expect(
-      screen.getByText('2 active subscriptions or recurring charges detected')
+      screen.getByText('2 active subscriptions or recurring charges detected'),
     ).toBeInTheDocument()
     expect(screen.getByText('Monthly Overhead')).toBeInTheDocument()
     expect(screen.getByText('Projected Yearly')).toBeInTheDocument()
@@ -126,25 +119,15 @@ describe('RecurringExpenses', () => {
   })
 
   it('renders singular message when exactly 1 recurring expense is detected', () => {
-    render(
-      <RecurringExpenses
-        recurringExpenses={[sampleRecurring[0]]}
-        totalMonthly={15.99}
-      />
-    )
+    render(<RecurringExpenses recurringExpenses={[sampleRecurring[0]]} totalMonthly={15.99} />)
 
     expect(
-      screen.getByText('1 active subscription or recurring charge detected')
+      screen.getByText('1 active subscription or recurring charge detected'),
     ).toBeInTheDocument()
   })
 
   it('allows reassigning the category for an individual item', () => {
-    render(
-      <RecurringExpenses
-        recurringExpenses={sampleRecurring}
-        totalMonthly={50.99}
-      />
-    )
+    render(<RecurringExpenses recurringExpenses={sampleRecurring} totalMonthly={50.99} />)
 
     // Find the category badge button for Netflix (Entertainment)
     const categoryBtn = screen.getByRole('button', { name: /Entertainment/i })
@@ -169,10 +152,7 @@ describe('RecurringExpenses', () => {
 
   it('elevates the recurring expenses container with containerWithOpenDropdown when a dropdown is open', () => {
     const { container } = render(
-      <RecurringExpenses
-        recurringExpenses={sampleRecurring}
-        totalMonthly={50.99}
-      />
+      <RecurringExpenses recurringExpenses={sampleRecurring} totalMonthly={50.99} />,
     )
 
     const rootElement = container.firstElementChild as HTMLElement

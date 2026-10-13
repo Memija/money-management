@@ -12,9 +12,11 @@ import { type AxisTickProps, AxisTickText } from './AxisTickText'
  * configuration stays referentially stable, so Recharts doesn't recompute scales or
  * re-render (and re-animate) every series.
  */
-export const MonthYearAxisTick: React.FC<AxisTickProps> = React.memo(({ payload, ...textProps }) => {
-  const { formatMonthYear } = useFormatters()
-  return <AxisTickText {...textProps} label={formatMonthYear(String(payload?.value ?? ''))} />
-})
+export const MonthYearAxisTick: React.FC<AxisTickProps> = React.memo(
+  ({ payload, ...textProps }) => {
+    const { formatMonthYear } = useFormatters()
+    return <AxisTickText {...textProps} label={formatMonthYear(String(payload?.value ?? ''))} />
+  },
+)
 
 MonthYearAxisTick.displayName = 'MonthYearAxisTick'

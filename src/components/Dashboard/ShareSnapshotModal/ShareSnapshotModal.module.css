@@ -112,7 +112,9 @@
   border: 2px solid transparent;
   cursor: pointer;
   padding: 0;
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
   outline: none;
 }
 
@@ -173,7 +175,9 @@
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
 }
 
 .btnPrimary:hover {
@@ -194,7 +198,9 @@
   font-weight: 500;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .btnSecondary:hover {

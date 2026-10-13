@@ -33,9 +33,7 @@ export const AccountSelector: React.FC<AccountSelectorProps> = ({
   // Selected bank object (if an individual institution is selected)
   const selectedAccount = useMemo(() => {
     if (selectedInstitution === 'all') return null
-    return accounts.find(
-      (a) => a.id === selectedInstitution || a.name === selectedInstitution,
-    )
+    return accounts.find((a) => a.id === selectedInstitution || a.name === selectedInstitution)
   }, [accounts, selectedInstitution])
 
   // Don't render anything if there are fewer than 2 accounts imported
@@ -51,7 +49,8 @@ export const AccountSelector: React.FC<AccountSelectorProps> = ({
           <span className={styles.headerTitle}>{t.bankAccounts || 'Bank Accounts'}</span>
         </div>
         <span className={styles.totalBadge}>
-          {accounts.length} {accounts.length === 1 ? t.institutions || 'Account' : t.institutions || 'Accounts'}
+          {accounts.length}{' '}
+          {accounts.length === 1 ? t.institutions || 'Account' : t.institutions || 'Accounts'}
         </span>
       </div>
 
@@ -95,8 +94,7 @@ export const AccountSelector: React.FC<AccountSelectorProps> = ({
 
         {/* Per-bank cards */}
         {accounts.map((acc) => {
-          const isSelected =
-            selectedInstitution === acc.id || selectedInstitution === acc.name
+          const isSelected = selectedInstitution === acc.id || selectedInstitution === acc.name
 
           return (
             <button
@@ -105,9 +103,7 @@ export const AccountSelector: React.FC<AccountSelectorProps> = ({
               role="tab"
               aria-selected={isSelected}
               data-testid={`account-card-${acc.id}`}
-              className={`${styles.accountCard} ${
-                isSelected ? styles.accountCardActive : ''
-              }`}
+              className={`${styles.accountCard} ${isSelected ? styles.accountCardActive : ''}`}
               onClick={() => onSelectInstitution(acc.name || acc.id)}
             >
               <div className={styles.cardTop}>
@@ -183,9 +179,7 @@ export const AccountSelector: React.FC<AccountSelectorProps> = ({
                 onClick={() => onSelectSubAccount('all')}
               >
                 <span className={styles.subPillName}>{t.allSubAccounts}</span>
-                <span className={styles.subPillCount}>
-                  ({selectedAccount.transactionCount})
-                </span>
+                <span className={styles.subPillCount}>({selectedAccount.transactionCount})</span>
               </button>
 
               {selectedAccount.subAccounts.map((sub) => (
@@ -201,9 +195,7 @@ export const AccountSelector: React.FC<AccountSelectorProps> = ({
                   onClick={() => onSelectSubAccount(sub.name)}
                 >
                   <span className={styles.subPillName}>{sub.name}</span>
-                  <span className={styles.subPillBalance}>
-                    {formatCurrency(sub.balance)}
-                  </span>
+                  <span className={styles.subPillBalance}>{formatCurrency(sub.balance)}</span>
                   <span className={styles.subPillCount}>({sub.transactionCount})</span>
                 </button>
               ))}

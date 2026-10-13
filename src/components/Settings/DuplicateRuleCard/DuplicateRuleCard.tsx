@@ -25,12 +25,9 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
   const inst = findInstitution(rule.institutionId || rule.institutionName)
   const amountText =
     rule.amount !== undefined ? formatCurrency(rule.amount) : t.anyAmount || 'Any amount'
-  const instText =
-    rule.institutionName || inst?.name || t.allInstitutions || 'All institutions'
+  const instText = rule.institutionName || inst?.name || t.allInstitutions || 'All institutions'
 
-  const executionDate = formatDate(
-    rule.lastAppliedAt || rule.createdAt || new Date().toISOString(),
-  )
+  const executionDate = formatDate(rule.lastAppliedAt || rule.createdAt || new Date().toISOString())
 
   const appliedWithDateText =
     rule.applyCount === 1
@@ -41,17 +38,19 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
 
   const hasModifications = Boolean(
     rule.modifications &&
-      (rule.modifications.amount !== undefined ||
-        (rule.modifications.description !== undefined &&
-          rule.modifications.description !== rule.descriptionPattern) ||
-        rule.modifications.category !== undefined ||
-        rule.modifications.date !== undefined),
+    (rule.modifications.amount !== undefined ||
+      (rule.modifications.description !== undefined &&
+        rule.modifications.description !== rule.descriptionPattern) ||
+      rule.modifications.category !== undefined ||
+      rule.modifications.date !== undefined),
   )
 
   return (
     <div
       className={`${styles.ruleItem} ${isModalPreview ? styles.modalPreview : ''}`}
-      data-testid={isModalPreview ? `modal-rule-preview-${rule.id}` : `duplicate-rule-item-${rule.id}`}
+      data-testid={
+        isModalPreview ? `modal-rule-preview-${rule.id}` : `duplicate-rule-item-${rule.id}`
+      }
     >
       <div className={styles.ruleBankRow}>
         <div
@@ -83,9 +82,7 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
         <span
           className={hasModifications ? styles.ruleModifiedBadge : styles.ruleActionBadge}
           data-testid={
-            isModalPreview
-              ? `modal-rule-action-badge-${rule.id}`
-              : `rule-action-badge-${rule.id}`
+            isModalPreview ? `modal-rule-action-badge-${rule.id}` : `rule-action-badge-${rule.id}`
           }
         >
           {hasModifications
@@ -97,9 +94,7 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
       <div
         className={styles.rulePattern}
         title={rule.descriptionPattern}
-        data-testid={
-          isModalPreview ? `modal-rule-pattern-${rule.id}` : `rule-pattern-${rule.id}`
-        }
+        data-testid={isModalPreview ? `modal-rule-pattern-${rule.id}` : `rule-pattern-${rule.id}`}
       >
         {rule.descriptionPattern}
       </div>
@@ -107,18 +102,14 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
       <div className={styles.badgeRow}>
         <span
           className={`${styles.metaPill} ${rule.amount !== undefined ? styles.amountPill : ''}`}
-          data-testid={
-            isModalPreview ? `modal-rule-amount-${rule.id}` : `rule-amount-${rule.id}`
-          }
+          data-testid={isModalPreview ? `modal-rule-amount-${rule.id}` : `rule-amount-${rule.id}`}
         >
           {amountText}
         </span>
 
         <span
           className={`${styles.metaPill} ${styles.appliedPill}`}
-          data-testid={
-            isModalPreview ? `modal-rule-applied-${rule.id}` : `rule-applied-${rule.id}`
-          }
+          data-testid={isModalPreview ? `modal-rule-applied-${rule.id}` : `rule-applied-${rule.id}`}
         >
           <Repeat size={11} aria-hidden="true" />
           <span>{appliedWithDateText}</span>
@@ -129,9 +120,7 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
         <div
           className={styles.modificationsCard}
           data-testid={
-            isModalPreview
-              ? `modal-rule-modifications-${rule.id}`
-              : `rule-modifications-${rule.id}`
+            isModalPreview ? `modal-rule-modifications-${rule.id}` : `rule-modifications-${rule.id}`
           }
         >
           <div className={styles.modificationsHeader}>
@@ -145,9 +134,7 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
               <div
                 className={styles.modRow}
                 data-testid={
-                  isModalPreview
-                    ? `modal-rule-mod-amount-${rule.id}`
-                    : `rule-mod-amount-${rule.id}`
+                  isModalPreview ? `modal-rule-mod-amount-${rule.id}` : `rule-mod-amount-${rule.id}`
                 }
               >
                 <span className={styles.modFieldLabel}>{t.amount || 'Amount'}:</span>
@@ -167,30 +154,22 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
                 <div
                   className={styles.modRow}
                   data-testid={
-                    isModalPreview
-                      ? `modal-rule-mod-desc-${rule.id}`
-                      : `rule-mod-desc-${rule.id}`
+                    isModalPreview ? `modal-rule-mod-desc-${rule.id}` : `rule-mod-desc-${rule.id}`
                   }
                 >
-                  <span className={styles.modFieldLabel}>
-                    {t.description || 'Description'}:
-                  </span>
+                  <span className={styles.modFieldLabel}>{t.description || 'Description'}:</span>
                   <span className={styles.modOldVal}>{rule.descriptionPattern}</span>
                   <span className={styles.modArrow} aria-hidden="true">
                     →
                   </span>
-                  <span className={styles.modNewVal}>
-                    {rule.modifications.description}
-                  </span>
+                  <span className={styles.modNewVal}>{rule.modifications.description}</span>
                 </div>
               )}
             {rule.modifications.category !== undefined && (
               <div
                 className={styles.modRow}
                 data-testid={
-                  isModalPreview
-                    ? `modal-rule-mod-cat-${rule.id}`
-                    : `rule-mod-cat-${rule.id}`
+                  isModalPreview ? `modal-rule-mod-cat-${rule.id}` : `rule-mod-cat-${rule.id}`
                 }
               >
                 <span className={styles.modFieldLabel}>{t.category || 'Category'}:</span>
@@ -201,15 +180,11 @@ export const DuplicateRuleCard: React.FC<DuplicateRuleCardProps> = ({
               <div
                 className={styles.modRow}
                 data-testid={
-                  isModalPreview
-                    ? `modal-rule-mod-date-${rule.id}`
-                    : `rule-mod-date-${rule.id}`
+                  isModalPreview ? `modal-rule-mod-date-${rule.id}` : `rule-mod-date-${rule.id}`
                 }
               >
                 <span className={styles.modFieldLabel}>{t.date || 'Date'}:</span>
-                <span className={styles.modNewVal}>
-                  {formatDate(rule.modifications.date)}
-                </span>
+                <span className={styles.modNewVal}>{formatDate(rule.modifications.date)}</span>
               </div>
             )}
           </div>

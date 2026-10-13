@@ -2,7 +2,6 @@ import { BillaLogo, BillaPlusLogo } from './grocery-logos'
 import { createImageLogo } from './logo-factory'
 import type { IconComponent } from './types'
 
-
 /** BIPA — Austria's leading drugstore & perfume retailer (Rewe Group). */
 export const BipaLogo = createImageLogo({
   src: '/brands/bipa.png',

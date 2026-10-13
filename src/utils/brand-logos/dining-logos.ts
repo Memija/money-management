@@ -153,7 +153,6 @@ export const KoeschingerForstLogo = createImageLogo({
   displayName: 'KoeschingerForstLogo',
 })
 
-
 /** Kalea (Kalea GmbH) — craft beer discovery boxes, advent calendars, and beer tasting community. */
 export const KaleaLogo = createImageLogo({
   src: '/brands/kalea.png',
@@ -167,7 +166,6 @@ export const BrotHausLogo = createImageLogo({
   label: 'BrotHaus',
   displayName: 'BrotHausLogo',
 })
-
 
 /** Bäckerei Moos — traditional artisan bakery & cafe chain across Central Hesse and Bad Homburg. */
 export const BaeckereiMoosLogo = createImageLogo({
@@ -209,7 +207,6 @@ export const FeinkostStrahmannLogo = createWordmarkLogo({
 })
 export { FeinkostStrahmannLogo as FcsFeinkostLogo }
 
-
 export const DINING_LOGOS: Record<string, IconComponent> = {
   BaeckereiMoosLogo,
   baeckereiMoosLogo: BaeckereiMoosLogo,
@@ -221,11 +218,11 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   'okka-turkish-bakery': OkkaBakeryLogo,
   BrotHausLogo,
   brotHausLogo: BrotHausLogo,
-  'brothaus': BrotHausLogo,
+  brothaus: BrotHausLogo,
   'brothaus-gmbh': BrotHausLogo,
   TransgourmetLogo,
   transgourmetLogo: TransgourmetLogo,
-  'transgourmet': TransgourmetLogo,
+  transgourmet: TransgourmetLogo,
   'transgourmet-deutschland': TransgourmetLogo,
   FruechteFeinkostLogo,
   fruechteFeinkostLogo: FruechteFeinkostLogo,
@@ -233,13 +230,13 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   'feinkost-rothenburg': FruechteFeinkostLogo,
   KaleaLogo,
   kaleaLogo: KaleaLogo,
-  'kalea': KaleaLogo,
+  kalea: KaleaLogo,
   PizzaHutLogo,
   pizzaHutLogo: PizzaHutLogo,
   'pizza-hut': PizzaHutLogo,
   SerwaysLogo,
   serwaysLogo: SerwaysLogo,
-  'serways': SerwaysLogo,
+  serways: SerwaysLogo,
   'raststaette-spessart': SerwaysLogo,
   TankUndRastLogo,
   tankUndRastLogo: TankUndRastLogo,
@@ -252,7 +249,7 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   'thong-thai': ThongThaiLogo,
   RatsstubeLogo,
   ratsstubeLogo: RatsstubeLogo,
-  'ratsstube': RatsstubeLogo,
+  ratsstube: RatsstubeLogo,
   'ratsstube-restaurant': RatsstubeLogo,
   SmoothieBarAntalyaLogo,
   smoothieBarAntalyaLogo: SmoothieBarAntalyaLogo,
@@ -260,19 +257,19 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   'smoothie-bar-antalya': SmoothieBarAntalyaLogo,
   IcturLogo,
   icturLogo: IcturLogo,
-  'ictur': IcturLogo,
+  ictur: IcturLogo,
   'ictur-yiyecek': IcturLogo,
   WasserpalastLogo,
   wasserpalastLogo: WasserpalastLogo,
-  'wasserpalast': WasserpalastLogo,
+  wasserpalast: WasserpalastLogo,
   'wasserpalast-graz': WasserpalastLogo,
   BurgerKingLogo,
   burgerKingLogo: BurgerKingLogo,
-  'burgerking': BurgerKingLogo,
+  burgerking: BurgerKingLogo,
   'burger-king': BurgerKingLogo,
   ChidobaLogo,
   chidobaLogo: ChidobaLogo,
-  'chidoba': ChidobaLogo,
+  chidoba: ChidobaLogo,
   'chidoba-mexican-grill': ChidobaLogo,
   EatingPointLogo,
   eatingPointLogo: EatingPointLogo,
@@ -294,11 +291,11 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   restoranDesetkaLogo: RestoranDesetkaLogo,
   'restoran-desetka': RestoranDesetkaLogo,
   'maxi-restoran-desetka': RestoranDesetkaLogo,
-  'desetka': RestoranDesetkaLogo,
+  desetka: RestoranDesetkaLogo,
   BrotchenmacherLogo,
   brotchenmacherLogo: BrotchenmacherLogo,
-  'brotchenmacher': BrotchenmacherLogo,
-  'broetchenmacher': BrotchenmacherLogo,
+  brotchenmacher: BrotchenmacherLogo,
+  broetchenmacher: BrotchenmacherLogo,
   ThaiSnackLogo,
   thaiSnackLogo: ThaiSnackLogo,
   'thai-snack': ThaiSnackLogo,
@@ -309,9 +306,7 @@ export const DINING_LOGOS: Record<string, IconComponent> = {
   'fcs-feinkost-catering': FeinkostStrahmannLogo,
   McdonaldsLogo,
   mcdonaldsLogo: McdonaldsLogo,
-  'mcdonalds': McdonaldsLogo,
+  mcdonalds: McdonaldsLogo,
   "mcdonald's": McdonaldsLogo,
   SiMcdonalds: McdonaldsLogo,
 }
-
-

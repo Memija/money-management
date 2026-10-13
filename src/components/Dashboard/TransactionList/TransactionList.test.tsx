@@ -1667,4 +1667,3 @@ describe('TransactionList Component', () => {
     })
   })
 })
-

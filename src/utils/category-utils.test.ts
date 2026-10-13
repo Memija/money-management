@@ -67,34 +67,34 @@ describe('category-utils', () => {
       expect(categorize('Starbucks')).toBe('Dining Out')
       expect(
         categorize(
-          'Okka Turkish Bakery, Frankfurt am DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Ca'
-        )
+          'Okka Turkish Bakery, Frankfurt am DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Ca',
+        ),
       ).toBe('Dining Out')
       expect(
         categorize(
-          'Baeckerei Moos Bad Homburg DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card Baeckerei Moos'
-        )
-      ).toBe('Dining Out')
-      expect(
-        categorize(
-          'MAXI RESTORAN DESETKA  ORASJE BA Karte Nr. 5355 0000 0000 0000 Virtual Debit Card MAXI RESTORAN DESETKA    ORASJE    BIH 2024-01-01T12:00:00 Kartenzahlung Original 10,00BAM 1EUR=1,9500000BAM Entgelt Auslandseinsatz 0,20EUR'
-        )
+          'Baeckerei Moos Bad Homburg DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card Baeckerei Moos',
+        ),
       ).toBe('Dining Out')
       expect(
         categorize(
           'MAXI RESTORAN DESETKA  ORASJE BA Karte Nr. 5355 0000 0000 0000 Virtual Debit Card MAXI RESTORAN DESETKA    ORASJE    BIH 2024-01-01T12:00:00 Kartenzahlung Original 10,00BAM 1EUR=1,9500000BAM Entgelt Auslandseinsatz 0,20EUR',
-          { amount: -14.9, type: 'expense' }
-        )
+        ),
       ).toBe('Dining Out')
       expect(
         categorize(
-          'XXXLUTZ RESTO-ESCHBORN  ESCHBORN DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card XXXLUTZ RESTO-ESCHBORN   ESCHBORN    DEU 2024-01-01T12:00:00 Kartenzahlung'
-        )
+          'MAXI RESTORAN DESETKA  ORASJE BA Karte Nr. 5355 0000 0000 0000 Virtual Debit Card MAXI RESTORAN DESETKA    ORASJE    BIH 2024-01-01T12:00:00 Kartenzahlung Original 10,00BAM 1EUR=1,9500000BAM Entgelt Auslandseinsatz 0,20EUR',
+          { amount: -14.9, type: 'expense' },
+        ),
       ).toBe('Dining Out')
       expect(
         categorize(
-          '98038 MOEMAX ELV54098706 28.01 14.58 ME0()98025 MOEMAX RESTO//ESCHBORN End-to-End-Ref.: T023012854098706008332()BDSK Handel Mandatsref: 5409870629792301281458 Gläubiger-ID: DE76ZZZ00000061166 SEPA-BASISLASTSCHRIFT einmalig'
-        )
+          'XXXLUTZ RESTO-ESCHBORN  ESCHBORN DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card XXXLUTZ RESTO-ESCHBORN   ESCHBORN    DEU 2024-01-01T12:00:00 Kartenzahlung',
+        ),
+      ).toBe('Dining Out')
+      expect(
+        categorize(
+          '98038 MOEMAX ELV54098706 28.01 14.58 ME0()98025 MOEMAX RESTO//ESCHBORN End-to-End-Ref.: T023012854098706008332()BDSK Handel Mandatsref: 5409870629792301281458 Gläubiger-ID: DE76ZZZ00000061166 SEPA-BASISLASTSCHRIFT einmalig',
+        ),
       ).toBe('Dining Out')
     })
 
@@ -104,13 +104,13 @@ describe('category-utils', () => {
       expect(categorize('UBER * TRIP 1234 HELP.UBER.COM')).toBe('Transport')
       expect(
         categorize(
-          'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1052983422516 . PAYPAL-ZAHLUNG UBE R LASTSCHRIFT an mc'
-        )
+          'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1052983422516 . PAYPAL-ZAHLUNG UBE R LASTSCHRIFT an mc',
+        ),
       ).toBe('Transport')
       expect(
         categorize(
-          'PayPal Europe S.a.r.l. et Cie S.C.A 1052983422516/PP.4585.PP/. Uber BV, Ihr Einkauf bei Uber'
-        )
+          'PayPal Europe S.a.r.l. et Cie S.C.A 1052983422516/PP.4585.PP/. Uber BV, Ihr Einkauf bei Uber',
+        ),
       ).toBe('Transport')
       expect(categorize('Uber trip')).toBe('Transport')
       expect(categorize('bolt receipt')).toBe('Transport')
@@ -123,8 +123,8 @@ describe('category-utils', () => {
       expect(categorize('TIER Scooter Fahrt')).toBe('Transport')
       expect(
         categorize(
-          'Mercedes-Benz AG DEUTDEFFXXX DE20500700100092001700 Bitte geben Sie bei Bezahlung Ihre'
-        )
+          'Mercedes-Benz AG DEUTDEFFXXX DE20500700100092001700 Bitte geben Sie bei Bezahlung Ihre',
+        ),
       ).toBe('Transport')
       expect(categorize('BMW Bank Leasingrate')).toBe('Transport')
       expect(categorize('Volkswagen Leasing GmbH')).toBe('Transport')
@@ -138,8 +138,8 @@ describe('category-utils', () => {
       expect(categorize('Airbnb stay')).toBe('Travel')
       expect(
         categorize(
-          'holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Max Must'
-        )
+          'holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Max Must',
+        ),
       ).toBe('Travel')
     })
 
@@ -156,8 +156,8 @@ describe('category-utils', () => {
     it('categorizes SumUp card payments at butcher shops and meat markets as Groceries', () => {
       expect(
         categorize(
-          'SumUp .Metzgerei Enk/Louisenstrass 2024-10-26T12:41:33 KFN 0 VJ 2412 Kartenzahlung'
-        )
+          'SumUp .Metzgerei Enk/Louisenstrass 2024-10-26T12:41:33 KFN 0 VJ 2412 Kartenzahlung',
+        ),
       ).toBe('Groceries')
       expect(categorize('Kartenzahlung Metzgerei Schmidt')).toBe('Groceries')
       expect(categorize('Fleischerei Müller Berlin')).toBe('Groceries')
@@ -168,8 +168,8 @@ describe('category-utils', () => {
     it('categorizes AI subscriptions and Google Services transactions as Utilities', () => {
       expect(
         categorize(
-          'PayPal Europe S.a.r.l. et Cie S.C.A 1052803220461/PP.4585.PP/. Google P ayment Ireland Ltd., Ihr Einkauf be i Google Payment Ireland Ltd. End-to-End-Ref.: 1052803220461 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend'
-        )
+          'PayPal Europe S.a.r.l. et Cie S.C.A 1052803220461/PP.4585.PP/. Google P ayment Ireland Ltd., Ihr Einkauf be i Google Payment Ireland Ltd. End-to-End-Ref.: 1052803220461 Mandatsref: 58V2224W7NHK6 Gläubiger-ID: LU96ZZZ0000000000000000058 SEPA-BASISLASTSCHRIFT wiederholend',
+        ),
       ).toBe('Utilities')
       expect(categorize('Google Payment Ireland Ltd.')).toBe('Utilities')
       expect(categorize('Google Ireland Ltd.')).toBe('Utilities')
@@ -190,8 +190,8 @@ describe('category-utils', () => {
       // User's exact statement description
       expect(
         categorize(
-          'IptiQ Life, S.A., Niederlassung Deu tschland Check 24 Alpha Kredit - 2 End-to-End-Ref.: AE00079526 Mandatsref: AE00079526-000001 Gläubiger-ID: DE08VER00001955733 SEPA-BASISLASTSCHRIFT erstmalig'
-        )
+          'IptiQ Life, S.A., Niederlassung Deu tschland Check 24 Alpha Kredit - 2 End-to-End-Ref.: AE00079526 Mandatsref: AE00079526-000001 Gläubiger-ID: DE08VER00001955733 SEPA-BASISLASTSCHRIFT erstmalig',
+        ),
       ).toBe('Insurance')
       expect(categorize('iptiq life sa niederlassung deutschland')).toBe('Insurance')
       expect(categorize('Check 24 Alpha Kredit - 2')).toBe('Insurance')
@@ -200,9 +200,9 @@ describe('category-utils', () => {
       expect(categorize('Ratenschutzversicherung Alpha Kredit')).toBe('Insurance')
       expect(categorize('Credit Life AG Ratenschutz')).toBe('Insurance')
       expect(categorize('Cardif Allgemeine Versicherung Ratenschutz')).toBe('Insurance')
-      expect(
-        categorize('Gläubiger-ID: DE08VER00001955733 SEPA-BASISLASTSCHRIFT Kredit')
-      ).toBe('Insurance')
+      expect(categorize('Gläubiger-ID: DE08VER00001955733 SEPA-BASISLASTSCHRIFT Kredit')).toBe(
+        'Insurance',
+      )
       expect(categorize('Allianz Versicherung')).toBe('Insurance')
       expect(categorize('HUK-COBURG Haftpflichtversicherung')).toBe('Insurance')
     })
@@ -223,19 +223,17 @@ describe('category-utils', () => {
     it('categorizes Tchibo retail transactions as Shopping', () => {
       expect(
         categorize(
-          'TCHIBO GMBH DRESDEFF200 DE14200800000816170700 20319230661010 End-to-End-Ref.: MOB.'
-        )
+          'TCHIBO GMBH DRESDEFF200 DE14200800000816170700 20319230661010 End-to-End-Ref.: MOB.',
+        ),
       ).toBe('Shopping')
       expect(categorize('Tchibo Filiale Hamburg')).toBe('Shopping')
       expect(categorize('Tchibo.de Online Shop')).toBe('Shopping')
     })
 
     it('categorizes C&A retail transactions as Shopping', () => {
-      expect(
-        categorize(
-          'CA//Sulzbach/DE 2022-05-05T13:28:17 KFN 0  VJ 2412 Kartenzahlung'
-        )
-      ).toBe('Shopping')
+      expect(categorize('CA//Sulzbach/DE 2022-05-05T13:28:17 KFN 0  VJ 2412 Kartenzahlung')).toBe(
+        'Shopping',
+      )
       expect(categorize('C&A Mode Filiale Frankfurt')).toBe('Shopping')
       expect(categorize('C&A Online Shop')).toBe('Shopping')
     })
@@ -243,13 +241,13 @@ describe('category-utils', () => {
     it('categorizes Dell retail and hardware transactions as Shopping (not ordinary Transfers)', () => {
       expect(
         categorize(
-          'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421'
-        )
+          'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421',
+        ),
       ).toBe('Shopping')
       expect(
         categorize(
-          'GERMANY rel CITIDEFFXXX DE11502109000209865084 40233251 End-to-End-Ref.: CCB.119.UE.569708'
-        )
+          'GERMANY rel CITIDEFFXXX DE11502109000209865084 40233251 End-to-End-Ref.: CCB.119.UE.569708',
+        ),
       ).toBe('Shopping')
       expect(categorize('Dell Technologies Online Store')).toBe('Shopping')
       expect(categorize('Dell.com Hardware Purchase')).toBe('Shopping')
@@ -284,9 +282,9 @@ describe('category-utils', () => {
     })
 
     it('categorizes Lothar Braun door installations and carpentry transactions as Shopping', () => {
-      expect(
-        categorize('Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung'),
-      ).toBe('Shopping')
+      expect(categorize('Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung')).toBe(
+        'Shopping',
+      )
       expect(categorize('Schreinerei Lothar Braun')).toBe('Shopping')
       expect(categorize('Schreinerei Braun Türeneinbau')).toBe('Shopping')
     })
@@ -314,8 +312,8 @@ describe('category-utils', () => {
     it('categorizes fair parken and parking transactions as Transport', () => {
       expect(
         categorize(
-          'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-'
-        )
+          'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-',
+        ),
       ).toBe('Transport')
       expect(categorize('fair parken Parkplatz')).toBe('Transport')
       expect(categorize('Parkhaus Hauptbahnhof Parkgebühr')).toBe('Transport')
@@ -325,8 +323,8 @@ describe('category-utils', () => {
     it('categorizes wundertax and tax filing platforms as Taxes', () => {
       expect(
         categorize(
-          'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00'
-        )
+          'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00',
+        ),
       ).toBe('Taxes')
       expect(categorize('wundertax Steuererklärung 2026')).toBe('Taxes')
       expect(categorize('Taxfix SE Servicegebühr')).toBe('Taxes')
@@ -338,8 +336,8 @@ describe('category-utils', () => {
     it('categorizes guardarian and cryptocurrency gateways as Crypto', () => {
       expect(
         categorize(
-          'GUARDARIAN OÜ CLJUGB21XXX GB33CLJU04130729903054 6154171893446142 End-to-End-Ref.: CCB'
-        )
+          'GUARDARIAN OÜ CLJUGB21XXX GB33CLJU04130729903054 6154171893446142 End-to-End-Ref.: CCB',
+        ),
       ).toBe('Crypto')
       expect(categorize('Guardarian Crypto Purchase')).toBe('Crypto')
       expect(categorize('Coinbase Ireland Limited')).toBe('Crypto')
@@ -1061,8 +1059,7 @@ describe('category-utils', () => {
     })
 
     it('cleans Süwag utility transaction stripping customer ref, IBAN, and BIC', () => {
-      const desc =
-        'Süwag COBADEFFXXX DE69500400000257744300 Kunden-Nr.: 263614738 Rechnungsnr:'
+      const desc = 'Süwag COBADEFFXXX DE69500400000257744300 Kunden-Nr.: 263614738 Rechnungsnr:'
       expect(extractCleanDescription(desc)).toBe('Süwag')
       expect(extractMerchantKeyword(desc)).toBe('Süwag')
     })
@@ -1131,7 +1128,7 @@ describe('category-utils', () => {
       const desc =
         'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00'
       expect(extractCleanDescription(desc)).toBe(
-        'wundertax GmbH Rueckzahlung Lizenzgebuehr Wundertax GmbH'
+        'wundertax GmbH Rueckzahlung Lizenzgebuehr Wundertax GmbH',
       )
       expect(extractMerchantKeyword(desc)).toBe('wundertax')
     })
@@ -1158,8 +1155,7 @@ describe('category-utils', () => {
     })
 
     it('cleans Stadtkasse Kelkheim municipal transfer stripping BIC, IBAN, and AZ reference', () => {
-      const desc =
-        'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836'
+      const desc = 'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836'
       expect(extractCleanDescription(desc)).toBe('STADTKASSE KELKHEIM TAUNUS')
       expect(extractMerchantKeyword(desc)).toBe('STADTKASSE KELKHEIM TAUNUS')
     })
@@ -1200,9 +1196,7 @@ describe('category-utils', () => {
       expect(extractCleanDescription(desc)).toBe(
         'Heinz Otto Annette Alexander u. Christa Christoph GbR Kautionsabrechnung Eschborn An der Grue',
       )
-      expect(extractMerchantKeyword(desc)).toBe(
-        'Heinz Otto Annette Alexander u. Christa Christoph',
-      )
+      expect(extractMerchantKeyword(desc)).toBe('Heinz Otto Annette Alexander u. Christa Christoph')
     })
 
     it('cleans Gerichtkasse court fee transaction description and extracts merchant', () => {
@@ -1241,8 +1235,7 @@ describe('category-utils', () => {
     })
 
     it('cleans Lothar Braun door installations transaction description and extracts merchant', () => {
-      const desc =
-        'Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung'
+      const desc = 'Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung'
       expect(extractCleanDescription(desc)).toBe('Lothar Braun GmbH')
       expect(extractMerchantKeyword(desc)).toBe('Lothar Braun')
     })
@@ -1342,7 +1335,9 @@ describe('category-utils', () => {
       expect(isPaymentProcessorOnly('Klarna Bank AB')).toBe(true)
       expect(isPaymentProcessorOnly('SumUp Payments')).toBe(true)
       expect(isPaymentProcessorOnly('Stripe Payments Europe')).toBe(true)
-      expect(isPaymentProcessorOnly('PayPal Europe S.a.r.l. et Cie S.C.A PP. .PP ASFINAG Maut')).toBe(false)
+      expect(
+        isPaymentProcessorOnly('PayPal Europe S.a.r.l. et Cie S.C.A PP. .PP ASFINAG Maut'),
+      ).toBe(false)
       expect(isPaymentProcessorOnly('ASFINAG Maut')).toBe(false)
       expect(isPaymentProcessorOnly('Uber')).toBe(false)
 
@@ -1726,8 +1721,8 @@ describe('category-utils', () => {
         expect(categorize('Aldi Sued')).toBe('Groceries')
         expect(
           categorize(
-            'ALDI SE U. CO. KG//ESCHBORN/DE 2022-04-08T12:48:20 KFN 0  VJ 2412 Kartenzahlung'
-          )
+            'ALDI SE U. CO. KG//ESCHBORN/DE 2022-04-08T12:48:20 KFN 0  VJ 2412 Kartenzahlung',
+          ),
         ).toBe('Groceries')
         expect(categorize('Biedronka')).toBe('Groceries')
         expect(categorize('Bingo d.o.o.')).toBe('Groceries')
@@ -1797,9 +1792,9 @@ describe('category-utils', () => {
             'Max Mustermann End-to-End-Ref.: 20250627-YVZ9IU-OP Kundenreferenz: SI25062700000000',
           ),
         ).toBe('Transfers')
-        expect(
-          categorize('Max Mustermann Money back Kundenreferenz: SI25062700000000'),
-        ).toBe('Transfers')
+        expect(categorize('Max Mustermann Money back Kundenreferenz: SI25062700000000')).toBe(
+          'Transfers',
+        )
         expect(categorize('Max Mustermann Money back')).toBe('Transfers')
         expect(categorize('Max Mustermann Geld zurück')).toBe('Transfers')
         expect(categorize('CD-SCT-20260401-12345 Max Mustermann')).toBe('Transfers')
@@ -1813,9 +1808,9 @@ describe('category-utils', () => {
         expect(categorize('Max / Erika Mustermann')).toBe('Transfers')
         expect(categorize('Max & Erika Mustermann')).toBe('Transfers')
         expect(categorize('Max Mustermann o. Erika Mustermann')).toBe('Transfers')
-        expect(
-          categorize('Finanzamt Frankfurt am Main End-to-End-Ref.: CCB.321.UE.998877'),
-        ).toBe('Taxes')
+        expect(categorize('Finanzamt Frankfurt am Main End-to-End-Ref.: CCB.321.UE.998877')).toBe(
+          'Taxes',
+        )
         expect(categorize('Einkommensteuer Vorauszahlung CCB.321.UE.112233')).toBe('Taxes')
 
         // Edukativni Centar Rani Razvoj foreign payment
@@ -1839,9 +1834,7 @@ describe('category-utils', () => {
 
         // German standard purchase phrases and word splits
         expect(
-          categorize(
-            'PayPal Europe S.a.r.l. et Cie S.C.A, Ihr Einkauf bei End-to-End-Ref.: 1052',
-          ),
+          categorize('PayPal Europe S.a.r.l. et Cie S.C.A, Ihr Einkauf bei End-to-End-Ref.: 1052'),
         ).toBe('Shopping')
         expect(
           categorize(
@@ -1867,7 +1860,9 @@ describe('category-utils', () => {
 
         // English purchase phrases and broken words
         expect(categorize('PayPal Pte. Ltd. Your purchase at TechGadgets')).toBe('Shopping')
-        expect(categorize('PayPal Pte. Ltd. Your pur chase at End-to-End-Ref: 8812')).toBe('Shopping')
+        expect(categorize('PayPal Pte. Ltd. Your pur chase at End-to-End-Ref: 8812')).toBe(
+          'Shopping',
+        )
         expect(categorize('POS Purchase at Main Street')).toBe('Shopping')
 
         // Polish purchase phrases and broken words
@@ -1961,12 +1956,12 @@ describe('category-utils', () => {
         expect(repairBrokenWords('Kranken versicherung')).toBe('Krankenversicherung')
         expect(repairBrokenWords('Kranke n versicherungen')).toBe('Krankenversicherungen')
         expect(repairBrokenWords('Kranke n versicherung')).toBe('Krankenversicherung')
-        expect(repairBrokenWords('CHECK24 Cashback - fuer Ihre Zahnzu satzversicherung: 10338717')).toBe(
-          'CHECK24 Cashback - fuer Ihre Zahnzusatzversicherung: 10338717',
-        )
-        expect(repairBrokenWords('CHECK24 Cashback - fuer Ihre Zahnzu satz versicherung: 10338717')).toBe(
-          'CHECK24 Cashback - fuer Ihre Zahnzusatzversicherung: 10338717',
-        )
+        expect(
+          repairBrokenWords('CHECK24 Cashback - fuer Ihre Zahnzu satzversicherung: 10338717'),
+        ).toBe('CHECK24 Cashback - fuer Ihre Zahnzusatzversicherung: 10338717')
+        expect(
+          repairBrokenWords('CHECK24 Cashback - fuer Ihre Zahnzu satz versicherung: 10338717'),
+        ).toBe('CHECK24 Cashback - fuer Ihre Zahnzusatzversicherung: 10338717')
         expect(repairBrokenWords('Zahnzu satzversicherung')).toBe('Zahnzusatzversicherung')
         expect(repairBrokenWords('Zahnzu satz versicherung')).toBe('Zahnzusatzversicherung')
         expect(repairBrokenWords('Zahn zusatzversicherung')).toBe('Zahnzusatzversicherung')
@@ -2634,12 +2629,20 @@ describe('category-utils', () => {
         expect(categorize('ERGO Direkt Zahnzusatzversicherung')).toBe('Healthcare')
         expect(categorize('Barmenia Zahnversicherung')).toBe('Healthcare')
         expect(categorize('Ottonova Zahnzusatzversicherung')).toBe('Healthcare')
-        expect(categorize('CHECK24 Vergleichsportal für Krankenversicherungen GmbH')).toBe('Healthcare')
+        expect(categorize('CHECK24 Vergleichsportal für Krankenversicherungen GmbH')).toBe(
+          'Healthcare',
+        )
 
         // Tolerates internal spaces in Kranke nversicherungen and variations
-        expect(categorize('CHECK24 Vergleichsportal für Kranke nversicherungen GmbH')).toBe('Healthcare')
-        expect(categorize('CHECK24 Vergleichsportal für Kranke n versicherungen GmbH')).toBe('Healthcare')
-        expect(categorize('CHECK24 Vergleichsportal für Kranken versicherungen GmbH')).toBe('Healthcare')
+        expect(categorize('CHECK24 Vergleichsportal für Kranke nversicherungen GmbH')).toBe(
+          'Healthcare',
+        )
+        expect(categorize('CHECK24 Vergleichsportal für Kranke n versicherungen GmbH')).toBe(
+          'Healthcare',
+        )
+        expect(categorize('CHECK24 Vergleichsportal für Kranken versicherungen GmbH')).toBe(
+          'Healthcare',
+        )
         expect(categorize('Kranke nversicherungen')).toBe('Healthcare')
         expect(categorize('Kranke n versicherungen')).toBe('Healthcare')
         expect(categorize('Kranken versicherungen')).toBe('Healthcare')
@@ -2769,7 +2772,7 @@ describe('category-utils', () => {
             'ALPE PANON PE PTUJ, PTUJ SI Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 20',
           ),
         ).toBe('Dining Out')
-        expect(categorize('Alpe-Panon McDonald\'s Slovenia')).toBe('Dining Out')
+        expect(categorize("Alpe-Panon McDonald's Slovenia")).toBe('Dining Out')
 
         // 8. Hallenbad & Freizeitzentrum Zell am See -> Entertainment
         expect(
@@ -3570,15 +3573,27 @@ describe('category-utils', () => {
         const { rowsToTransactionsWithMeta } = await import('./parsers/csv-parser')
         const rows = [
           ['Buchungstag', 'Buchungstext', 'Betrag'],
-          ['15.09.2026', 'PayPal Europe S.a.r.l. et Cie S.C.A 1024755127651/PP.4585.PP/. , Ihr Einkauf bei End-to-End-Ref.: 1024755127651', '-25,00'],
-          ['15.09.2026', 'PayPal Europe S.a.r.l. et Cie S.C.A 1033392822749/PP.4585.PP/. , Ihr Einkauf bei End-to-End-Ref.: 1033392822749', '-35,00'],
-          ['15.09.2026', 'PayPal Europe S.a.r.l. et Cie S.C.A 1034892226822/PP.4585.PP/. , Ihr Einkauf bei End-to-End-Ref.: 1034892226822', '-45,00'],
+          [
+            '15.09.2026',
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1024755127651/PP.4585.PP/. , Ihr Einkauf bei End-to-End-Ref.: 1024755127651',
+            '-25,00',
+          ],
+          [
+            '15.09.2026',
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1033392822749/PP.4585.PP/. , Ihr Einkauf bei End-to-End-Ref.: 1033392822749',
+            '-35,00',
+          ],
+          [
+            '15.09.2026',
+            'PayPal Europe S.a.r.l. et Cie S.C.A 1034892226822/PP.4585.PP/. , Ihr Einkauf bei End-to-End-Ref.: 1034892226822',
+            '-45,00',
+          ],
         ]
         const parsed = rowsToTransactionsWithMeta(rows, 'Commerzbank')
 
         const refs = ['1024755127651', '1033392822749', '1034892226822']
         for (const ref of refs) {
-          const target = parsed.transactions.find(tx => tx.description.includes(ref))
+          const target = parsed.transactions.find((tx) => tx.description.includes(ref))
           expect(target).toBeDefined()
           // Default categorization must be Shopping
           expect(getTransactionCategory(target!)).toBe('Shopping')
@@ -3651,5 +3666,3 @@ describe('category-utils', () => {
     })
   })
 })
-
-

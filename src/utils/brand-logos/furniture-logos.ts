@@ -96,12 +96,10 @@ export const FURNITURE_LOGOS: Record<string, IconComponent> = {
   RollerLogo,
   Home24Logo,
   home24Logo: Home24Logo,
-  'home24': Home24Logo,
+  home24: Home24Logo,
   'home24-se': Home24Logo,
   IkeaLogo,
   IKEALogo: IkeaLogo,
   SiIkea: IkeaLogo,
-  'ikea': IkeaLogo,
+  ikea: IkeaLogo,
 }
-
-

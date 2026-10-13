@@ -157,7 +157,16 @@ export const LotharBraunLogo: IconComponent = ({ size = 16, className }) => (
     <circle cx="40.5" cy="26.5" r={1.1} fill="#713F12" stroke="#000000" strokeWidth={0.4} />
 
     {/* Base Bar: SCHREINEREI Banner */}
-    <rect x="3.5" y="36.5" width="41" height="8" rx="1.5" fill="#0C0A09" stroke="#292524" strokeWidth={0.6} />
+    <rect
+      x="3.5"
+      y="36.5"
+      width="41"
+      height="8"
+      rx="1.5"
+      fill="#0C0A09"
+      stroke="#292524"
+      strokeWidth={0.6}
+    />
     <text
       x="24"
       y="42.5"
@@ -174,7 +183,4 @@ export const LotharBraunLogo: IconComponent = ({ size = 16, className }) => (
 )
 LotharBraunLogo.displayName = 'LotharBraunLogo'
 
-export {
-  LotharBraunLogo as SchreinereiBraunLogo,
-  LotharBraunLogo as SchreinereiLotharBraunLogo,
-}
+export { LotharBraunLogo as SchreinereiBraunLogo, LotharBraunLogo as SchreinereiLotharBraunLogo }

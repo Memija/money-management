@@ -285,7 +285,10 @@ export function filterInternalSpaceTransfers(
     normDescMap.set(item.tx.id, norm)
     extCounterpartyMap.set(item.tx.id, hasExternalCounterparty(item.tx))
     spaceKeywordMap.set(item.tx.id, hasSpaceTransferKeyword(norm))
-    reversalMap.set(item.tx.id, REVERSAL_KEYWORDS.some((kw) => norm.includes(kw)))
+    reversalMap.set(
+      item.tx.id,
+      REVERSAL_KEYWORDS.some((kw) => norm.includes(kw)),
+    )
     depotMap.set(item.tx.id, norm.includes('depot'))
     meaningfulWordsMap.set(
       item.tx.id,
@@ -348,8 +351,12 @@ export function filterInternalSpaceTransfers(
       const sharedMeaningfulWords = meaningfulWordsA.filter((w) => meaningfulWordsB.includes(w))
 
       const isDescCrossReference =
-        (normDescA.length >= 4 && !BANKING_STOP_WORDS.has(normDescA) && normDescB.includes(normDescA)) ||
-        (normDescB.length >= 4 && !BANKING_STOP_WORDS.has(normDescB) && normDescA.includes(normDescB))
+        (normDescA.length >= 4 &&
+          !BANKING_STOP_WORDS.has(normDescA) &&
+          normDescB.includes(normDescA)) ||
+        (normDescB.length >= 4 &&
+          !BANKING_STOP_WORDS.has(normDescB) &&
+          normDescA.includes(normDescB))
 
       const isSpacePair =
         (hasSpaceKeywordA && hasSpaceKeywordB) ||
@@ -477,18 +484,20 @@ export function calculateTransferCandidateScore(
     ibansA.some((iban) => compactDescB.includes(iban.toLowerCase())) ||
     ibansB.some((iban) => compactDescA.includes(iban.toLowerCase()))
 
-  const knownIbansA = [
-    ...(accountA.accountIbans || []),
-    ...(txA.ownIban ? [txA.ownIban] : []),
-  ].map((ib) => ib.toUpperCase().replace(/\s+/g, ''))
+  const knownIbansA = [...(accountA.accountIbans || []), ...(txA.ownIban ? [txA.ownIban] : [])].map(
+    (ib) => ib.toUpperCase().replace(/\s+/g, ''),
+  )
 
-  const knownIbansB = [
-    ...(accountB.accountIbans || []),
-    ...(txB.ownIban ? [txB.ownIban] : []),
-  ].map((ib) => ib.toUpperCase().replace(/\s+/g, ''))
+  const knownIbansB = [...(accountB.accountIbans || []), ...(txB.ownIban ? [txB.ownIban] : [])].map(
+    (ib) => ib.toUpperCase().replace(/\s+/g, ''),
+  )
 
-  const aPointsToB = ibansA.some((iban) => knownIbansB.includes(iban.toUpperCase().replace(/\s+/g, '')))
-  const bPointsToA = ibansB.some((iban) => knownIbansA.includes(iban.toUpperCase().replace(/\s+/g, '')))
+  const aPointsToB = ibansA.some((iban) =>
+    knownIbansB.includes(iban.toUpperCase().replace(/\s+/g, '')),
+  )
+  const bPointsToA = ibansB.some((iban) =>
+    knownIbansA.includes(iban.toUpperCase().replace(/\s+/g, '')),
+  )
 
   if (hasDirectDescIban) {
     score += 120
@@ -497,7 +506,16 @@ export function calculateTransferCandidateScore(
   }
 
   // Institution name mention (e.g. Account A mentions 'N26' or Account B mentions 'Commerzbank')
-  const genericTokens = new Set(['bank', 'ag', 'gmbh', 'deutschland', 'germany', 'online', 'direct', 'direkt'])
+  const genericTokens = new Set([
+    'bank',
+    'ag',
+    'gmbh',
+    'deutschland',
+    'germany',
+    'online',
+    'direct',
+    'direkt',
+  ])
   const instWordsA = normInstA.split(' ').filter((w) => w.length >= 3 && !genericTokens.has(w))
   const instWordsB = normInstB.split(' ').filter((w) => w.length >= 3 && !genericTokens.has(w))
 
@@ -543,7 +561,10 @@ export function calculateTransferCandidateScore(
     sharedWords.length >= 2 ||
     (hasKeyword && sharedWords.length >= 1) ||
     ((aPointsToB || bPointsToA) &&
-      (matchesInstA || matchesInstB || sharedWords.length >= 2 || (hasKeyword && sharedWords.length >= 1)))
+      (matchesInstA ||
+        matchesInstB ||
+        sharedWords.length >= 2 ||
+        (hasKeyword && sharedWords.length >= 1)))
 
   if (!hasReliableClue) {
     return 0

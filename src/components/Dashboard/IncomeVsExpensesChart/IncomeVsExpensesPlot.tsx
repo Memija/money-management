@@ -17,13 +17,19 @@ import {
 import type { MonthlyEntry } from '../../../hooks/useAnalytics'
 import { useChartAnimation } from '../../../hooks/useChartAnimation'
 import { MonthYearAxisTick } from '../../shared/ChartAxisTicks'
-import { type IncomeChartViewMode, LocalizedIncomeTooltip, SeriesLegendLabel } from './IncomeVsExpensesTooltip'
+import {
+  type IncomeChartViewMode,
+  LocalizedIncomeTooltip,
+  SeriesLegendLabel,
+} from './IncomeVsExpensesTooltip'
 
 /** Matches Recharts' default Line/Area animation so the gate never cuts an animation short. */
 const CHART_ANIMATION_MS = 1500
 const X_TICK_OFFSET_PX = 6
 const AXIS_TICK_STYLE = { fill: 'var(--text-dim)', fontSize: 11 }
-const MONTH_TICK = <MonthYearAxisTick fill="var(--text-dim)" fontSize={11} offsetY={X_TICK_OFFSET_PX} />
+const MONTH_TICK = (
+  <MonthYearAxisTick fill="var(--text-dim)" fontSize={11} offsetY={X_TICK_OFFSET_PX} />
+)
 const CHART_MARGIN = { top: 12, right: 8, left: -16, bottom: 4 }
 const BAR_RADIUS: [number, number, number, number] = [5, 5, 0, 0]
 const MONTHLY_CURSOR = { fill: 'rgba(255, 255, 255, 0.04)', radius: 8 }
@@ -38,7 +44,8 @@ const formatCompactAxis = (v: number): string => {
   }
   const abs = Math.abs(v)
   const sign = v < 0 ? '-' : ''
-  const compact = (num: number): string => (num >= 100 ? num.toFixed(0) : num.toFixed(1).replace(/\.0$/, ''))
+  const compact = (num: number): string =>
+    num >= 100 ? num.toFixed(0) : num.toFixed(1).replace(/\.0$/, '')
   if (abs >= 1_000_000) {
     return `${sign}${compact(abs / 1_000_000)}M`
   }
@@ -67,7 +74,16 @@ interface IncomeVsExpensesPlotProps {
  * doesn't rebuild or re-animate the chart.
  */
 export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.memo(
-  ({ chartData, viewMode, gradientOffset, avgIncome, avgExpenses, showNetLine, hiddenSeries, onLegendClick }) => {
+  ({
+    chartData,
+    viewMode,
+    gradientOffset,
+    avgIncome,
+    avgExpenses,
+    showNetLine,
+    hiddenSeries,
+    onLegendClick,
+  }) => {
     const animationTrigger = useMemo(() => ({ chartData, viewMode }), [chartData, viewMode])
     const isAnimationActive = useChartAnimation(animationTrigger, CHART_ANIMATION_MS)
 
@@ -83,9 +99,19 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
 
     const sharedAxes = (
       <>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--card-border)" opacity={0.6} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="var(--card-border)"
+          opacity={0.6}
+        />
         <XAxis dataKey="rawMonth" axisLine={false} tickLine={false} tick={MONTH_TICK} />
-        <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK_STYLE} tickFormatter={formatCompactAxis} />
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={AXIS_TICK_STYLE}
+          tickFormatter={formatCompactAxis}
+        />
       </>
     )
 
@@ -105,7 +131,11 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
             </defs>
             {sharedAxes}
             <Tooltip content={tooltipContent} cursor={MONTHLY_CURSOR} />
-            <Legend onClick={onLegendClick} formatter={renderLegendText} wrapperStyle={LEGEND_WRAPPER_STYLE} />
+            <Legend
+              onClick={onLegendClick}
+              formatter={renderLegendText}
+              wrapperStyle={LEGEND_WRAPPER_STYLE}
+            />
             <Bar
               dataKey="income"
               name="income"
@@ -127,7 +157,12 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
             {showNetLine && (
               <>
                 <ReferenceLine y={avgIncome} stroke="#10b981" strokeDasharray="4 4" opacity={0.3} />
-                <ReferenceLine y={avgExpenses} stroke="#f43f5e" strokeDasharray="4 4" opacity={0.3} />
+                <ReferenceLine
+                  y={avgExpenses}
+                  stroke="#f43f5e"
+                  strokeDasharray="4 4"
+                  opacity={0.3}
+                />
                 <Line
                   type="monotone"
                   dataKey="net"
@@ -158,7 +193,12 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
             </defs>
             {sharedAxes}
             <Tooltip content={tooltipContent} />
-            <ReferenceLine y={0} stroke="var(--card-border)" strokeDasharray="3 3" strokeWidth={1.5} />
+            <ReferenceLine
+              y={0}
+              stroke="var(--card-border)"
+              strokeDasharray="3 3"
+              strokeWidth={1.5}
+            />
             <Area
               type="monotone"
               dataKey="cumulativeNet"

@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  adjustColor,
-  CATEGORY_COLORS,
-  getCategoryColor,
-  ICON_COLORS,
-} from './category-colors'
+import { adjustColor, CATEGORY_COLORS, getCategoryColor, ICON_COLORS } from './category-colors'
 
 describe('category-colors', () => {
   describe('CATEGORY_COLORS', () => {
@@ -36,7 +31,10 @@ describe('category-colors', () => {
       ]
 
       for (const category of requiredCategories) {
-        expect(CATEGORY_COLORS[category], `Color for category "${category}" must exist`).toBeDefined()
+        expect(
+          CATEGORY_COLORS[category],
+          `Color for category "${category}" must exist`,
+        ).toBeDefined()
         expect(CATEGORY_COLORS[category]).toMatch(/^#[0-9a-fA-F]{6}$/)
       }
     })
@@ -52,7 +50,9 @@ describe('category-colors', () => {
       expect(iconEntries.length).toBeGreaterThan(30)
 
       for (const [iconName, color] of iconEntries) {
-        expect(color, `Color for icon "${iconName}" must be a 6-digit hex`).toMatch(/^#[0-9a-fA-F]{6}$/)
+        expect(color, `Color for icon "${iconName}" must be a 6-digit hex`).toMatch(
+          /^#[0-9a-fA-F]{6}$/,
+        )
       }
     })
 
@@ -111,56 +111,52 @@ describe('category-colors', () => {
       expect(getCategoryColor('Other')).toBe(CATEGORY_COLORS.Other)
     })
 
-    it(
-      'returns correct category color for localized category names in all supported languages',
-      () => {
-        // Polish
-        expect(getCategoryColor('Wynagrodzenie')).toBe(CATEGORY_COLORS.Salary)
-        expect(getCategoryColor('Czynsz')).toBe(CATEGORY_COLORS.Rent)
-        expect(getCategoryColor('Spożywcze')).toBe(CATEGORY_COLORS.Groceries)
-        // Indonesian
-        expect(getCategoryColor('Gaji')).toBe(CATEGORY_COLORS.Salary)
-        expect(getCategoryColor('Sewa')).toBe(CATEGORY_COLORS.Rent)
-        // Serbian Cyrillic
-        expect(getCategoryColor('Плата')).toBe(CATEGORY_COLORS.Salary)
-        expect(getCategoryColor('Станарина')).toBe(CATEGORY_COLORS.Rent)
-        // Communication across languages
-        expect(getCategoryColor('Kommunikation')).toBe(CATEGORY_COLORS.Communication)
-        expect(getCategoryColor('Komunikacja')).toBe(CATEGORY_COLORS.Communication)
-        expect(getCategoryColor('Комуникација')).toBe(CATEGORY_COLORS.Communication)
-        expect(getCategoryColor('Komunikasi')).toBe(CATEGORY_COLORS.Communication)
-        // Travel across languages
-        expect(getCategoryColor('Podróże')).toBe(CATEGORY_COLORS.Travel)
-        expect(getCategoryColor('Reisen')).toBe(CATEGORY_COLORS.Travel)
-        expect(getCategoryColor('Putovanja')).toBe(CATEGORY_COLORS.Travel)
-        expect(getCategoryColor('Путовања')).toBe(CATEGORY_COLORS.Travel)
-        expect(getCategoryColor('Perjalanan')).toBe(CATEGORY_COLORS.Travel)
-        // Taxes across languages
-        expect(getCategoryColor('Steuern')).toBe(CATEGORY_COLORS.Taxes)
-        expect(getCategoryColor('Taxes')).toBe(CATEGORY_COLORS.Taxes)
-        // Crypto across languages
-        expect(getCategoryColor('Krypto')).toBe(CATEGORY_COLORS.Crypto)
-        expect(getCategoryColor('Kripto')).toBe(CATEGORY_COLORS.Crypto)
-        expect(getCategoryColor('Крипто')).toBe(CATEGORY_COLORS.Crypto)
-        expect(getCategoryColor('Porezi')).toBe(CATEGORY_COLORS.Taxes)
-        expect(getCategoryColor('Порези')).toBe(CATEGORY_COLORS.Taxes)
-        expect(getCategoryColor('Podatki')).toBe(CATEGORY_COLORS.Taxes)
-        // Cash across languages
-        expect(getCategoryColor('Bargeld')).toBe(CATEGORY_COLORS.Cash)
-        expect(getCategoryColor('Gotówka')).toBe(CATEGORY_COLORS.Cash)
-        expect(getCategoryColor('Gotovina')).toBe(CATEGORY_COLORS.Cash)
-        expect(getCategoryColor('Готовина')).toBe(CATEGORY_COLORS.Cash)
-        expect(getCategoryColor('Tarik Tunai')).toBe(CATEGORY_COLORS.Cash)
-        // Bank Fees across languages
-        expect(getCategoryColor('Bankgebühren')).toBe(CATEGORY_COLORS['Bank Fees'])
-        expect(getCategoryColor('Opłaty bankowe')).toBe(CATEGORY_COLORS['Bank Fees'])
-        expect(getCategoryColor('Bankarske naknade')).toBe(CATEGORY_COLORS['Bank Fees'])
-        expect(getCategoryColor('Банкарске накнаде')).toBe(CATEGORY_COLORS['Bank Fees'])
-        expect(getCategoryColor('Biaya Bank')).toBe(CATEGORY_COLORS['Bank Fees'])
-        expect(getCategoryColor('Pajak')).toBe(CATEGORY_COLORS.Taxes)
-      },
-      15000
-    )
+    it('returns correct category color for localized category names in all supported languages', () => {
+      // Polish
+      expect(getCategoryColor('Wynagrodzenie')).toBe(CATEGORY_COLORS.Salary)
+      expect(getCategoryColor('Czynsz')).toBe(CATEGORY_COLORS.Rent)
+      expect(getCategoryColor('Spożywcze')).toBe(CATEGORY_COLORS.Groceries)
+      // Indonesian
+      expect(getCategoryColor('Gaji')).toBe(CATEGORY_COLORS.Salary)
+      expect(getCategoryColor('Sewa')).toBe(CATEGORY_COLORS.Rent)
+      // Serbian Cyrillic
+      expect(getCategoryColor('Плата')).toBe(CATEGORY_COLORS.Salary)
+      expect(getCategoryColor('Станарина')).toBe(CATEGORY_COLORS.Rent)
+      // Communication across languages
+      expect(getCategoryColor('Kommunikation')).toBe(CATEGORY_COLORS.Communication)
+      expect(getCategoryColor('Komunikacja')).toBe(CATEGORY_COLORS.Communication)
+      expect(getCategoryColor('Комуникација')).toBe(CATEGORY_COLORS.Communication)
+      expect(getCategoryColor('Komunikasi')).toBe(CATEGORY_COLORS.Communication)
+      // Travel across languages
+      expect(getCategoryColor('Podróże')).toBe(CATEGORY_COLORS.Travel)
+      expect(getCategoryColor('Reisen')).toBe(CATEGORY_COLORS.Travel)
+      expect(getCategoryColor('Putovanja')).toBe(CATEGORY_COLORS.Travel)
+      expect(getCategoryColor('Путовања')).toBe(CATEGORY_COLORS.Travel)
+      expect(getCategoryColor('Perjalanan')).toBe(CATEGORY_COLORS.Travel)
+      // Taxes across languages
+      expect(getCategoryColor('Steuern')).toBe(CATEGORY_COLORS.Taxes)
+      expect(getCategoryColor('Taxes')).toBe(CATEGORY_COLORS.Taxes)
+      // Crypto across languages
+      expect(getCategoryColor('Krypto')).toBe(CATEGORY_COLORS.Crypto)
+      expect(getCategoryColor('Kripto')).toBe(CATEGORY_COLORS.Crypto)
+      expect(getCategoryColor('Крипто')).toBe(CATEGORY_COLORS.Crypto)
+      expect(getCategoryColor('Porezi')).toBe(CATEGORY_COLORS.Taxes)
+      expect(getCategoryColor('Порези')).toBe(CATEGORY_COLORS.Taxes)
+      expect(getCategoryColor('Podatki')).toBe(CATEGORY_COLORS.Taxes)
+      // Cash across languages
+      expect(getCategoryColor('Bargeld')).toBe(CATEGORY_COLORS.Cash)
+      expect(getCategoryColor('Gotówka')).toBe(CATEGORY_COLORS.Cash)
+      expect(getCategoryColor('Gotovina')).toBe(CATEGORY_COLORS.Cash)
+      expect(getCategoryColor('Готовина')).toBe(CATEGORY_COLORS.Cash)
+      expect(getCategoryColor('Tarik Tunai')).toBe(CATEGORY_COLORS.Cash)
+      // Bank Fees across languages
+      expect(getCategoryColor('Bankgebühren')).toBe(CATEGORY_COLORS['Bank Fees'])
+      expect(getCategoryColor('Opłaty bankowe')).toBe(CATEGORY_COLORS['Bank Fees'])
+      expect(getCategoryColor('Bankarske naknade')).toBe(CATEGORY_COLORS['Bank Fees'])
+      expect(getCategoryColor('Банкарске накнаде')).toBe(CATEGORY_COLORS['Bank Fees'])
+      expect(getCategoryColor('Biaya Bank')).toBe(CATEGORY_COLORS['Bank Fees'])
+      expect(getCategoryColor('Pajak')).toBe(CATEGORY_COLORS.Taxes)
+    }, 15000)
 
     describe('custom categories support', () => {
       it('returns icon color when custom category matches ID and has a valid icon', () => {
@@ -288,7 +284,7 @@ describe('category-colors', () => {
         for (const { input, expected } of testCases) {
           expect(
             getCategoryColor(input),
-            `Input "${input}" should match expected category color`
+            `Input "${input}" should match expected category color`,
           ).toBe(expected)
         }
       }, 15000)

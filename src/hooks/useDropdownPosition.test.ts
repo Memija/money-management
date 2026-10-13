@@ -30,7 +30,7 @@ describe('useDropdownPosition', () => {
         isOpen: false,
         triggerRef: { current: triggerElement },
         dropdownRef: { current: dropdownElement },
-      })
+      }),
     )
 
     expect(dropdownElement.style.getPropertyValue('--dropdown-shift-x')).toBe('')
@@ -68,7 +68,7 @@ describe('useDropdownPosition', () => {
         triggerRef: { current: triggerElement },
         dropdownRef: { current: dropdownElement },
         padding: 12,
-      })
+      }),
     )
 
     // Viewport is 375. Safe right bound is 375 - 12 = 363.
@@ -111,7 +111,7 @@ describe('useDropdownPosition', () => {
         triggerRef: { current: triggerElement },
         dropdownRef: { current: dropdownElement },
         padding: 12,
-      })
+      }),
     )
 
     // Safe left bound is 12px. Dropdown left is -20px. Shift = 12 - (-20) = 32px.
@@ -150,7 +150,7 @@ describe('useDropdownPosition', () => {
         triggerRef: { current: triggerElement },
         dropdownRef: { current: dropdownElement },
         estimatedHeight: 200,
-      })
+      }),
     )
 
     // Should flip upwards:
@@ -197,7 +197,7 @@ describe('useDropdownPosition', () => {
         dropdownRef: { current: dropdownElement },
         padding: 12,
         estimatedHeight: 260,
-      })
+      }),
     )
 
     // max-width should be 375 - 2*12 = 351px
@@ -261,7 +261,7 @@ describe('useDropdownPosition', () => {
         dropdownRef: { current: dropdownElement },
         padding: 12,
         estimatedHeight: 260,
-      })
+      }),
     )
 
     // Because spaceAbove (76px) is tiny due to header, it should NOT flip up even if spaceBelow was smaller
@@ -272,4 +272,3 @@ describe('useDropdownPosition', () => {
     document.body.removeChild(header)
   })
 })
-

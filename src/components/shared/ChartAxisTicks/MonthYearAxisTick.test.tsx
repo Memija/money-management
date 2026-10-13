@@ -18,7 +18,13 @@ const getExpectedLabel = (): string => {
 const renderTick = (offsetY?: number) =>
   render(
     <svg>
-      <MonthYearAxisTick x={TICK_X} y={TICK_Y} payload={{ value: MONTH_KEY }} fontSize={11} offsetY={offsetY} />
+      <MonthYearAxisTick
+        x={TICK_X}
+        y={TICK_Y}
+        payload={{ value: MONTH_KEY }}
+        fontSize={11}
+        offsetY={offsetY}
+      />
     </svg>,
   )
 

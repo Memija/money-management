@@ -378,13 +378,21 @@
 @supports (color: color-mix(in srgb, red, blue)) {
   .categoryCard:hover,
   .categoryCard.activeCard {
-    background: linear-gradient(135deg, color-mix(in srgb, var(--active-card-color, var(--primary)) 10%, transparent) 0%, rgba(255, 255, 255, 0.04) 100%);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--active-card-color, var(--primary)) 10%, transparent) 0%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
     border-color: color-mix(in srgb, var(--active-card-color, var(--primary)) 45%, transparent);
   }
 
   [data-theme='light'] .categoryCard:hover,
   [data-theme='light'] .categoryCard.activeCard {
-    background: linear-gradient(135deg, color-mix(in srgb, var(--active-card-color, var(--primary)) 8%, white) 0%, white 100%);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--active-card-color, var(--primary)) 8%, white) 0%,
+      white 100%
+    );
     border-color: color-mix(in srgb, var(--active-card-color, var(--primary)) 40%, transparent);
   }
 }

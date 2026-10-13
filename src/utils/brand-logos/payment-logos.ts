@@ -59,23 +59,22 @@ WesternUnionLogo.displayName = 'WesternUnionLogo'
 
 export const PAYMENT_LOGOS: Record<string, IconComponent> = {
   PayoneLogo,
-  'payone': PayoneLogo,
+  payone: PayoneLogo,
   PAYONELogo: PayoneLogo,
   PaypalLogo,
   PayPalLogo: PaypalLogo,
   SiPaypal: PaypalLogo,
-  'paypal': PaypalLogo,
+  paypal: PaypalLogo,
   GooglePayLogo,
   GooglepayLogo: GooglePayLogo,
   GPayLogo: GooglePayLogo,
   SiGooglepay: GooglePayLogo,
   'google-pay': GooglePayLogo,
   'google pay': GooglePayLogo,
-  'gpay': GooglePayLogo,
-  'GPay': GooglePayLogo,
+  gpay: GooglePayLogo,
+  GPay: GooglePayLogo,
   WesternUnionLogo,
   westernUnionLogo: WesternUnionLogo,
   'western-union': WesternUnionLogo,
   SiWesternunion: WesternUnionLogo,
 }
-

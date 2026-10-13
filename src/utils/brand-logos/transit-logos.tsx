@@ -298,7 +298,16 @@ export const FairParkenLogo: IconComponent = ({ size = 16, className }) => (
     role="img"
   >
     <rect width="48" height="48" fill="#002D62" />
-    <rect x="6" y="11" width="13" height="26" rx="3" fill="#00529C" stroke="#FFFFFF" strokeWidth="1.5" />
+    <rect
+      x="6"
+      y="11"
+      width="13"
+      height="26"
+      rx="3"
+      fill="#00529C"
+      stroke="#FFFFFF"
+      strokeWidth="1.5"
+    />
     <text
       x="12.5"
       y="24"

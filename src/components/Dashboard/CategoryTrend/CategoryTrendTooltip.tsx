@@ -62,8 +62,12 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
   return (
     <div className={styles.tooltipContainer}>
       <div className={styles.tooltipHeader}>
-        <span className={styles.tooltipMonth}>{formatMonthYear ? formatMonthYear(label ?? '') : label}</span>
-        <span className={`${styles.tooltipTotalBadge} privacy-blur`}>{formatCurrency(totalMonth)}</span>
+        <span className={styles.tooltipMonth}>
+          {formatMonthYear ? formatMonthYear(label ?? '') : label}
+        </span>
+        <span className={`${styles.tooltipTotalBadge} privacy-blur`}>
+          {formatCurrency(totalMonth)}
+        </span>
       </div>
       <div className={styles.tooltipList}>
         {sortedItems.map((item) => {
@@ -97,10 +101,7 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
               aria-label={`${getCategoryLabel(catKey, t, locale, customCategories)}: ${formatCurrency(val)} (${pct})`}
             >
               <div className={styles.tooltipCatInfo}>
-                <span
-                  className={styles.tooltipDot}
-                  style={{ backgroundColor: catColor }}
-                />
+                <span className={styles.tooltipDot} style={{ backgroundColor: catColor }} />
                 <span className={styles.tooltipCatName}>
                   {getCategoryLabel(catKey, t, locale, customCategories)}
                 </span>

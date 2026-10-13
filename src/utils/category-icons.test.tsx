@@ -44,7 +44,7 @@ describe('category-icons', () => {
         for (const iconName of group.icons) {
           expect(
             AVAILABLE_ICONS[iconName],
-            `Icon "${iconName}" in group "${group.name}" must exist in AVAILABLE_ICONS`
+            `Icon "${iconName}" in group "${group.name}" must exist in AVAILABLE_ICONS`,
           ).toBeDefined()
         }
       }
@@ -757,13 +757,28 @@ describe('category-icons', () => {
     })
 
     it.each([
-      ['Syna GmbH KUNDENNUMMER 483029022 End-to-End-Ref.: Beleg: 312004778285 Mandatsref: 0085', 'syna', 'SynaLogo', 'Utilities'],
+      [
+        'Syna GmbH KUNDENNUMMER 483029022 End-to-End-Ref.: Beleg: 312004778285 Mandatsref: 0085',
+        'syna',
+        'SynaLogo',
+        'Utilities',
+      ],
       ['Westnetz GmbH Netzentgelt', 'westnetz', 'WestnetzLogo', 'Utilities'],
       ['NRM Netzdienste Rhein-Main GmbH', 'nrm', 'NrmLogo', 'Utilities'],
-      ['Allg.Deutscher Automobil-Club ADAC e.V. ADAC E.V. MUSTERMANN MAX MUSTERMANN ERIKA BEITRAG: 01.01.22-', 'adac', 'AdacLogo', 'Transport'],
+      [
+        'Allg.Deutscher Automobil-Club ADAC e.V. ADAC E.V. MUSTERMANN MAX MUSTERMANN ERIKA BEITRAG: 01.01.22-',
+        'adac',
+        'AdacLogo',
+        'Transport',
+      ],
       ['ACE Auto Club Europa e.V.', 'ace', 'AceLogo', 'Transport'],
       ['AvD Automobilclub von Deutschland', 'avd', 'AvdLogo', 'Transport'],
-      ['POCO Einrichtungsmarkte GmbH ELV54203406 19.02 13.01 ME0 End-to-End-Ref.: T0220219542034', 'poco', 'PocoLogo', 'Shopping'],
+      [
+        'POCO Einrichtungsmarkte GmbH ELV54203406 19.02 13.01 ME0 End-to-End-Ref.: T0220219542034',
+        'poco',
+        'PocoLogo',
+        'Shopping',
+      ],
       ['XXXLutz KG Wiesbaden', 'xxxlutz', 'XxxlutzLogo', 'Shopping'],
       ['moemax Frankfurt', 'moemax', 'MoemaxLogo', 'Shopping'],
       ['Möbel Höffner Eschborn', 'hoeffner', 'HoeffnerLogo', 'Shopping'],
@@ -772,14 +787,34 @@ describe('category-icons', () => {
       ['Segmüller Weiterstadt', 'segmueller', 'SegmuellerLogo', 'Shopping'],
       ['porta Möbel Frankfurt', 'porta', 'PortaLogo', 'Shopping'],
       ['JYSK GmbH', 'jysk', 'JyskLogo', 'Shopping'],
-      ['Turnverein Dornholzhausen 1918 e.V. Sammelbuchung TV Dornholzhausen/Ts. 1918 e.V., Mustermann Max', 'tv-dornholzhausen', 'TvDornholzhausenLogo', 'Healthcare'],
-      ['Die Haftpflichtkasse VVaG 60603542 / Unfall Beitrag 23.01.25 - meine-hk.de - Jetzt anmelden und Re', 'haftpflichtkasse', 'HaftpflichtkasseLogo', 'Insurance'],
+      [
+        'Turnverein Dornholzhausen 1918 e.V. Sammelbuchung TV Dornholzhausen/Ts. 1918 e.V., Mustermann Max',
+        'tv-dornholzhausen',
+        'TvDornholzhausenLogo',
+        'Healthcare',
+      ],
+      [
+        'Die Haftpflichtkasse VVaG 60603542 / Unfall Beitrag 23.01.25 - meine-hk.de - Jetzt anmelden und Re',
+        'haftpflichtkasse',
+        'HaftpflichtkasseLogo',
+        'Insurance',
+      ],
       ['Debeka Versicherung', 'debeka', 'DebekaLogo', 'Insurance'],
-      ['AXA Krankenversicherung Aktiengesel Krankenvers. 493886204X ERSTBTR 10/ 21 9,17 EUR End-to-End-Ref.: 545020471096/0003 Mandatsref: 21054199212 Gläubiger-ID: DE23G0100000066097 SEPA-BASISLASTSCHRIFT wiederholend', 'axa', 'AxaLogo', 'Healthcare'],
+      [
+        'AXA Krankenversicherung Aktiengesel Krankenvers. 493886204X ERSTBTR 10/ 21 9,17 EUR End-to-End-Ref.: 545020471096/0003 Mandatsref: 21054199212 Gläubiger-ID: DE23G0100000066097 SEPA-BASISLASTSCHRIFT wiederholend',
+        'axa',
+        'AxaLogo',
+        'Healthcare',
+      ],
       ['Debeka Krankenversicherung a.G.', 'debeka', 'DebekaLogo', 'Healthcare'],
       ['ERGO Versicherung', 'ergo', 'ErgoLogo', 'Insurance'],
       ['AXA Konzern AG', 'axa', 'AxaLogo', 'Insurance'],
-      ['AXA Versicherung Aktiengesellschaft Kfz-Versicherung 88331191217 MTK-BA  117 BTR. 04/22 89,52 EUR End-to-End-Ref.: 580024561334/0001 Mandatsref: 21054199212 Gläubiger-ID: DE23G0100000066097 SEPA-BASISLASTSCHRIFT wiederholend', 'axa', 'AxaLogo', 'Insurance'],
+      [
+        'AXA Versicherung Aktiengesellschaft Kfz-Versicherung 88331191217 MTK-BA  117 BTR. 04/22 89,52 EUR End-to-End-Ref.: 580024561334/0001 Mandatsref: 21054199212 Gläubiger-ID: DE23G0100000066097 SEPA-BASISLASTSCHRIFT wiederholend',
+        'axa',
+        'AxaLogo',
+        'Insurance',
+      ],
       ['Generali Versicherung', 'generali', 'GeneraliLogo', 'Insurance'],
       ['R+V Versicherung AG', 'ruv', 'RuvLogo', 'Insurance'],
       ['Signal Iduna Gruppe', 'signal-iduna', 'SignalIdunaLogo', 'Insurance'],
@@ -791,28 +826,88 @@ describe('category-icons', () => {
       ['HDI Versicherung AG', 'hdi', 'HdiLogo', 'Insurance'],
       ['VHV Versicherungen', 'vhv', 'VhvLogo', 'Insurance'],
       ['CosmosDirekt Versicherung', 'cosmosdirekt', 'CosmosDirektLogo', 'Insurance'],
-      ['ByeBye PBNKDEFFXXX DE93440100460095667464 2110630491421 End-to-End-Ref.: CCB.109.UE.P', 'byebye', 'ByebyeLogo', 'Travel'],
-      ['Deutsches Jugendherbergswerk Hauptv erband e. V. 22,50 Beitrag-25 31492804 End-to-End-Ref.: N', 'djh', 'DjhLogo', 'Travel'],
-      ['Hostelling International membership', 'hostelling-international', 'HostellingInternationalLogo', 'Travel'],
+      [
+        'ByeBye PBNKDEFFXXX DE93440100460095667464 2110630491421 End-to-End-Ref.: CCB.109.UE.P',
+        'byebye',
+        'ByebyeLogo',
+        'Travel',
+      ],
+      [
+        'Deutsches Jugendherbergswerk Hauptv erband e. V. 22,50 Beitrag-25 31492804 End-to-End-Ref.: N',
+        'djh',
+        'DjhLogo',
+        'Travel',
+      ],
+      [
+        'Hostelling International membership',
+        'hostelling-international',
+        'HostellingInternationalLogo',
+        'Travel',
+      ],
       ['a&o Hostels Berlin', 'ao-hostels', 'AoHostelsLogo', 'Travel'],
       ['MEININGER Hotels Frankfurt', 'meininger', 'MeiningerLogo', 'Travel'],
-      ['Standesamt Bad Soden am Taunus NASSDE55XXX DE84510500150197000325 Internationale Geburts', 'stadt-bad-soden', 'BadSodenLogo', 'Taxes'],
+      [
+        'Standesamt Bad Soden am Taunus NASSDE55XXX DE84510500150197000325 Internationale Geburts',
+        'stadt-bad-soden',
+        'BadSodenLogo',
+        'Taxes',
+      ],
       ['Main-Taunus-Kreis Kreiskasse', 'main-taunus-kreis', 'MainTaunusKreisLogo', 'Taxes'],
-      ['Muenchener VEREIN Krankenversicheru ng a. Kundennummer S88063 KV1003 17,46 End-to-End-Ref.', 'muenchener-verein', 'MuenchenerVereinLogo', 'Healthcare'],
-      ['WebID Solutions GmbH HYVEDEMM488 DE22100208900035900527 TWMDO WebID Ident 643-572-', 'webid', 'WebIdLogo', 'Bank Fees'],
+      [
+        'Muenchener VEREIN Krankenversicheru ng a. Kundennummer S88063 KV1003 17,46 End-to-End-Ref.',
+        'muenchener-verein',
+        'MuenchenerVereinLogo',
+        'Healthcare',
+      ],
+      [
+        'WebID Solutions GmbH HYVEDEMM488 DE22100208900035900527 TWMDO WebID Ident 643-572-',
+        'webid',
+        'WebIdLogo',
+        'Bank Fees',
+      ],
       ['IDnow GmbH VideoIdent', 'idnow', 'IdnowLogo', 'Bank Fees'],
       ['POSTIDENT Verfahren', 'postident', 'PostidentLogo', 'Bank Fees'],
       ['Verimi GmbH ID', 'verimi', 'VerimiLogo', 'Bank Fees'],
-      ['GENERALKOSULAT VON BOSNIENHERZEGOW. DRESDEFFXXX DE71500800000000000001 Max Must', 'konsulat-bosnien', 'BosniaCoatOfArmsLogo', 'Taxes'],
-      ['Swiss Life SE VS 9667224-1/819491326 Beitrag 02/2 026 Ihr Beitrag fur ein selbstbesti mmtes Leben', 'swiss-life', 'SwissLifeLogo', 'Savings'],
+      [
+        'GENERALKOSULAT VON BOSNIENHERZEGOW. DRESDEFFXXX DE71500800000000000001 Max Must',
+        'konsulat-bosnien',
+        'BosniaCoatOfArmsLogo',
+        'Taxes',
+      ],
+      [
+        'Swiss Life SE VS 9667224-1/819491326 Beitrag 02/2 026 Ihr Beitrag fur ein selbstbesti mmtes Leben',
+        'swiss-life',
+        'SwissLifeLogo',
+        'Savings',
+      ],
       ['Canada Life Assurance Europe', 'canada-life', 'CanadaLifeLogo', 'Savings'],
       ['Alte Leipziger Lebensversicherung', 'alte-leipziger', 'AlteLeipzigerLogo', 'Savings'],
-      ['Aeguron Risiko-Lebensversicherung AeguronRisikoLV 02/26 6267061-P End-to-End-Ref.: 89c9c867', 'aeguron', 'AeguronLogo', 'Insurance'],
-      ['iptiQ Life SA AeguronRisikoLV 04/26 6267061-P End-to-End-Ref.: de3e4c7022094659943152a87c2', 'aeguron', 'AeguronLogo', 'Insurance'],
-      ['WGV-Wuertt. Gemeinde-Versicherung MTK-BA 117 V90092776488 01.06.2025- 01.07.2025 End-to-E', 'wgv', 'WgvLogo', 'Insurance'],
+      [
+        'Aeguron Risiko-Lebensversicherung AeguronRisikoLV 02/26 6267061-P End-to-End-Ref.: 89c9c867',
+        'aeguron',
+        'AeguronLogo',
+        'Insurance',
+      ],
+      [
+        'iptiQ Life SA AeguronRisikoLV 04/26 6267061-P End-to-End-Ref.: de3e4c7022094659943152a87c2',
+        'aeguron',
+        'AeguronLogo',
+        'Insurance',
+      ],
+      [
+        'WGV-Wuertt. Gemeinde-Versicherung MTK-BA 117 V90092776488 01.06.2025- 01.07.2025 End-to-E',
+        'wgv',
+        'WgvLogo',
+        'Insurance',
+      ],
       ['Hannoversche Lebensversicherung AG', 'hannoversche', 'HannoverscheLogo', 'Insurance'],
       ['Provinzial Versicherung AG', 'provinzial', 'ProvinzialLogo', 'Insurance'],
-      ['SV SparkassenVersicherung Gebäude', 'sv-sparkassenversicherung', 'SvSparkassenVersicherungLogo', 'Insurance'],
+      [
+        'SV SparkassenVersicherung Gebäude',
+        'sv-sparkassenversicherung',
+        'SvSparkassenVersicherungLogo',
+        'Insurance',
+      ],
       ['BGV Badische Gemeinde-Versicherung', 'bgv', 'BgvLogo', 'Insurance'],
       ['Versicherungskammer Bayern', 'vkb', 'VkbLogo', 'Insurance'],
       ['Swiss Re Reinsurance', 'swiss-re', 'SwissReLogo', 'Insurance'],
@@ -889,14 +984,7 @@ describe('category-icons', () => {
 
     it('renders HerokuLogo successfully into the DOM', () => {
       const { container } = render(
-        <div>
-          {getCategoryIcon(
-            'Utilities',
-            24,
-            undefined,
-            'HEROKU* JUL-106945945',
-          )}
-        </div>,
+        <div>{getCategoryIcon('Utilities', 24, undefined, 'HEROKU* JUL-106945945')}</div>,
       )
       const svg = container.querySelector('svg')
       expect(svg).toBeInTheDocument()
@@ -1159,8 +1247,7 @@ describe('category-icons', () => {
     })
 
     it('matches LotharBraunLogo for Lothar Braun door installations and carpentry transactions', () => {
-      const lotharTx =
-        'Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung'
+      const lotharTx = 'Lothar Braun GmbH PBNKDEFFXXX DE82500100600255577603 Rechnung'
       const icon = getCategoryIcon('Shopping', 20, undefined, lotharTx)
       expect(React.isValidElement(icon)).toBe(true)
       if (React.isValidElement(icon)) {
@@ -1661,7 +1748,7 @@ describe('category-icons', () => {
       expect(postInfo.suggestedCategory).toBe('Shopping')
 
       const tchiboInfo = getMerchantBrandInfo(
-        'TCHIBO GMBH DRESDEFF200 DE14200800000816170700 20319230661010 End-to-End-Ref.: MOB.'
+        'TCHIBO GMBH DRESDEFF200 DE14200800000816170700 20319230661010 End-to-End-Ref.: MOB.',
       )
       expect(tchiboInfo.merchant?.id).toBe('tchibo')
       expect(tchiboInfo.logoComponent).toBe(MERCHANT_LOGOS.TchiboLogo)
@@ -1669,7 +1756,7 @@ describe('category-icons', () => {
       expect(tchiboInfo.brandColor).toBe('#072042')
 
       const dellInfo = getMerchantBrandInfo(
-        'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421'
+        'Dell GmbH CITIDEFFXXX DE33502109000209865076 40308324 End-to-End-Ref.: CCB.147.UE.361421',
       )
       expect(dellInfo.merchant?.id).toBe('dell')
       expect(dellInfo.logoComponent).toBe(MERCHANT_LOGOS.DellLogo)
@@ -1677,7 +1764,7 @@ describe('category-icons', () => {
       expect(dellInfo.brandColor).toBe('#007DB8')
 
       const fairParkenInfo = getMerchantBrandInfo(
-        'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-'
+        'FAIR PARKEN GMBH WELADED1KSD DE19301502000002120590 AKTENZEICHEN: 30362484 End-to-',
       )
       expect(fairParkenInfo.merchant?.id).toBe('fair-parken')
       expect(fairParkenInfo.logoComponent).toBe(MERCHANT_LOGOS.FairParkenLogo)
@@ -1685,7 +1772,7 @@ describe('category-icons', () => {
       expect(fairParkenInfo.brandColor).toBe('#002D62')
 
       const wundertaxInfo = getMerchantBrandInfo(
-        'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00'
+        'wundertax GmbH Rueckzahlung Lizenzgebuehr Wunderta x GmbH End-to-End-Ref.: 4306669553-00',
       )
       expect(wundertaxInfo.merchant?.id).toBe('wundertax')
       expect(wundertaxInfo.logoComponent).toBe(MERCHANT_LOGOS.WundertaxLogo)
@@ -1693,7 +1780,7 @@ describe('category-icons', () => {
       expect(wundertaxInfo.brandColor).toBe('#00CB9D')
 
       const guardarianInfo = getMerchantBrandInfo(
-        'GUARDARIAN OÜ CLJUGB21XXX GB33CLJU04130729903054 6154171893446142 End-to-End-Ref.: CCB'
+        'GUARDARIAN OÜ CLJUGB21XXX GB33CLJU04130729903054 6154171893446142 End-to-End-Ref.: CCB',
       )
       expect(guardarianInfo.merchant?.id).toBe('guardarian')
       expect(guardarianInfo.logoComponent).toBe(MERCHANT_LOGOS.GuardarianLogo)
@@ -1736,7 +1823,9 @@ describe('category-icons', () => {
       expect(shopApothekeInfo.suggestedCategory).toBe('Healthcare')
       expect(shopApothekeInfo.brandColor).toBe('#E30613')
 
-      const sumupInfo = getMerchantBrandInfo('SumUp .Metzgerei Enk/Louisenstrass 2024-10-26T12:41:33 KFN 0 VJ 2412 Kartenzahlung')
+      const sumupInfo = getMerchantBrandInfo(
+        'SumUp .Metzgerei Enk/Louisenstrass 2024-10-26T12:41:33 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(sumupInfo.merchant?.id).toBe('sumup')
       expect(sumupInfo.logoComponent).toBe(MERCHANT_LOGOS.SumupLogo)
       expect(sumupInfo.suggestedCategory).toBe('Groceries')
@@ -1748,13 +1837,17 @@ describe('category-icons', () => {
       expect(sumupRetailInfo.suggestedCategory).toBe('Shopping')
       expect(sumupRetailInfo.brandColor).toBe('#0050FF')
 
-      const suewagInfo = getMerchantBrandInfo('Süwag COBADEFFXXX DE69500400000257744300 Kunden-Nr.: 263614738 Rechnungsnr:')
+      const suewagInfo = getMerchantBrandInfo(
+        'Süwag COBADEFFXXX DE69500400000257744300 Kunden-Nr.: 263614738 Rechnungsnr:',
+      )
       expect(suewagInfo.merchant?.id).toBe('suewag')
       expect(suewagInfo.logoComponent).toBe(MERCHANT_LOGOS.SuewagLogo)
       expect(suewagInfo.suggestedCategory).toBe('Utilities')
       expect(suewagInfo.brandColor).toBe('#004B87')
 
-      const eurowingsInfo = getMerchantBrandInfo('holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Max Must')
+      const eurowingsInfo = getMerchantBrandInfo(
+        'holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Max Must',
+      )
       expect(eurowingsInfo.merchant?.id).toBe('eurowings')
       expect(eurowingsInfo.logoComponent).toBe(MERCHANT_LOGOS.EurowingsLogo)
       expect(eurowingsInfo.suggestedCategory).toBe('Travel')
@@ -1779,14 +1872,14 @@ describe('category-icons', () => {
       expect(dakInfo.brandColor).toBe('#E4002B')
 
       const xxxlutzResto = getMerchantBrandInfo(
-        'XXXLUTZ RESTO-ESCHBORN  ESCHBORN DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card XXXLUTZ RESTO-ESCHBORN   ESCHBORN    DEU 2024-01-01T12:00:00 Kartenzahlung'
+        'XXXLUTZ RESTO-ESCHBORN  ESCHBORN DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card XXXLUTZ RESTO-ESCHBORN   ESCHBORN    DEU 2024-01-01T12:00:00 Kartenzahlung',
       )
       expect(xxxlutzResto.merchant?.id).toBe('xxxlutz')
       expect(xxxlutzResto.logoComponent).toBe(MERCHANT_LOGOS.XxxlutzLogo)
       expect(xxxlutzResto.suggestedCategory).toBe('Dining Out')
 
       const moemaxResto = getMerchantBrandInfo(
-        '98038 MOEMAX ELV54098706 28.01 14.58 ME0()98025 MOEMAX RESTO//ESCHBORN End-to-End-Ref.: T023012854098706008332()BDSK Handel Mandatsref: 5409870629792301281458 Gläubiger-ID: DE76ZZZ00000061166 SEPA-BASISLASTSCHRIFT einmalig'
+        '98038 MOEMAX ELV54098706 28.01 14.58 ME0()98025 MOEMAX RESTO//ESCHBORN End-to-End-Ref.: T023012854098706008332()BDSK Handel Mandatsref: 5409870629792301281458 Gläubiger-ID: DE76ZZZ00000061166 SEPA-BASISLASTSCHRIFT einmalig',
       )
       expect(moemaxResto.merchant?.id).toBe('moemax')
       expect(moemaxResto.logoComponent).toBe(MERCHANT_LOGOS.MoemaxLogo)
@@ -1843,7 +1936,7 @@ describe('category-icons', () => {
       expect(sixtInfo.brandColor).toBe('#FF5F00')
 
       const mercedesInfo = getMerchantBrandInfo(
-        'Mercedes-Benz AG DEUTDEFFXXX DE20500700100092001700 Bitte geben Sie bei Bezahlung Ihre'
+        'Mercedes-Benz AG DEUTDEFFXXX DE20500700100092001700 Bitte geben Sie bei Bezahlung Ihre',
       )
       expect(mercedesInfo.merchant?.id).toBe('mercedes')
       expect(mercedesInfo.logoComponent).toBe(MERCHANT_LOGOS.MercedesLogo)
@@ -1893,7 +1986,7 @@ describe('category-icons', () => {
       expect(fordInfo.brandColor).toBe('#002C6C')
 
       const tomorrowInfo = getMerchantBrandInfo(
-        'MAX MUSTERMANN - TOMORROW SOBKDEBBXXX DE58110101002000000001 FÜR DIE ZUKUNFT End-to-End-'
+        'MAX MUSTERMANN - TOMORROW SOBKDEBBXXX DE58110101002000000001 FÜR DIE ZUKUNFT End-to-End-',
       )
       expect(tomorrowInfo.merchant?.id).toBe('tomorrow')
       expect(tomorrowInfo.logoComponent).toBe(MERCHANT_LOGOS.TomorrowLogo)
@@ -1901,7 +1994,7 @@ describe('category-icons', () => {
       expect(tomorrowInfo.brandColor).toBe('#FF8454')
 
       const revolutInfo = getMerchantBrandInfo(
-        'Max Mustermann REVOLT21XXX LT153250000290000001 End-to-End-Ref.: MOB.147.UE.32306'
+        'Max Mustermann REVOLT21XXX LT153250000290000001 End-to-End-Ref.: MOB.147.UE.32306',
       )
       expect(revolutInfo.merchant?.id).toBe('revolut')
       expect(revolutInfo.logoComponent).toBe(MERCHANT_LOGOS.RevolutLogo)
@@ -1983,102 +2076,140 @@ describe('category-icons', () => {
       expect(bunqBankInfo.logoComponent).toBe(MERCHANT_LOGOS.BunqLogo)
       expect(bunqBankInfo.suggestedCategory).toBe('Transfers')
 
-      const paybackInfo = getMerchantBrandInfo('PAYBACK PAY / PAYMORROW WELADEDDXXX DE85300500000071013312 PAYBACK PAY End-to-En')
+      const paybackInfo = getMerchantBrandInfo(
+        'PAYBACK PAY / PAYMORROW WELADEDDXXX DE85300500000071013312 PAYBACK PAY End-to-En',
+      )
       expect(paybackInfo.merchant?.id).toBe('payback')
       expect(paybackInfo.logoComponent).toBe(MERCHANT_LOGOS.PaybackLogo)
       expect(paybackInfo.suggestedCategory).toBe('Shopping')
       expect(paybackInfo.brandColor).toBe('#003EB0')
 
-      const kelkheimInfo = getMerchantBrandInfo('STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836')
+      const kelkheimInfo = getMerchantBrandInfo(
+        'STADTKASSE KELKHEIM (TAUNUS) HELADEF1TSK DE34512500000005211530 AZ: 40004836',
+      )
       expect(kelkheimInfo.merchant?.id).toBe('stadt-kelkheim')
       expect(kelkheimInfo.logoComponent).toBe(MERCHANT_LOGOS.KelkheimLogo)
       expect(kelkheimInfo.suggestedCategory).toBe('Taxes')
       expect(kelkheimInfo.brandColor).toBe('#DA121A')
 
-      const bookingInfo = getMerchantBrandInfo('PayPal (Europe) S.a r.l. et Cie, S. C.A. . Booking.com BV, Ihr Einkauf bei B ooking.com BV ABBUCHUNG')
+      const bookingInfo = getMerchantBrandInfo(
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. . Booking.com BV, Ihr Einkauf bei B ooking.com BV ABBUCHUNG',
+      )
       expect(bookingInfo.merchant?.id).toBe('booking')
       expect(bookingInfo.logoComponent).toBe(MERCHANT_LOGOS.BookingLogo)
       expect(bookingInfo.suggestedCategory).toBe('Travel')
       expect(bookingInfo.brandColor).toBe('#003580')
 
-      const gvgInfo = getMerchantBrandInfo('GVG Glasfaser GmbH RG.23565869/KD.10250177 End-to-End-Ref.: 00000023565869102501774490')
+      const gvgInfo = getMerchantBrandInfo(
+        'GVG Glasfaser GmbH RG.23565869/KD.10250177 End-to-End-Ref.: 00000023565869102501774490',
+      )
       expect(gvgInfo.merchant?.id).toBe('gvg-glasfaser')
       expect(gvgInfo.logoComponent).toBe(MERCHANT_LOGOS.GvgGlasfaserLogo)
       expect(gvgInfo.suggestedCategory).toBe('Communication')
 
-      const gruenweltInfo = getMerchantBrandInfo('Grünwelt Wärmestrom GmbH ABSCHLAG Strom 08/26 VK: 1210005133 32 Gruenwelt Waermestrom')
+      const gruenweltInfo = getMerchantBrandInfo(
+        'Grünwelt Wärmestrom GmbH ABSCHLAG Strom 08/26 VK: 1210005133 32 Gruenwelt Waermestrom',
+      )
       expect(gruenweltInfo.merchant?.id).toBe('gruenwelt')
       expect(gruenweltInfo.logoComponent).toBe(MERCHANT_LOGOS.GruenweltLogo)
       expect(gruenweltInfo.suggestedCategory).toBe('Utilities')
 
-      const disneyInfo = getMerchantBrandInfo('PayPal Europe S.a.r.l. et Cie S.C.A 1052099636248/PP.4585.PP/. DisneyPl us, Ihr Einkauf bei DisneyPl')
+      const disneyInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1052099636248/PP.4585.PP/. DisneyPl us, Ihr Einkauf bei DisneyPl',
+      )
       expect(disneyInfo.merchant?.id).toBe('disney-plus')
       expect(disneyInfo.logoComponent).toBe(MERCHANT_LOGOS.DisneyPlusLogo)
       expect(disneyInfo.suggestedCategory).toBe('Entertainment')
 
-      const mossInfo = getMerchantBrandInfo('CAFE RESTAURANT MOSS, ZELL AM SEE AT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual DB')
+      const mossInfo = getMerchantBrandInfo(
+        'CAFE RESTAURANT MOSS, ZELL AM SEE AT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual DB',
+      )
       expect(mossInfo.merchant?.id).toBe('cafe-moss')
       expect(mossInfo.logoComponent).toBe(MERCHANT_LOGOS.CafeMossLogo)
       expect(mossInfo.suggestedCategory).toBe('Dining Out')
 
-      const billaInfo = getMerchantBrandInfo('BILLA DANKT 0005128, ZELL AM SEE A T Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debi')
+      const billaInfo = getMerchantBrandInfo(
+        'BILLA DANKT 0005128, ZELL AM SEE A T Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debi',
+      )
       expect(billaInfo.merchant?.id).toBe('billa')
       expect(billaInfo.logoComponent).toBe(MERCHANT_LOGOS.BillaLogo)
       expect(billaInfo.suggestedCategory).toBe('Groceries')
 
-      const jugendherbergeInfo = getMerchantBrandInfo('Salzburger Jugendherbe, Zell am See AT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit')
+      const jugendherbergeInfo = getMerchantBrandInfo(
+        'Salzburger Jugendherbe, Zell am See AT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit',
+      )
       expect(jugendherbergeInfo.merchant?.id).toBe('salzburger-jugendherberge')
       expect(jugendherbergeInfo.logoComponent).toBe(MERCHANT_LOGOS.SalzburgerJugendherbergeLogo)
       expect(jugendherbergeInfo.suggestedCategory).toBe('Travel')
 
-      const alpePanonInfo = getMerchantBrandInfo('ALPE PANON PE PTUJ, PTUJ SI Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 20')
+      const alpePanonInfo = getMerchantBrandInfo(
+        'ALPE PANON PE PTUJ, PTUJ SI Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 20',
+      )
       expect(alpePanonInfo.merchant?.id).toBe('alpe-panon')
       expect(alpePanonInfo.logoComponent).toBe(MERCHANT_LOGOS.AlpePanonLogo)
       expect(alpePanonInfo.suggestedCategory).toBe('Dining Out')
 
-      const hallenbadInfo = getMerchantBrandInfo('HALLENBAD ZELL AM SEE, ZELL SEE AT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit')
+      const hallenbadInfo = getMerchantBrandInfo(
+        'HALLENBAD ZELL AM SEE, ZELL SEE AT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit',
+      )
       expect(hallenbadInfo.merchant?.id).toBe('hallenbad-zellamsee')
       expect(hallenbadInfo.logoComponent).toBe(MERCHANT_LOGOS.HallenbadZellLogo)
       expect(hallenbadInfo.suggestedCategory).toBe('Entertainment')
     })
 
     it('returns brand info for batch 10 real-world transaction statements', () => {
-      const janitosInfo = getMerchantBrandInfo('Janitos Versicherung AG Vertrags-Nr. 6100113945 HR 15.10.20 25-15.10.2026 End-to-End-Ref.: 17602')
+      const janitosInfo = getMerchantBrandInfo(
+        'Janitos Versicherung AG Vertrags-Nr. 6100113945 HR 15.10.20 25-15.10.2026 End-to-End-Ref.: 17602',
+      )
       expect(janitosInfo.merchant?.id).toBe('janitos')
       expect(janitosInfo.logoComponent).toBe(MERCHANT_LOGOS.JanitosLogo)
       expect(janitosInfo.suggestedCategory).toBe('Insurance')
 
-      const serwaysInfo = getMerchantBrandInfo('Raststaette Spessart N, Rohrbrunn DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit C')
+      const serwaysInfo = getMerchantBrandInfo(
+        'Raststaette Spessart N, Rohrbrunn DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit C',
+      )
       expect(serwaysInfo.merchant?.id).toBe('serways')
       expect(serwaysInfo.logoComponent).toBe(MERCHANT_LOGOS.SerwaysLogo)
       expect(serwaysInfo.suggestedCategory).toBe('Dining Out')
 
-      const toomInfo = getMerchantBrandInfo('toom BM Oberursel, OBERURSEL DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Car')
+      const toomInfo = getMerchantBrandInfo(
+        'toom BM Oberursel, OBERURSEL DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Car',
+      )
       expect(toomInfo.merchant?.id).toBe('toom')
       expect(toomInfo.logoComponent).toBe(MERCHANT_LOGOS.ToomLogo)
       expect(toomInfo.suggestedCategory).toBe('Shopping')
 
-      const sparInfo = getMerchantBrandInfo('SPAR CABANAS TAVIRA 1, CABANAS TAVI R PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtu')
+      const sparInfo = getMerchantBrandInfo(
+        'SPAR CABANAS TAVIRA 1, CABANAS TAVI R PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtu',
+      )
       expect(sparInfo.merchant?.id).toBe('spar')
       expect(sparInfo.logoComponent).toBe(MERCHANT_LOGOS.SparLogo)
       expect(sparInfo.suggestedCategory).toBe('Groceries')
 
-      const argumentoInfo = getMerchantBrandInfo('ARGUMENTO DA LUA,LDA, FARO PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card')
+      const argumentoInfo = getMerchantBrandInfo(
+        'ARGUMENTO DA LUA,LDA, FARO PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card',
+      )
       expect(argumentoInfo.merchant?.id).toBe('argumento-da-lua')
       expect(argumentoInfo.logoComponent).toBe(MERCHANT_LOGOS.ArgumentoDaLuaLogo)
       expect(argumentoInfo.suggestedCategory).toBe('Shopping')
 
-      const delhisBellyInfo = getMerchantBrandInfo('DELHIS BELLY, UNIPES, FARO PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 25 ')
+      const delhisBellyInfo = getMerchantBrandInfo(
+        'DELHIS BELLY, UNIPES, FARO PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 25 ',
+      )
       expect(delhisBellyInfo.merchant?.id).toBe('delhis-belly')
       expect(delhisBellyInfo.logoComponent).toBe(MERCHANT_LOGOS.DelhisBellyLogo)
       expect(delhisBellyInfo.suggestedCategory).toBe('Dining Out')
 
-      const goldenClubInfo = getMerchantBrandInfo('SITES CABANAS SA, FARO PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 20')
+      const goldenClubInfo = getMerchantBrandInfo(
+        'SITES CABANAS SA, FARO PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 20',
+      )
       expect(goldenClubInfo.merchant?.id).toBe('golden-club-cabanas')
       expect(goldenClubInfo.logoComponent).toBe(MERCHANT_LOGOS.GoldenClubCabanasLogo)
       expect(goldenClubInfo.suggestedCategory).toBe('Travel')
 
-      const pizzaHutInfo = getMerchantBrandInfo('PH 822 ESCHBORN DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card PH 822 ESCHBORN DEU 20')
+      const pizzaHutInfo = getMerchantBrandInfo(
+        'PH 822 ESCHBORN DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card PH 822 ESCHBORN DEU 20',
+      )
       expect(pizzaHutInfo.merchant?.id).toBe('pizza-hut')
       expect(pizzaHutInfo.logoComponent).toBe(MERCHANT_LOGOS.PizzaHutLogo)
       expect(pizzaHutInfo.suggestedCategory).toBe('Dining Out')
@@ -2086,31 +2217,41 @@ describe('category-icons', () => {
 
     it('returns brand info for batch 11 real-world transaction statements', () => {
       // 1. rhenag (Rheinische Elektrizitäts- und Gasversorgungsgesellschaft)
-      const rhenagInfo = getMerchantBrandInfo('Rheinische Elektrizitäts- und Gasve rsorgungsgesellscha Vertragsnummer 21810010775 1089385- 108')
+      const rhenagInfo = getMerchantBrandInfo(
+        'Rheinische Elektrizitäts- und Gasve rsorgungsgesellscha Vertragsnummer 21810010775 1089385- 108',
+      )
       expect(rhenagInfo.merchant?.id).toBe('rhenag')
       expect(rhenagInfo.logoComponent).toBe(MERCHANT_LOGOS.RhenagLogo)
       expect(rhenagInfo.suggestedCategory).toBe('Utilities')
 
       // 2. Rats-Apotheke
-      const ratsApoInfo = getMerchantBrandInfo('RATS APOTHEKE sagt Danke GIR 799135 2022-03-12T09:28:55 KFN 0 VJ 2412 Kartenzahlung')
+      const ratsApoInfo = getMerchantBrandInfo(
+        'RATS APOTHEKE sagt Danke GIR 799135 2022-03-12T09:28:55 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(ratsApoInfo.merchant?.id).toBe('apotheke')
       expect(ratsApoInfo.logoComponent).toBe(MERCHANT_LOGOS.ApothekeLogo)
       expect(ratsApoInfo.suggestedCategory).toBe('Healthcare')
 
       // 3. Thong Thai Thai Restaurant
-      const thongThaiInfo = getMerchantBrandInfo('Thong Thai GmbH Co. KG/Rödelheimer 2022-03-26T13:28:44 KFN 0 VJ 2412 Kartenzahlung')
+      const thongThaiInfo = getMerchantBrandInfo(
+        'Thong Thai GmbH Co. KG/Rödelheimer 2022-03-26T13:28:44 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(thongThaiInfo.merchant?.id).toBe('thong-thai')
       expect(thongThaiInfo.logoComponent).toBe(MERCHANT_LOGOS.ThongThaiLogo)
       expect(thongThaiInfo.suggestedCategory).toBe('Dining Out')
 
       // 4. Reifen-Diehl Eschborn
-      const reifenDiehlInfo = getMerchantBrandInfo('REIFEN-DIEHL.ESCHBORN//Eschborn/DE 2022-04-30T12:41:00 KFN 0 VJ 2412 Kartenzahlung')
+      const reifenDiehlInfo = getMerchantBrandInfo(
+        'REIFEN-DIEHL.ESCHBORN//Eschborn/DE 2022-04-30T12:41:00 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(reifenDiehlInfo.merchant?.id).toBe('reifen-diehl')
       expect(reifenDiehlInfo.logoComponent).toBe(MERCHANT_LOGOS.ReifenDiehlLogo)
       expect(reifenDiehlInfo.suggestedCategory).toBe('Transport')
 
       // 5. STONES Baustoffe
-      const stonesInfo = getMerchantBrandInfo('STONES GMBH 120510420024424241253413150 ELV6534 1315 12.05 10.42 ME0 End-to-End-Ref.: 12')
+      const stonesInfo = getMerchantBrandInfo(
+        'STONES GMBH 120510420024424241253413150 ELV6534 1315 12.05 10.42 ME0 End-to-End-Ref.: 12',
+      )
       expect(stonesInfo.merchant?.id).toBe('stones')
       expect(stonesInfo.merchant?.name).toBe('STONES Baustoffe')
       expect(stonesInfo.brandColor).toBe('#8ABA18')
@@ -2127,61 +2268,81 @@ describe('category-icons', () => {
       expect(stonesFullInfo.logoComponent).toBe(MERCHANT_LOGOS.StonesLogo)
 
       // 6. Liebig-Apotheke Bad Homburg
-      const liebigApoInfo = getMerchantBrandInfo('LIEBIG-APOTHEKE//BAD HOMBURG/DE 2022-05-24T10:32:50 KFN 0 VJ 2412 Kartenzahlung')
+      const liebigApoInfo = getMerchantBrandInfo(
+        'LIEBIG-APOTHEKE//BAD HOMBURG/DE 2022-05-24T10:32:50 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(liebigApoInfo.merchant?.id).toBe('apotheke')
       expect(liebigApoInfo.logoComponent).toBe(MERCHANT_LOGOS.ApothekeLogo)
       expect(liebigApoInfo.suggestedCategory).toBe('Healthcare')
 
       // 7. BabyOne Baby- & Kinderausstattung
-      const babyOneInfo = getMerchantBrandInfo('BabyOne B+K Nr.45 GmbH Fil 015 GIR 2022-07-08T12:50:27 KFN 0 VJ 2412 Kartenzahlung')
+      const babyOneInfo = getMerchantBrandInfo(
+        'BabyOne B+K Nr.45 GmbH Fil 015 GIR 2022-07-08T12:50:27 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(babyOneInfo.merchant?.id).toBe('babyone')
       expect(babyOneInfo.logoComponent).toBe(MERCHANT_LOGOS.BabyOneLogo)
       expect(babyOneInfo.suggestedCategory).toBe('Shopping')
 
       // 8. Anadolu Supermarkt
-      const anadoluInfo = getMerchantBrandInfo('ANADOLU SUPERMARKT GIR 69287732//BA 2022-07-09T12:24:08 KFN 0 VJ 2412 Kartenzahlung')
+      const anadoluInfo = getMerchantBrandInfo(
+        'ANADOLU SUPERMARKT GIR 69287732//BA 2022-07-09T12:24:08 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(anadoluInfo.merchant?.id).toBe('anadolu-supermarkt')
       expect(anadoluInfo.logoComponent).toBe(MERCHANT_LOGOS.AnadoluSupermarktLogo)
       expect(anadoluInfo.suggestedCategory).toBe('Groceries')
 
       // 9. ebase (European Bank for Financial Services)
-      const ebaseInfo = getMerchantBrandInfo('European Bank for Financial Service s GmbH 9914335757302 Kauf 0,074908 Ant am 06.09.2022 zu 3')
+      const ebaseInfo = getMerchantBrandInfo(
+        'European Bank for Financial Service s GmbH 9914335757302 Kauf 0,074908 Ant am 06.09.2022 zu 3',
+      )
       expect(ebaseInfo.merchant?.id).toBe('ebase')
       expect(ebaseInfo.logoComponent).toBe(MERCHANT_LOGOS.EbaseLogo)
       expect(ebaseInfo.suggestedCategory).toBe('Savings')
 
       // 10. MyShoes SE
-      const myShoesInfo = getMerchantBrandInfo('MyShoes SE//Friedrichsdorf/DE 2022-09-03T13:20:44 KFN 0 VJ 2412 Kartenzahlung')
+      const myShoesInfo = getMerchantBrandInfo(
+        'MyShoes SE//Friedrichsdorf/DE 2022-09-03T13:20:44 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(myShoesInfo.merchant?.id).toBe('myshoes')
       expect(myShoesInfo.logoComponent).toBe(MERCHANT_LOGOS.MyShoesLogo)
       expect(myShoesInfo.suggestedCategory).toBe('Shopping')
 
       // 11. TEDi Filiale 4912 Bad Homburg
-      const tediInfo = getMerchantBrandInfo('TEDi Fil. 4912//Bad Homburg/DE 2022-11-08T16:06:57 KFN 0 VJ 2412 Kartenzahlung')
+      const tediInfo = getMerchantBrandInfo(
+        'TEDi Fil. 4912//Bad Homburg/DE 2022-11-08T16:06:57 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(tediInfo.merchant?.id).toBe('tedi')
       expect(tediInfo.logoComponent).toBe(MERCHANT_LOGOS.TediLogo)
       expect(tediInfo.suggestedCategory).toBe('Shopping')
 
       // 12. Kontoführung Commerzbank
-      const kfInfo = getMerchantBrandInfo('Kontoführung Konto 123456700 EUR BLZ 500 400 00 vom 01.02.2023 bis 28.02.2023 Kontoführung')
+      const kfInfo = getMerchantBrandInfo(
+        'Kontoführung Konto 123456700 EUR BLZ 500 400 00 vom 01.02.2023 bis 28.02.2023 Kontoführung',
+      )
       expect(kfInfo.merchant?.id).toBe('commerzbank')
       expect(kfInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
 
       // 13. Commerzbank SEPA transfer (BIC COBADEFFXXX)
-      const cobadeffInfo = getMerchantBrandInfo('MAX MUSTERMANN COBADEFFXXX DE13500400000000000001 5000000000000000 End-to-End-Ref.: MO')
+      const cobadeffInfo = getMerchantBrandInfo(
+        'MAX MUSTERMANN COBADEFFXXX DE13500400000000000001 5000000000000000 End-to-End-Ref.: MO',
+      )
       expect(cobadeffInfo.merchant?.id).toBe('commerzbank')
       expect(cobadeffInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
       expect(cobadeffInfo.suggestedCategory).toBe('Transfers')
 
       // 14. KMK Immobilienverwaltung (with KMK in name -> belongs to KMK Immobilienverwaltung)
-      const kmkInfo = getMerchantBrandInfo('WEG Landwehrweg 1, 61350 z. Hd. KMK   Immobilienverw. GmbH 556.101701 Mustermann Erika Lastschrif t 12/2024 End-to-End-Ref.: 556/101701 Mandatsref: cc804780000000000000000000000000 Gläubiger-ID: DE13ZZZ00000579310 SEPA-BASISLASTSCHRIFT wiederholend')
+      const kmkInfo = getMerchantBrandInfo(
+        'WEG Landwehrweg 1, 61350 z. Hd. KMK   Immobilienverw. GmbH 556.101701 Mustermann Erika Lastschrif t 12/2024 End-to-End-Ref.: 556/101701 Mandatsref: cc804780000000000000000000000000 Gläubiger-ID: DE13ZZZ00000579310 SEPA-BASISLASTSCHRIFT wiederholend',
+      )
       expect(kmkInfo.merchant?.id).toBe('kmk-immobilien')
       expect(kmkInfo.merchant?.name).toBe('KMK Immobilienverwaltung')
       expect(kmkInfo.logoComponent).toBe(MERCHANT_LOGOS.KmkImmobilienLogo)
       expect(kmkInfo.suggestedCategory).toBe('Rent')
 
       // 14b. WEG Landwehrweg 1 (private condo association - does NOT use civic Bad Homburg city logo)
-      const wegInfo = getMerchantBrandInfo('WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld Landwehrweg End-to-End-Ref.: NOTPROVIDED Mandatsref: LANDWEHRCC25 Gläubiger-ID: DE85ZZZ00002471357 SEPA-BASISLASTSCHRIFT wiederholend')
+      const wegInfo = getMerchantBrandInfo(
+        'WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld Landwehrweg End-to-End-Ref.: NOTPROVIDED Mandatsref: LANDWEHRCC25 Gläubiger-ID: DE85ZZZ00002471357 SEPA-BASISLASTSCHRIFT wiederholend',
+      )
       expect(wegInfo.merchant?.id).toBe('weg-landwehrweg')
       expect(wegInfo.logoComponent).not.toBe(MERCHANT_LOGOS.BadHomburgLogo)
       expect(wegInfo.suggestedCategory).toBe('Rent')
@@ -2196,141 +2357,195 @@ describe('category-icons', () => {
       expect(hasMerchantLogo(heinzOttoTx)).toBe(false)
 
       // 15. FNZ Bank AG (formerly ebase)
-      const fnzInfo = getMerchantBrandInfo('FNZ Bank AG (ehemals ebase AG) 9914335757302 Kauf 0,077528 Ant am 05.10.2023 zu 322,465500')
+      const fnzInfo = getMerchantBrandInfo(
+        'FNZ Bank AG (ehemals ebase AG) 9914335757302 Kauf 0,077528 Ant am 05.10.2023 zu 322,465500',
+      )
       expect(fnzInfo.merchant?.id).toBe('fnz-bank')
       expect(fnzInfo.logoComponent).toBe(MERCHANT_LOGOS.FnzBankLogo)
       expect(fnzInfo.suggestedCategory).toBe('Savings')
 
       // 16. Ratsstube Restaurant Rothenburg
-      const ratsstubeInfo = getMerchantBrandInfo('Ratsstube Restaurant Rothenburg ob DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card Ratsstube R')
+      const ratsstubeInfo = getMerchantBrandInfo(
+        'Ratsstube Restaurant Rothenburg ob DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card Ratsstube R',
+      )
       expect(ratsstubeInfo.merchant?.id).toBe('ratsstube')
       expect(ratsstubeInfo.logoComponent).toBe(MERCHANT_LOGOS.RatsstubeLogo)
       expect(ratsstubeInfo.suggestedCategory).toBe('Dining Out')
 
       // 17. sander Hotel Koblenz
-      const sanderInfo = getMerchantBrandInfo('sander Hotel Koblenz DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card sander Hotel Koblenz DEU 2')
+      const sanderInfo = getMerchantBrandInfo(
+        'sander Hotel Koblenz DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card sander Hotel Koblenz DEU 2',
+      )
       expect(sanderInfo.merchant?.id).toBe('sander-hotel')
       expect(sanderInfo.logoComponent).toBe(MERCHANT_LOGOS.SanderHotelLogo)
       expect(sanderInfo.suggestedCategory).toBe('Travel')
 
       // 18. Smoothie Bar Antalya
-      const smoothieInfo = getMerchantBrandInfo('SMOOTHIE BAR ANTALYA TR Karte Nr. 5355 0000 0000 0000 Virtual Debit Card SMOOTHIE BAR ANTI')
+      const smoothieInfo = getMerchantBrandInfo(
+        'SMOOTHIE BAR ANTALYA TR Karte Nr. 5355 0000 0000 0000 Virtual Debit Card SMOOTHIE BAR ANTI',
+      )
       expect(smoothieInfo.merchant?.id).toBe('smoothie-bar-antalya')
       expect(smoothieInfo.logoComponent).toBe(MERCHANT_LOGOS.SmoothieBarAntalyaLogo)
       expect(smoothieInfo.suggestedCategory).toBe('Dining Out')
 
       // 19. ICTUR Antalya Airport Dining
-      const icturInfo = getMerchantBrandInfo('ICTUR YIYECEK VE ICECE ANTALYA TR Karte Nr. 5355 0000 0000 0000 Virtual Debit Card ICTUR YIYE')
+      const icturInfo = getMerchantBrandInfo(
+        'ICTUR YIYECEK VE ICECE ANTALYA TR Karte Nr. 5355 0000 0000 0000 Virtual Debit Card ICTUR YIYE',
+      )
       expect(icturInfo.merchant?.id).toBe('ictur')
       expect(icturInfo.logoComponent).toBe(MERCHANT_LOGOS.IcturLogo)
       expect(icturInfo.suggestedCategory).toBe('Dining Out')
 
       // 20. Hrvatske autoceste (HAC A3 Velika Kopanica)
-      const hacInfo = getMerchantBrandInfo('AUTOCESTA A3 V.KOPANIC VELIKA KOPA N HR Karte Nr. 5355 0000 0000 0000 Virtual Debit Card AU')
+      const hacInfo = getMerchantBrandInfo(
+        'AUTOCESTA A3 V.KOPANIC VELIKA KOPA N HR Karte Nr. 5355 0000 0000 0000 Virtual Debit Card AU',
+      )
       expect(hacInfo.merchant?.id).toBe('hac-autoceste')
       expect(hacInfo.logoComponent).toBe(MERCHANT_LOGOS.HacAutocesteLogo)
       expect(hacInfo.suggestedCategory).toBe('Transport')
 
       // 21. Wasserpalast Graz-Liebenau
-      const wasserpalastInfo = getMerchantBrandInfo('WASSERPALAST GRAZ-LIEBENAU AT Karte Nr. 5355 0000 0000 0000 Virtual Debit Card WASSERPAL')
+      const wasserpalastInfo = getMerchantBrandInfo(
+        'WASSERPALAST GRAZ-LIEBENAU AT Karte Nr. 5355 0000 0000 0000 Virtual Debit Card WASSERPAL',
+      )
       expect(wasserpalastInfo.merchant?.id).toBe('wasserpalast')
       expect(wasserpalastInfo.logoComponent).toBe(MERCHANT_LOGOS.WasserpalastLogo)
       expect(wasserpalastInfo.suggestedCategory).toBe('Dining Out')
 
       // 22. toom Baumarkt
-      const toomInfo = getMerchantBrandInfo('toom BM Oberursel, OBERURSEL DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Car')
+      const toomInfo = getMerchantBrandInfo(
+        'toom BM Oberursel, OBERURSEL DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Car',
+      )
       expect(toomInfo.merchant?.id).toBe('toom')
       expect(toomInfo.logoComponent).toBe(MERCHANT_LOGOS.ToomLogo)
       expect(toomInfo.suggestedCategory).toBe('Shopping')
 
       // Batch 12:
       // 1. mobilezone GmbH / HIGH mobile
-      const mobilezoneInfo = getMerchantBrandInfo('mobilezone GmbH 3243033328 End-to-End-Ref.: 0077110000ZV2612446Z Mandatsref: HIGH-16540')
+      const mobilezoneInfo = getMerchantBrandInfo(
+        'mobilezone GmbH 3243033328 End-to-End-Ref.: 0077110000ZV2612446Z Mandatsref: HIGH-16540',
+      )
       expect(mobilezoneInfo.merchant?.id).toBe('mobilezone')
       expect(mobilezoneInfo.logoComponent).toBe(MERCHANT_LOGOS.MobilezoneLogo)
       expect(mobilezoneInfo.suggestedCategory).toBe('Communication')
 
       // 2. Kontoführung Commerzbank
-      const kf2026Info = getMerchantBrandInfo('Kontoführung Konto 123456700 EUR BLZ 500 400 00 vom 01.06.2026 bis 30.06.2026 Kontoführung')
+      const kf2026Info = getMerchantBrandInfo(
+        'Kontoführung Konto 123456700 EUR BLZ 500 400 00 vom 01.06.2026 bis 30.06.2026 Kontoführung',
+      )
       expect(kf2026Info.merchant?.id).toBe('commerzbank')
       expect(kf2026Info.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
 
       // 3. Stadtkasse Bad Nauheim
-      const badNauheimInfo = getMerchantBrandInfo('STADTKASSE BAD NAUHEIM PBNKDEFFXXX DE34440100460141202460 0298350131 End-to-End-R')
+      const badNauheimInfo = getMerchantBrandInfo(
+        'STADTKASSE BAD NAUHEIM PBNKDEFFXXX DE34440100460141202460 0298350131 End-to-End-R',
+      )
       expect(badNauheimInfo.merchant?.id).toBe('stadt-bad-nauheim')
       expect(badNauheimInfo.logoComponent).toBe(MERCHANT_LOGOS.BadNauheimLogo)
       expect(badNauheimInfo.suggestedCategory).toBe('Taxes')
 
       // 4. Kronberg Talstation Jakobsbad CH
-      const kronbergInfo = getMerchantBrandInfo('Kronberg Talstation, Jakobsbad CH Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card')
+      const kronbergInfo = getMerchantBrandInfo(
+        'Kronberg Talstation, Jakobsbad CH Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card',
+      )
       expect(kronbergInfo.merchant?.id).toBe('kronberg')
       expect(kronbergInfo.logoComponent).toBe(MERCHANT_LOGOS.KronbergLogo)
       expect(kronbergInfo.suggestedCategory).toBe('Entertainment')
 
       // 5. SEA LIFE Konstanz GmbH
-      const seaLifeInfo = getMerchantBrandInfo('SEA LIFE Konstanz GmbH, Hamburg DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit')
+      const seaLifeInfo = getMerchantBrandInfo(
+        'SEA LIFE Konstanz GmbH, Hamburg DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit',
+      )
       expect(seaLifeInfo.merchant?.id).toBe('sea-life')
       expect(seaLifeInfo.logoComponent).toBe(MERCHANT_LOGOS.SeaLifeLogo)
       expect(seaLifeInfo.suggestedCategory).toBe('Entertainment')
 
       // 6. Hotel Neckarlux Heidelberg
-      const neckarluxInfo = getMerchantBrandInfo('HOTEL NECKARLUX INH. CUENE//HEIDELB 2026-04-18T15:59:01 KFN 0 VJ 2812 Kartenzahlung')
+      const neckarluxInfo = getMerchantBrandInfo(
+        'HOTEL NECKARLUX INH. CUENE//HEIDELB 2026-04-18T15:59:01 KFN 0 VJ 2812 Kartenzahlung',
+      )
       expect(neckarluxInfo.merchant?.id).toBe('hotel-neckarlux')
       expect(neckarluxInfo.logoComponent).toBe(MERCHANT_LOGOS.HotelNeckarluxLogo)
       expect(neckarluxInfo.suggestedCategory).toBe('Travel')
 
       // 7. authentic play GmbH (PayPal)
-      const authenticPlayInfo = getMerchantBrandInfo('PayPal Europe S.a.r.l. et Cie S.C.A 1048027847722/PP.4585.PP/. authenti c play GmbH, Ihr Einkauf bei')
+      const authenticPlayInfo = getMerchantBrandInfo(
+        'PayPal Europe S.a.r.l. et Cie S.C.A 1048027847722/PP.4585.PP/. authenti c play GmbH, Ihr Einkauf bei',
+      )
       expect(authenticPlayInfo.merchant?.id).toBe('authentic-play')
       expect(authenticPlayInfo.logoComponent).toBe(MERCHANT_LOGOS.AuthenticPlayLogo)
       expect(authenticPlayInfo.suggestedCategory).toBe('Shopping')
 
       // 8. Chidoba Mexican Grill Sulzbach
-      const chidobaInfo = getMerchantBrandInfo('Chidoba Mexican Grill, Sulzbach DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Car')
+      const chidobaInfo = getMerchantBrandInfo(
+        'Chidoba Mexican Grill, Sulzbach DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Car',
+      )
       expect(chidobaInfo.merchant?.id).toBe('chidoba')
       expect(chidobaInfo.merchant?.brandColor).toBe('#DE3439')
       expect(chidobaInfo.logoComponent).toBe(MERCHANT_LOGOS.ChidobaLogo)
       expect(chidobaInfo.suggestedCategory).toBe('Dining Out')
 
-      const chidobaFullInfo = getMerchantBrandInfo('Chidoba Mexican Grill, Sulzbach  DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2026-01-01 12:00:00')
+      const chidobaFullInfo = getMerchantBrandInfo(
+        'Chidoba Mexican Grill, Sulzbach  DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2026-01-01 12:00:00',
+      )
       expect(chidobaFullInfo.merchant?.id).toBe('chidoba')
       expect(chidobaFullInfo.merchant?.brandColor).toBe('#DE3439')
       expect(chidobaFullInfo.logoComponent).toBe(MERCHANT_LOGOS.ChidobaLogo)
       expect(chidobaFullInfo.suggestedCategory).toBe('Dining Out')
 
       // 9. Store 3798 Bad Homburg (uses default Dining Out category logo)
-      const badHomburgStoreInfo = getMerchantBrandInfo('3798 Bad Homburg von d, Bad Homburg v DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual')
+      const badHomburgStoreInfo = getMerchantBrandInfo(
+        '3798 Bad Homburg von d, Bad Homburg v DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual',
+      )
       expect(badHomburgStoreInfo.merchant?.id).toBe('bad-homburg-store')
       expect(badHomburgStoreInfo.logoComponent).toBe(AVAILABLE_ICONS.Utensils)
       expect(badHomburgStoreInfo.suggestedCategory).toBe('Dining Out')
-      expect(hasMerchantLogo('3798 Bad Homburg von d, Bad Homburg v DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual')).toBe(false)
+      expect(
+        hasMerchantLogo(
+          '3798 Bad Homburg von d, Bad Homburg v DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual',
+        ),
+      ).toBe(false)
 
-      const badHomburgFullInfo = getMerchantBrandInfo('3798 Bad Homburg von d, Bad Homburg  v  DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2026-01-01 12:00:00')
+      const badHomburgFullInfo = getMerchantBrandInfo(
+        '3798 Bad Homburg von d, Bad Homburg  v  DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2026-01-01 12:00:00',
+      )
       expect(badHomburgFullInfo.merchant?.id).toBe('bad-homburg-store')
       expect(badHomburgFullInfo.logoComponent).toBe(AVAILABLE_ICONS.Utensils)
       expect(badHomburgFullInfo.suggestedCategory).toBe('Dining Out')
-      expect(hasMerchantLogo('3798 Bad Homburg von d, Bad Homburg  v  DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2026-01-01 12:00:00')).toBe(false)
+      expect(
+        hasMerchantLogo(
+          '3798 Bad Homburg von d, Bad Homburg  v  DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2026-01-01 12:00:00',
+        ),
+      ).toBe(false)
 
       // 10. CPC Parkhaus Nürnberg
-      const cpcInfo = getMerchantBrandInfo('CPC Parkhaus Nuernberg, Nuernberg DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debi')
+      const cpcInfo = getMerchantBrandInfo(
+        'CPC Parkhaus Nuernberg, Nuernberg DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debi',
+      )
       expect(cpcInfo.merchant?.id).toBe('cpc-parkhaus')
       expect(cpcInfo.logoComponent).toBe(MERCHANT_LOGOS.CpcParkhausLogo)
       expect(cpcInfo.suggestedCategory).toBe('Transport')
 
       // 11. FAO Eating Point Faro Airport
-      const eatingPointInfo = getMerchantBrandInfo('FAO EATING POINT, FARO PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2025')
+      const eatingPointInfo = getMerchantBrandInfo(
+        'FAO EATING POINT, FARO PT Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit Card 2025',
+      )
       expect(eatingPointInfo.merchant?.id).toBe('eating-point')
       expect(eatingPointInfo.logoComponent).toBe(MERCHANT_LOGOS.EatingPointLogo)
       expect(eatingPointInfo.suggestedCategory).toBe('Dining Out')
 
       // 12. DJH Jugendherberge Nürnberg Kaiserburg
-      const jhInfo = getMerchantBrandInfo('Jugendherberge Nuernbe, Nuernberg DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit')
+      const jhInfo = getMerchantBrandInfo(
+        'Jugendherberge Nuernbe, Nuernberg DE Karte Nr. 5355 00XX XXXX 0000 Kartenzahlung Virtual Debit',
+      )
       expect(jhInfo.merchant?.id).toBe('jugendherberge-nuernberg')
       expect(jhInfo.logoComponent).toBe(MERCHANT_LOGOS.JugendherbergeNuernbergLogo)
       expect(jhInfo.suggestedCategory).toBe('Travel')
 
       // 13. Volkshochschule Bad Homburg
-      const vhsInfo = getMerchantBrandInfo('VOLKSHOCHSCHULE//BAD HOMBURG/DE 2024-11-19T09:28:16 KFN 0 VJ 2412 Kartenzahlung')
+      const vhsInfo = getMerchantBrandInfo(
+        'VOLKSHOCHSCHULE//BAD HOMBURG/DE 2024-11-19T09:28:16 KFN 0 VJ 2412 Kartenzahlung',
+      )
       expect(vhsInfo.merchant?.id).toBe('vhs-bad-homburg')
       expect(vhsInfo.logoComponent).toBe(MERCHANT_LOGOS.VhsBadHomburgLogo)
       expect(vhsInfo.suggestedCategory).toBe('Education')
@@ -2345,7 +2560,9 @@ describe('category-icons', () => {
       expect(rasthausInfo.brandColor).toBe('#B0063E')
 
       // 15. Burger King Rosdorf (BK 31590 SOT Rosdorf)
-      const bkInfo = getMerchantBrandInfo('BK 31590 SOT ROSDORF DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card BK 31590 SOT ROSDO')
+      const bkInfo = getMerchantBrandInfo(
+        'BK 31590 SOT ROSDORF DE Karte Nr. 5355 0000 0000 0000 Virtual Debit Card BK 31590 SOT ROSDO',
+      )
       expect(bkInfo.merchant?.id).toBe('burgerking')
       expect(bkInfo.logoComponent).toBe(MERCHANT_LOGOS.BurgerKingLogo)
       expect(bkInfo.suggestedCategory).toBe('Dining Out')
@@ -2459,7 +2676,9 @@ describe('category-icons', () => {
 
       // 2. XsollaLogo
       const { container: c2 } = render(
-        <div>{getCategoryIcon('Entertainment', 24, undefined, 'Xsolla HK Limited Game Checkout')}</div>,
+        <div>
+          {getCategoryIcon('Entertainment', 24, undefined, 'Xsolla HK Limited Game Checkout')}
+        </div>,
       )
       const img2 = c2.querySelector('img')
       expect(img2).toBeInTheDocument()
@@ -2722,7 +2941,9 @@ describe('category-icons', () => {
       expect(kinderInfo.logoComponent).toBe(MERCHANT_LOGOS.KinderplanetLogo)
       expect(kinderInfo.suggestedCategory).toBe('Entertainment')
 
-      const { container: kinderContainer } = render(React.createElement(MERCHANT_LOGOS.KinderplanetLogo, { size: 24 }))
+      const { container: kinderContainer } = render(
+        React.createElement(MERCHANT_LOGOS.KinderplanetLogo, { size: 24 }),
+      )
       const kinderImg = kinderContainer.querySelector('img')
       expect(kinderImg).toBeTruthy()
       expect(kinderImg?.getAttribute('data-brand-logo')).toBe('true')
@@ -2854,7 +3075,12 @@ describe('category-icons', () => {
       expect(paypalTruncatedInfo.merchant?.name).toBe('PayPal')
       expect(paypalTruncatedInfo.logoComponent).toBe(MERCHANT_LOGOS.SiPaypal)
       expect(paypalTruncatedInfo.brandColor).toBe('#00457C')
-      const icon = getCategoryIcon('Shopping', 20, undefined, 'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1049039954031 PP.4585.PP . PayPal ( Europe) S.a r.l. et Cie, SCA, I')
+      const icon = getCategoryIcon(
+        'Shopping',
+        20,
+        undefined,
+        'PayPal (Europe) S.a r.l. et Cie, S. C.A. 1049039954031 PP.4585.PP . PayPal ( Europe) S.a r.l. et Cie, SCA, I',
+      )
       expect(React.isValidElement(icon) && icon.type === MERCHANT_LOGOS.SiPaypal).toBe(true)
 
       // 47. Edukativni Centar Rani Razvoj (Mladenovac)
@@ -2956,7 +3182,9 @@ describe('category-icons', () => {
       ]
 
       for (const item of logos) {
-        const { container } = render(<div>{getCategoryIcon('Shopping', 24, undefined, item.desc)}</div>)
+        const { container } = render(
+          <div>{getCategoryIcon('Shopping', 24, undefined, item.desc)}</div>,
+        )
         const img = container.querySelector('img')
         expect(img, `Logo image for ${item.label} should render`).toBeInTheDocument()
         expect(img).toHaveAttribute('aria-label', item.label)
@@ -3061,7 +3289,9 @@ describe('category-icons', () => {
 
       // Brand info resolution
       expect(getMerchantBrandInfo('Mercedes-Benz AG').logoComponent).toBe(MercedesLogo)
-      expect(getMerchantBrandInfo('Allg.Deutscher Automobil-Club ADAC e.V.').logoComponent).toBe(AdacLogo)
+      expect(getMerchantBrandInfo('Allg.Deutscher Automobil-Club ADAC e.V.').logoComponent).toBe(
+        AdacLogo,
+      )
       expect(getMerchantBrandInfo('RMV Ticket Service').logoComponent).toBe(RmvLogo)
       expect(getMerchantBrandInfo('Aral Tankstelle').logoComponent).toBe(AralLogo)
       expect(getMerchantBrandInfo('Deutsche Bahn DB Fernverkehr').logoComponent).toBe(DbLogo)
@@ -3095,7 +3325,9 @@ describe('category-icons', () => {
       expect(tuiSvg?.getAttribute('aria-label')).toBe('TUI')
 
       // Render EurowingsLogo
-      const { container: eurowingsContainer } = render(React.createElement(EurowingsLogo, { size: 20 }))
+      const { container: eurowingsContainer } = render(
+        React.createElement(EurowingsLogo, { size: 20 }),
+      )
       const eurowingsElement = eurowingsContainer.querySelector('[data-brand-logo="true"]')
       expect(eurowingsElement).toBeTruthy()
       expect(eurowingsElement?.getAttribute('data-brand-logo')).toBe('true')
@@ -3109,13 +3341,17 @@ describe('category-icons', () => {
       expect(dertourElement?.classList.contains('brand-logo-full')).toBe(true)
 
       // Render AlltoursLogo
-      const { container: alltoursContainer } = render(React.createElement(AlltoursLogo, { size: 20 }))
+      const { container: alltoursContainer } = render(
+        React.createElement(AlltoursLogo, { size: 20 }),
+      )
       const alltoursElement = alltoursContainer.querySelector('[data-brand-logo="true"]')
       expect(alltoursElement?.getAttribute('data-brand-logo')).toBe('true')
       expect(alltoursElement?.classList.contains('brand-logo-full')).toBe(true)
 
       // Render SchauinslandLogo
-      const { container: schauContainer } = render(React.createElement(SchauinslandLogo, { size: 20 }))
+      const { container: schauContainer } = render(
+        React.createElement(SchauinslandLogo, { size: 20 }),
+      )
       const schauElement = schauContainer.querySelector('[data-brand-logo="true"]')
       expect(schauElement?.getAttribute('data-brand-logo')).toBe('true')
       expect(schauElement?.classList.contains('brand-logo-full')).toBe(true)
@@ -3129,8 +3365,9 @@ describe('category-icons', () => {
       // Brand info resolution
       expect(getMerchantBrandInfo('TUI Deutschland GmbH').logoComponent).toBe(TuiLogo)
       expect(
-        getMerchantBrandInfo('holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Max Must')
-          .logoComponent
+        getMerchantBrandInfo(
+          'holidays.ch GmbH Ihre Reisebuchung/Eurowings Holiday s/0022241300/41122589/20230818Max Must',
+        ).logoComponent,
       ).toBe(EurowingsLogo)
       expect(getMerchantBrandInfo('DERTOUR Reisebüro').logoComponent).toBe(DertourLogo)
       expect(getMerchantBrandInfo('alltours flugreisen').logoComponent).toBe(AlltoursLogo)
@@ -3162,7 +3399,9 @@ describe('category-icons', () => {
       expect(FinanzamtLogo).toBe(GermanyFlagLogo)
 
       // Render WundertaxLogo
-      const { container: wundertaxContainer } = render(React.createElement(WundertaxLogo, { size: 20 }))
+      const { container: wundertaxContainer } = render(
+        React.createElement(WundertaxLogo, { size: 20 }),
+      )
       const wundertaxSvg = wundertaxContainer.querySelector('svg')
       expect(wundertaxSvg?.getAttribute('data-brand-logo')).toBe('true')
       expect(wundertaxSvg?.classList.contains('brand-logo-full')).toBe(true)
@@ -3176,7 +3415,9 @@ describe('category-icons', () => {
       expect(taxfixSvg?.style.borderRadius).toBe('inherit')
 
       // Render SmartsteuerLogo
-      const { container: smartsteuerContainer } = render(React.createElement(SmartsteuerLogo, { size: 20 }))
+      const { container: smartsteuerContainer } = render(
+        React.createElement(SmartsteuerLogo, { size: 20 }),
+      )
       const smartsteuerSvg = smartsteuerContainer.querySelector('svg')
       expect(smartsteuerSvg?.getAttribute('data-brand-logo')).toBe('true')
       expect(smartsteuerSvg?.classList.contains('brand-logo-full')).toBe(true)
@@ -3197,28 +3438,36 @@ describe('category-icons', () => {
       expect(wisoSvg?.style.borderRadius).toBe('inherit')
 
       // Render FaerberHutzelLogo
-      const { container: faerberContainer } = render(React.createElement(FaerberHutzelLogo, { size: 20 }))
+      const { container: faerberContainer } = render(
+        React.createElement(FaerberHutzelLogo, { size: 20 }),
+      )
       const faerberSvg = faerberContainer.querySelector('svg')
       expect(faerberSvg?.getAttribute('data-brand-logo')).toBe('true')
       expect(faerberSvg?.classList.contains('brand-logo-full')).toBe(true)
       expect(faerberSvg?.style.borderRadius).toBe('inherit')
 
       // Render FinanzamtLogo (GermanyFlagLogo)
-      const { container: finanzamtContainer } = render(React.createElement(FinanzamtLogo, { size: 20 }))
+      const { container: finanzamtContainer } = render(
+        React.createElement(FinanzamtLogo, { size: 20 }),
+      )
       const finanzamtSvg = finanzamtContainer.querySelector('svg')
       expect(finanzamtSvg?.getAttribute('data-brand-logo')).toBe('true')
       expect(finanzamtSvg?.classList.contains('brand-logo-full')).toBe(true)
       expect(finanzamtSvg?.style.borderRadius).toBe('inherit')
 
       // Render BadHomburgLogo
-      const { container: badHomburgContainer } = render(React.createElement(BadHomburgLogo, { size: 20 }))
+      const { container: badHomburgContainer } = render(
+        React.createElement(BadHomburgLogo, { size: 20 }),
+      )
       const badHomburgSvg = badHomburgContainer.querySelector('svg')
       expect(badHomburgSvg?.getAttribute('data-brand-logo')).toBe('true')
       expect(badHomburgSvg?.classList.contains('brand-logo-full')).toBe(true)
       expect(badHomburgSvg?.style.borderRadius).toBe('inherit')
 
       // Render SchmittenLogo
-      const { container: schmittenContainer } = render(React.createElement(SchmittenLogo, { size: 20 }))
+      const { container: schmittenContainer } = render(
+        React.createElement(SchmittenLogo, { size: 20 }),
+      )
       const schmittenSvg = schmittenContainer.querySelector('svg')
       expect(schmittenSvg?.getAttribute('data-brand-logo')).toBe('true')
       expect(schmittenSvg?.classList.contains('brand-logo-full')).toBe(true)
@@ -3232,14 +3481,18 @@ describe('category-icons', () => {
       expect(hessenSvg?.style.borderRadius).toBe('inherit')
 
       // Render KelkheimLogo (img)
-      const { container: kelkheimContainer } = render(React.createElement(KelkheimLogo, { size: 20 }))
+      const { container: kelkheimContainer } = render(
+        React.createElement(KelkheimLogo, { size: 20 }),
+      )
       const kelkheimImg = kelkheimContainer.querySelector('img')
       expect(kelkheimImg?.getAttribute('data-brand-logo')).toBe('true')
       expect(kelkheimImg?.classList.contains('brand-logo-full')).toBe(true)
       expect(kelkheimImg?.style.borderRadius).toBe('inherit')
 
       // Render HochtaunuskreisLogo (img)
-      const { container: htkContainer } = render(React.createElement(HochtaunuskreisLogo, { size: 20 }))
+      const { container: htkContainer } = render(
+        React.createElement(HochtaunuskreisLogo, { size: 20 }),
+      )
       const htkImg = htkContainer.querySelector('img')
       expect(htkImg?.getAttribute('data-brand-logo')).toBe('true')
       expect(htkImg?.classList.contains('brand-logo-full')).toBe(true)
@@ -3475,9 +3728,7 @@ describe('category-icons', () => {
       const { SparLogo } = MERCHANT_LOGOS
       expect(SparLogo).toBeTruthy()
 
-      const { container: logoContainer } = render(
-        React.createElement(SparLogo, { size: 24 }),
-      )
+      const { container: logoContainer } = render(React.createElement(SparLogo, { size: 24 }))
       const logoImg = logoContainer.querySelector('img')
       expect(logoImg).toBeTruthy()
       expect(logoImg?.getAttribute('data-brand-logo')).toBe('true')
@@ -3508,9 +3759,7 @@ describe('category-icons', () => {
       expect(SiGooglepay).toBe(GooglePayLogo)
 
       // Render GooglePayLogo directly
-      const { container: logoContainer } = render(
-        React.createElement(GooglePayLogo, { size: 24 }),
-      )
+      const { container: logoContainer } = render(React.createElement(GooglePayLogo, { size: 24 }))
       const logoImg = logoContainer.querySelector('img')
       expect(logoImg).toBeTruthy()
       expect(logoImg?.getAttribute('data-brand-logo')).toBe('true')
@@ -3601,18 +3850,36 @@ describe('category-icons', () => {
     })
 
     it('returns true for newly supported retail, dining, travel, and banking merchants', () => {
-      expect(hasMerchantLogo('PayPal Europe S.a.r.l. et Cie S.C.A 1034066035058/PP.4585.PP/. Wunschgu tschein GmbH')).toBe(true)
-      expect(hasMerchantLogo('PayPal Europe S.a.r.l. et Cie S.C.A 1034839345667/PP.4585.PP/. Snap Out door Sp. z o.o.')).toBe(true)
-      expect(hasMerchantLogo('PayPal Europe S.a.r.l. et Cie S.C.A 1029466710300 Airport Parking GmbH')).toBe(true)
+      expect(
+        hasMerchantLogo(
+          'PayPal Europe S.a.r.l. et Cie S.C.A 1034066035058/PP.4585.PP/. Wunschgu tschein GmbH',
+        ),
+      ).toBe(true)
+      expect(
+        hasMerchantLogo(
+          'PayPal Europe S.a.r.l. et Cie S.C.A 1034839345667/PP.4585.PP/. Snap Out door Sp. z o.o.',
+        ),
+      ).toBe(true)
+      expect(
+        hasMerchantLogo('PayPal Europe S.a.r.l. et Cie S.C.A 1029466710300 Airport Parking GmbH'),
+      ).toBe(true)
       expect(hasMerchantLogo('THAI SNACK GASTRONOMIE Frankfurt DE')).toBe(true)
       expect(hasMerchantLogo('FCS Feinkost Catering Frankfurt DE')).toBe(true)
       expect(hasMerchantLogo('SANJA PETRUSIC ESBCHR22XXX HR3024020063200783081 Knjige')).toBe(true)
-      expect(hasMerchantLogo('WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld')).toBe(false)
+      expect(hasMerchantLogo('WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld')).toBe(
+        false,
+      )
       expect(hasMerchantLogo('Erika Mustermann Kundenreferenz: CD-SCT-INST-665122573')).toBe(true)
-      expect(hasMerchantLogo('MAX O. ERIKA MUSTERMANN GENODEF1S01 DE36550905000000000001 KREDITRATE')).toBe(true)
-      expect(hasMerchantLogo('MAX MUSTERMANN NTSBDEB1XXX DE35100110010000000001 FOR SPACES.')).toBe(true)
+      expect(
+        hasMerchantLogo('MAX O. ERIKA MUSTERMANN GENODEF1S01 DE36550905000000000001 KREDITRATE'),
+      ).toBe(true)
+      expect(hasMerchantLogo('MAX MUSTERMANN NTSBDEB1XXX DE35100110010000000001 FOR SPACES.')).toBe(
+        true,
+      )
       expect(hasMerchantLogo('ERIKA MUSTERMANN Help End-to-End-Ref.: MOB.341.UE.33587')).toBe(true)
-      expect(hasMerchantLogo('Das mobileTAN-Verfahren ist zwar sicher, aber nicht mehr zeitgemäß.')).toBe(true)
+      expect(
+        hasMerchantLogo('Das mobileTAN-Verfahren ist zwar sicher, aber nicht mehr zeitgemäß.'),
+      ).toBe(true)
     })
 
     it('resolves merchant logo via counterpartyIban when description is non-branded', () => {
@@ -3635,16 +3902,26 @@ describe('category-icons', () => {
   describe('rendering new brand logos', () => {
     it('renders newly added official brand assets correctly into DOM', () => {
       // Erste Bank
-      const { container: ersteContainer } = render(<div>{getCategoryIcon('Transfers', 24, undefined, 'ESBCHR22XXX Erste Bank')}</div>)
+      const { container: ersteContainer } = render(
+        <div>{getCategoryIcon('Transfers', 24, undefined, 'ESBCHR22XXX Erste Bank')}</div>,
+      )
       expect(ersteContainer.querySelector('img')?.getAttribute('src')).toBe('/banks/erste-bank.svg')
 
       // Wunschgutschein
-      const { container: wunschContainer } = render(<div>{getCategoryIcon('Shopping', 24, undefined, 'Wunschgutschein GmbH')}</div>)
-      expect(wunschContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/wunschgutschein.svg')
+      const { container: wunschContainer } = render(
+        <div>{getCategoryIcon('Shopping', 24, undefined, 'Wunschgutschein GmbH')}</div>,
+      )
+      expect(wunschContainer.querySelector('img')?.getAttribute('src')).toBe(
+        '/brands/wunschgutschein.svg',
+      )
 
       // Snap Outdoor
-      const { container: snapContainer } = render(<div>{getCategoryIcon('Shopping', 24, undefined, 'Snap Outdoor Sp. z o.o.')}</div>)
-      expect(snapContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/snap-outdoor.png')
+      const { container: snapContainer } = render(
+        <div>{getCategoryIcon('Shopping', 24, undefined, 'Snap Outdoor Sp. z o.o.')}</div>,
+      )
+      expect(snapContainer.querySelector('img')?.getAttribute('src')).toBe(
+        '/brands/snap-outdoor.png',
+      )
 
       const { container: snapPaypalContainer } = render(
         <div>
@@ -3656,27 +3933,44 @@ describe('category-icons', () => {
           )}
         </div>,
       )
-      expect(snapPaypalContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/snap-outdoor.png')
+      expect(snapPaypalContainer.querySelector('img')?.getAttribute('src')).toBe(
+        '/brands/snap-outdoor.png',
+      )
 
       // Airport Parking
-      const { container: parkingContainer } = render(<div>{getCategoryIcon('Travel', 24, undefined, 'Airport Parking GmbH')}</div>)
-      expect(parkingContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/airport-parking.png')
+      const { container: parkingContainer } = render(
+        <div>{getCategoryIcon('Travel', 24, undefined, 'Airport Parking GmbH')}</div>,
+      )
+      expect(parkingContainer.querySelector('img')?.getAttribute('src')).toBe(
+        '/brands/airport-parking.png',
+      )
 
       // Thai Snack
-      const { container: thaiContainer } = render(<div>{getCategoryIcon('Dining Out', 24, undefined, 'THAI SNACK GASTRONOMIE')}</div>)
+      const { container: thaiContainer } = render(
+        <div>{getCategoryIcon('Dining Out', 24, undefined, 'THAI SNACK GASTRONOMIE')}</div>,
+      )
       expect(thaiContainer.querySelector('img')?.getAttribute('src')).toBe('/brands/thai-snack.png')
 
       // FCS Feinkost Catering
-      const { container: fcsContainer } = render(<div>{getCategoryIcon('Dining Out', 24, undefined, 'FCS Feinkost Catering')}</div>)
+      const { container: fcsContainer } = render(
+        <div>{getCategoryIcon('Dining Out', 24, undefined, 'FCS Feinkost Catering')}</div>,
+      )
       expect(fcsContainer.firstChild).toBeInTheDocument()
 
       // Commerzbank via counterpartyIban
-      const { container: cbIbanContainer } = render(<div>{getCategoryIcon('Transfers', 24, undefined, 'MAX MUSTERMANN', 'DE92500400000000000001')}</div>)
-      expect(cbIbanContainer.querySelector('img')?.getAttribute('src')).toBe('/banks/commerzbank.png')
+      const { container: cbIbanContainer } = render(
+        <div>
+          {getCategoryIcon('Transfers', 24, undefined, 'MAX MUSTERMANN', 'DE92500400000000000001')}
+        </div>,
+      )
+      expect(cbIbanContainer.querySelector('img')?.getAttribute('src')).toBe(
+        '/banks/commerzbank.png',
+      )
     })
 
     it('renders Coinbase, Netflix, and Wizz Air with full-bleed brand logo attributes and proper labels', () => {
-      const { CoinbaseLogo, NetflixLogo, WizzAirLogo, SiCoinbase, SiNetflix, SiWizzair } = MERCHANT_LOGOS
+      const { CoinbaseLogo, NetflixLogo, WizzAirLogo, SiCoinbase, SiNetflix, SiWizzair } =
+        MERCHANT_LOGOS
 
       expect(CoinbaseLogo).toBeTruthy()
       expect(NetflixLogo).toBeTruthy()
@@ -3710,20 +4004,26 @@ describe('category-icons', () => {
       expect(wizzSvg?.getAttribute('aria-label')).toBe('Wizz Air')
 
       // Check getCategoryIcon integration
-      const { container: cbIconContainer } = render(<div>{getCategoryIcon('Crypto', 24, undefined, 'Coinbase Ireland Limited')}</div>)
+      const { container: cbIconContainer } = render(
+        <div>{getCategoryIcon('Crypto', 24, undefined, 'Coinbase Ireland Limited')}</div>,
+      )
       expect(cbIconContainer.querySelector('svg')?.getAttribute('data-brand-logo')).toBe('true')
       expect(cbIconContainer.querySelector('svg')?.getAttribute('aria-label')).toBe('Coinbase')
 
-      const { container: nfIconContainer } = render(<div>{getCategoryIcon('Entertainment', 24, undefined, 'Netflix Subscription')}</div>)
+      const { container: nfIconContainer } = render(
+        <div>{getCategoryIcon('Entertainment', 24, undefined, 'Netflix Subscription')}</div>,
+      )
       expect(nfIconContainer.querySelector('svg')?.getAttribute('data-brand-logo')).toBe('true')
       expect(nfIconContainer.querySelector('svg')?.getAttribute('aria-label')).toBe('Netflix')
 
-      const { container: wizzIconContainer } = render(<div>{getCategoryIcon('Travel', 24, undefined, 'WIZZ AIR Flight Ticket')}</div>)
+      const { container: wizzIconContainer } = render(
+        <div>{getCategoryIcon('Travel', 24, undefined, 'WIZZ AIR Flight Ticket')}</div>,
+      )
       expect(wizzIconContainer.querySelector('svg')?.getAttribute('data-brand-logo')).toBe('true')
       expect(wizzIconContainer.querySelector('svg')?.getAttribute('aria-label')).toBe('Wizz Air')
     })
 
-    it('renders Vodafone, Heroku, Deutsche Bank, Cloudflare, Lothar Braun, Western Union, O2, McDonald\'s, Apple, Uber, Klarna, and MediaMarkt with full-bleed brand logo attributes and proper labels', () => {
+    it("renders Vodafone, Heroku, Deutsche Bank, Cloudflare, Lothar Braun, Western Union, O2, McDonald's, Apple, Uber, Klarna, and MediaMarkt with full-bleed brand logo attributes and proper labels", () => {
       const {
         VodafoneLogo,
         SiVodafone,
@@ -3775,18 +4075,53 @@ describe('category-icons', () => {
       expect(SiMediamarkt).toBe(MediaMarktLogo)
 
       const testCases = [
-        { logo: VodafoneLogo, label: 'Vodafone', desc: 'Vodafone GmbH Mobilfunk', cat: 'Communication' },
+        {
+          logo: VodafoneLogo,
+          label: 'Vodafone',
+          desc: 'Vodafone GmbH Mobilfunk',
+          cat: 'Communication',
+        },
         { logo: HerokuLogo, label: 'Heroku', desc: 'Heroku hosting monthly', cat: 'Utilities' },
-        { logo: DeutscheBankLogo, label: 'Deutsche Bank', desc: 'Deutsche Bank AG Überweisung', cat: 'Transfers' },
-        { logo: CloudflareLogo, label: 'Cloudflare', desc: 'Cloudflare Inc DNS service', cat: 'Utilities' },
-        { logo: LotharBraunLogo, label: 'Schreinerei Lothar Braun', desc: 'Lothar Braun GmbH Rechnung', cat: 'Shopping' },
-        { logo: WesternUnionLogo, label: 'Western Union', desc: 'Western Union Money Transfer', cat: 'Transfers' },
+        {
+          logo: DeutscheBankLogo,
+          label: 'Deutsche Bank',
+          desc: 'Deutsche Bank AG Überweisung',
+          cat: 'Transfers',
+        },
+        {
+          logo: CloudflareLogo,
+          label: 'Cloudflare',
+          desc: 'Cloudflare Inc DNS service',
+          cat: 'Utilities',
+        },
+        {
+          logo: LotharBraunLogo,
+          label: 'Schreinerei Lothar Braun',
+          desc: 'Lothar Braun GmbH Rechnung',
+          cat: 'Shopping',
+        },
+        {
+          logo: WesternUnionLogo,
+          label: 'Western Union',
+          desc: 'Western Union Money Transfer',
+          cat: 'Transfers',
+        },
         { logo: O2Logo, label: 'O2', desc: 'O2 Telefonica Mobilfunk', cat: 'Communication' },
-        { logo: McdonaldsLogo, label: "McDonald's", desc: "McDonald's Restaurant Burger", cat: 'Dining Out' },
+        {
+          logo: McdonaldsLogo,
+          label: "McDonald's",
+          desc: "McDonald's Restaurant Burger",
+          cat: 'Dining Out',
+        },
         { logo: AppleLogo, label: 'Apple', desc: 'Apple.com / App Store', cat: 'Shopping' },
         { logo: UberLogo, label: 'Uber', desc: 'UBER *TRIP 1234', cat: 'Transport' },
         { logo: KlarnaLogo, label: 'Klarna', desc: 'Klarna Bank AB Rechnung', cat: 'Transfers' },
-        { logo: MediaMarktLogo, label: 'MediaMarkt', desc: 'MediaMarkt Saturn online', cat: 'Shopping' },
+        {
+          logo: MediaMarktLogo,
+          label: 'MediaMarkt',
+          desc: 'MediaMarkt Saturn online',
+          cat: 'Shopping',
+        },
       ]
 
       for (const tc of testCases) {
@@ -3797,7 +4132,9 @@ describe('category-icons', () => {
         expect(svg?.classList.contains('brand-logo-full')).toBe(true)
         expect(svg?.getAttribute('aria-label')).toBe(tc.label)
 
-        const { container: iconContainer } = render(<div>{getCategoryIcon(tc.cat, 24, undefined, tc.desc)}</div>)
+        const { container: iconContainer } = render(
+          <div>{getCategoryIcon(tc.cat, 24, undefined, tc.desc)}</div>,
+        )
         const iconSvg = iconContainer.querySelector('svg')
         expect(iconSvg).toBeTruthy()
         expect(iconSvg?.getAttribute('data-brand-logo')).toBe('true')
@@ -3810,7 +4147,7 @@ describe('category-icons', () => {
   describe('getMerchantBrandInfo for iptiQ / loan protection insurance', () => {
     it('resolves iptiQ brand info and suggests Insurance category', () => {
       const info = getMerchantBrandInfo(
-        'IptiQ Life, S.A., Niederlassung Deu tschland Check 24 Alpha Kredit - 2 End-to-End-Ref.: AE00079526 Mandatsref: AE00079526-000001 Gläubiger-ID: DE08VER00001955733 SEPA-BASISLASTSCHRIFT erstmalig'
+        'IptiQ Life, S.A., Niederlassung Deu tschland Check 24 Alpha Kredit - 2 End-to-End-Ref.: AE00079526 Mandatsref: AE00079526-000001 Gläubiger-ID: DE08VER00001955733 SEPA-BASISLASTSCHRIFT erstmalig',
       )
       expect(info.merchant).toBeDefined()
       expect(info.merchant?.id).toBe('iptiq')
@@ -3819,5 +4156,3 @@ describe('category-icons', () => {
     })
   })
 })
-
-

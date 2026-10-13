@@ -34,7 +34,11 @@ interface CategoryShareTooltipProps {
 }
 
 /** Self-localizing tooltip so the donut can pass Recharts a locale-independent element. */
-const CategoryShareTooltip: React.FC<CategoryShareTooltipProps> = ({ active, payload, totalExpenses }) => {
+const CategoryShareTooltip: React.FC<CategoryShareTooltipProps> = ({
+  active,
+  payload,
+  totalExpenses,
+}) => {
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency } = useFormatters()
 
@@ -48,7 +52,10 @@ const CategoryShareTooltip: React.FC<CategoryShareTooltipProps> = ({ active, pay
   return (
     <div className={styles.tooltipContainer}>
       <div className={styles.tooltipHeader}>
-        <div className={styles.tooltipDot} style={{ backgroundColor: data.color, color: data.color }} />
+        <div
+          className={styles.tooltipDot}
+          style={{ backgroundColor: data.color, color: data.color }}
+        />
         <span className={styles.tooltipTitle}>{getCategoryLabel(data.name, t)}</span>
       </div>
       <div className={styles.tooltipRow}>
@@ -109,14 +116,21 @@ export const ExpenseCategoriesDonut: React.FC<ExpenseCategoriesDonutProps> = Rea
     // Custom Sector renderer with luminous active expansion
     const renderSector = useCallback(
       (props: unknown, index: number) => {
-        const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props as SectorShapeProps
+        const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
+          props as SectorShapeProps
         const angles = { cx, cy, startAngle, endAngle, fill }
 
         if (activeIndex === index) {
           return (
             <g key={`active-sector-${index}`} style={SECTOR_GROUP_STYLE}>
               {/* Luminous outer halo */}
-              <Sector {...angles} innerRadius={outerRadius + 4} outerRadius={outerRadius + 10} opacity={0.35} cornerRadius={4} />
+              <Sector
+                {...angles}
+                innerRadius={outerRadius + 4}
+                outerRadius={outerRadius + 10}
+                opacity={0.35}
+                cornerRadius={4}
+              />
               {/* Main expanded active slice */}
               <Sector
                 {...angles}
@@ -151,7 +165,14 @@ export const ExpenseCategoriesDonut: React.FC<ExpenseCategoriesDonutProps> = Rea
         <PieChart>
           <defs>
             {categories.map((cat, idx) => (
-              <linearGradient key={`pie-grad-${idx}`} id={`pie-grad-${idx}`} x1="0" y1="0" x2="1" y2="1">
+              <linearGradient
+                key={`pie-grad-${idx}`}
+                id={`pie-grad-${idx}`}
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="1"
+              >
                 <stop offset="0%" stopColor={cat.color} stopOpacity={1} />
                 <stop offset="100%" stopColor={cat.color} stopOpacity={0.78} />
               </linearGradient>
@@ -176,7 +197,10 @@ export const ExpenseCategoriesDonut: React.FC<ExpenseCategoriesDonutProps> = Rea
               <Cell key={`cell-${cat.name}`} fill={`url(#pie-grad-${index})`} style={CELL_STYLE} />
             ))}
           </Pie>
-          <Tooltip wrapperStyle={TOOLTIP_WRAPPER_STYLE} content={<CategoryShareTooltip totalExpenses={totalExpenses} />} />
+          <Tooltip
+            wrapperStyle={TOOLTIP_WRAPPER_STYLE}
+            content={<CategoryShareTooltip totalExpenses={totalExpenses} />}
+          />
         </PieChart>
       </ResponsiveContainer>
     )

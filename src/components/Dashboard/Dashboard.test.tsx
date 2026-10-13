@@ -25,12 +25,34 @@ vi.mock('recharts', () => ({
   YAxis: () => <div>YAxis</div>,
   Tooltip: () => <div>Tooltip</div>,
   PieChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Pie: ({ children, shape, data }: { children?: React.ReactNode; shape?: (props: Record<string, unknown>, idx: number) => React.ReactNode; data?: Array<Record<string, unknown>> }) => (
+  Pie: ({
+    children,
+    shape,
+    data,
+  }: {
+    children?: React.ReactNode
+    shape?: (props: Record<string, unknown>, idx: number) => React.ReactNode
+    data?: Array<Record<string, unknown>>
+  }) => (
     <div>
       Pie
       {data?.map((item: Record<string, unknown>, idx: number) => (
         <div key={idx}>
-          {shape ? shape({ ...item, cx: 100, cy: 100, innerRadius: 50, outerRadius: 80, startAngle: 0, endAngle: 180, fill: '#fff' }, idx) : null}
+          {shape
+            ? shape(
+                {
+                  ...item,
+                  cx: 100,
+                  cy: 100,
+                  innerRadius: 50,
+                  outerRadius: 80,
+                  startAngle: 0,
+                  endAngle: 180,
+                  fill: '#fff',
+                },
+                idx,
+              )
+            : null}
         </div>
       ))}
       {children}

@@ -51,7 +51,15 @@ export const TaxfixLogo: IconComponent = ({ size = 16, className }) => (
   >
     <rect width="48" height="48" fill="#24C875" />
     <circle cx="17.5" cy="17.5" r="4.5" fill="#FFFFFF" />
-    <line x1="33" y1="15" x2="15" y2="33" stroke="#FFFFFF" strokeWidth="4.5" strokeLinecap="round" />
+    <line
+      x1="33"
+      y1="15"
+      x2="15"
+      y2="33"
+      stroke="#FFFFFF"
+      strokeWidth="4.5"
+      strokeLinecap="round"
+    />
     <circle cx="30.5" cy="30.5" r="4.5" fill="#FFFFFF" />
   </svg>
 )
@@ -125,14 +133,8 @@ export const ElsterLogo: IconComponent = ({ size = 16, className }) => (
     role="img"
   >
     <rect width="48" height="48" fill="#003366" />
-    <path
-      d="M14 14h18v5H20v4h10v5H20v6h12v5H14V14z"
-      fill="#FFCC00"
-    />
-    <path
-      d="M32 19l4-5 4 5h-8z"
-      fill="#00A3E0"
-    />
+    <path d="M14 14h18v5H20v4h10v5H20v6h12v5H14V14z" fill="#FFCC00" />
+    <path d="M32 19l4-5 4 5h-8z" fill="#00A3E0" />
   </svg>
 )
 ElsterLogo.displayName = 'ElsterLogo'
@@ -187,4 +189,3 @@ export const WisoSteuerLogo: IconComponent = ({ size = 16, className }) => (
 WisoSteuerLogo.displayName = 'WisoSteuerLogo'
 
 export { GermanyFlagLogo as FinanzamtLogo } from './civic-logos'
-

@@ -45,7 +45,8 @@ export const TopMerchantsTooltip: React.FC<TopMerchantsTooltipProps> = ({
   }
 
   const category = data.category || brand.suggestedCategory || 'Other'
-  const share = totalExpenses && totalExpenses > 0 ? ((data.amount / totalExpenses) * 100).toFixed(1) : null
+  const share =
+    totalExpenses && totalExpenses > 0 ? ((data.amount / totalExpenses) * 100).toFixed(1) : null
   const avgLabel =
     data.count === 1
       ? t.perTransaction || 'Per transaction'
@@ -57,12 +58,20 @@ export const TopMerchantsTooltip: React.FC<TopMerchantsTooltipProps> = ({
     <div className={styles.tooltipContainer}>
       <div className={styles.tooltipHeader}>
         <div className={styles.tooltipLogoBox}>
-          <MerchantLogo brand={brand} size={TOOLTIP_LOGO_SIZE} initialsClassName={styles.tooltipInitialsAvatar} />
+          <MerchantLogo
+            brand={brand}
+            size={TOOLTIP_LOGO_SIZE}
+            initialsClassName={styles.tooltipInitialsAvatar}
+          />
         </div>
         <div>
           <p className={styles.tooltipTitle}>{data.name}</p>
           <span className={styles.tooltipCategoryBadge}>
-            <CategoryIcon category={category} size={TOOLTIP_CATEGORY_ICON_SIZE} customCategories={customCategories} />
+            <CategoryIcon
+              category={category}
+              size={TOOLTIP_CATEGORY_ICON_SIZE}
+              customCategories={customCategories}
+            />
             <span>{getCategoryLabel(category, t)}</span>
           </span>
         </div>
@@ -78,7 +87,9 @@ export const TopMerchantsTooltip: React.FC<TopMerchantsTooltipProps> = ({
       {data.count > 0 && (
         <div className={styles.tooltipRow}>
           <span>{avgLabel}</span>
-          <span className={`${styles.tooltipValue} privacy-blur`}>{formatCurrency(data.amount / data.count)}</span>
+          <span className={`${styles.tooltipValue} privacy-blur`}>
+            {formatCurrency(data.amount / data.count)}
+          </span>
         </div>
       )}
       {share && (

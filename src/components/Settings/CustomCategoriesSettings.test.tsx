@@ -87,7 +87,7 @@ describe('CustomCategoriesSettings', () => {
         translations: expect.objectContaining({
           en: 'My Lovely Pets',
         }),
-      })
+      }),
     )
   })
 
@@ -107,7 +107,7 @@ describe('CustomCategoriesSettings', () => {
       expect.objectContaining({
         id: 'custom_1',
         icon: undefined,
-      })
+      }),
     )
   })
 

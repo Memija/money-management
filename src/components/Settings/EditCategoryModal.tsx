@@ -98,9 +98,7 @@ const EditCategoryModalContent: React.FC<EditCategoryModalContentProps> = ({
         <form onSubmit={handleSave} className={styles.scrollArea}>
           {/* Icon Section */}
           <div className={styles.section}>
-            <label className={styles.sectionLabel}>
-              {t.chooseIconTitle || 'Category Icon'}
-            </label>
+            <label className={styles.sectionLabel}>{t.chooseIconTitle || 'Category Icon'}</label>
             <div className={styles.iconRow}>
               <button
                 type="button"
@@ -151,11 +149,7 @@ const EditCategoryModalContent: React.FC<EditCategoryModalContentProps> = ({
                     key={loc}
                     className={`${styles.translationRow} ${isCurrent ? styles.activeRow : ''}`}
                   >
-                    <img
-                      src={localeLabels[loc].flag}
-                      alt=""
-                      className={styles.flagIcon}
-                    />
+                    <img src={localeLabels[loc].flag} alt="" className={styles.flagIcon} />
                     <span className={styles.langLabel}>
                       {localeLabels[loc].native}
                       {isCurrent && ' *'}
@@ -175,18 +169,10 @@ const EditCategoryModalContent: React.FC<EditCategoryModalContentProps> = ({
 
           {/* Footer */}
           <div className={styles.footer}>
-            <button
-              type="button"
-              onClick={onClose}
-              className={styles.cancelBtn}
-            >
+            <button type="button" onClick={onClose} className={styles.cancelBtn}>
               {t.cancel || 'Cancel'}
             </button>
-            <button
-              type="submit"
-              className={styles.saveBtn}
-              disabled={!hasAnyTranslation}
-            >
+            <button type="submit" className={styles.saveBtn} disabled={!hasAnyTranslation}>
               {t.saveChanges || 'Save Changes'}
             </button>
           </div>
@@ -223,4 +209,3 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
     document.body,
   )
 }
-

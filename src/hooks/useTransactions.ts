@@ -136,7 +136,15 @@ export function useTransactions(period?: PeriodFilter) {
         break
     }
     return result
-  }, [allTransactions, showGhost, selectedInstitution, selectedSubAccount, searchTerm, sortOrder, period])
+  }, [
+    allTransactions,
+    showGhost,
+    selectedInstitution,
+    selectedSubAccount,
+    searchTerm,
+    sortOrder,
+    period,
+  ])
 
   return {
     allTransactions,

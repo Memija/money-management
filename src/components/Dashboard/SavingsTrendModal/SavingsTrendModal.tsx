@@ -42,7 +42,17 @@ interface MonthRowProps {
   tooltipLabel?: string
 }
 
-const MonthRow: React.FC<MonthRowProps> = ({ month, income, expenses, saved, rate, delay, formatCurrency, formatSavingsRate, tooltipLabel }) => {
+const MonthRow: React.FC<MonthRowProps> = ({
+  month,
+  income,
+  expenses,
+  saved,
+  rate,
+  delay,
+  formatCurrency,
+  formatSavingsRate,
+  tooltipLabel,
+}) => {
   const isPositive = saved >= 0
   return (
     <motion.tr
@@ -54,18 +64,21 @@ const MonthRow: React.FC<MonthRowProps> = ({ month, income, expenses, saved, rat
       <td className={styles['month-name']}>{month}</td>
       <td className={`${styles['month-income']} privacy-blur`}>{formatCurrency(income)}</td>
       <td className={`${styles['month-expenses']} privacy-blur`}>{formatCurrency(expenses)}</td>
-      <td className={`${styles['month-saved']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']} privacy-blur`}>
-        {isPositive ? '+' : ''}{formatCurrency(saved)}
+      <td
+        className={`${styles['month-saved']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']} privacy-blur`}
+      >
+        {isPositive ? '+' : ''}
+        {formatCurrency(saved)}
       </td>
-      <td className={`${styles['month-rate']} ${isPositive ? styles['rate-positive'] : styles['rate-negative']}`}>
+      <td
+        className={`${styles['month-rate']} ${isPositive ? styles['rate-positive'] : styles['rate-negative']}`}
+      >
         <div className={styles['rate-cell']}>
           <span>{formatSavingsRate(rate)}</span>
           {rate <= -100 && tooltipLabel && (
             <span className={styles['info-tooltip-wrapper']}>
               <Info size={12} className={styles['info-icon']} />
-              <span className={styles['info-tooltip-bubble']}>
-                {tooltipLabel}
-              </span>
+              <span className={styles['info-tooltip-bubble']}>{tooltipLabel}</span>
             </span>
           )}
         </div>
@@ -75,7 +88,13 @@ const MonthRow: React.FC<MonthRowProps> = ({ month, income, expenses, saved, rat
 }
 
 // Custom tooltip for the chart
-const ChartTooltip = ({ active, payload, label, formatCurrency, formatMonthYear }: {
+const ChartTooltip = ({
+  active,
+  payload,
+  label,
+  formatCurrency,
+  formatMonthYear,
+}: {
   active?: boolean
   payload?: Array<{ value: number; name: string; color: string }>
   label?: string
@@ -89,9 +108,14 @@ const ChartTooltip = ({ active, payload, label, formatCurrency, formatMonthYear 
   const isPositive = saved >= 0
   return (
     <div className={styles['chart-tooltip']}>
-      <p className={styles['chart-tooltip-label']}>{formatMonthYear ? formatMonthYear(label ?? '') : label}</p>
-      <p className={`${styles['chart-tooltip-value']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']}`}>
-        {isPositive ? '+' : ''}{formatCurrency(saved)}
+      <p className={styles['chart-tooltip-label']}>
+        {formatMonthYear ? formatMonthYear(label ?? '') : label}
+      </p>
+      <p
+        className={`${styles['chart-tooltip-value']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']}`}
+      >
+        {isPositive ? '+' : ''}
+        {formatCurrency(saved)}
       </p>
     </div>
   )
@@ -108,23 +132,28 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatSavingsRate, formatMonthYear } = useFormatters()
 
-  const enriched = useMemo(() =>
-    monthlyData.map((m) => ({
-      ...m,
-      saved: m.income - m.expenses,
-      rate: m.income > 0 ? Math.round(((m.income - m.expenses) / m.income) * 100) : 0,
-    })),
-    [monthlyData]
+  const enriched = useMemo(
+    () =>
+      monthlyData.map((m) => ({
+        ...m,
+        saved: m.income - m.expenses,
+        rate: m.income > 0 ? Math.round(((m.income - m.expenses) / m.income) * 100) : 0,
+      })),
+    [monthlyData],
   )
 
   const totalSaved = totalIncome - totalExpenses
-  const bestMonth = useMemo(() =>
-    enriched.length > 0 ? enriched.reduce((best, m) => m.saved > best.saved ? m : best) : null,
-    [enriched]
+  const bestMonth = useMemo(
+    () =>
+      enriched.length > 0 ? enriched.reduce((best, m) => (m.saved > best.saved ? m : best)) : null,
+    [enriched],
   )
-  const worstMonth = useMemo(() =>
-    enriched.length > 0 ? enriched.reduce((worst, m) => m.saved < worst.saved ? m : worst) : null,
-    [enriched]
+  const worstMonth = useMemo(
+    () =>
+      enriched.length > 0
+        ? enriched.reduce((worst, m) => (m.saved < worst.saved ? m : worst))
+        : null,
+    [enriched],
   )
 
   const isPositive = totalSaved >= 0
@@ -134,35 +163,42 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
     if (enriched.length === 0) return 0
     const dataMax = Math.max(...enriched.map((m) => m.saved))
     const dataMin = Math.min(...enriched.map((m) => m.saved))
-    
+
     if (dataMax <= 0) return 0
     if (dataMin >= 0) return 1
     return dataMax / (dataMax - dataMin)
   }, [enriched])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={t.savingsTrendTitle || 'Savings Trend'} maxWidth="620px">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t.savingsTrendTitle || 'Savings Trend'}
+      maxWidth="620px"
+    >
       <div className={styles.content}>
-
         {/* Hero summary */}
         <div className={`${styles.hero} ${heroAccent}`}>
           <div className={styles['hero-icon']}>
             <PiggyBank size={22} />
           </div>
           <div className={styles['hero-text']}>
-            <p className={styles['hero-label']}>{isPositive ? (t.netSavedLabel || 'Net Saved') : (t.netDeficitLabel || 'Net Deficit')}</p>
+            <p className={styles['hero-label']}>
+              {isPositive ? t.netSavedLabel || 'Net Saved' : t.netDeficitLabel || 'Net Deficit'}
+            </p>
             <p className={`${styles['hero-value']} privacy-blur`}>
-              {isPositive ? '+' : ''}{formatCurrency(totalSaved)}
+              {isPositive ? '+' : ''}
+              {formatCurrency(totalSaved)}
             </p>
           </div>
-          <div className={`${styles['hero-rate']} ${isPositive ? styles['rate-positive'] : styles['rate-negative']}`}>
+          <div
+            className={`${styles['hero-rate']} ${isPositive ? styles['rate-positive'] : styles['rate-negative']}`}
+          >
             {formatSavingsRate(savingsRate)}
             {savingsRate <= -100 && (
               <span className={styles['info-tooltip-wrapper']}>
                 <Info size={14} className={styles['info-icon']} />
-                <span className={styles['info-tooltip-bubble']}>
-                  {t.multiplierInfo}
-                </span>
+                <span className={styles['info-tooltip-bubble']}>{t.multiplierInfo}</span>
               </span>
             )}
           </div>
@@ -174,13 +210,21 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
             {bestMonth && (
               <div className={styles['highlight-pill-emerald']}>
                 <TrendingUp size={12} />
-                <span>{t.savingsBestMonth || 'Best'}: <strong>{formatMonthYear(bestMonth.rawMonth || bestMonth.name)}</strong> (<span className="privacy-blur">+{formatCurrency(bestMonth.saved)}</span>)</span>
+                <span>
+                  {t.savingsBestMonth || 'Best'}:{' '}
+                  <strong>{formatMonthYear(bestMonth.rawMonth || bestMonth.name)}</strong> (
+                  <span className="privacy-blur">+{formatCurrency(bestMonth.saved)}</span>)
+                </span>
               </div>
             )}
             {worstMonth && worstMonth.name !== bestMonth?.name && (
-               <div className={styles['highlight-pill-rose']}>
+              <div className={styles['highlight-pill-rose']}>
                 <TrendingDown size={12} />
-                <span>{t.savingsWorstMonth || 'Worst'}: <strong>{formatMonthYear(worstMonth.rawMonth || worstMonth.name)}</strong> (<span className="privacy-blur">{formatCurrency(worstMonth.saved)}</span>)</span>
+                <span>
+                  {t.savingsWorstMonth || 'Worst'}:{' '}
+                  <strong>{formatMonthYear(worstMonth.rawMonth || worstMonth.name)}</strong> (
+                  <span className="privacy-blur">{formatCurrency(worstMonth.saved)}</span>)
+                </span>
               </div>
             )}
           </div>
@@ -204,12 +248,7 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis
-                  dataKey="rawMonth"
-                  tick={MONTH_TICK}
-                  axisLine={false}
-                  tickLine={false}
-                />
+                <XAxis dataKey="rawMonth" tick={MONTH_TICK} axisLine={false} tickLine={false} />
                 <YAxis
                   tick={{ fontSize: 10, fill: 'var(--text-dim)' }}
                   axisLine={false}
@@ -218,7 +257,12 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                   width={70}
                 />
                 <Tooltip
-                  content={<ChartTooltip formatCurrency={formatCurrency} formatMonthYear={formatMonthYear} />}
+                  content={
+                    <ChartTooltip
+                      formatCurrency={formatCurrency}
+                      formatMonthYear={formatMonthYear}
+                    />
+                  }
                 />
                 <Area
                   type="monotone"
@@ -226,7 +270,12 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                   stroke="url(#splitStroke)"
                   strokeWidth={2}
                   fill="url(#splitFill)"
-                  dot={(props: { cx?: number; cy?: number; payload?: { saved: number }; key?: React.Key | null }) => {
+                  dot={(props: {
+                    cx?: number
+                    cy?: number
+                    payload?: { saved: number }
+                    key?: React.Key | null
+                  }) => {
                     const { cx, cy, payload, key } = props
                     if (!payload || cx === undefined || cy === undefined) return null
                     return (
@@ -240,7 +289,12 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                       />
                     )
                   }}
-                  activeDot={(props: { cx?: number; cy?: number; payload?: { saved: number }; key?: React.Key | null }) => {
+                  activeDot={(props: {
+                    cx?: number
+                    cy?: number
+                    payload?: { saved: number }
+                    key?: React.Key | null
+                  }) => {
                     const { cx, cy, payload, key } = props
                     if (!payload || cx === undefined || cy === undefined) return null
                     return (
@@ -269,8 +323,14 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                   <th>{t.periodMonth || 'Month'}</th>
                   <th>{t.totalIncomeLabel || 'Income'}</th>
                   <th>{t.totalExpensesLabel || 'Expenses'}</th>
-                  <th>{isPositive ? (t.netSavedLabel || 'Net Saved') : (t.netDeficitLabel || 'Net Deficit')}</th>
-                  <th>{isPositive ? (t.insightSavingsRate || 'Rate') : (t.deficitRateTitle || 'Rate')}</th>
+                  <th>
+                    {isPositive
+                      ? t.netSavedLabel || 'Net Saved'
+                      : t.netDeficitLabel || 'Net Deficit'}
+                  </th>
+                  <th>
+                    {isPositive ? t.insightSavingsRate || 'Rate' : t.deficitRateTitle || 'Rate'}
+                  </th>
                 </tr>
               </thead>
               <tbody className={styles['table-body']}>

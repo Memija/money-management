@@ -40,4 +40,3 @@ export * from './travel-logos'
 export * from './types'
 export * from './utility-logos'
 export * from './variety-store-logos'
-

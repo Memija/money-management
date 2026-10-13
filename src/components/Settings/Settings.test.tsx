@@ -133,22 +133,34 @@ describe('Settings Component', () => {
     render(<Settings />)
 
     // Initial tab is Categories & Rules
-    expect(screen.getByRole('tab', { name: 'Categories & Rules' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('tab', { name: 'Data Management' })).toHaveAttribute('aria-selected', 'false')
+    expect(screen.getByRole('tab', { name: 'Categories & Rules' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    )
+    expect(screen.getByRole('tab', { name: 'Data Management' })).toHaveAttribute(
+      'aria-selected',
+      'false',
+    )
     expect(screen.getByText('Target Category')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Delete All Data' })).not.toBeInTheDocument()
 
     // Switch to Data Management tab
     fireEvent.click(screen.getByRole('tab', { name: 'Data Management' }))
 
-    expect(screen.getByRole('tab', { name: 'Data Management' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: 'Data Management' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    )
     expect(screen.getByRole('button', { name: 'Delete All Data' })).toBeInTheDocument()
     expect(screen.queryByText('Target Category')).not.toBeInTheDocument()
 
     // Switch back to Categories & Rules tab
     fireEvent.click(screen.getByRole('tab', { name: 'Categories & Rules' }))
 
-    expect(screen.getByRole('tab', { name: 'Categories & Rules' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: 'Categories & Rules' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    )
     expect(screen.getByText('Target Category')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Delete All Data' })).not.toBeInTheDocument()
   })

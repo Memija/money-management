@@ -192,7 +192,12 @@ const validateAccount = (rawAcc: unknown, accIndex: number): ValidationErrorInfo
       }
     }
     for (let i = 0; i < acc.duplicateTransactions.length; i++) {
-      const err = validateTransaction(acc.duplicateTransactions[i], name, i, 'duplicateTransactions')
+      const err = validateTransaction(
+        acc.duplicateTransactions[i],
+        name,
+        i,
+        'duplicateTransactions',
+      )
       if (err) return err
     }
   }
@@ -270,7 +275,11 @@ export const parseAndValidateBackup = (jsonString: string): BackupValidationResu
       }
       for (let i = 0; i < dataPayload.customCategories.length; i++) {
         const cat = dataPayload.customCategories[i] as unknown
-        if (!cat || typeof cat !== 'object' || typeof (cat as Record<string, unknown>).id !== 'string') {
+        if (
+          !cat ||
+          typeof cat !== 'object' ||
+          typeof (cat as Record<string, unknown>).id !== 'string'
+        ) {
           return {
             valid: false,
             error: `Custom category #${i + 1} is missing a valid 'id'`,
@@ -290,7 +299,11 @@ export const parseAndValidateBackup = (jsonString: string): BackupValidationResu
       }
       for (let i = 0; i < dataPayload.duplicateOverrideRules.length; i++) {
         const rule = dataPayload.duplicateOverrideRules[i] as unknown
-        if (!rule || typeof rule !== 'object' || typeof (rule as Record<string, unknown>).id !== 'string') {
+        if (
+          !rule ||
+          typeof rule !== 'object' ||
+          typeof (rule as Record<string, unknown>).id !== 'string'
+        ) {
           return {
             valid: false,
             error: `Duplicate override rule #${i + 1} is missing a valid 'id'`,
@@ -331,10 +344,7 @@ export const parseAndValidateBackup = (jsonString: string): BackupValidationResu
 /**
  * Localizes a backup validation error using the provided translation strings.
  */
-export const formatBackupError = (
-  result: InvalidBackupResult,
-  t?: TranslationStrings,
-): string => {
+export const formatBackupError = (result: InvalidBackupResult, t?: TranslationStrings): string => {
   if (!t || !result.errorDetail) {
     return result.error
   }

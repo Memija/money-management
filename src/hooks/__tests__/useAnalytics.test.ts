@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import type { Transaction } from '../../types'
-import { type PeriodFilter,useAnalytics } from '../useAnalytics'
+import { type PeriodFilter, useAnalytics } from '../useAnalytics'
 
 describe('useAnalytics hook', () => {
   const period: PeriodFilter = { mode: 'all', value: '' }

@@ -1,7 +1,16 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import type { AppStep, Country, CustomCategory, DuplicateDeleteMode, DuplicateOverrideRule, FinancialInstitution, ImportedAccount, Transaction } from '../types'
+import type {
+  AppStep,
+  Country,
+  CustomCategory,
+  DuplicateDeleteMode,
+  DuplicateOverrideRule,
+  FinancialInstitution,
+  ImportedAccount,
+  Transaction,
+} from '../types'
 import { reconcileCrossAccountTransfers } from '../utils/account-transfers'
 import {
   categorize,
@@ -65,7 +74,15 @@ export interface AppState {
   /**
    * Returns the count of duplicate and new transactions for the given institution.
    */
-  getDuplicateTransactionStats: (institutionId: string, transactions: Transaction[]) => { duplicateCount: number; newCount: number; duplicateIds: string[]; alreadyDuplicatedIds: string[] }
+  getDuplicateTransactionStats: (
+    institutionId: string,
+    transactions: Transaction[],
+  ) => {
+    duplicateCount: number
+    newCount: number
+    duplicateIds: string[]
+    alreadyDuplicatedIds: string[]
+  }
   /**
    * Cleans up duplicate transactions in imported accounts and recalculates balances.
    */
@@ -83,7 +100,11 @@ export interface AppState {
   migrateHealthInsurance: () => void
 }
 
-export const toCanonicalTransactionKey = (t: { date: string; amount: number; description: string }) => {
+export const toCanonicalTransactionKey = (t: {
+  date: string
+  amount: number
+  description: string
+}) => {
   const normDesc = (t.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
   const normAmount = Number(t.amount).toFixed(2)
   return `${t.date}|${normAmount}|${normDesc}`
@@ -118,15 +139,16 @@ export const matchesDuplicateOverrideRule = (
   }
 
   if (amountsToMatch.length > 0 && tx.amount !== undefined) {
-    const matchesAnyAmount = amountsToMatch.some(
-      (a) => Math.abs(Number(tx.amount) - a) < 0.005,
-    )
+    const matchesAnyAmount = amountsToMatch.some((a) => Math.abs(Number(tx.amount) - a) < 0.005)
     if (!matchesAnyAmount) return false
   }
 
   const txDesc = (tx.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
   const rulePattern = (rule.descriptionPattern || '').trim().toLowerCase().replace(/\s+/g, ' ')
-  const modPattern = (rule.modifications?.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
+  const modPattern = (rule.modifications?.description || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
 
   if (!rulePattern && !modPattern) return false
 
@@ -228,7 +250,8 @@ export const sanitizeDuplicateOverrideRules = (
           rule.createdAt && !isNaN(new Date(rule.createdAt).getTime())
             ? rule.createdAt
             : new Date().toISOString(),
-        applyCount: typeof rule.applyCount === 'number' && rule.applyCount > 0 ? rule.applyCount : 1,
+        applyCount:
+          typeof rule.applyCount === 'number' && rule.applyCount > 0 ? rule.applyCount : 1,
       }
     })
 }
@@ -435,7 +458,9 @@ export const useAppStore = create<AppState>()(
 
       updateCustomCategory: (category) =>
         set((state) => ({
-          customCategories: state.customCategories.map((c) => (c.id === category.id ? category : c)),
+          customCategories: state.customCategories.map((c) =>
+            c.id === category.id ? category : c,
+          ),
         })),
 
       deleteCustomCategory: (id) =>
@@ -519,7 +544,8 @@ export const useAppStore = create<AppState>()(
           const ruleToDelete = currentRules.find((r) => r.id === targetId)
           if (!ruleToDelete) return state
 
-          const shouldDeleteRule = mode === 'rule_only' || mode === 'both' || mode === false || mode === true
+          const shouldDeleteRule =
+            mode === 'rule_only' || mode === 'both' || mode === false || mode === true
           const shouldDeleteTransactions = mode === 'data_only' || mode === 'both' || mode === true
 
           const newRules = shouldDeleteRule
@@ -588,10 +614,13 @@ export const useAppStore = create<AppState>()(
 
       clearDuplicateOverrideRules: (mode = 'both') =>
         set((state) => {
-          const shouldDeleteRules = mode === 'rule_only' || mode === 'both' || mode === false || mode === true
+          const shouldDeleteRules =
+            mode === 'rule_only' || mode === 'both' || mode === false || mode === true
           const shouldDeleteTransactions = mode === 'data_only' || mode === 'both' || mode === true
 
-          const newRules = shouldDeleteRules ? [] : sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
+          const newRules = shouldDeleteRules
+            ? []
+            : sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
 
           if (!shouldDeleteTransactions) {
             return { duplicateOverrideRules: newRules }
@@ -607,7 +636,9 @@ export const useAppStore = create<AppState>()(
                 if (rules.some((r) => isModifiedTransactionForRule(r, tx, account.institutionId))) {
                   return true
                 }
-                if (rules.some((r) => isOriginalTransactionMatchForRule(r, tx, account.institutionId))) {
+                if (
+                  rules.some((r) => isOriginalTransactionMatchForRule(r, tx, account.institutionId))
+                ) {
                   return true
                 }
               }
@@ -755,7 +786,6 @@ export const useAppStore = create<AppState>()(
               }
               cleanTxs.push(ensureUniqueId(t))
             })
-
             ;(account.duplicateTransactions || []).forEach((t) => {
               if (t.isModified) {
                 modTxs.push(ensureUniqueId({ ...t, isDuplicate: true, isModified: true }))
@@ -763,7 +793,6 @@ export const useAppStore = create<AppState>()(
                 dupTxs.push(ensureUniqueId({ ...t, isDuplicate: true, isModified: false }))
               }
             })
-
             ;(account.modifiedTransactions || []).forEach((t) => {
               modTxs.push(ensureUniqueId({ ...t, isDuplicate: true, isModified: true }))
             })
@@ -780,9 +809,7 @@ export const useAppStore = create<AppState>()(
           } else {
             // Same institution already has data — merge transactions.
             const existing = state.importedAccounts[existingIdx]
-            const existingCleanKeys = new Set(
-              existing.transactions.map(toCanonicalTransactionKey),
-            )
+            const existingCleanKeys = new Set(existing.transactions.map(toCanonicalTransactionKey))
             const existingDupKeys = new Set([
               ...(existing.duplicateTransactions || []).map(toCanonicalTransactionKey),
               ...(existing.modifiedTransactions || []).map(toCanonicalTransactionKey),
@@ -956,12 +983,14 @@ export const useAppStore = create<AppState>()(
       removeImportedAccount: (institutionIdOrName: string) =>
         set((state) => {
           const updated = state.importedAccounts.filter(
-            (a) => a.institutionId !== institutionIdOrName && a.institutionName !== institutionIdOrName,
+            (a) =>
+              a.institutionId !== institutionIdOrName && a.institutionName !== institutionIdOrName,
           )
           const reconciled = reconcileCrossAccountTransfers(updated)
           const hasRemainingAccounts = reconciled.length > 0
           const shouldResetStep =
-            !hasRemainingAccounts && (state.currentStep === 'dashboard' || state.currentStep === 'review')
+            !hasRemainingAccounts &&
+            (state.currentStep === 'dashboard' || state.currentStep === 'review')
 
           return {
             importedAccounts: reconciled,
@@ -1139,7 +1168,9 @@ export const useAppStore = create<AppState>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           if (Array.isArray(state.duplicateOverrideRules)) {
-            state.duplicateOverrideRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
+            state.duplicateOverrideRules = sanitizeDuplicateOverrideRules(
+              state.duplicateOverrideRules,
+            )
           }
           if (state.customKeywords) {
             state.customKeywords = sanitizeCustomKeywords(state.customKeywords)

@@ -58,7 +58,9 @@ describe('filterInternalSpaceTransfers', () => {
     expect(result.transactions).toHaveLength(1)
     expect(result.transactions[0].id).toBe('tx-3')
     expect(result.excludedTransactions).toHaveLength(2)
-    expect(result.excludedTransactions?.map((t) => t.id)).toEqual(expect.arrayContaining(['tx-1', 'tx-2']))
+    expect(result.excludedTransactions?.map((t) => t.id)).toEqual(
+      expect.arrayContaining(['tx-1', 'tx-2']),
+    )
   })
 
   it('discards reciprocal space pairs with English space names (Main Account / Investment fund)', () => {
