@@ -24,7 +24,7 @@ const renderTick = (offsetY?: number) =>
 
 describe('MonthYearAxisTick', () => {
   beforeEach(() => {
-    useLanguageStore.setState({ locale: 'en' })
+    useLanguageStore.getState().setLocale('en')
   })
 
   it('should render the localized month label at the tick position', () => {
@@ -48,7 +48,7 @@ describe('MonthYearAxisTick', () => {
     expect(screen.getByText(englishLabel)).toBeTruthy()
 
     act(() => {
-      useLanguageStore.setState({ locale: 'de' })
+      useLanguageStore.getState().setLocale('de')
     })
     const germanLabel = getExpectedLabel()
 

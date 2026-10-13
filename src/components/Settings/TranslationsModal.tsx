@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence,motion } from 'framer-motion'
 import { X } from 'lucide-react'
 
-import { localeLabels,localeOrder } from '../../i18n/translations'
+import { localeLabels,localeOrder } from '../../i18n/locale-meta'
 import { useLanguageStore } from '../../store/useLanguageStore'
 
 import styles from './TranslationsModal.module.css'

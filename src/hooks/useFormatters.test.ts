@@ -6,7 +6,7 @@ import { useFormatters } from './useFormatters'
 
 describe('useFormatters', () => {
   beforeEach(() => {
-    useLanguageStore.setState({ locale: 'en' })
+    useLanguageStore.getState().setLocale('en')
   })
 
   it('should return the current locale', () => {
@@ -24,7 +24,7 @@ describe('useFormatters', () => {
   })
 
   it('should map "bs" locale to "de-DE" formatting', () => {
-    useLanguageStore.setState({ locale: 'bs' })
+    useLanguageStore.getState().setLocale('bs')
     const { result } = renderHook(() => useFormatters())
 
     expect(result.current.locale).toBe('bs')
@@ -40,7 +40,7 @@ describe('useFormatters', () => {
   })
 
   it('should map "sr" locale to "de-DE" formatting', () => {
-    useLanguageStore.setState({ locale: 'sr' })
+    useLanguageStore.getState().setLocale('sr')
     const { result } = renderHook(() => useFormatters())
 
     expect(result.current.locale).toBe('sr')
@@ -51,7 +51,7 @@ describe('useFormatters', () => {
   })
 
   it('should format date correctly for en', () => {
-    useLanguageStore.setState({ locale: 'en' })
+    useLanguageStore.getState().setLocale('en')
     const { result } = renderHook(() => useFormatters())
 
     const formatted = result.current.formatDate('2024-05-15')
@@ -68,7 +68,7 @@ describe('useFormatters', () => {
   })
 
   it('should format month year correctly', () => {
-    useLanguageStore.setState({ locale: 'en' })
+    useLanguageStore.getState().setLocale('en')
     const { result } = renderHook(() => useFormatters())
 
     const formatted = result.current.formatMonthYear('2024-05')
@@ -77,22 +77,22 @@ describe('useFormatters', () => {
   })
 
   it('should format month year properly for bs and sr without falling back to de-DE month names', () => {
-    useLanguageStore.setState({ locale: 'bs' })
+    useLanguageStore.getState().setLocale('bs')
     const { result: resultBs } = renderHook(() => useFormatters())
     expect(resultBs.current.formatMonthYear('2024-03')).toBe('Mar 24')
 
-    useLanguageStore.setState({ locale: 'sr' })
+    useLanguageStore.getState().setLocale('sr')
     const { result: resultSr } = renderHook(() => useFormatters())
     expect(resultSr.current.formatMonthYear('2024-08')).toBe('Авг 24')
   })
 
   it('should format category counts correctly based on current locale in store', () => {
-    useLanguageStore.setState({ locale: 'en' })
+    useLanguageStore.getState().setLocale('en')
     const { result: resultEn } = renderHook(() => useFormatters())
     expect(resultEn.current.formatCategoryCount(1)).toBe('1 category')
     expect(resultEn.current.formatCategoryCount(11)).toBe('11 categories')
 
-    useLanguageStore.setState({ locale: 'sr' })
+    useLanguageStore.getState().setLocale('sr')
     const { result: resultSr } = renderHook(() => useFormatters())
     expect(resultSr.current.formatCategoryCount(1)).toBe('1 категорија')
     expect(resultSr.current.formatCategoryCount(2)).toBe('2 категорије')
@@ -100,18 +100,18 @@ describe('useFormatters', () => {
   })
 
   it('should format charges counts correctly based on current locale in store', () => {
-    useLanguageStore.setState({ locale: 'en' })
+    useLanguageStore.getState().setLocale('en')
     const { result: resultEn } = renderHook(() => useFormatters())
     expect(resultEn.current.formatChargesCount(1)).toBe('1 charge')
     expect(resultEn.current.formatChargesCount(3)).toBe('3 charges')
 
-    useLanguageStore.setState({ locale: 'bs' })
+    useLanguageStore.getState().setLocale('bs')
     const { result: resultBs } = renderHook(() => useFormatters())
     expect(resultBs.current.formatChargesCount(1)).toBe('1 naplata')
     expect(resultBs.current.formatChargesCount(3)).toBe('3 naplate')
     expect(resultBs.current.formatChargesCount(5)).toBe('5 naplata')
 
-    useLanguageStore.setState({ locale: 'sr' })
+    useLanguageStore.getState().setLocale('sr')
     const { result: resultSr } = renderHook(() => useFormatters())
     expect(resultSr.current.formatChargesCount(1)).toBe('1 наплата')
     expect(resultSr.current.formatChargesCount(3)).toBe('3 наплате')

@@ -1,5 +1,6 @@
 import { categoryI18nKeys } from '../i18n/categories'
-import { translations, type TranslationStrings } from '../i18n/translations'
+import { categoryTermsByLocale } from '../i18n/category-terms'
+import type { TranslationStrings } from '../i18n/types'
 import type { CustomCategory, Transaction } from '../types'
 import { categorize } from './categorizer/categorizer'
 import {
@@ -13,9 +14,10 @@ export * from './categorizer/description-cleaning'
 
 // Build reverse lookup of localized category labels across all languages to canonical keys
 const localizedCategoryMap: Record<string, string> = {}
-for (const locale of Object.values(translations)) {
+for (const terms of Object.values(categoryTermsByLocale)) {
+  const labels: Partial<Record<string, string>> = terms.labels
   for (const [canonicalKey, i18nKey] of Object.entries(categoryI18nKeys)) {
-    const label = locale[i18nKey]
+    const label = labels[i18nKey]
     if (typeof label === 'string') {
       const normalized =
         canonicalKey === 'DiningOut'

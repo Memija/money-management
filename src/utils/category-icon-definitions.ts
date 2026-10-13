@@ -62,7 +62,7 @@ import {
   Zap,
 } from 'lucide-react'
 
-import { translations } from '../i18n/translations'
+import { categoryTermsByLocale } from '../i18n/category-terms'
 import type { IconComponent } from './brand-logos/types'
 
 export const AVAILABLE_ICONS: Record<string, IconComponent> = {
@@ -121,9 +121,9 @@ export const ICON_GROUPS = [
 
 // Dynamically compile coffee keywords from all registered locales + universal terms
 const coffeeKeywords = new Set<string>(['coffee', 'cafe', 'latte', 'espresso', 'cappuccino'])
-for (const locale of Object.values(translations)) {
-  if (locale.icons?.Coffee) {
-    coffeeKeywords.add(locale.icons.Coffee.toLowerCase())
+for (const terms of Object.values(categoryTermsByLocale)) {
+  if (terms.coffee) {
+    coffeeKeywords.add(terms.coffee.toLowerCase())
   }
 }
 export const COFFEE_REGEX = new RegExp(`(${[...coffeeKeywords].join('|')})`, 'i')

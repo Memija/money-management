@@ -3,12 +3,17 @@
  *
  * Checklist when adding a new locale:
  * 1. Add locale code to this `Locale` union.
- * 2. Create translations in `src/i18n/locales/<locale>.ts`.
- * 3. Register in `src/i18n/translations.ts` (`translations`, `localeLabels`, and `localeOrder`).
- * 4. Create parser configuration in `src/i18n/parser-locales/<locale>.ts`.
- * 5. Verify date formatting in `src/utils/date-utils.ts` (`MONTH_FALLBACKS` & `WEEKDAY_FALLBACKS` if ICU data is incomplete).
+ * 2. Create category labels/keywords in `src/i18n/category-terms/<locale>.ts` and register it in
+ *    `src/i18n/category-terms/index.ts` (always bundled — used for categorization in every language).
+ * 3. Create translations in `src/i18n/locales/<locale>.ts` (spread `...<locale>Terms.labels`, reuse
+ *    `<locale>Terms.keywords` and `<locale>Terms.coffee`).
+ * 4. Register the lazy loader in `src/i18n/locale-loader.ts` (`LOADERS`), the picker entry in
+ *    `src/i18n/locale-meta.ts` (`localeLabels`, `localeOrder`) and the static record in
+ *    `src/i18n/translations.ts` (tests only). The guardrail in `locale-loader.test.ts` checks these match.
+ * 5. Create parser configuration in `src/i18n/parser-locales/<locale>.ts`.
+ * 6. Verify date formatting in `src/utils/date-utils.ts` (`MONTH_FALLBACKS` & `WEEKDAY_FALLBACKS` if ICU data is incomplete).
  *    Note: The automated guardrail test in `date-utils.test.ts` will test all `localeOrder` entries automatically.
- * 6. Verify data guardrails pass in `src/data/` (`countries.test.ts`, `institutions.test.ts`, `merchants.test.ts`).
+ * 7. Verify data guardrails pass in `src/data/` (`countries.test.ts`, `institutions.test.ts`, `merchants.test.ts`).
  */
 export type Locale = 'en' | 'id' | 'pl' | 'bs' | 'sr' | 'de'
 

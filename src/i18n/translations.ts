@@ -6,8 +6,13 @@ import { pl } from './locales/pl'
 import { sr } from './locales/sr'
 import type { Locale, TranslationStrings } from './types'
 
+export { localeLabels, localeOrder } from './locale-meta'
 export * from './types'
 
+/**
+ * All locales, statically bundled. Intended for tests and tooling only — runtime code must use
+ * `useLanguageStore` (backed by `locale-loader`) so that inactive locales stay lazy-loaded.
+ */
 export const translations: Record<Locale, TranslationStrings> = {
   en,
   id,
@@ -16,15 +21,3 @@ export const translations: Record<Locale, TranslationStrings> = {
   sr,
   de,
 }
-
-/** Display labels for the language picker */
-export const localeLabels: Record<Locale, { native: string; flag: string }> = {
-  en: { native: 'English', flag: '/flags/gb.png' },
-  id: { native: 'Bahasa Indonesia', flag: '/flags/id.png' },
-  pl: { native: 'Polski', flag: '/flags/pl.png' },
-  bs: { native: 'Bosanski', flag: '/flags/ba.png' },
-  sr: { native: 'Српски', flag: '/flags/rs.png' },
-  de: { native: 'Deutsch', flag: '/flags/de.png' },
-}
-
-export const localeOrder: Locale[] = ['id', 'bs', 'de', 'en', 'pl', 'sr']

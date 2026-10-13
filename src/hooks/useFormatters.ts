@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react'
 
-import { translations } from '../i18n/translations'
 import { useLanguageStore } from '../store/useLanguageStore'
 import {
   formatCategoryCount as formatCategoryCountUtil,
@@ -46,8 +45,7 @@ function getDateFormatter(locale: string): Intl.DateTimeFormat {
 
 export const useFormatters = () => {
   const locale = useLanguageStore((s) => s.locale)
-  const storeT = useLanguageStore((s) => s.t)
-  const t = translations[locale] || storeT || translations['en']
+  const t = useLanguageStore((s) => s.t)
 
   // Some browsers (especially Chromium-based ones on Windows) have stripped ICU data
   // for 'bs' and 'sr', causing them to fall back to English (YYYY-MM-DD and -€500.00).

@@ -1,8 +1,19 @@
 import React, { startTransition, useEffect, useRef, useState } from 'react'
-import { ChevronDown, Eye, EyeOff, Monitor, Moon, PieChart, PlusCircle, Settings, Sun } from 'lucide-react'
+import {
+  ChevronDown,
+  Eye,
+  EyeOff,
+  Monitor,
+  Moon,
+  PieChart,
+  PlusCircle,
+  Settings,
+  Sun,
+} from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
 
-import { localeLabels, localeOrder } from '../../../i18n/translations'
+import { prefetchAllTranslations } from '../../../i18n/locale-loader'
+import { localeLabels, localeOrder } from '../../../i18n/locale-meta'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { usePrivacyStore } from '../../../store/usePrivacyStore'
@@ -29,15 +40,19 @@ const AppHeader: React.FC = () => {
   const langDropdownRef = useRef<HTMLDivElement>(null)
 
   const themeOptions: { value: Theme; label: string; icon: React.ReactNode }[] = [
-    { 
-      value: 'system', 
-      label: t.themeSystem, 
+    {
+      value: 'system',
+      label: t.themeSystem,
       icon: (
         <div className={styles['system-theme-icon']}>
           <Monitor size={15} />
-          {resolvedTheme === 'dark' ? <Moon size={10} opacity={0.7} /> : <Sun size={10} opacity={0.7} />}
+          {resolvedTheme === 'dark' ? (
+            <Moon size={10} opacity={0.7} />
+          ) : (
+            <Sun size={10} opacity={0.7} />
+          )}
         </div>
-      ) 
+      ),
     },
     { value: 'light', label: t.themeLight, icon: <Sun size={15} /> },
     { value: 'dark', label: t.themeDark, icon: <Moon size={15} /> },
@@ -108,7 +123,9 @@ const AppHeader: React.FC = () => {
               title={t.goToDashboard}
               id="header-go-to-dashboard-btn"
             >
-              <span className={styles['theme-switcher-icon']}><PieChart size={15} /></span>
+              <span className={styles['theme-switcher-icon']}>
+                <PieChart size={15} />
+              </span>
               <span className={styles['theme-switcher-label']}>{t.goToDashboard}</span>
             </button>
           )}
@@ -122,7 +139,9 @@ const AppHeader: React.FC = () => {
               title={t.newImport}
               id="header-new-import-btn"
             >
-              <span className={styles['theme-switcher-icon']}><PlusCircle size={15} /></span>
+              <span className={styles['theme-switcher-icon']}>
+                <PlusCircle size={15} />
+              </span>
               <span className={styles['theme-switcher-label']}>{t.newImport}</span>
             </button>
           )}
@@ -136,8 +155,12 @@ const AppHeader: React.FC = () => {
               title={t.settingsTitle || 'Settings'}
               id="header-settings-btn"
             >
-              <span className={styles['theme-switcher-icon']}><Settings size={15} /></span>
-              <span className={styles['theme-switcher-label']}>{t.settingsTitle || 'Settings'}</span>
+              <span className={styles['theme-switcher-icon']}>
+                <Settings size={15} />
+              </span>
+              <span className={styles['theme-switcher-label']}>
+                {t.settingsTitle || 'Settings'}
+              </span>
             </button>
           )}
 
@@ -146,7 +169,11 @@ const AppHeader: React.FC = () => {
             type="button"
             className={`${styles['theme-switcher-trigger']} ${isPrivacyMode ? styles['privacy-active'] : ''}`}
             onClick={togglePrivacyMode}
-            aria-label={isPrivacyMode ? t.privacyModeActive || 'Privacy Mode Active' : t.privacyMode || 'Privacy Mode'}
+            aria-label={
+              isPrivacyMode
+                ? t.privacyModeActive || 'Privacy Mode Active'
+                : t.privacyMode || 'Privacy Mode'
+            }
             title={t.privacyModeTooltip || 'Toggle Privacy Mode (Alt+P)'}
             aria-pressed={isPrivacyMode}
             id="header-privacy-mode-btn"
@@ -156,7 +183,7 @@ const AppHeader: React.FC = () => {
               {isPrivacyMode ? <EyeOff size={15} /> : <Eye size={15} />}
             </span>
             <span className={styles['theme-switcher-label']}>
-              {isPrivacyMode ? (t.privacyModeActive || 'Privacy') : (t.privacyMode || 'Privacy')}
+              {isPrivacyMode ? t.privacyModeActive || 'Privacy' : t.privacyMode || 'Privacy'}
             </span>
           </button>
 
@@ -164,7 +191,12 @@ const AppHeader: React.FC = () => {
           <div className={styles['theme-switcher']} ref={langDropdownRef}>
             <button
               className={styles['theme-switcher-trigger']}
+              onPointerEnter={prefetchAllTranslations}
+              onFocus={prefetchAllTranslations}
               onClick={() => {
+                if (!isLangOpen) {
+                  prefetchAllTranslations()
+                }
                 setIsLangOpen(!isLangOpen)
                 setIsThemeOpen(false)
               }}

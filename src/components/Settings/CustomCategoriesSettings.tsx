@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { AnimatePresence,motion } from 'framer-motion'
 import { Globe, Pencil,Plus, Tag, X } from 'lucide-react'
 
-import { localeLabels } from '../../i18n/translations'
+import { localeLabels } from '../../i18n/locale-meta'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import type { CustomCategory } from '../../types'

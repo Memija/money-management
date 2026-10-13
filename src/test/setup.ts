@@ -1,7 +1,13 @@
 import { cleanup } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
 
+import { registerTranslations } from '../i18n/locale-loader'
+import { translations } from '../i18n/translations'
+
 import '@testing-library/jest-dom'
+
+// Locales are lazy-loaded in the app; seed them all so `setLocale` stays synchronous in tests
+registerTranslations(translations)
 
 // Run cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {

@@ -1,5 +1,6 @@
 import { POPULAR_MERCHANTS } from '../../data/merchants'
-import { type CategoryKeywords, translations } from '../../i18n/translations'
+import { categoryTermsByLocale } from '../../i18n/category-terms'
+import type { CategoryKeywords } from '../../i18n/types'
 import { createBoundedCache } from '../bounded-cache'
 import { getCandidateMerchants } from '../merchant-index'
 import { escapeRegExp, matchesLowercaseTerm } from '../regex-utils'
@@ -96,9 +97,9 @@ export function buildKeywordRegex(keywords: string[]): RegExp | undefined {
 const categoryRegexes: Partial<Record<keyof CategoryKeywords, RegExp>> = {}
 const aggregatedKeywords: Record<string, string[]> = {}
 
-// 1. Build aggregated keywords across all locale translations
-for (const locale of Object.values(translations)) {
-  const keywords = locale.categoryKeywords
+// 1. Build aggregated keywords across all locales
+for (const terms of Object.values(categoryTermsByLocale)) {
+  const keywords = terms.keywords
   if (keywords) {
     for (const [cat, words] of Object.entries(keywords)) {
       if (!aggregatedKeywords[cat]) aggregatedKeywords[cat] = []
