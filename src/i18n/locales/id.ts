@@ -492,6 +492,12 @@ export const id: TranslationStrings = {
   filterWithoutLogosActiveNotice: 'Menampilkan transaksi tanpa logo',
   filterWithoutLogosBadge: 'Tanpa logo',
   filterWithoutLogosInfo: 'Opsi ini membantu Anda mengidentifikasi transaksi dan pedagang yang belum memiliki logo merek. Ini hanya memfilter daftar Semua Transaksi di bagian bawah dasbor.',
+  detachTransactionsTitle: 'Lepaskan semua transaksi dari dasbor',
+  detachTransactionsDesc: 'Biarkan filter pada Semua Transaksi berdiri sendiri sehingga perubahan tidak mempengaruhi grafik, saldo, dan metrik.',
+  detachTransactionsAction: 'Filter terhubung dengan dasbor (klik untuk melepaskan)',
+  attachTransactionsAction: 'Filter terlepas dari dasbor (klik untuk menghubungkan)',
+  detachedBadge: 'Terlepas',
+  detachedBadgeTooltip: 'Filter pada daftar ini tidak mempengaruhi grafik atau metrik dasbor',
   active: 'Aktif',
   inactive: 'Nonaktif',
 

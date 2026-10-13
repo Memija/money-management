@@ -10,6 +10,7 @@ import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
 import { useTransactions } from '../../hooks/useTransactions'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
+import { hasMerchantLogo } from '../../utils/category-icons'
 import { hasExtensiveCategoryData } from '../../utils/category-utils'
 import { CategoryTrend } from './CategoryTrend'
 import { type AvgDetailType, DashboardModals, type DetailModalState } from './DashboardModals'
@@ -111,6 +112,10 @@ const Dashboard: React.FC = () => {
     filteredTx,
     searchTerm,
     setSearchTerm,
+    selectedCategory,
+    setSelectedCategory,
+    typeFilter,
+    setTypeFilter,
     selectedInstitution,
     setSelectedInstitution,
     selectedSubAccount,
@@ -120,6 +125,9 @@ const Dashboard: React.FC = () => {
     setShowGhost,
     ghostCount,
   } = useTransactions(period)
+
+  const detachTransactionsFromDashboard = useAppStore((s) => s.detachTransactionsFromDashboard)
+  const setDetachTransactionsFromDashboard = useAppStore((s) => s.setDetachTransactionsFromDashboard)
 
   const isSingleAccountView = selectedInstitution !== 'all'
 
@@ -135,8 +143,63 @@ const Dashboard: React.FC = () => {
     return txs
   }, [allTransactions, selectedInstitution, selectedSubAccount])
 
+  // Transactions with all active filters (search term, category, type) applied for dashboard analytics
+  const filteredDashboardTransactions = useMemo(() => {
+    let txs = dashboardTransactions
+
+    const term = searchTerm.trim().toLowerCase()
+    if (term) {
+      txs = txs.filter((t) => {
+        const descMatch = t.description.toLowerCase().includes(term)
+        const catMatch = t.category ? t.category.toLowerCase().includes(term) : false
+        return descMatch || catMatch
+      })
+    }
+
+    if (selectedCategory && selectedCategory !== 'all') {
+      if (selectedCategory === 'without-logos') {
+        txs = txs.filter((t) => !hasMerchantLogo(t.description, t.counterpartyIban))
+      } else {
+        txs = txs.filter((t) => t.category === selectedCategory)
+      }
+    }
+
+    if (typeFilter && typeFilter !== 'all') {
+      if (typeFilter === 'transfers') {
+        txs = txs.filter((t) => t.isGhost)
+      } else if (typeFilter === 'duplicates') {
+        txs = txs.filter((t) => Boolean(t.isDuplicate || t.forceImport || t.importedByRuleId))
+      } else if (typeFilter === 'modified') {
+        txs = txs.filter((t) => Boolean(t.isModified))
+      } else {
+        txs = txs.filter((t) => t.type === typeFilter && !t.isGhost)
+      }
+    }
+
+    return txs
+  }, [dashboardTransactions, searchTerm, selectedCategory, typeFilter])
+
+  const isAnyFilterActive =
+    !detachTransactionsFromDashboard &&
+    (searchTerm.trim().length > 0 ||
+      (Boolean(selectedCategory) && selectedCategory !== 'all') ||
+      (Boolean(typeFilter) && typeFilter !== 'all'))
+
+  const effectiveDashboardTransactions = detachTransactionsFromDashboard
+    ? dashboardTransactions
+    : filteredDashboardTransactions
+
   // Analytics — all derived data from one centralized hook
   const analytics = useAnalytics(
+    effectiveDashboardTransactions,
+    period,
+    undefined,
+    'cat-color-',
+    isSingleAccountView || (!detachTransactionsFromDashboard && typeFilter === 'transfers'),
+  )
+
+  // Full bank analytics for period picker options (so period options always show full account range)
+  const fullBankAnalytics = useAnalytics(
     dashboardTransactions,
     period,
     undefined,
@@ -155,7 +218,7 @@ const Dashboard: React.FC = () => {
     return hasExtensiveCategoryData(analytics.monthlyCategoryData)
   }, [analytics.monthlyCategoryData, analytics.topMerchants.length])
 
-  const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(dashboardTransactions)
+  const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(effectiveDashboardTransactions)
 
   const selectedAccountInfo = useMemo(() => {
     if (selectedInstitution === 'all') {
@@ -169,7 +232,7 @@ const Dashboard: React.FC = () => {
 
   // Current display balance: ensures complete ledger balance for 'all' period matches AccountSelector exactly
   const displayBalance = useMemo(() => {
-    if (period.mode !== 'all') {
+    if (isAnyFilterActive || period.mode !== 'all') {
       return analytics.balance
     }
     if (selectedInstitution === 'all') {
@@ -181,6 +244,7 @@ const Dashboard: React.FC = () => {
     }
     return selectedAccountInfo ? selectedAccountInfo.balance : analytics.balance
   }, [
+    isAnyFilterActive,
     period.mode,
     selectedInstitution,
     selectedSubAccount,
@@ -206,9 +270,9 @@ const Dashboard: React.FC = () => {
             <PeriodFilter
               period={period}
               onPeriodChange={handlePeriodChange}
-              availableYears={analytics.availableYears}
-              availableQuarters={analytics.availableQuarters}
-              availableMonths={analytics.availableMonths}
+              availableYears={fullBankAnalytics.availableYears}
+              availableQuarters={fullBankAnalytics.availableQuarters}
+              availableMonths={fullBankAnalytics.availableMonths}
             />
 
             <button
@@ -372,12 +436,18 @@ const Dashboard: React.FC = () => {
             institutionNames={institutionNames}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            typeFilter={typeFilter}
+            setTypeFilter={setTypeFilter}
             selectedInstitution={selectedInstitution}
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
             setShowGhost={setShowGhost}
             ghostCount={ghostCount}
             showBankName={hasMultipleAccounts && selectedInstitution === 'all'}
+            detachTransactionsFromDashboard={detachTransactionsFromDashboard}
+            setDetachTransactionsFromDashboard={setDetachTransactionsFromDashboard}
           />
         </div>
         </main>

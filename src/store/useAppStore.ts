@@ -24,8 +24,10 @@ export interface AppState {
   customCategories: CustomCategory[]
   duplicateOverrideRules: DuplicateOverrideRule[]
   filterTransactionsWithoutLogos: boolean
+  detachTransactionsFromDashboard: boolean
 
   setFilterTransactionsWithoutLogos: (enabled: boolean) => void
+  setDetachTransactionsFromDashboard: (detach: boolean) => void
   setCustomKeywords: (category: string, keywords: string[]) => void
   setManualCategory: (transactionId: string, category: string) => void
   setManualCategoriesBulk: (mapping: Record<string, string>) => void
@@ -313,6 +315,7 @@ export function recategorizeAccounts(
   accounts: ImportedAccount[],
   manualCategories?: Record<string, string>,
   customKeywords?: Record<string, string[]>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _customCategories?: CustomCategory[],
 ): { accounts: ImportedAccount[]; changed: boolean } {
   let changed = false
@@ -379,6 +382,7 @@ export const useAppStore = create<AppState>()(
       customCategories: [],
       duplicateOverrideRules: [],
       filterTransactionsWithoutLogos: false,
+      detachTransactionsFromDashboard: false,
       appliedCategorizerVersion: CATEGORIZER_RULES_VERSION,
 
       autoRecategorizeUneditedTransactions: (force = false) => {
@@ -420,6 +424,9 @@ export const useAppStore = create<AppState>()(
 
       setFilterTransactionsWithoutLogos: (enabled) =>
         set({ filterTransactionsWithoutLogos: enabled }),
+
+      setDetachTransactionsFromDashboard: (detach) =>
+        set({ detachTransactionsFromDashboard: detach }),
 
       addCustomCategory: (category) =>
         set((state) => ({
@@ -981,6 +988,7 @@ export const useAppStore = create<AppState>()(
           customCategories: [],
           duplicateOverrideRules: [],
           filterTransactionsWithoutLogos: false,
+          detachTransactionsFromDashboard: false,
         })
         try {
           useAppStore.persist?.clearStorage()

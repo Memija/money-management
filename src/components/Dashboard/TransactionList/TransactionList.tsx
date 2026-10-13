@@ -6,6 +6,8 @@ import {
   Copy,
   Ghost,
   ImageOff,
+  Link2,
+  Link2Off,
   Receipt,
   RotateCcw,
   Search,
@@ -35,6 +37,8 @@ import { TransactionItem } from './TransactionItem'
 
 import styles from './TransactionList.module.css'
 
+export type TypeFilter = 'all' | 'income' | 'expense' | 'transfers' | 'duplicates' | 'modified'
+
 interface TransactionListProps {
   filteredTx: Transaction[]
   allTransactions?: Transaction[]
@@ -43,6 +47,8 @@ interface TransactionListProps {
   setSearchTerm: (val: string) => void
   selectedCategory?: string
   setSelectedCategory?: (val: string) => void
+  typeFilter?: TypeFilter
+  setTypeFilter?: (val: TypeFilter) => void
   selectedInstitution?: string
   setSelectedInstitution?: (val: string) => void
   sortOrder?: 'newest' | 'oldest' | 'highest' | 'lowest'
@@ -51,9 +57,9 @@ interface TransactionListProps {
   setShowGhost?: (val: boolean) => void
   ghostCount?: number
   showBankName?: boolean
+  detachTransactionsFromDashboard?: boolean
+  setDetachTransactionsFromDashboard?: (val: boolean) => void
 }
-
-type TypeFilter = 'all' | 'income' | 'expense' | 'transfers' | 'duplicates' | 'modified'
 
 const DEFAULT_PAGE_SIZE = 10
 
@@ -66,12 +72,16 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
     setSearchTerm,
     selectedCategory,
     setSelectedCategory,
+    typeFilter: propTypeFilter,
+    setTypeFilter: propSetTypeFilter,
     selectedInstitution = 'all',
     sortOrder = 'newest',
     setSortOrder,
     setShowGhost,
     ghostCount = 0,
     showBankName,
+    detachTransactionsFromDashboard: propDetach,
+    setDetachTransactionsFromDashboard: propSetDetach,
   }) => {
     const t = useLanguageStore((s) => s.t)
     const locale = useLanguageStore((s) => s.locale)
@@ -81,13 +91,17 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
     const customKeywords = useAppStore((s) => s.customKeywords)
     const setCustomKeywords = useAppStore((s) => s.setCustomKeywords)
     const filterTransactionsWithoutLogos = useAppStore((s) => s.filterTransactionsWithoutLogos)
+    const storeDetach = useAppStore((s) => s.detachTransactionsFromDashboard)
+    const storeSetDetach = useAppStore((s) => s.setDetachTransactionsFromDashboard)
+    const detachTransactionsFromDashboard = propDetach !== undefined ? propDetach : storeDetach
+    const setDetachTransactionsFromDashboard = propSetDetach || storeSetDetach
     const { formatDate, formatCurrency, formatTransactionCount } = useFormatters()
 
     const shouldShowBankName =
       (showBankName !== undefined ? showBankName : institutionNames.length > 1) &&
       selectedInstitution === 'all'
 
-    const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
+    const [internalTypeFilter, setInternalTypeFilter] = useState<TypeFilter>('all')
     const [internalCategory, setInternalCategory] = useState<string>('all')
     const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE)
     const [currentPage, setCurrentPage] = useState<number>(1)
@@ -96,6 +110,20 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
       newCategory: string
       relatedTx: Transaction[]
     } | null>(null)
+
+    const typeFilter = propTypeFilter !== undefined ? propTypeFilter : internalTypeFilter
+
+    const handleTypeFilterChange = useCallback(
+      (type: TypeFilter) => {
+        if (propSetTypeFilter) {
+          propSetTypeFilter(type)
+        } else {
+          setInternalTypeFilter(type)
+        }
+        setCurrentPage(1)
+      },
+      [propSetTypeFilter],
+    )
 
     const rawCategory = selectedCategory !== undefined ? selectedCategory : internalCategory
     const categoryFilter =
@@ -463,7 +491,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
 
     const handleResetFilters = () => {
       setSearchTerm('')
-      setTypeFilter('all')
+      handleTypeFilterChange('all')
       handleCategoryFilterChange('all')
       setSortOrder?.('newest')
       setCurrentPage(1)
@@ -489,7 +517,22 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
               <Receipt size={22} />
             </div>
             <div className={styles.titleTextContainer}>
-              <h3 className={styles.title}>{t.allTransactions}</h3>
+              <div className={styles.titleWithBadge}>
+                <h3 className={styles.title}>{t.allTransactions}</h3>
+                {detachTransactionsFromDashboard && (
+                  <span
+                    className={styles.detachedBadge}
+                    title={
+                      t.detachedBadgeTooltip ||
+                      'Filters in this list do not affect dashboard charts or metrics'
+                    }
+                    data-testid="transactions-detached-badge"
+                  >
+                    <Link2Off size={11} aria-hidden="true" />
+                    {t.detachedBadge || 'Detached'}
+                  </span>
+                )}
+              </div>
               <p className={styles.subtitle}>{formatTransactionCount(effectiveTx.length)}</p>
             </div>
           </div>
@@ -516,8 +559,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
               role="tab"
               aria-selected={typeFilter === 'all'}
               onClick={() => {
-                setTypeFilter('all')
-                setCurrentPage(1)
+                handleTypeFilterChange('all')
               }}
               className={`${styles.typeFilterBtn} ${
                 typeFilter === 'all' ? styles.typeFilterBtnActive : ''
@@ -531,8 +573,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
               role="tab"
               aria-selected={typeFilter === 'income'}
               onClick={() => {
-                setTypeFilter('income')
-                setCurrentPage(1)
+                handleTypeFilterChange('income')
               }}
               className={`${styles.typeFilterBtn} ${
                 typeFilter === 'income' ? styles.typeFilterBtnActive : ''
@@ -546,8 +587,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
               role="tab"
               aria-selected={typeFilter === 'expense'}
               onClick={() => {
-                setTypeFilter('expense')
-                setCurrentPage(1)
+                handleTypeFilterChange('expense')
               }}
               className={`${styles.typeFilterBtn} ${
                 typeFilter === 'expense' ? styles.typeFilterBtnActive : ''
@@ -563,8 +603,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
                 aria-selected={typeFilter === 'transfers'}
                 onClick={() => {
                   setShowGhost?.(true)
-                  setTypeFilter('transfers')
-                  setCurrentPage(1)
+                  handleTypeFilterChange('transfers')
                 }}
                 className={`${styles.typeFilterBtn} ${
                   typeFilter === 'transfers' ? styles.typeFilterBtnActive : ''
@@ -580,8 +619,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
                 role="tab"
                 aria-selected={typeFilter === 'duplicates'}
                 onClick={() => {
-                  setTypeFilter('duplicates')
-                  setCurrentPage(1)
+                  handleTypeFilterChange('duplicates')
                 }}
                 className={`${styles.typeFilterBtn} ${
                   typeFilter === 'duplicates' ? styles.typeFilterBtnActive : ''
@@ -601,8 +639,7 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
                 role="tab"
                 aria-selected={typeFilter === 'modified'}
                 onClick={() => {
-                  setTypeFilter('modified')
-                  setCurrentPage(1)
+                  handleTypeFilterChange('modified')
                 }}
                 className={`${styles.typeFilterBtn} ${
                   typeFilter === 'modified' ? styles.typeFilterBtnActive : ''
@@ -674,6 +711,27 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
                 { value: 'lowest', label: t.lowestAmount },
               ]}
             />
+
+            <button
+              type="button"
+              onClick={() => setDetachTransactionsFromDashboard(!detachTransactionsFromDashboard)}
+              className={`${styles.detachBtn} ${
+                detachTransactionsFromDashboard ? styles.detachBtnActive : styles.detachBtnLinked
+              }`}
+              title={
+                detachTransactionsFromDashboard
+                  ? t.attachTransactionsAction || 'Filters detached from dashboard (click to link)'
+                  : t.detachTransactionsAction || 'Filters linked to dashboard (click to detach)'
+              }
+              aria-label={
+                detachTransactionsFromDashboard
+                  ? t.attachTransactionsAction || 'Filters detached from dashboard (click to link)'
+                  : t.detachTransactionsAction || 'Filters linked to dashboard (click to detach)'
+              }
+              data-testid="toggle-detach-transactions"
+            >
+              {detachTransactionsFromDashboard ? <Link2Off size={15} /> : <Link2 size={15} />}
+            </button>
 
             {isFilterActive && (
               <button

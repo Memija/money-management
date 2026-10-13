@@ -48,46 +48,51 @@ const { mockResetImport } = vi.hoisted(() => ({
   mockResetImport: vi.fn(),
 }))
 
+const defaultMockAppState = {
+  importedAccounts: [
+    {
+      institutionId: '1',
+      institutionName: 'Bank A',
+      importedAt: '2024-01-01T12:00:00Z',
+      transactions: [
+        {
+          id: 't1',
+          amount: 3000,
+          type: 'income',
+          date: '2024-01-01',
+          description: 'Salary',
+          institution: 'Bank A',
+        },
+        {
+          id: 't2',
+          amount: -1000,
+          type: 'expense',
+          date: '2024-01-02',
+          description: 'Rent',
+          institution: 'Bank A',
+        },
+        {
+          id: 't3',
+          amount: -50,
+          type: 'expense',
+          date: '2024-01-03',
+          description: 'Random',
+          institution: 'Bank A',
+        },
+      ],
+    },
+  ],
+  resetImport: mockResetImport,
+  detachTransactionsFromDashboard: false,
+  setDetachTransactionsFromDashboard: vi.fn((val: boolean) => {
+    defaultMockAppState.detachTransactionsFromDashboard = val
+  }),
+}
+
 // Mock the stores
 vi.mock('../../store/useAppStore', () => ({
   useAppStore: vi.fn((selector) => {
-    const state = {
-      importedAccounts: [
-        {
-          institutionId: '1',
-          institutionName: 'Bank A',
-          importedAt: '2024-01-01T12:00:00Z',
-          transactions: [
-            {
-              id: 't1',
-              amount: 3000,
-              type: 'income',
-              date: '2024-01-01',
-              description: 'Salary',
-              institution: 'Bank A',
-            },
-            {
-              id: 't2',
-              amount: -1000,
-              type: 'expense',
-              date: '2024-01-02',
-              description: 'Rent',
-              institution: 'Bank A',
-            },
-            {
-              id: 't3',
-              amount: -50,
-              type: 'expense',
-              date: '2024-01-03',
-              description: 'Random',
-              institution: 'Bank A',
-            },
-          ],
-        },
-      ],
-      resetImport: mockResetImport,
-    }
-    return typeof selector === 'function' ? selector(state) : state
+    return typeof selector === 'function' ? selector(defaultMockAppState) : defaultMockAppState
   }),
 }))
 
@@ -126,6 +131,10 @@ vi.mock('../../store/useLanguageStore', () => ({
         subAccounts: 'Sub-accounts',
         bankAccounts: 'Bank Accounts',
         institutions: 'Accounts',
+        detachTransactionsAction: 'Filters linked to dashboard (click to detach)',
+        attachTransactionsAction: 'Filters detached from dashboard (click to link)',
+        detachedBadge: 'Detached',
+        detachedBadgeTooltip: 'Filters in this list do not affect dashboard charts or metrics',
       } as unknown as TranslationStrings,
     }
     return typeof selector === 'function' ? selector(state as LanguageState) : state
@@ -135,6 +144,12 @@ vi.mock('../../store/useLanguageStore', () => ({
 describe('Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    defaultMockAppState.detachTransactionsFromDashboard = false
+    vi.mocked(useAppStore).mockImplementation((selector) => {
+      return typeof selector === 'function'
+        ? selector(defaultMockAppState as unknown as AppState)
+        : (defaultMockAppState as unknown as AppState)
+    })
   })
 
   it('renders summary statistics correctly', () => {
@@ -383,5 +398,83 @@ describe('Dashboard', () => {
 
     fireEvent.click(shareBtn)
     expect(screen.getByTestId('share-card-download-btn')).toBeInTheDocument()
+  })
+
+  it('updates dashboard analytics and balance when category filter is changed in All Transactions', () => {
+    render(<Dashboard />)
+
+    // Initially: Income = 3000, Expenses = 1050 (Rent: 1000, Random: 50), Balance = 1950
+    const heroSection = document.querySelector('section')!
+    expect(heroSection).toHaveTextContent(/1[.,]950/)
+
+    // Select 'Rent' in category filter
+    const categorySelect = screen.getByLabelText('Filter by category')
+    fireEvent.change(categorySelect, { target: { value: 'Rent' } })
+
+    // Now dashboard reacts to Rent filter: Expenses should be 1,000, Balance should be -1,000
+    expect(heroSection).toHaveTextContent(/1[.,]000/)
+  })
+
+  it('updates dashboard analytics when type filter is changed in All Transactions', () => {
+    render(<Dashboard />)
+
+    const heroSection = document.querySelector('section')!
+    expect(heroSection).toHaveTextContent(/1[.,]950/)
+
+    // Click 'Income' tab in All Transactions
+    const incomeTab = screen.getByRole('tab', { name: /Income/i })
+    fireEvent.click(incomeTab)
+
+    // Hero balance becomes 3,000
+    expect(heroSection).toHaveTextContent(/3[.,]000/)
+
+    // Click 'Expenses' tab
+    const expenseTab = screen.getByRole('tab', { name: /Expenses/i })
+    fireEvent.click(expenseTab)
+
+    // Hero balance becomes -1,050
+    expect(heroSection).toHaveTextContent(/1[.,]050/)
+  })
+
+  it('restores full dashboard balance and analytics when filters are reset', () => {
+    render(<Dashboard />)
+
+    const heroSection = document.querySelector('section')!
+    expect(heroSection).toHaveTextContent(/1[.,]950/)
+
+    // Apply category filter
+    const categorySelect = screen.getByLabelText('Filter by category')
+    fireEvent.change(categorySelect, { target: { value: 'Rent' } })
+
+    // Reset button should now be visible
+    const resetBtn = screen.getByRole('button', { name: 'Reset all filters' })
+    expect(resetBtn).toBeInTheDocument()
+    fireEvent.click(resetBtn)
+
+    // Restores to 1950
+    expect(heroSection).toHaveTextContent(/1[.,]950/)
+  })
+
+  it('does not impact dashboard analytics or balance when transactions are detached', () => {
+    defaultMockAppState.detachTransactionsFromDashboard = true
+    render(<Dashboard />)
+
+    const heroSection = document.querySelector('section')!
+    expect(heroSection).toHaveTextContent(/1[.,]950/)
+
+    // Detached badge should be visible
+    expect(screen.getByTestId('transactions-detached-badge')).toBeInTheDocument()
+
+    // Change category filter in All Transactions to Rent
+    const categorySelect = screen.getByLabelText('Filter by category')
+    fireEvent.change(categorySelect, { target: { value: 'Rent' } })
+
+    // Since transactions are detached, the Dashboard balance remains unchanged (1,950)
+    expect(heroSection).toHaveTextContent(/1[.,]950/)
+
+    // Toggle detach button in All Transactions to re-link
+    const detachBtn = screen.getByTestId('toggle-detach-transactions')
+    fireEvent.click(detachBtn)
+    expect(defaultMockAppState.setDetachTransactionsFromDashboard).toHaveBeenCalledWith(false)
   })
 })

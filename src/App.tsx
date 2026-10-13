@@ -54,7 +54,7 @@ import { useLanguageStore } from './store/useLanguageStore'
 import styles from './App.module.css'
 
 if (typeof window !== 'undefined') {
-  ;(window as any).__store = useAppStore
+  ;(window as unknown as { __store: unknown }).__store = useAppStore
 }
 
 const LoadingFallback: React.FC = () => {

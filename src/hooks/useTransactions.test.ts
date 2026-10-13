@@ -435,4 +435,30 @@ describe('useTransactions', () => {
     const ruleTx = result.current.allTransactions.find((t) => t.id === 'rule-1')
     expect(ruleTx?.isDuplicate).toBe(true)
   })
+
+  // ---- Controlled Category and Type Filter state ---------------------------
+
+  it('should initialize selectedCategory to "all" and allow updating it', () => {
+    const { result } = renderHook(() => useTransactions())
+
+    expect(result.current.selectedCategory).toBe('all')
+
+    act(() => {
+      result.current.setSelectedCategory('Groceries')
+    })
+
+    expect(result.current.selectedCategory).toBe('Groceries')
+  })
+
+  it('should initialize typeFilter to "all" and allow updating it', () => {
+    const { result } = renderHook(() => useTransactions())
+
+    expect(result.current.typeFilter).toBe('all')
+
+    act(() => {
+      result.current.setTypeFilter('income')
+    })
+
+    expect(result.current.typeFilter).toBe('income')
+  })
 })

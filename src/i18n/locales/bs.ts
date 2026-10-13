@@ -492,6 +492,12 @@ export const bs: TranslationStrings = {
   filterWithoutLogosActiveNotice: 'Prikazuju se transakcije bez logotipa',
   filterWithoutLogosBadge: 'Bez logotipa',
   filterWithoutLogosInfo: 'Ova opcija pomaže u prepoznavanju transakcija i trgovaca koji još nemaju dodijeljen logotip brenda. Filtrira samo listu „Sve transakcije” na dnu kontrolne ploče.',
+  detachTransactionsTitle: 'Odvoji sve transakcije od kontrolne ploče',
+  detachTransactionsDesc: 'Zadrži filtere u Svim transakcijama nezavisnim tako da promjene ne utiču na grafikone, stanja i statistike.',
+  detachTransactionsAction: 'Filteri povezani sa kontrolnom pločom (kliknite za odvajanje)',
+  attachTransactionsAction: 'Filteri odvojeni od kontrolne ploče (kliknite za povezivanje)',
+  detachedBadge: 'Odvojeno',
+  detachedBadgeTooltip: 'Filteri u ovoj listi ne utiču na grafikone i statistike kontrolne ploče',
   active: 'Aktivno',
   inactive: 'Neaktivno',
 

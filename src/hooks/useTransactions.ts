@@ -24,12 +24,22 @@ function matchesPeriod(date: string, period?: PeriodFilter): boolean {
   }
 }
 
+export type TransactionTypeFilter =
+  | 'all'
+  | 'income'
+  | 'expense'
+  | 'transfers'
+  | 'duplicates'
+  | 'modified'
+
 export function useTransactions(period?: PeriodFilter) {
   const importedAccounts = useAppStore((s) => s.importedAccounts)
   const customKeywords = useAppStore((s) => s.customKeywords)
   const manualCategories = useAppStore((s) => s.manualCategories)
 
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [typeFilter, setTypeFilter] = useState<TransactionTypeFilter>('all')
   const [selectedInstitution, setSelectedInstitution] = useState<string>('all')
   const [selectedSubAccount, setSelectedSubAccount] = useState<string>('all')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest')
@@ -133,6 +143,10 @@ export function useTransactions(period?: PeriodFilter) {
     filteredTx,
     searchTerm,
     setSearchTerm,
+    selectedCategory,
+    setSelectedCategory,
+    typeFilter,
+    setTypeFilter,
     selectedInstitution,
     setSelectedInstitution: handleSetSelectedInstitution,
     selectedSubAccount,

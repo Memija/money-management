@@ -18,6 +18,9 @@ vi.mock('../../../store/useLanguageStore', () => ({
         filterWithoutLogosInfo:
           'This option helps you identify transactions and merchants that do not yet have an assigned brand logo.',
         filterWithoutLogosBadge: 'Without logos',
+        detachTransactionsTitle: 'Detach all transactions from dashboard',
+        detachTransactionsDesc:
+          'Keep filters in All Transactions independent so changes do not affect charts, balances, and metrics.',
         active: 'Active',
         inactive: 'Inactive',
         transactions: 'transactions',
@@ -31,6 +34,7 @@ describe('AdvancedSettings', () => {
   beforeEach(() => {
     useAppStore.setState({
       filterTransactionsWithoutLogos: false,
+      detachTransactionsFromDashboard: false,
       importedAccounts: [],
     })
   })
@@ -43,7 +47,8 @@ describe('AdvancedSettings', () => {
       screen.getByText('Configure advanced preferences and specialized transaction filters.'),
     ).toBeInTheDocument()
     expect(screen.getByText('Filter transactions without logos')).toBeInTheDocument()
-    expect(screen.getByText('Inactive')).toBeInTheDocument()
+    expect(screen.getByText('Detach all transactions from dashboard')).toBeInTheDocument()
+    expect(screen.getAllByText('Inactive').length).toBe(2)
 
     const toggle = screen.getByRole('switch', { name: 'Filter transactions without logos' })
     expect(toggle).toHaveAttribute('aria-checked', 'false')
@@ -60,6 +65,16 @@ describe('AdvancedSettings', () => {
     // Re-render with new state
     render(<AdvancedSettings />)
     expect(screen.getAllByText('Active').length).toBeGreaterThan(0)
+  })
+
+  it('toggles detachTransactionsFromDashboard when clicked', () => {
+    render(<AdvancedSettings />)
+
+    const toggle = screen.getByTestId('toggle-detach-transactions-setting')
+    expect(toggle).toHaveAttribute('aria-checked', 'false')
+
+    fireEvent.click(toggle)
+    expect(useAppStore.getState().detachTransactionsFromDashboard).toBe(true)
   })
 
   it('displays transaction stats when accounts have imported transactions', () => {

@@ -95,6 +95,10 @@ const mockTranslations = {
   modified: 'Modified',
   filterWithoutLogosActiveNotice: 'Showing transactions without logos',
   filterWithoutLogosBadge: 'Without logos',
+  detachTransactionsAction: 'Filters linked to dashboard (click to detach)',
+  attachTransactionsAction: 'Filters detached from dashboard (click to link)',
+  detachedBadge: 'Detached',
+  detachedBadgeTooltip: 'Filters in this list do not affect dashboard charts or metrics',
 }
 
 const mockTransactions: Transaction[] = [
@@ -1606,6 +1610,60 @@ describe('TransactionList Component', () => {
       expect(screen.getByText('Merchant with Logo')).toBeInTheDocument()
       expect(screen.getByText('Local Bakery No Brand')).toBeInTheDocument()
       expect(screen.queryByTestId('without-logos-filter-badge')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('detach transactions from dashboard', () => {
+    it('renders the toggle button with linked status by default and calls setter on click', () => {
+      const mockSetDetach = vi.fn()
+      render(
+        <TransactionList
+          filteredTx={mockTransactions}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          detachTransactionsFromDashboard={false}
+          setDetachTransactionsFromDashboard={mockSetDetach}
+        />,
+      )
+
+      const toggleBtn = screen.getByTestId('toggle-detach-transactions')
+      expect(toggleBtn).toBeInTheDocument()
+      expect(toggleBtn).toHaveAttribute(
+        'aria-label',
+        'Filters linked to dashboard (click to detach)',
+      )
+      expect(screen.queryByTestId('transactions-detached-badge')).not.toBeInTheDocument()
+
+      fireEvent.click(toggleBtn)
+      expect(mockSetDetach).toHaveBeenCalledWith(true)
+    })
+
+    it('renders detached badge and updated tooltip when detached is true', () => {
+      const mockSetDetach = vi.fn()
+      render(
+        <TransactionList
+          filteredTx={mockTransactions}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          detachTransactionsFromDashboard={true}
+          setDetachTransactionsFromDashboard={mockSetDetach}
+        />,
+      )
+
+      const toggleBtn = screen.getByTestId('toggle-detach-transactions')
+      expect(toggleBtn).toHaveAttribute(
+        'aria-label',
+        'Filters detached from dashboard (click to link)',
+      )
+
+      const badge = screen.getByTestId('transactions-detached-badge')
+      expect(badge).toBeInTheDocument()
+      expect(badge).toHaveTextContent('Detached')
+
+      fireEvent.click(toggleBtn)
+      expect(mockSetDetach).toHaveBeenCalledWith(false)
     })
   })
 })

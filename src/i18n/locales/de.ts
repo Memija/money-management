@@ -496,6 +496,12 @@ export const de: TranslationStrings = {
   filterWithoutLogosActiveNotice: 'Transaktionen ohne Logos werden angezeigt',
   filterWithoutLogosBadge: 'Ohne Logos',
   filterWithoutLogosInfo: 'Diese Option hilft dabei, Transaktionen und Händler zu identifizieren, denen noch kein Markenlogo zugewiesen ist. Sie filtert ausschließlich die Liste „Alle Transaktionen“ unten im Dashboard.',
+  detachTransactionsTitle: 'Alle Transaktionen vom Dashboard trennen',
+  detachTransactionsDesc: 'Filter in „Alle Transaktionen“ unabhängig halten, sodass Änderungen keine Diagramme, Salden und Kennzahlen beeinflussen.',
+  detachTransactionsAction: 'Filter mit Dashboard synchronisiert (klicken zum Trennen)',
+  attachTransactionsAction: 'Filter vom Dashboard getrennt (klicken zum Synchronisieren)',
+  detachedBadge: 'Getrennt',
+  detachedBadgeTooltip: 'Filter in dieser Liste beeinflussen Dashboard-Diagramme und -Kennzahlen nicht',
   active: 'Aktiv',
   inactive: 'Inaktiv',
 

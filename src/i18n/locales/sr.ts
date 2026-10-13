@@ -492,6 +492,12 @@ export const sr: TranslationStrings = {
   filterWithoutLogosActiveNotice: 'Приказују се трансакције без логотипа',
   filterWithoutLogosBadge: 'Без логотипа',
   filterWithoutLogosInfo: 'Ова опција помаже у препознавању трансакција и трговаца који још немају додељен логотип бренда. Филтрира само листу „Све трансакције” на дну контролне табле.',
+  detachTransactionsTitle: 'Одвоји све трансакције од контролне табле',
+  detachTransactionsDesc: 'Задржи филтере у Свим трансакцијама независним тако да промене не утичу на графиконе, стања и статистике.',
+  detachTransactionsAction: 'Филтери повезани са контролном таблом (кликните за одвајање)',
+  attachTransactionsAction: 'Филтери одвојени од контролне табле (кликните за повезивање)',
+  detachedBadge: 'Одвојено',
+  detachedBadgeTooltip: 'Филтери у овој листи не утичу на графиконе и статистике контролне табле',
   active: 'Активно',
   inactive: 'Неактивно',
 

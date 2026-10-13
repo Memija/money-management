@@ -490,6 +490,12 @@ export interface TranslationStrings {
   filterWithoutLogosActiveNotice: string
   filterWithoutLogosBadge: string
   filterWithoutLogosInfo: string
+  detachTransactionsTitle: string
+  detachTransactionsDesc: string
+  detachTransactionsAction: string
+  attachTransactionsAction: string
+  detachedBadge: string
+  detachedBadgeTooltip: string
   active: string
   inactive: string
 

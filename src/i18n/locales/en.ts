@@ -493,6 +493,12 @@ export const en: TranslationStrings = {
   filterWithoutLogosActiveNotice: 'Showing transactions without logos',
   filterWithoutLogosBadge: 'Without logos',
   filterWithoutLogosInfo: 'This option helps you identify transactions and merchants that do not yet have an assigned brand logo. It only filters the All Transactions list at the bottom of the dashboard.',
+  detachTransactionsTitle: 'Detach all transactions from dashboard',
+  detachTransactionsDesc: 'Keep filters in All Transactions independent so changes do not affect charts, balances, and metrics.',
+  detachTransactionsAction: 'Filters linked to dashboard (click to detach)',
+  attachTransactionsAction: 'Filters detached from dashboard (click to link)',
+  detachedBadge: 'Detached',
+  detachedBadgeTooltip: 'Filters in this list do not affect dashboard charts or metrics',
   active: 'Active',
   inactive: 'Inactive',
 

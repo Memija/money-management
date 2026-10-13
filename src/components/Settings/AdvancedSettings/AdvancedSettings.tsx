@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { ImageOff, Info, SlidersHorizontal } from 'lucide-react'
+import { ImageOff, Info, Link2Off, SlidersHorizontal } from 'lucide-react'
 
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
@@ -12,6 +12,8 @@ export const AdvancedSettings: React.FC = () => {
   const importedAccounts = useAppStore((s) => s.importedAccounts)
   const filterTransactionsWithoutLogos = useAppStore((s) => s.filterTransactionsWithoutLogos)
   const setFilterTransactionsWithoutLogos = useAppStore((s) => s.setFilterTransactionsWithoutLogos)
+  const detachTransactionsFromDashboard = useAppStore((s) => s.detachTransactionsFromDashboard)
+  const setDetachTransactionsFromDashboard = useAppStore((s) => s.setDetachTransactionsFromDashboard)
 
   // Calculate live statistics across imported transactions
   const { totalTxs, withoutLogoCount } = useMemo(() => {
@@ -98,6 +100,54 @@ export const AdvancedSettings: React.FC = () => {
                 <span
                   className={`${styles.switchKnob} ${
                     filterTransactionsWithoutLogos ? styles.switchKnobActive : ''
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
+          <div
+            className={`${styles.optionCard} ${
+              detachTransactionsFromDashboard ? styles.optionCardActive : ''
+            }`}
+          >
+            <div className={styles.optionLeft}>
+              <div className={styles.optionIconWrapper} aria-hidden="true">
+                <Link2Off size={20} />
+              </div>
+              <div className={styles.optionText}>
+                <h4 className={styles.optionTitle}>
+                  {t.detachTransactionsTitle || 'Detach all transactions from dashboard'}
+                </h4>
+                <p className={styles.optionDesc}>
+                  {t.detachTransactionsDesc ||
+                    'Keep filters in All Transactions independent so changes do not affect charts, balances, and metrics.'}
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.optionRight}>
+              <span
+                className={`${styles.statusBadge} ${
+                  detachTransactionsFromDashboard ? styles.statusActive : styles.statusInactive
+                }`}
+              >
+                {detachTransactionsFromDashboard ? (t.active || 'Active') : (t.inactive || 'Inactive')}
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={detachTransactionsFromDashboard}
+                aria-label={t.detachTransactionsTitle || 'Detach all transactions from dashboard'}
+                onClick={() => setDetachTransactionsFromDashboard(!detachTransactionsFromDashboard)}
+                className={`${styles.switchButton} ${
+                  detachTransactionsFromDashboard ? styles.switchButtonActive : ''
+                }`}
+                data-testid="toggle-detach-transactions-setting"
+              >
+                <span
+                  className={`${styles.switchKnob} ${
+                    detachTransactionsFromDashboard ? styles.switchKnobActive : ''
                   }`}
                 />
               </button>

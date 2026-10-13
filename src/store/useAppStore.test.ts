@@ -7,12 +7,12 @@ import type {
   ImportedAccount,
   Transaction,
 } from '../types'
+import { CATEGORIZER_RULES_VERSION } from '../utils/categorizer/categorizer'
 import {
   countDuplicateTransactionsInAccounts,
   sanitizeDuplicateOverrideRules,
   useAppStore,
 } from './useAppStore'
-import { CATEGORIZER_RULES_VERSION } from '../utils/categorizer/categorizer'
 
 describe('useAppStore', () => {
   beforeEach(() => {
@@ -1737,6 +1737,28 @@ describe('useAppStore', () => {
 
       useAppStore.getState().clearAllData()
       expect(useAppStore.getState().filterTransactionsWithoutLogos).toBe(false)
+    })
+  })
+
+  describe('detachTransactionsFromDashboard', () => {
+    it('defaults to false', () => {
+      expect(useAppStore.getState().detachTransactionsFromDashboard).toBe(false)
+    })
+
+    it('sets detachTransactionsFromDashboard correctly', () => {
+      useAppStore.getState().setDetachTransactionsFromDashboard(true)
+      expect(useAppStore.getState().detachTransactionsFromDashboard).toBe(true)
+
+      useAppStore.getState().setDetachTransactionsFromDashboard(false)
+      expect(useAppStore.getState().detachTransactionsFromDashboard).toBe(false)
+    })
+
+    it('resets detachTransactionsFromDashboard on clearAllData', () => {
+      useAppStore.getState().setDetachTransactionsFromDashboard(true)
+      expect(useAppStore.getState().detachTransactionsFromDashboard).toBe(true)
+
+      useAppStore.getState().clearAllData()
+      expect(useAppStore.getState().detachTransactionsFromDashboard).toBe(false)
     })
   })
 

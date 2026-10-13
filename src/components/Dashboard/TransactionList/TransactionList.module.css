@@ -54,6 +54,32 @@
   gap: 0.2rem;
 }
 
+.titleWithBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detachedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  line-height: 1;
+}
+
+[data-theme='light'] .detachedBadge {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border-color: rgba(217, 119, 6, 0.25);
+}
+
 .title {
   font-size: 1.15rem;
   font-weight: 700;
@@ -386,6 +412,53 @@
   transform: rotate(-45deg);
 }
 
+.detachBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  background: var(--dropdown-item-hover);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.detachBtn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.detachBtnLinked {
+  color: var(--text-muted);
+}
+
+.detachBtnLinked:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.detachBtnActive {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+[data-theme='light'] .detachBtnActive {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border-color: rgba(217, 119, 6, 0.35);
+}
+
+.detachBtnActive:hover {
+  background: rgba(245, 158, 11, 0.22);
+  color: #f59e0b;
+}
+
 /* ─────────────────────────────────────────────────
    List Content & Empty State
 ───────────────────────────────────────────────── */
@@ -676,7 +749,8 @@
     max-width: none;
   }
 
-  .resetBtn {
+  .resetBtn,
+  .detachBtn {
     flex-shrink: 0;
   }
 }

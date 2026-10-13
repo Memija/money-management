@@ -496,6 +496,12 @@ export const pl: TranslationStrings = {
   filterWithoutLogosActiveNotice: 'Wyświetlanie transakcji bez logo',
   filterWithoutLogosBadge: 'Bez logo',
   filterWithoutLogosInfo: 'Ta opcja pomaga zidentyfikować transakcje i sprzedawców, którzy nie mają jeszcze przypisanego logo marki. Filtruje tylko listę „Wszystkie transakcje” na dole pulpitu.',
+  detachTransactionsTitle: 'Odłącz wszystkie transakcje od pulpitu',
+  detachTransactionsDesc: 'Zachowaj filtry w Wszystkich transakcjach jako niezależne, aby zmiany nie wpływały na wykresy, salda i wskaźniki.',
+  detachTransactionsAction: 'Filtry połączone z pulpitem (kliknij, aby odłączyć)',
+  attachTransactionsAction: 'Filtry odłączone od pulpitu (kliknij, aby połączyć)',
+  detachedBadge: 'Odłączone',
+  detachedBadgeTooltip: 'Filtry na tej liście nie wpływają na wykresy ani wskaźniki pulpitu',
   active: 'Aktywny',
   inactive: 'Nieaktywny',
 
