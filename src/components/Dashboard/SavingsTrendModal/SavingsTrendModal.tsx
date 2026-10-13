@@ -14,9 +14,12 @@ import {
 import type { MonthlyEntry } from '../../../hooks/useAnalytics'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { MonthYearAxisTick } from '../../shared/ChartAxisTicks'
 import { Modal } from '../../shared/Modal'
 
 import styles from './SavingsTrendModal.module.css'
+
+const MONTH_TICK = <MonthYearAxisTick fill="var(--text-dim)" fontSize={10} />
 
 interface SavingsTrendModalProps {
   isOpen: boolean
@@ -203,10 +206,9 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis
                   dataKey="rawMonth"
-                  tick={{ fontSize: 10, fill: 'var(--text-dim)' }}
+                  tick={MONTH_TICK}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={formatMonthYear}
                 />
                 <YAxis
                   tick={{ fontSize: 10, fill: 'var(--text-dim)' }}

@@ -1,7 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { PieChart as PieChartIcon } from 'lucide-react'
-import { Cell, Pie, PieChart, ResponsiveContainer, Sector, Tooltip } from 'recharts'
 
 import type { CategoryEntry } from '../../../hooks/useAnalytics'
 import { useFormatters } from '../../../hooks/useFormatters'
@@ -9,6 +8,7 @@ import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel } from '../../../utils/category-utils'
+import { ExpenseCategoriesDonut } from './ExpenseCategoriesDonut'
 
 import styles from './ExpenseCategories.module.css'
 
@@ -16,17 +16,6 @@ interface ExpenseCategoriesProps {
   categoryBreakdown: CategoryEntry[]
   totalExpenses: number
   onCategoryClick: (categoryName: string) => void
-}
-
-interface SectorShapeProps {
-  cx: number
-  cy: number
-  innerRadius: number
-  outerRadius: number
-  startAngle: number
-  endAngle: number
-  fill: string
-  index: number
 }
 
 const getRankBadgeClass = (index: number) => {
@@ -56,82 +45,10 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(({
   const avgExpensePerCategory =
     sortedCategories.length > 0 ? totalExpenses / sortedCategories.length : 0
 
-  const handlePieEnter = useCallback((_: unknown, index: number) => {
-    setActiveIndex(index)
-  }, [])
-
-  const handlePieLeave = useCallback(() => {
-    setActiveIndex(null)
-  }, [])
-
   const hoveredCategory =
     activeIndex !== null && sortedCategories[activeIndex]
       ? sortedCategories[activeIndex]
       : null
-
-  // Custom Sector renderer with luminous active expansion
-  const renderSector = (props: unknown, index: number) => {
-    const {
-      cx,
-      cy,
-      innerRadius,
-      outerRadius,
-      startAngle,
-      endAngle,
-      fill,
-    } = props as SectorShapeProps
-
-    const isHovered = activeIndex === index
-
-    if (isHovered) {
-      return (
-        <g key={`active-sector-${index}`} style={{ outline: 'none' }}>
-          {/* Luminous outer halo */}
-          <Sector
-            cx={cx}
-            cy={cy}
-            innerRadius={outerRadius + 4}
-            outerRadius={outerRadius + 10}
-            startAngle={startAngle}
-            endAngle={endAngle}
-            fill={fill}
-            opacity={0.35}
-            cornerRadius={4}
-          />
-          {/* Main expanded active slice */}
-          <Sector
-            cx={cx}
-            cy={cy}
-            innerRadius={innerRadius - 4}
-            outerRadius={outerRadius + 7}
-            startAngle={startAngle}
-            endAngle={endAngle}
-            fill={fill}
-            stroke="var(--card-bg, #161821)"
-            strokeWidth={3}
-            cornerRadius={6}
-          />
-        </g>
-      )
-    }
-
-    return (
-      <g key={`sector-${index}`} style={{ outline: 'none' }}>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-          stroke="var(--card-bg, #161821)"
-          strokeWidth={2}
-          cornerRadius={5}
-        />
-      </g>
-    )
-  }
 
   if (sortedCategories.length === 0) {
     return (
@@ -208,96 +125,13 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(({
       <div className={styles.content}>
         {/* Donut Chart Container with Center Stats & Glass Disc */}
         <div className={styles.chartWrapper}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <defs>
-                {sortedCategories.map((cat, idx) => (
-                  <linearGradient
-                    key={`pie-grad-${idx}`}
-                    id={`pie-grad-${idx}`}
-                    x1="0"
-                    y1="0"
-                    x2="1"
-                    y2="1"
-                  >
-                    <stop offset="0%" stopColor={cat.color} stopOpacity={1} />
-                    <stop offset="100%" stopColor={cat.color} stopOpacity={0.78} />
-                  </linearGradient>
-                ))}
-              </defs>
-              <Pie
-                data={sortedCategories}
-                innerRadius={84}
-                outerRadius={128}
-                minAngle={4}
-                paddingAngle={3}
-                dataKey="value"
-                shape={renderSector}
-                onMouseEnter={handlePieEnter}
-                onMouseLeave={handlePieLeave}
-                onClick={(_, index) => {
-                  const cat = sortedCategories[index]
-                  if (cat) {
-                    onCategoryClick(cat.name)
-                  }
-                }}
-                animationDuration={600}
-                animationEasing="ease-out"
-              >
-                {sortedCategories.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={`url(#pie-grad-${index})`}
-                    style={{ cursor: 'pointer', outline: 'none' }}
-                  />
-                ))}
-              </Pie>
-              <Tooltip
-                wrapperStyle={{ outline: 'none', zIndex: 10 }}
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    const data = payload[0].payload as CategoryEntry
-                    const pct =
-                      totalExpenses > 0
-                        ? ((data.value / totalExpenses) * 100).toFixed(1)
-                        : '0'
-                    return (
-                      <div className={styles.tooltipContainer}>
-                        <div className={styles.tooltipHeader}>
-                          <div
-                            className={styles.tooltipDot}
-                            style={{
-                              backgroundColor: data.color,
-                              color: data.color,
-                            }}
-                          />
-                          <span className={styles.tooltipTitle}>
-                            {getCategoryLabel(data.name, t)}
-                          </span>
-                        </div>
-                        <div className={styles.tooltipRow}>
-                          <span className={`${styles.tooltipValue} privacy-blur`}>
-                            {formatCurrency(data.value)}
-                          </span>
-                          <span
-                            className={styles.tooltipBadge}
-                            style={{
-                              color: data.color,
-                              backgroundColor: `${data.color}20`,
-                              borderColor: `${data.color}40`,
-                            }}
-                          >
-                            {pct}%
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  }
-                  return null
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <ExpenseCategoriesDonut
+            categories={sortedCategories}
+            totalExpenses={totalExpenses}
+            activeIndex={activeIndex}
+            onActiveIndexChange={setActiveIndex}
+            onCategoryClick={onCategoryClick}
+          />
 
           {/* Interactive Center Donut Display with Frosted Glass Disc */}
           <div className={styles.centerStats}>

@@ -1,0 +1,1 @@
+export { MonthYearAxisTick } from './MonthYearAxisTick'

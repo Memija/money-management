@@ -27,6 +27,15 @@ import { TransactionList } from './TransactionList'
 
 import styles from './Dashboard.module.css'
 
+const __w = window as unknown as { __prof?: Record<string, number[]> }
+const __onRender: React.ProfilerOnRenderCallback = (id, _phase, actual) => {
+  const store = (__w.__prof ??= {})
+  ;(store[id] ??= []).push(actual)
+}
+const P = ({ id, children }: { id: string; children: React.ReactNode }) => (
+  <React.Profiler id={id} onRender={__onRender}>{children}</React.Profiler>
+)
+
 const Dashboard: React.FC = () => {
   const importedAccounts = useAppStore((s) => s.importedAccounts)
   const t = useLanguageStore((s) => s.t)
@@ -255,9 +264,9 @@ const Dashboard: React.FC = () => {
   }, [analytics.categoryBreakdown, analytics.totalExpenses, t])
 
   return (
-    <div className={styles['dashboard-outer']}>
+    <P id="Dashboard"><div className={styles['dashboard-outer']}>
       {/* Subheader — plain flex item above the scroll area, no position tricks needed */}
-      <div className={styles['subheader-bar']}>
+      <P id="Subheader"><div className={styles['subheader-bar']}>
         <div className={styles['subheader-inner']}>
           <div className={styles['subheader-left']}>
             <PeriodFilter
@@ -323,7 +332,7 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+      </div></P>
 
       {/* Main content area */}
       <div className={styles['scroll-area']}>
@@ -366,7 +375,7 @@ const Dashboard: React.FC = () => {
         </motion.section>
 
         {/* Insight Cards */}
-        <InsightCards
+        <P id="InsightCards"><InsightCards
           transactionCount={analytics.transactionCount}
           incomeCount={analytics.incomeCount}
           expenseCount={analytics.expenseCount}
@@ -385,45 +394,45 @@ const Dashboard: React.FC = () => {
           onAvgIncomeClick={handleAvgIncomeClick}
           onAvgExpenseClick={handleAvgExpenseClick}
           onCategoryClick={handleCategoryDetailClick}
-        />
+        /></P>
 
         {/* Charts Grid */}
         <div className={styles['dashboard-grid']}>
           {/* Income vs Expenses Chart */}
-          <IncomeVsExpensesChart
+          <P id="IncomeVsExpenses"><IncomeVsExpensesChart
             monthlyData={analytics.monthlyData}
             totalIncome={analytics.totalIncome}
             totalExpenses={analytics.totalExpenses}
-          />
+          /></P>
 
           {/* Expense Categories full-row interactive breakdown */}
-          <ExpenseCategories
+          <P id="ExpenseCategories"><ExpenseCategories
             categoryBreakdown={analytics.categoryBreakdown}
             totalExpenses={analytics.totalExpenses}
             onCategoryClick={handleCategoryDetailClick}
-          />
+          /></P>
 
           {/* Recurring Expenses */}
-          <RecurringExpenses
+          <P id="RecurringExpenses"><RecurringExpenses
             recurringExpenses={recurringExpenses}
             totalMonthly={recurringMonthlyTotal}
-          />
+          /></P>
 
           {/* Top Merchants + Category Trend (side-by-side or full row when lots of data are present) */}
-          <TopMerchants
+          <P id="TopMerchants"><TopMerchants
             merchants={analytics.topMerchants}
             totalExpenses={analytics.totalExpenses}
             onMerchantClick={handleMerchantDetailClick}
             fullWidth={isCategoryTrendFullWidth}
-          />
-          <CategoryTrend
+          /></P>
+          <P id="CategoryTrend"><CategoryTrend
             data={analytics.monthlyCategoryData}
             fullWidth={isCategoryTrendFullWidth}
-          />
+          /></P>
 
 
           {/* Transactions Table */}
-          <TransactionList
+          <P id="TransactionList"><TransactionList
             filteredTx={filteredTx}
             allTransactions={allTransactions}
             institutionNames={institutionNames}
@@ -435,13 +444,13 @@ const Dashboard: React.FC = () => {
             setShowGhost={setShowGhost}
             ghostCount={ghostCount}
             showBankName={hasMultipleAccounts && selectedInstitution === 'all'}
-          />
+          /></P>
         </div>
         </main>
       </div>
 
       {/* Consolidated Transaction detail modal */}
-      <TransactionPreviewModal
+      <P id="Modals"><TransactionPreviewModal
         isOpen={activeDetailModal !== null}
         onClose={() => setActiveDetailModal(null)}
         title={detailModalConfig?.title ?? ''}
@@ -481,8 +490,8 @@ const Dashboard: React.FC = () => {
         netSavings={analytics.balance}
         savingsRate={analytics.savingsRate}
         topCategories={shareCardCategories}
-      />
-    </div>
+      /></P>
+    </div></P>
   )
 }
 
