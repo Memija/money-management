@@ -10,51 +10,33 @@ import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
 import { useTransactions } from '../../hooks/useTransactions'
 import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
-import { getCategoryLabel, hasExtensiveCategoryData } from '../../utils/category-utils'
-import { TransactionPreviewModal } from '../shared/TransactionPreviewModal'
-import { AvgDetailModal } from './AvgDetailModal/AvgDetailModal'
+import { hasExtensiveCategoryData } from '../../utils/category-utils'
 import { CategoryTrend } from './CategoryTrend'
+import { type AvgDetailType, DashboardModals, type DetailModalState } from './DashboardModals'
 import { ExpenseCategories } from './ExpenseCategories'
 import { IncomeVsExpensesChart } from './IncomeVsExpensesChart'
 import { InsightCards } from './InsightCards'
 import { PeriodFilter } from './PeriodFilter'
 import { RecurringExpenses } from './RecurringExpenses'
-import { SavingsTrendModal } from './SavingsTrendModal/SavingsTrendModal'
-import { ShareSnapshotModal } from './ShareSnapshotModal'
 import { StickyAccountSwitcher } from './StickyAccountSwitcher'
 import { TopMerchants } from './TopMerchants'
 import { TransactionList } from './TransactionList'
 
 import styles from './Dashboard.module.css'
 
-const __w = window as unknown as { __prof?: Record<string, number[]> }
-const __onRender: React.ProfilerOnRenderCallback = (id, _phase, actual) => {
-  const store = (__w.__prof ??= {})
-  ;(store[id] ??= []).push(actual)
-}
-const P = ({ id, children }: { id: string; children: React.ReactNode }) => (
-  <React.Profiler id={id} onRender={__onRender}>{children}</React.Profiler>
-)
-
 const Dashboard: React.FC = () => {
   const importedAccounts = useAppStore((s) => s.importedAccounts)
   const t = useLanguageStore((s) => s.t)
-  const { formatCurrency, formatMonthYear } = useFormatters()
+  const { formatCurrency } = useFormatters()
 
   // Period filter state
   const [period, setPeriod] = useState<PeriodFilterType>({ mode: 'all', value: '' })
 
   // Detail modal state (consolidates filter, category, and merchant drilldowns)
-  type DetailModalState =
-    | { type: 'filter'; filter: 'all' | 'income' | 'expense' }
-    | { type: 'category'; category: string }
-    | { type: 'merchant'; merchant: string }
-    | null
-
   const [activeDetailModal, setActiveDetailModal] = useState<DetailModalState>(null)
 
   // Avg detail modal
-  const [avgDetailType, setAvgDetailType] = useState<'income' | 'expense' | null>(null)
+  const [avgDetailType, setAvgDetailType] = useState<AvgDetailType>(null)
 
   // Savings trend modal
   const [isSavingsTrendOpen, setIsSavingsTrendOpen] = useState(false)
@@ -94,6 +76,26 @@ const Dashboard: React.FC = () => {
 
   const handleMerchantDetailClick = useCallback((merchant: string) => {
     setActiveDetailModal({ type: 'merchant', merchant })
+  }, [])
+
+  const handleDetailModalClose = useCallback(() => {
+    setActiveDetailModal(null)
+  }, [])
+
+  const handleSavingsTrendClose = useCallback(() => {
+    setIsSavingsTrendOpen(false)
+  }, [])
+
+  const handleShareModalClose = useCallback(() => {
+    setIsShareModalOpen(false)
+  }, [])
+
+  const handleShareModalOpen = useCallback(() => {
+    setIsShareModalOpen(true)
+  }, [])
+
+  const handleAvgDetailClose = useCallback(() => {
+    setAvgDetailType(null)
   }, [])
 
   const {
@@ -187,51 +189,6 @@ const Dashboard: React.FC = () => {
     selectedAccountInfo,
   ])
 
-  // Consolidated modal configuration
-  const detailModalConfig = useMemo(() => {
-    if (!activeDetailModal) return null
-
-    if (activeDetailModal.type === 'filter') {
-      const { filter } = activeDetailModal
-      const title =
-        filter === 'income'
-          ? t.income
-          : filter === 'expense'
-            ? t.expenses
-            : t.allTransactions
-      const variant: 'expense' | 'income' = filter === 'expense' ? 'expense' : 'income'
-      const transactions = analytics.periodTransactions.filter(
-        (tx) => filter === 'all' || tx.type === filter,
-      )
-      return { title, variant, transactions }
-    }
-
-    if (activeDetailModal.type === 'category') {
-      const { category } = activeDetailModal
-      const title = getCategoryLabel(category, t)
-      const variant = 'expense' as const
-      const transactions = analytics.periodTransactions.filter(
-        (tx) => tx.type === 'expense' && (tx.category || 'Other') === category,
-      )
-      return { title, variant, transactions }
-    }
-
-    if (activeDetailModal.type === 'merchant') {
-      const { merchant } = activeDetailModal
-      const title = merchant || t.topMerchants
-      const variant = 'expense' as const
-      const normalizedMerchant = merchant.trim().replace(/\s+/g, ' ').toLowerCase()
-      const transactions = analytics.periodTransactions.filter(
-        (tx) =>
-          tx.type === 'expense' &&
-          tx.description.trim().replace(/\s+/g, ' ').toLowerCase() === normalizedMerchant,
-      )
-      return { title, variant, transactions }
-    }
-
-    return null
-  }, [activeDetailModal, analytics.periodTransactions, t])
-
   const heroRef = useRef<HTMLElement>(null)
   const isHeroInView = useInView(heroRef, { margin: '-60px 0px 0px 0px' })
 
@@ -240,33 +197,10 @@ const Dashboard: React.FC = () => {
     [importedAccounts],
   )
 
-  const periodLabel = useMemo(() => {
-    if (period.mode === 'all') return t.periodAll || 'All'
-    if (period.mode === 'year') return period.value
-    if (period.mode === 'quarter') {
-      const [year, quarter] = period.value.split('-Q')
-      return `Q${quarter} ${year}`
-    }
-    if (period.mode === 'month') {
-      return formatMonthYear(period.value)
-    }
-    return period.value
-  }, [period, formatMonthYear, t])
-
-  const shareCardCategories = useMemo(() => {
-    return analytics.categoryBreakdown.slice(0, 4).map((c) => ({
-      name: getCategoryLabel(c.name, t),
-      amount: c.value,
-      percent:
-        analytics.totalExpenses > 0 ? Math.round((c.value / analytics.totalExpenses) * 100) : 0,
-      color: c.color,
-    }))
-  }, [analytics.categoryBreakdown, analytics.totalExpenses, t])
-
   return (
-    <P id="Dashboard"><div className={styles['dashboard-outer']}>
+    <div className={styles['dashboard-outer']}>
       {/* Subheader — plain flex item above the scroll area, no position tricks needed */}
-      <P id="Subheader"><div className={styles['subheader-bar']}>
+      <div className={styles['subheader-bar']}>
         <div className={styles['subheader-inner']}>
           <div className={styles['subheader-left']}>
             <PeriodFilter
@@ -280,7 +214,7 @@ const Dashboard: React.FC = () => {
             <button
               type="button"
               className={styles['share-snapshot-btn']}
-              onClick={() => setIsShareModalOpen(true)}
+              onClick={handleShareModalOpen}
               title={t.shareSnapshot || 'Share Snapshot'}
               aria-label={t.shareSnapshot || 'Share Snapshot'}
               data-testid="dashboard-share-snapshot-btn"
@@ -332,7 +266,7 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
-      </div></P>
+      </div>
 
       {/* Main content area */}
       <div className={styles['scroll-area']}>
@@ -375,7 +309,7 @@ const Dashboard: React.FC = () => {
         </motion.section>
 
         {/* Insight Cards */}
-        <P id="InsightCards"><InsightCards
+        <InsightCards
           transactionCount={analytics.transactionCount}
           incomeCount={analytics.incomeCount}
           expenseCount={analytics.expenseCount}
@@ -394,45 +328,45 @@ const Dashboard: React.FC = () => {
           onAvgIncomeClick={handleAvgIncomeClick}
           onAvgExpenseClick={handleAvgExpenseClick}
           onCategoryClick={handleCategoryDetailClick}
-        /></P>
+        />
 
         {/* Charts Grid */}
         <div className={styles['dashboard-grid']}>
           {/* Income vs Expenses Chart */}
-          <P id="IncomeVsExpenses"><IncomeVsExpensesChart
+          <IncomeVsExpensesChart
             monthlyData={analytics.monthlyData}
             totalIncome={analytics.totalIncome}
             totalExpenses={analytics.totalExpenses}
-          /></P>
+          />
 
           {/* Expense Categories full-row interactive breakdown */}
-          <P id="ExpenseCategories"><ExpenseCategories
+          <ExpenseCategories
             categoryBreakdown={analytics.categoryBreakdown}
             totalExpenses={analytics.totalExpenses}
             onCategoryClick={handleCategoryDetailClick}
-          /></P>
+          />
 
           {/* Recurring Expenses */}
-          <P id="RecurringExpenses"><RecurringExpenses
+          <RecurringExpenses
             recurringExpenses={recurringExpenses}
             totalMonthly={recurringMonthlyTotal}
-          /></P>
+          />
 
           {/* Top Merchants + Category Trend (side-by-side or full row when lots of data are present) */}
-          <P id="TopMerchants"><TopMerchants
+          <TopMerchants
             merchants={analytics.topMerchants}
             totalExpenses={analytics.totalExpenses}
             onMerchantClick={handleMerchantDetailClick}
             fullWidth={isCategoryTrendFullWidth}
-          /></P>
-          <P id="CategoryTrend"><CategoryTrend
+          />
+          <CategoryTrend
             data={analytics.monthlyCategoryData}
             fullWidth={isCategoryTrendFullWidth}
-          /></P>
+          />
 
 
           {/* Transactions Table */}
-          <P id="TransactionList"><TransactionList
+          <TransactionList
             filteredTx={filteredTx}
             allTransactions={allTransactions}
             institutionNames={institutionNames}
@@ -444,54 +378,31 @@ const Dashboard: React.FC = () => {
             setShowGhost={setShowGhost}
             ghostCount={ghostCount}
             showBankName={hasMultipleAccounts && selectedInstitution === 'all'}
-          /></P>
+          />
         </div>
         </main>
       </div>
 
-      {/* Consolidated Transaction detail modal */}
-      <P id="Modals"><TransactionPreviewModal
-        isOpen={activeDetailModal !== null}
-        onClose={() => setActiveDetailModal(null)}
-        title={detailModalConfig?.title ?? ''}
-        variant={detailModalConfig?.variant ?? 'expense'}
-        transactions={detailModalConfig?.transactions ?? []}
-        showInstitution={hasMultipleAccounts && selectedInstitution === 'all'}
-        isImport={false}
-      />
-
-      {/* Avg detail modal — opened from Avg. Transaction card rows */}
-      {avgDetailType !== null && (
-        <AvgDetailModal
-          isOpen
-          onClose={() => setAvgDetailType(null)}
-          type={avgDetailType}
-          transactions={analytics.periodTransactions}
-        />
-      )}
-
-      {/* Savings trend modal — opened from Net Saved row */}
-      <SavingsTrendModal
-        isOpen={isSavingsTrendOpen}
-        onClose={() => setIsSavingsTrendOpen(false)}
+      <DashboardModals
+        period={period}
+        periodTransactions={analytics.periodTransactions}
         monthlyData={analytics.monthlyData}
+        categoryBreakdown={analytics.categoryBreakdown}
         totalIncome={analytics.totalIncome}
         totalExpenses={analytics.totalExpenses}
+        balance={analytics.balance}
         savingsRate={analytics.savingsRate}
+        showInstitution={hasMultipleAccounts && selectedInstitution === 'all'}
+        activeDetailModal={activeDetailModal}
+        onDetailModalClose={handleDetailModalClose}
+        avgDetailType={avgDetailType}
+        onAvgDetailClose={handleAvgDetailClose}
+        isSavingsTrendOpen={isSavingsTrendOpen}
+        onSavingsTrendClose={handleSavingsTrendClose}
+        isShareModalOpen={isShareModalOpen}
+        onShareModalClose={handleShareModalClose}
       />
-
-      {/* Social Share Snapshot Modal */}
-      <ShareSnapshotModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        periodLabel={periodLabel}
-        totalIncome={analytics.totalIncome}
-        totalExpenses={analytics.totalExpenses}
-        netSavings={analytics.balance}
-        savingsRate={analytics.savingsRate}
-        topCategories={shareCardCategories}
-      /></P>
-    </div></P>
+    </div>
   )
 }
 

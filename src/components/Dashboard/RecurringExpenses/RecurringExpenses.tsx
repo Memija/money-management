@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Calendar, RefreshCw, TrendingUp } from 'lucide-react'
 
@@ -6,10 +6,8 @@ import { useFormatters } from '../../../hooks/useFormatters'
 import type { RecurringExpense } from '../../../hooks/useRecurringTransactions'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
-import { getCategoryColor } from '../../../utils/category-colors'
-import { getCategoryIcon } from '../../../utils/category-icons'
 import { normalizeDescription } from '../../../utils/category-utils'
-import { CategorySelect } from '../../shared/CategorySelect/CategorySelect'
+import { RecurringExpenseCard } from './RecurringExpenseCard'
 
 import styles from './RecurringExpenses.module.css'
 
@@ -17,6 +15,10 @@ interface RecurringExpensesProps {
   recurringExpenses: RecurringExpense[]
   totalMonthly: number
 }
+
+const MONTHS_PER_YEAR = 12
+/** Shortest normalized name that is learned as a custom keyword. */
+const MIN_KEYWORD_LENGTH = 3
 
 export const RecurringExpenses: React.FC<RecurringExpensesProps> = React.memo(({
   recurringExpenses,
@@ -27,28 +29,38 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = React.memo(({
   const setManualCategoriesBulk = useAppStore((s) => s.setManualCategoriesBulk)
   const customKeywords = useAppStore((s) => s.customKeywords)
   const setCustomKeywords = useAppStore((s) => s.setCustomKeywords)
-  const { formatCurrency, formatChargesCount } = useFormatters()
+  const { formatCurrency } = useFormatters()
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
 
-  const totalYearly = useMemo(() => totalMonthly * 12, [totalMonthly])
+  const totalYearly = useMemo(() => totalMonthly * MONTHS_PER_YEAR, [totalMonthly])
 
-  const handleCategoryChange = (expense: RecurringExpense, newCategory: string) => {
-    if (!newCategory) return
-    const mapping: Record<string, string> = {}
-    ;(expense.transactionIds || []).forEach((txId) => {
-      mapping[txId] = newCategory
-    })
-    setManualCategoriesBulk(mapping)
-
-    const norm = normalizeDescription(expense.name)
-    if (norm.length >= 3) {
-      const existingKeywords = customKeywords[newCategory] || []
-      if (!existingKeywords.some((kw) => kw.toLowerCase() === norm.toLowerCase())) {
-        setCustomKeywords(newCategory, [...existingKeywords, norm])
+  const handleCategoryChange = useCallback(
+    (expense: RecurringExpense, newCategory: string) => {
+      if (!newCategory) {
+        return
       }
-    }
-  }
+      const mapping: Record<string, string> = {}
+      ;(expense.transactionIds || []).forEach((txId) => {
+        mapping[txId] = newCategory
+      })
+      setManualCategoriesBulk(mapping)
+
+      const norm = normalizeDescription(expense.name)
+      if (norm.length >= MIN_KEYWORD_LENGTH) {
+        const existingKeywords = customKeywords[newCategory] || []
+        if (!existingKeywords.some((kw) => kw.toLowerCase() === norm.toLowerCase())) {
+          setCustomKeywords(newCategory, [...existingKeywords, norm])
+        }
+      }
+    },
+    [customKeywords, setCustomKeywords, setManualCategoriesBulk],
+  )
+
+  const handleDropdownOpenChange = useCallback((expenseId: string, isOpen: boolean) => {
+    // Only clear when the card that owns the open dropdown closes it
+    setOpenDropdownId((current) => (isOpen ? expenseId : current === expenseId ? null : current))
+  }, [])
 
   if (recurringExpenses.length === 0) {
     return null
@@ -110,91 +122,17 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = React.memo(({
 
       {/* Grid of Recurring Cards */}
       <div className={styles.grid}>
-        {recurringExpenses.map((expense) => {
-          const categoryColor = getCategoryColor(expense.category, customCategories)
-          const weightPct = totalMonthly > 0 ? (expense.amount / totalMonthly) * 100 : 0
-          const yearlyAmount = expense.amount * 12
-          const isDropdownOpen = openDropdownId === expense.id
-
-          return (
-            <motion.div
-              key={expense.id}
-              whileHover={{ y: -2 }}
-              transition={{ duration: 0.15 }}
-              className={`${styles.card} ${isDropdownOpen ? styles.cardWithOpenDropdown : ''}`}
-              style={{
-                '--card-accent-color': categoryColor,
-              } as React.CSSProperties}
-            >
-              {/* Card Top: Brand Icon + Title + Category Dropdown + Frequency */}
-              <div className={styles.cardHeader}>
-                <div className={styles.cardInfo}>
-                  <div className={styles.brandIconBox}>
-                    {getCategoryIcon(expense.category, 20, customCategories, expense.name)}
-                  </div>
-                  <div className={styles.nameBlock}>
-                    <h4 className={`${styles.itemName} privacy-blur`} title={expense.name}>
-                      {expense.name}
-                    </h4>
-                    <div className={styles.categorySelectWrapper}>
-                      <CategorySelect
-                        value={expense.category || 'Other'}
-                        onChange={(newCat) => handleCategoryChange(expense, newCat)}
-                        variant="badge"
-                        align="left"
-                        onOpenChange={(isOpen) => setOpenDropdownId(isOpen ? expense.id : null)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <span className={styles.frequencyTag}>
-                  <Calendar size={11} className={styles.frequencyIcon} />
-                  {t.monthlyFrequency}
-                </span>
-              </div>
-
-              {/* Card Middle: Amount & History */}
-              <div className={styles.cardPricing}>
-                <div className={styles.amountDisplay}>
-                  <span className={`${styles.amountValue} privacy-blur`}>
-                    {formatCurrency(expense.amount)}
-                  </span>
-                  <span className={styles.amountPeriod}>{t.perMonth}</span>
-                </div>
-                <div className={styles.projectionMeta}>
-                  <span className={`${styles.yearlyEst} privacy-blur`}>
-                    ~{formatCurrency(yearlyAmount)}{t.perYear}
-                  </span>
-                  <span className={styles.bulletDot}>•</span>
-                  <span className={styles.chargesCount}>
-                    {formatChargesCount(expense.transactionCount)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Bottom: Budget Weight Bar (with interactive hover effects) */}
-              <div className={styles.cardFooter}>
-                <div
-                  className={styles.weightBarContainer}
-                  title={`${weightPct.toFixed(1)}%`}
-                >
-                  <div className={styles.weightBarBg}>
-                    <div
-                      className={styles.weightBarFill}
-                      style={{
-                        width: `${Math.min(100, Math.max(3, weightPct))}%`,
-                      }}
-                    />
-                  </div>
-                  <span className={styles.weightPctText}>
-                    {weightPct.toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          )
-        })}
+        {recurringExpenses.map((expense) => (
+          <RecurringExpenseCard
+            key={expense.id}
+            expense={expense}
+            totalMonthly={totalMonthly}
+            customCategories={customCategories}
+            isDropdownOpen={openDropdownId === expense.id}
+            onCategoryChange={handleCategoryChange}
+            onDropdownOpenChange={handleDropdownOpenChange}
+          />
+        ))}
       </div>
     </motion.div>
   )

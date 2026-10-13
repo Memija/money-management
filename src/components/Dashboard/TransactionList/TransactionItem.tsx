@@ -6,8 +6,8 @@ import { useLanguageStore } from '../../../store/useLanguageStore'
 import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
-import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel, isInformativeTransaction } from '../../../utils/category-utils'
+import { CategoryIcon } from '../../shared/CategoryIcon'
 import { CategorySelect } from '../../shared/CategorySelect'
 import { CopyButton } from '../../shared/CopyButton'
 
@@ -21,6 +21,8 @@ interface TransactionItemProps {
   onCategoryChange: (tx: Transaction, newCategory: string) => void
   showBankName?: boolean
 }
+
+const TX_ICON_SIZE = 20
 
 export const TransactionItem = React.memo<TransactionItemProps>(
   ({ tx, customCategories, formatDate, formatCurrency, onCategoryChange, showBankName = true }) => {
@@ -49,7 +51,13 @@ export const TransactionItem = React.memo<TransactionItemProps>(
             {isZeroAmount ? (
               <Info size={20} color="var(--text-dim)" aria-hidden="true" />
             ) : (
-              getCategoryIcon(tx.category || 'Other', 20, customCategories, tx.description, tx.counterpartyIban)
+              <CategoryIcon
+                category={tx.category || 'Other'}
+                size={TX_ICON_SIZE}
+                customCategories={customCategories}
+                description={tx.description}
+                counterpartyIban={tx.counterpartyIban}
+              />
             )}
           </div>
           <div className={styles.txDetails}>

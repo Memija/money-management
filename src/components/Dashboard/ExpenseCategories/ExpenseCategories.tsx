@@ -6,8 +6,8 @@ import type { CategoryEntry } from '../../../hooks/useAnalytics'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
-import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel } from '../../../utils/category-utils'
+import { CategoryIcon } from '../../shared/CategoryIcon'
 import { ExpenseCategoriesDonut } from './ExpenseCategoriesDonut'
 
 import styles from './ExpenseCategories.module.css'
@@ -17,6 +17,8 @@ interface ExpenseCategoriesProps {
   totalExpenses: number
   onCategoryClick: (categoryName: string) => void
 }
+
+const CATEGORY_ICON_SIZE = 16
 
 const getRankBadgeClass = (index: number) => {
   if (index === 0) return styles.rankGold
@@ -154,7 +156,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(({
                       } as React.CSSProperties
                     }
                   >
-                    {getCategoryIcon(hoveredCategory.name, 16, customCategories)}
+                    <CategoryIcon category={hoveredCategory.name} size={CATEGORY_ICON_SIZE} customCategories={customCategories} />
                   </div>
                   <p className={styles.centerCategoryLabel}>
                     {getCategoryLabel(hoveredCategory.name, t, locale, customCategories)}
@@ -233,7 +235,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(({
                       #{index + 1}
                     </span>
                     <div className={styles.iconBox}>
-                      {getCategoryIcon(cat.name, 16, customCategories)}
+                      <CategoryIcon category={cat.name} size={CATEGORY_ICON_SIZE} customCategories={customCategories} />
                     </div>
                     <span
                       className={styles.categoryName}

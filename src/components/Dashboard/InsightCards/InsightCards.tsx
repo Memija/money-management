@@ -6,8 +6,8 @@ import { useFormatters } from '../../../hooks/useFormatters'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { getCategoryColor } from '../../../utils/category-colors'
-import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel } from '../../../utils/category-utils'
+import { CategoryIcon } from '../../shared/CategoryIcon'
 
 import styles from './InsightCards.module.css'
 
@@ -210,7 +210,7 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(({
                 color="amber"
                 customColor={catColor}
                 delay={0.35 + idx * 0.1}
-                icon={getCategoryIcon(cat.name, 10, customCategories)}
+                icon={<CategoryIcon category={cat.name} size={10} customCategories={customCategories} />}
                 onClick={onCategoryClick ? () => onCategoryClick(cat.name) : undefined}
               />
             )

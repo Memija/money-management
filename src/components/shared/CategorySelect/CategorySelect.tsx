@@ -8,6 +8,7 @@ import { useLanguageStore } from '../../../store/useLanguageStore'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel } from '../../../utils/category-utils'
+import { CategoryIcon } from '../CategoryIcon'
 import { QuickCategoryModal } from './QuickCategoryModal'
 
 import styles from './CategorySelect.module.css'
@@ -97,7 +98,11 @@ export const CategorySelect: React.FC<CategorySelectProps> = React.memo(({
       >
         <div className={styles.buttonContent}>
           <div className={styles.iconWrapper}>
-            {getCategoryIcon(value || 'Other', variant === 'badge' ? 14 : 16, customCategories)}
+            <CategoryIcon
+              category={value || 'Other'}
+              size={variant === 'badge' ? 14 : 16}
+              customCategories={customCategories}
+            />
           </div>
           <span className={styles.buttonLabel}>
             {getCategoryLabel(value || 'Other', t, currentLocale, customCategories)}
