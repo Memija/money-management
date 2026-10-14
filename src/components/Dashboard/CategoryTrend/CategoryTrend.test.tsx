@@ -229,6 +229,40 @@ describe('CategoryTrend', () => {
       fireEvent.keyDown(rentButton, { key: 'Enter' })
       expect(onCategoryClick).toHaveBeenCalledTimes(2)
     })
+
+    it('notifies onTooltipHoverChange and stops event propagation to prevent data point interference', () => {
+      const onTooltipHoverChange = vi.fn()
+      const { container } = render(
+        <CustomTrendTooltip
+          active
+          payload={mockPayload}
+          label="Mar 25"
+          formatCurrency={(v) => `€${v}`}
+          t={useLanguageStore.getState().t}
+          customCategories={[]}
+          locale="en"
+          onTooltipHoverChange={onTooltipHoverChange}
+        />,
+      )
+
+      const tooltipContainer = container.firstChild as HTMLElement
+      expect(tooltipContainer).toBeInTheDocument()
+
+      // Entering tooltip notifies chart that tooltip is hovered
+      fireEvent.mouseEnter(tooltipContainer)
+      expect(onTooltipHoverChange).toHaveBeenCalledWith(true)
+
+      // Moving mouse inside tooltip stops propagation and maintains hovered state
+      const mouseMoveEvent = new MouseEvent('mousemove', { bubbles: true, cancelable: true })
+      const stopSpy = vi.spyOn(mouseMoveEvent, 'stopPropagation')
+      tooltipContainer.dispatchEvent(mouseMoveEvent)
+      expect(stopSpy).toHaveBeenCalled()
+      expect(onTooltipHoverChange).toHaveBeenCalledWith(true)
+
+      // Leaving tooltip notifies chart that tooltip is no longer hovered
+      fireEvent.mouseLeave(tooltipContainer)
+      expect(onTooltipHoverChange).toHaveBeenCalledWith(false)
+    })
   })
 
   describe('timeline zooming and navigation', () => {
@@ -311,7 +345,7 @@ describe('CategoryTrend', () => {
       expect(nextBtn).not.toBeDisabled()
     })
 
-    it('allows opening and exiting full screen view', () => {
+    it('allows opening and exiting full screen view', async () => {
       render(<CategoryTrend data={twelveMonthsData} />)
 
       const fullscreenBtn = screen.getByTestId('category-trend-fullscreen-btn')

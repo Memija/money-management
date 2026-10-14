@@ -351,7 +351,9 @@
   max-width: 320px;
   pointer-events: auto;
   z-index: 100;
+  position: relative;
 }
+
 
 [data-theme='light'] .tooltipContainer {
   background: #ffffff;
@@ -398,6 +400,27 @@
   flex-direction: column;
   gap: 0.26rem;
   padding: 2px 2px;
+  max-height: min(280px, 48vh);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+.tooltipList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tooltipList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tooltipList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+}
+
+[data-theme='light'] .tooltipList::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.16);
 }
 
 .tooltipRow {
@@ -575,24 +598,13 @@
 }
 
 /* ─────────────────────────────────────────────────
-   Hover Reaction on Stacked Bars
+   Bar Segments
 ───────────────────────────────────────────────── */
 .chartContainer :global(.recharts-bar-rectangle) {
   cursor: pointer;
 }
 
-.barSegmentGroup {
+.barSegment {
   cursor: pointer;
 }
 
-.barSegmentHovered {
-  filter: brightness(1.2);
-}
-
-.barSegmentDimmed {
-  opacity: 0.42;
-}
-
-.chartContainer :global(.recharts-bar-rectangle:hover) {
-  filter: brightness(1.25);
-}

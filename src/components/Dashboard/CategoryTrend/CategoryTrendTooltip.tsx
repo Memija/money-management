@@ -27,6 +27,7 @@ interface TrendTooltipInteractionProps {
   activeCategory?: string | null
   onCategoryHover?: (catKey: string | null) => void
   onCategoryClick?: (catKey: string) => void
+  onTooltipHoverChange?: (isHovered: boolean) => void
 }
 
 interface CustomTooltipProps extends TrendTooltipInteractionProps {
@@ -48,6 +49,7 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
   activeCategory,
   onCategoryHover,
   onCategoryClick,
+  onTooltipHoverChange,
 }) => {
   if (!active || !payload || !payload.length) return null
 
@@ -60,7 +62,20 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
     .sort((a, b) => Number(b.value) - Number(a.value))
 
   return (
-    <div className={styles.tooltipContainer}>
+    <div
+      className={styles.tooltipContainer}
+      onMouseMove={(e) => {
+        e.stopPropagation()
+        onTooltipHoverChange?.(true)
+      }}
+      onMouseEnter={() => {
+        onTooltipHoverChange?.(true)
+      }}
+      onMouseLeave={() => {
+        onTooltipHoverChange?.(false)
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className={styles.tooltipHeader}>
         <span className={styles.tooltipMonth}>
           {formatMonthYear ? formatMonthYear(label ?? '') : label}
@@ -91,10 +106,14 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
               }
               onMouseEnter={() => onCategoryHover?.(catKey)}
               onMouseLeave={() => onCategoryHover?.(null)}
-              onClick={() => onCategoryClick?.(catKey)}
+              onClick={(e) => {
+                e.stopPropagation()
+                onCategoryClick?.(catKey)
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault()
+                  e.stopPropagation()
                   onCategoryClick?.(catKey)
                 }
               }}

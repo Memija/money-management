@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Area,
   AreaChart,
@@ -27,7 +27,7 @@ const MONTH_TICK = <MonthYearAxisTick fill="var(--text-dim)" fontSize={11} />
 const STACKED_MARGIN = { top: 16, right: 12, left: -10, bottom: 4 }
 const AREA_MARGIN = { top: 12, right: 10, left: -14, bottom: 0 }
 const STACKED_CURSOR = { fill: 'rgba(255, 255, 255, 0.08)', radius: 10 }
-const TOOLTIP_WRAPPER_STYLE = { pointerEvents: 'auto' as const }
+const TOOLTIP_WRAPPER_STYLE = { pointerEvents: 'auto' as const, zIndex: 100 }
 
 const formatEuroThousands = (v: number): string => {
   if (v === 0) {
@@ -81,7 +81,32 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
     onCategorySelect,
     animationKey,
   }) => {
-    const [hoveredMonth, setHoveredMonth] = useState<string | null>(null)
+    const [isTooltipHovered, setIsTooltipHovered] = useState(false)
+    const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    useEffect(() => {
+      return () => {
+        if (leaveTimerRef.current) {
+          clearTimeout(leaveTimerRef.current)
+        }
+      }
+    }, [])
+
+    const handleTooltipHoverChange = useCallback((hovered: boolean) => {
+      if (leaveTimerRef.current) {
+        clearTimeout(leaveTimerRef.current)
+        leaveTimerRef.current = null
+      }
+      if (hovered) {
+        setIsTooltipHovered(true)
+      } else {
+        leaveTimerRef.current = setTimeout(() => {
+          setIsTooltipHovered(false)
+          leaveTimerRef.current = null
+        }, 160)
+      }
+    }, [])
+
     const animationSource = animationKey ?? data
     const animationTrigger = useMemo(
       () => ({ animationSource, viewMode }),
@@ -106,7 +131,8 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
       return map
     }, [data, categories])
 
-    // Custom shape: each category renders as a floating capsule segment with rounded ends
+    // Custom shape: each category renders as a floating capsule segment with rounded ends.
+    // Memoized with stable reference so mouse movement across data points incurs zero DOM re-creations.
     const renderStackedBar = useCallback(
       (barProps: unknown) => {
         const p = barProps as BarShapeProps
@@ -127,66 +153,64 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
           isBottom ? outer : inner,
         ]
 
-        const isMonthHovered = hoveredMonth !== null && monthKey === hoveredMonth
-        const isDimmedByMonth = hoveredMonth !== null && !isMonthHovered
-        const hoverExpand = isMonthHovered ? 3 : 0
         const rawHeight = p.height
         const gap = rawHeight > 10 ? 2.5 : rawHeight > 4 ? 1.5 : 0.5
 
         return (
-          <g
-            className={`${styles.barSegmentGroup} ${isMonthHovered ? styles.barSegmentHovered : ''} ${isDimmedByMonth ? styles.barSegmentDimmed : ''}`}
-          >
-            <Rectangle
-              {...(barProps as Record<string, unknown>)}
-              x={(p.x ?? 0) - hoverExpand / 2}
-              y={(p.y ?? 0) + gap / 2}
-              width={p.width + hoverExpand}
-              height={Math.max(1.5, rawHeight - gap)}
-              radius={radius}
-            />
-          </g>
+          <Rectangle
+            {...(barProps as Record<string, unknown>)}
+            x={p.x ?? 0}
+            y={(p.y ?? 0) + gap / 2}
+            width={p.width}
+            height={Math.max(1.5, rawHeight - gap)}
+            radius={radius}
+            className={styles.barSegment}
+          />
         )
       },
-      [monthBoundsMap, hoveredMonth],
+      [monthBoundsMap],
     )
 
-    const handleMouseMove = useCallback((state: { activeLabel?: string | number } | null) => {
-      if (state?.activeLabel !== undefined && state.activeLabel !== null) {
-        const label = String(state.activeLabel)
-        setHoveredMonth((prev) => (prev === label ? prev : label))
+    const handleMouseMove = useCallback(() => {
+      if (leaveTimerRef.current) {
+        clearTimeout(leaveTimerRef.current)
+        leaveTimerRef.current = null
       }
+      setIsTooltipHovered((prev) => (prev ? false : prev))
     }, [])
 
-    const handleMouseLeave = useCallback(() => {
-      setHoveredMonth(null)
-    }, [])
-
-    const tooltipContent = (
-      <LocalizedTrendTooltip
-        customCategories={customCategories}
-        activeCategory={activeCategory}
-        onCategoryHover={onCategoryHover}
-        onCategoryClick={onCategorySelect}
-      />
+    const tooltipContent = useMemo(
+      () => (
+        <LocalizedTrendTooltip
+          customCategories={customCategories}
+          activeCategory={activeCategory}
+          onCategoryHover={onCategoryHover}
+          onCategoryClick={onCategorySelect}
+          onTooltipHoverChange={handleTooltipHoverChange}
+        />
+      ),
+      [customCategories, activeCategory, onCategoryHover, onCategorySelect, handleTooltipHoverChange],
     )
 
-    const sharedAxes = (
-      <>
-        <CartesianGrid
-          strokeDasharray="3 3"
-          vertical={false}
-          stroke="var(--card-border)"
-          opacity={0.6}
-        />
-        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={MONTH_TICK} />
-        <YAxis
-          axisLine={false}
-          tickLine={false}
-          tick={AXIS_TICK_STYLE}
-          tickFormatter={formatEuroThousands}
-        />
-      </>
+    const sharedAxes = useMemo(
+      () => (
+        <>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            vertical={false}
+            stroke="var(--card-border)"
+            opacity={0.6}
+          />
+          <XAxis dataKey="month" axisLine={false} tickLine={false} tick={MONTH_TICK} />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tick={AXIS_TICK_STYLE}
+            tickFormatter={formatEuroThousands}
+          />
+        </>
+      ),
+      [],
     )
 
     return (
@@ -198,7 +222,6 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
               margin={STACKED_MARGIN}
               maxBarSize={44}
               onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
             >
               <defs>
                 {categoryColors.map(({ cat, color }) => (
@@ -222,6 +245,8 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
                 content={tooltipContent}
                 cursor={STACKED_CURSOR}
                 offset={14}
+                isAnimationActive={false}
+                active={isTooltipHovered ? true : undefined}
               />
               {categoryColors.map(({ cat, color }) => {
                 const isCatActive = activeCategory === cat
@@ -238,15 +263,17 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
                     shape={renderStackedBar}
                     isAnimationActive={isAnimationActive}
                     animationDuration={CHART_ANIMATION_MS}
-                    onMouseEnter={() => onCategoryHover(cat)}
-                    onMouseLeave={() => onCategoryHover(null)}
                     onClick={() => onCategorySelect(cat)}
                   />
                 )
               })}
             </BarChart>
           ) : (
-            <AreaChart data={data} margin={AREA_MARGIN}>
+            <AreaChart
+              data={data}
+              margin={AREA_MARGIN}
+              onMouseMove={handleMouseMove}
+            >
               <defs>
                 {categoryColors.map(({ cat, color }) => (
                   <linearGradient
@@ -263,7 +290,13 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
                 ))}
               </defs>
               {sharedAxes}
-              <Tooltip wrapperStyle={TOOLTIP_WRAPPER_STYLE} content={tooltipContent} />
+              <Tooltip
+                wrapperStyle={TOOLTIP_WRAPPER_STYLE}
+                content={tooltipContent}
+                offset={14}
+                isAnimationActive={false}
+                active={isTooltipHovered ? true : undefined}
+              />
               {categoryColors.map(({ cat, color }) => {
                 const isCatActive = activeCategory === cat
                 const isCatDimmed = activeCategory !== null && !isCatActive

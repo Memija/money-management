@@ -73,15 +73,15 @@
 }
 
 .microBarActive {
-  background: linear-gradient(180deg, #c084fc 0%, #818cf8 60%, #6366f1 100%);
+  background: linear-gradient(180deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);
   opacity: 0.95;
-  filter: drop-shadow(0 1px 2px rgba(129, 140, 248, 0.3));
+  filter: drop-shadow(0 1px 3px rgba(16, 185, 129, 0.35));
 }
 
 [data-theme='light'] .microBarActive {
-  background: linear-gradient(180deg, #9333ea 0%, #6366f1 60%, #4f46e5 100%);
+  background: linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 100%);
   opacity: 0.92;
-  filter: drop-shadow(0 1px 2px rgba(99, 102, 241, 0.22));
+  filter: drop-shadow(0 1px 2px rgba(5, 150, 105, 0.22));
 }
 
 /* Frosted boundary curtains over unselected regions */
@@ -129,10 +129,10 @@
   left: var(--window-left, 0%);
   width: var(--window-width, 100%);
   min-width: 32px;
-  background: rgba(99, 102, 241, 0.1);
-  border-top: 2px solid #a855f7;
-  border-bottom: 2px solid #6366f1;
-  box-shadow: inset 0 0 16px rgba(168, 85, 247, 0.16), 0 0 12px rgba(99, 102, 241, 0.12);
+  background: rgba(16, 185, 129, 0.12);
+  border-top: 2px solid #34d399;
+  border-bottom: 2px solid #10b981;
+  box-shadow: inset 0 0 16px rgba(16, 185, 129, 0.18), 0 0 14px rgba(16, 185, 129, 0.14);
   cursor: grab;
   z-index: 3;
   box-sizing: border-box;
@@ -142,22 +142,22 @@
 .selectionWindow:active,
 .selectionWindowDragging {
   cursor: grabbing;
-  background: rgba(99, 102, 241, 0.18);
-  border-color: #c084fc;
-  box-shadow: inset 0 0 20px rgba(192, 132, 252, 0.25), 0 0 16px rgba(168, 85, 247, 0.25);
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #6ee7b7;
+  box-shadow: inset 0 0 20px rgba(52, 211, 153, 0.3), 0 0 16px rgba(16, 185, 129, 0.3);
 }
 
 [data-theme='light'] .selectionWindow {
-  background: rgba(99, 102, 241, 0.08);
-  border-top-color: #7c3aed;
-  border-bottom-color: #4f46e5;
-  box-shadow: inset 0 0 12px rgba(99, 102, 241, 0.12);
+  background: rgba(16, 185, 129, 0.09);
+  border-top-color: #10b981;
+  border-bottom-color: #059669;
+  box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.14);
 }
 
 [data-theme='light'] .selectionWindow:active,
 [data-theme='light'] .selectionWindowDragging {
-  background: rgba(99, 102, 241, 0.16);
-  border-color: #6366f1;
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #059669;
 }
 
 /* Center Pan Grab Indicator */
@@ -191,11 +191,11 @@
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: #a855f7;
+  background: #34d399;
 }
 
 [data-theme='light'] .panDot {
-  background: #6366f1;
+  background: #059669;
 }
 
 /* Precision Handles */
@@ -204,15 +204,15 @@
   top: 3px;
   bottom: 3px;
   width: 14px;
-  background: linear-gradient(180deg, #1e2235 0%, #151826 100%);
-  border: 1.5px solid rgba(168, 85, 247, 0.5);
+  background: linear-gradient(180deg, #132720 0%, #0d1a15 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.55);
   border-radius: 7px;
   cursor: col-resize;
   z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   touch-action: none;
   outline: none;
@@ -220,23 +220,23 @@
 }
 
 [data-theme='light'] .handle {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(99, 102, 241, 0.12), inset 0 1px 0 #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(16, 185, 129, 0.15), inset 0 1px 0 #ffffff;
 }
 
 .handle:hover,
 .handle:focus-visible,
 .handleActive {
-  border-color: #c084fc;
-  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25), 0 4px 14px rgba(168, 85, 247, 0.45);
+  border-color: #34d399;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3), 0 4px 14px rgba(16, 185, 129, 0.5);
 }
 
 [data-theme='light'] .handle:hover,
 [data-theme='light'] .handle:focus-visible,
 [data-theme='light'] .handleActive {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 3px 10px rgba(99, 102, 241, 0.25);
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22), 0 3px 10px rgba(16, 185, 129, 0.25);
 }
 
 .handleStart {
@@ -258,25 +258,25 @@
 .handleGripBar {
   width: 1.5px;
   height: 12px;
-  background: rgba(168, 85, 247, 0.7);
+  background: rgba(16, 185, 129, 0.7);
   border-radius: 9999px;
   transition: height 0.15s ease, background 0.15s ease;
 }
 
 [data-theme='light'] .handleGripBar {
-  background: rgba(99, 102, 241, 0.65);
+  background: rgba(5, 150, 105, 0.65);
 }
 
 .handle:hover .handleGripBar,
 .handleActive .handleGripBar {
   height: 15px;
-  background: #c084fc;
+  background: #34d399;
 }
 
 [data-theme='light'] .handle:hover .handleGripBar,
 [data-theme='light'] .handleActive .handleGripBar {
   height: 15px;
-  background: #6366f1;
+  background: #059669;
 }
 
 /* Floating Date Tooltips */
@@ -286,14 +286,14 @@
   left: 50%;
   transform: translateX(-50%);
   background: rgba(15, 23, 42, 0.94);
-  border: 1px solid rgba(168, 85, 247, 0.5);
+  border: 1px solid rgba(16, 185, 129, 0.55);
   border-radius: 9999px;
   padding: 0.22rem 0.65rem;
   font-size: 0.68rem;
   font-weight: 600;
   color: #ffffff;
   white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 10px rgba(16, 185, 129, 0.2);
   pointer-events: none;
   z-index: 10;
   letter-spacing: 0.02em;
@@ -303,8 +303,8 @@
 
 [data-theme='light'] .floatingBadge {
   background: #ffffff;
-  border-color: rgba(99, 102, 241, 0.35);
-  color: #1e293b;
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #064e3b;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
@@ -383,24 +383,24 @@
   gap: 5px;
   padding: 0.15rem 0.65rem;
   border-radius: 9999px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.22);
 }
 
 [data-theme='light'] .footerRangeBadge {
-  background: rgba(99, 102, 241, 0.06);
-  border-color: rgba(99, 102, 241, 0.16);
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.18);
 }
 
 .footerRangeText {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #a855f7;
+  color: #34d399;
   letter-spacing: 0.02em;
 }
 
 [data-theme='light'] .footerRangeText {
-  color: #6366f1;
+  color: #059669;
 }
 
 .footerRangeCount {

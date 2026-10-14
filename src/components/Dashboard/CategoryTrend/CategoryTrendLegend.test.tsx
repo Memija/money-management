@@ -1,11 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import type { CustomCategory } from '../../../types'
 import { CategoryTrendLegend } from './CategoryTrendLegend'
 
 describe('CategoryTrendLegend', () => {
   const categories = ['Groceries', 'Rent', 'Utilities']
-  const customCategories = []
+  const customCategories: CustomCategory[] = []
 
   it('renders category legend pills with labels', () => {
     render(

@@ -130,7 +130,7 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
               </linearGradient>
             </defs>
             {sharedAxes}
-            <Tooltip content={tooltipContent} cursor={MONTHLY_CURSOR} />
+            <Tooltip content={tooltipContent} cursor={MONTHLY_CURSOR} isAnimationActive={false} />
             <Legend
               onClick={onLegendClick}
               formatter={renderLegendText}
@@ -192,7 +192,7 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
               </linearGradient>
             </defs>
             {sharedAxes}
-            <Tooltip content={tooltipContent} />
+            <Tooltip content={tooltipContent} isAnimationActive={false} />
             <ReferenceLine
               y={0}
               stroke="var(--card-border)"

@@ -130,7 +130,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       panLater,
       resetZoom,
       scrubToRatio,
-    } = useTimelineZoom({ totalCount: data.length, minWindow: 3 })
+    } = useTimelineZoom({ totalCount: data.length, isLotsOfData: isExtensive, minWindow: 3 })
 
     // Decouple rapid slider scrubbing from heavy chart DOM re-renders
     const deferredStartIndex = useDeferredValue(startIndex)
