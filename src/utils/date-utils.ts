@@ -156,3 +156,34 @@ export const formatMonthYearLocalized = (
   monthYearCache.set(cacheKey, result)
   return result
 }
+
+/**
+ * Generates an array of contiguous 'YYYY-MM' strings between startMonth and endMonth inclusive.
+ * e.g. generateMonthRange('2025-10', '2026-02') -> ['2025-10', '2025-11', '2025-12', '2026-01', '2026-02']
+ */
+export function generateMonthRange(startMonth: string, endMonth: string): string[] {
+  if (!startMonth || !endMonth) return []
+  if (startMonth > endMonth) return [startMonth]
+
+  const [startYear, startM] = startMonth.split('-').map(Number)
+  const [endYear, endM] = endMonth.split('-').map(Number)
+
+  if (isNaN(startYear) || isNaN(startM) || isNaN(endYear) || isNaN(endM)) {
+    return [startMonth]
+  }
+
+  const months: string[] = []
+  let y = startYear
+  let m = startM
+
+  while (y < endYear || (y === endYear && m <= endM)) {
+    months.push(`${y}-${String(m).padStart(2, '0')}`)
+    m++
+    if (m > 12) {
+      m = 1
+      y++
+    }
+  }
+  return months
+}
+

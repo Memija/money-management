@@ -165,4 +165,75 @@ describe('useAnalytics hook', () => {
     expect(result.current.balance).toBe(2350) // 3000 - 150 - 500 = 2350
     expect(result.current.periodTransactions).toHaveLength(2)
   })
+
+  it('generates continuous monthlyCategoryData with 0s for months without expenses', () => {
+    const sparseTxs: Transaction[] = [
+      {
+        id: 'tx-1',
+        date: '2026-01-15',
+        description: 'Doctor Visit',
+        amount: -100,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Health',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-2',
+        date: '2026-04-20',
+        description: 'Dentist Checkup',
+        amount: -200,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Health',
+        institution: 'Commerzbank',
+      },
+    ]
+
+    const { result } = renderHook(() => useAnalytics(sparseTxs, period, formatMonthYear))
+
+    // Between 2026-01 and 2026-04 there are 4 months: 01, 02, 03, 04
+    expect(result.current.monthlyCategoryData).toHaveLength(4)
+    expect(result.current.monthlyCategoryData.map((d) => d.month)).toEqual([
+      '2026-01',
+      '2026-02',
+      '2026-03',
+      '2026-04',
+    ])
+    // 2026-01 has Health: 100
+    expect(result.current.monthlyCategoryData[0].Health).toBe(100)
+    // 2026-02 and 2026-03 have Health: 0
+    expect(result.current.monthlyCategoryData[1].Health).toBe(0)
+    expect(result.current.monthlyCategoryData[2].Health).toBe(0)
+    // 2026-04 has Health: 200
+    expect(result.current.monthlyCategoryData[3].Health).toBe(200)
+  })
+
+  it('respects targetMonthRange parameter when provided', () => {
+    const singleTx: Transaction[] = [
+      {
+        id: 'tx-1',
+        date: '2026-03-10',
+        description: 'Pharmacy',
+        amount: -50,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Health',
+        institution: 'Commerzbank',
+      },
+    ]
+
+    const targetMonths = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06']
+
+    const { result } = renderHook(() =>
+      useAnalytics(singleTx, period, formatMonthYear, 'cat-color-', false, targetMonths),
+    )
+
+    expect(result.current.monthlyCategoryData).toHaveLength(6)
+    expect(result.current.monthlyCategoryData.map((d) => d.month)).toEqual(targetMonths)
+    expect(result.current.monthlyCategoryData[2].Health).toBe(50)
+    expect(result.current.monthlyCategoryData[0].Health).toBe(0)
+    expect(result.current.monthlyCategoryData[5].Health).toBe(0)
+  })
 })
+

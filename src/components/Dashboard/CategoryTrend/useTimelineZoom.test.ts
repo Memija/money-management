@@ -203,4 +203,140 @@ describe('useTimelineZoom', () => {
     expect(result.current.startIndex).toBe(0)
     expect(result.current.endIndex).toBe(19)
   })
+
+  it('preserves active preset (6M) when totalCount changes', () => {
+    let count = 24
+    const { result, rerender } = renderHook(() =>
+      useTimelineZoom({ totalCount: count, isLotsOfData: true }),
+    )
+
+    act(() => {
+      result.current.setPreset('6M')
+    })
+    expect(result.current.activePreset).toBe('6M')
+    expect(result.current.visibleCount).toBe(6)
+    expect(result.current.startIndex).toBe(18)
+    expect(result.current.endIndex).toBe(23)
+
+    // Simulate dataset change (e.g. changing transaction category or category filter from 24 to 20 months)
+    count = 20
+    rerender()
+
+    expect(result.current.activePreset).toBe('6M')
+    expect(result.current.visibleCount).toBe(6)
+    expect(result.current.startIndex).toBe(14)
+    expect(result.current.endIndex).toBe(19)
+
+    // Simulate clearing filter (from 20 back to 24 months)
+    count = 24
+    rerender()
+
+    expect(result.current.activePreset).toBe('6M')
+    expect(result.current.visibleCount).toBe(6)
+    expect(result.current.startIndex).toBe(18)
+    expect(result.current.endIndex).toBe(23)
+  })
+
+  it('preserves active preset (3M) when totalCount changes', () => {
+    let count = 12
+    const { result, rerender } = renderHook(() =>
+      useTimelineZoom({ totalCount: count, isLotsOfData: true }),
+    )
+
+    act(() => {
+      result.current.setPreset('3M')
+    })
+    expect(result.current.activePreset).toBe('3M')
+    expect(result.current.visibleCount).toBe(3)
+    expect(result.current.startIndex).toBe(9)
+    expect(result.current.endIndex).toBe(11)
+
+    // Total count increases
+    count = 15
+    rerender()
+
+    expect(result.current.activePreset).toBe('3M')
+    expect(result.current.visibleCount).toBe(3)
+    expect(result.current.startIndex).toBe(12)
+    expect(result.current.endIndex).toBe(14)
+  })
+
+  it('preserves custom zoom window span when totalCount changes', () => {
+    let count = 20
+    const { result, rerender } = renderHook(() =>
+      useTimelineZoom({ totalCount: count, isLotsOfData: true }),
+    )
+
+    // Set custom 5-month window in the middle
+    act(() => {
+      result.current.setRangeIndices(6, 10)
+    })
+    expect(result.current.visibleCount).toBe(5)
+    expect(result.current.startIndex).toBe(6)
+    expect(result.current.endIndex).toBe(10)
+
+    // totalCount shifts slightly
+    count = 18
+    rerender()
+
+    expect(result.current.visibleCount).toBe(5)
+    expect(result.current.startIndex).toBe(6)
+    expect(result.current.endIndex).toBe(10)
+  })
+
+  it('preserves end-anchored custom window when totalCount changes', () => {
+    let count = 20
+    const { result, rerender } = renderHook(() =>
+      useTimelineZoom({ totalCount: count, isLotsOfData: true }),
+    )
+
+    // Set custom 5-month window anchored at the end (indices 15 to 19)
+    act(() => {
+      result.current.setRangeIndices(15, 19)
+    })
+    expect(result.current.visibleCount).toBe(5)
+    expect(result.current.isAtEnd).toBe(true)
+
+    // totalCount changes to 16
+    count = 16
+    rerender()
+
+    expect(result.current.visibleCount).toBe(5)
+    expect(result.current.startIndex).toBe(11)
+    expect(result.current.endIndex).toBe(15)
+    expect(result.current.isAtEnd).toBe(true)
+  })
+
+  it('reconciles custom date window using monthKeys when dataset keys shift', () => {
+    let keys = ['2025-01', '2025-02', '2025-03', '2025-04', '2025-05', '2025-06']
+    const { result, rerender } = renderHook(() =>
+      useTimelineZoom({ totalCount: keys.length, isLotsOfData: true, monthKeys: keys }),
+    )
+
+    // Select custom window: 2025-02 to 2025-04 (indices 1 to 3)
+    act(() => {
+      result.current.setRangeIndices(1, 3)
+    })
+    expect(result.current.startIndex).toBe(1)
+    expect(result.current.endIndex).toBe(3)
+
+    // Dataset prepends earlier months (e.g. 2024-11, 2024-12)
+    keys = [
+      '2024-11',
+      '2024-12',
+      '2025-01',
+      '2025-02',
+      '2025-03',
+      '2025-04',
+      '2025-05',
+      '2025-06',
+    ]
+    rerender()
+
+    // 2025-02 is now index 3, and 2025-04 is index 5
+    expect(result.current.startIndex).toBe(3)
+    expect(result.current.endIndex).toBe(5)
+  })
 })
+
+

@@ -1,4 +1,4 @@
-import React, { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Layers, Maximize2, TrendingUp } from 'lucide-react'
 
@@ -111,6 +111,8 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       })
     }, [data])
 
+    const monthKeys = useMemo(() => data.map((d) => d.rawMonth || d.month), [data])
+
     // Interactive timeline zoom & pan controller
     const {
       startIndex,
@@ -130,25 +132,26 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       panLater,
       resetZoom,
       scrubToRatio,
-    } = useTimelineZoom({ totalCount: data.length, isLotsOfData: isExtensive, minWindow: 3 })
+    } = useTimelineZoom({
+      totalCount: data.length,
+      isLotsOfData: isExtensive,
+      minWindow: 3,
+      monthKeys,
+    })
 
-    // Decouple rapid slider scrubbing from heavy chart DOM re-renders
-    const deferredStartIndex = useDeferredValue(startIndex)
-    const deferredEndIndex = useDeferredValue(endIndex)
-
-    // Slice dataset to active viewport window
+    // Slice dataset to active viewport window immediately for instant responsiveness
     const visibleData = useMemo(() => {
       if (data.length <= 1) {
         return data
       }
-      return data.slice(deferredStartIndex, deferredEndIndex + 1)
-    }, [data, deferredStartIndex, deferredEndIndex])
+      return data.slice(startIndex, endIndex + 1)
+    }, [data, startIndex, endIndex])
 
     const startMonthLabel = formatMonthYear(data[startIndex]?.month ?? '')
     const endMonthLabel = formatMonthYear(data[endIndex]?.month ?? '')
     const canZoomAndNavigate = isExtensive && data.length > 3
 
-    if (data.length === 0 || categories.length === 0) {
+    if (data.length === 0) {
       return null
     }
 
@@ -253,16 +256,24 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
 
         {/* Chart Canvas */}
         <div className={styles.chartContainer}>
-          <CategoryTrendChart
-            data={visibleData}
-            animationKey={data}
-            categories={categories}
-            customCategories={customCategories}
-            viewMode={viewMode}
-            activeCategory={activeCategory}
-            onCategoryHover={setHoveredCategory}
-            onCategorySelect={handleCategorySelect}
-          />
+          {categories.length === 0 ? (
+            <div className={styles.emptyContainer}>
+              <p className={styles.emptyText}>
+                {t.noTransactionsInPeriod || 'No transactions of this type in this period.'}
+              </p>
+            </div>
+          ) : (
+            <CategoryTrendChart
+              data={visibleData}
+              animationKey={data}
+              categories={categories}
+              customCategories={customCategories}
+              viewMode={viewMode}
+              activeCategory={activeCategory}
+              onCategoryHover={setHoveredCategory}
+              onCategorySelect={handleCategorySelect}
+            />
+          )}
         </div>
 
         {/* Timeline Slider (when extensive data points are present) */}
@@ -279,16 +290,18 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
         )}
 
         {/* Interactive Category Legend with Spotlight Filter */}
-        <CategoryTrendLegend
-          categories={categories}
-          customCategories={customCategories}
-          selectedCategory={selectedCategory}
-          hoveredCategory={hoveredCategory}
-          activeCategory={activeCategory}
-          onCategoryHover={setHoveredCategory}
-          onCategorySelect={handleCategorySelect}
-          onClearCategorySelect={() => setSelectedCategory(null)}
-        />
+        {categories.length > 0 && (
+          <CategoryTrendLegend
+            categories={categories}
+            customCategories={customCategories}
+            selectedCategory={selectedCategory}
+            hoveredCategory={hoveredCategory}
+            activeCategory={activeCategory}
+            onCategoryHover={setHoveredCategory}
+            onCategorySelect={handleCategorySelect}
+            onClearCategorySelect={() => setSelectedCategory(null)}
+          />
+        )}
 
         {/* Fullscreen Expanded View Modal */}
         <CategoryTrendFullscreenModal

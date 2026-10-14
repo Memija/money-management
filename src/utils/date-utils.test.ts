@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { localeOrder } from '../i18n/translations'
 import {
   formatMonthYearLocalized,
+  generateMonthRange,
   getLocalizedMonthNames,
   getLocalizedWeekdays,
   MONTH_FALLBACKS,
@@ -149,4 +150,53 @@ describe('date-utils', () => {
       }
     })
   })
+
+  describe('generateMonthRange', () => {
+    it('returns empty array when start or end is empty', () => {
+      expect(generateMonthRange('', '')).toEqual([])
+      expect(generateMonthRange('2025-01', '')).toEqual([])
+    })
+
+    it('returns start month when startMonth is greater than endMonth', () => {
+      expect(generateMonthRange('2025-05', '2024-05')).toEqual(['2025-05'])
+    })
+
+    it('returns single month when start equals end', () => {
+      expect(generateMonthRange('2025-06', '2025-06')).toEqual(['2025-06'])
+    })
+
+    it('generates contiguous months across the same year', () => {
+      expect(generateMonthRange('2025-03', '2025-06')).toEqual([
+        '2025-03',
+        '2025-04',
+        '2025-05',
+        '2025-06',
+      ])
+    })
+
+    it('generates contiguous months across year boundaries', () => {
+      expect(generateMonthRange('2024-11', '2025-02')).toEqual([
+        '2024-11',
+        '2024-12',
+        '2025-01',
+        '2025-02',
+      ])
+    })
+
+    it('generates exact 61 months over a 5-year span', () => {
+      const months = generateMonthRange('2021-09', '2026-09')
+      expect(months).toHaveLength(61)
+      expect(months[0]).toBe('2021-09')
+      expect(months[60]).toBe('2026-09')
+      expect(months.slice(55)).toEqual([
+        '2026-04',
+        '2026-05',
+        '2026-06',
+        '2026-07',
+        '2026-08',
+        '2026-09',
+      ])
+    })
+  })
 })
+

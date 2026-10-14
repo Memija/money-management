@@ -4,6 +4,7 @@ import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
 import { getCategoryColor } from '../utils/category-colors'
 import { getTransactionCategory, isInformativeTransaction } from '../utils/category-utils'
+import { generateMonthRange } from '../utils/date-utils'
 
 const sortCategories = (a: [string, number], b: [string, number]) => {
   if (a[0] === 'Other' && b[0] !== 'Other') return 1
@@ -82,7 +83,8 @@ export interface MerchantEntry {
 
 export interface MonthlyCategoryEntry {
   month: string
-  [category: string]: number | string
+  rawMonth?: string
+  [category: string]: number | string | undefined
 }
 
 const CATEGORY_COLORS = [
@@ -148,6 +150,7 @@ export const useAnalytics = (
   formatMonthYear?: (dateString: string) => string,
   catColorClassPrefix: string = 'cat-color-',
   includeGhosts: boolean = false,
+  targetMonthRange?: string[],
 ): AnalyticsData => {
   const customKeywords = useAppStore((s) => s.customKeywords)
   const manualCategories = useAppStore((s) => s.manualCategories)
@@ -405,6 +408,8 @@ export const useAnalytics = (
   // Monthly category stacked data
   const monthlyCategoryData = useMemo(() => {
     const map: Record<string, Record<string, number>> = {}
+    const categoriesFound = new Set<string>()
+
     periodTransactions
       .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
       .forEach((t) => {
@@ -414,20 +419,53 @@ export const useAnalytics = (
           map[month] = {}
         }
         map[month][cat] = (map[month][cat] || 0) + Math.abs(t.amount)
+        categoriesFound.add(cat)
       })
 
-    return Object.entries(map)
-      .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
-      .map(([month, cats]) => {
-        const entry: MonthlyCategoryEntry = {
-          month: formatMonthYear ? formatMonthYear(month) : month,
-        }
-        for (const [cat, val] of Object.entries(cats)) {
-          entry[cat] = Math.round(val)
-        }
-        return entry
-      })
-  }, [periodTransactions, formatMonthYear])
+    // Determine continuous sequence of months for the active period
+    let monthsList: string[] = []
+    if (targetMonthRange && targetMonthRange.length > 0) {
+      monthsList = targetMonthRange
+    } else if (period.mode === 'year') {
+      monthsList = Array.from(
+        { length: 12 },
+        (_, i) => `${period.value}-${String(i + 1).padStart(2, '0')}`,
+      )
+    } else if (period.mode === 'quarter') {
+      const [y, q] = period.value.split('-Q')
+      const qNum = parseInt(q, 10)
+      const startM = (qNum - 1) * 3 + 1
+      monthsList = [
+        `${y}-${String(startM).padStart(2, '0')}`,
+        `${y}-${String(startM + 1).padStart(2, '0')}`,
+        `${y}-${String(startM + 2).padStart(2, '0')}`,
+      ]
+    } else if (period.mode === 'month') {
+      monthsList = [period.value]
+    } else {
+      // mode === 'all'
+      const rawMonths = Object.keys(map).sort()
+      if (rawMonths.length > 0) {
+        monthsList = generateMonthRange(rawMonths[0], rawMonths[rawMonths.length - 1])
+      }
+    }
+
+    if (monthsList.length === 0) {
+      monthsList = Object.keys(map).sort()
+    }
+
+    return monthsList.map((month) => {
+      const entry: MonthlyCategoryEntry = {
+        month: formatMonthYear ? formatMonthYear(month) : month,
+        rawMonth: month,
+      }
+      const cats = map[month] || {}
+      for (const cat of categoriesFound) {
+        entry[cat] = Math.round(cats[cat] || 0)
+      }
+      return entry
+    })
+  }, [periodTransactions, formatMonthYear, targetMonthRange, period])
 
   return useMemo(
     () => ({

@@ -12,6 +12,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import { hasMerchantLogo } from '../../utils/category-icons'
 import { hasExtensiveCategoryData } from '../../utils/category-utils'
+import { generateMonthRange } from '../../utils/date-utils'
 import { CategoryTrend } from './CategoryTrend'
 import { type AvgDetailType, DashboardModals, type DetailModalState } from './DashboardModals'
 import { ExpenseCategories } from './ExpenseCategories'
@@ -191,6 +192,40 @@ const Dashboard: React.FC = () => {
     ? dashboardTransactions
     : filteredDashboardTransactions
 
+  // Complete continuous month sequence for the active period/account domain
+  const fullPeriodMonths = useMemo(() => {
+    if (period.mode === 'year') {
+      return Array.from(
+        { length: 12 },
+        (_, i) => `${period.value}-${String(i + 1).padStart(2, '0')}`,
+      )
+    }
+    if (period.mode === 'quarter') {
+      const [y, q] = period.value.split('-Q')
+      const qNum = parseInt(q, 10)
+      const startM = (qNum - 1) * 3 + 1
+      return [
+        `${y}-${String(startM).padStart(2, '0')}`,
+        `${y}-${String(startM + 1).padStart(2, '0')}`,
+        `${y}-${String(startM + 2).padStart(2, '0')}`,
+      ]
+    }
+    if (period.mode === 'month') {
+      return [period.value]
+    }
+    // mode === 'all'
+    let minMonth = ''
+    let maxMonth = ''
+    for (const t of dashboardTransactions) {
+      if (t.isGhost) continue
+      const m = t.date.substring(0, 7)
+      if (!minMonth || m < minMonth) minMonth = m
+      if (!maxMonth || m > maxMonth) maxMonth = m
+    }
+    if (!minMonth || !maxMonth) return []
+    return generateMonthRange(minMonth, maxMonth)
+  }, [dashboardTransactions, period])
+
   // Analytics — all derived data from one centralized hook
   const analytics = useAnalytics(
     effectiveDashboardTransactions,
@@ -198,6 +233,7 @@ const Dashboard: React.FC = () => {
     undefined,
     'cat-color-',
     isSingleAccountView || (!detachTransactionsFromDashboard && typeFilter === 'transfers'),
+    fullPeriodMonths,
   )
 
   // Full bank analytics for period picker options (so period options always show full account range)
@@ -207,6 +243,7 @@ const Dashboard: React.FC = () => {
     undefined,
     'cat-color-',
     isSingleAccountView,
+    fullPeriodMonths,
   )
 
   // Allow Spending by Category (and Top Merchants) to occupy full row on desktop when lots of data are present
