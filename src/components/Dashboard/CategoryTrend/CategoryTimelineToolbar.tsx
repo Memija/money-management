@@ -59,14 +59,16 @@ export const CategoryTimelineToolbar: React.FC<CategoryTimelineToolbarProps> = R
 
     return (
       <div className={styles.toolbar} role="region" aria-label={t.timelineRange || 'Timeline'}>
-        <div className={styles.leftGroup}>
+        <div className={styles.infoRow}>
           <div className={styles.rangeBadge}>
             <Calendar size={13} className={styles.calendarIcon} aria-hidden="true" />
             <span>{rangeText}</span>
           </div>
 
           <span className={styles.countPill}>{showingText}</span>
+        </div>
 
+        <div className={styles.controlsRow}>
           {/* Quick window presets */}
           <div
             className={styles.presetsGroup}
@@ -116,70 +118,70 @@ export const CategoryTimelineToolbar: React.FC<CategoryTimelineToolbarProps> = R
               {t.presetAll || 'All'}
             </button>
           </div>
-        </div>
 
-        <div className={styles.rightGroup}>
-          {/* Pan Navigation Buttons */}
-          <div className={styles.buttonCluster}>
-            <button
-              type="button"
-              className={styles.iconBtn}
-              onClick={onPanEarlier}
-              disabled={isAtStart}
-              title={t.panEarlier || 'Previous months'}
-              aria-label={t.panEarlier || 'Previous months'}
-            >
-              <ChevronLeft size={15} />
-            </button>
-            <button
-              type="button"
-              className={styles.iconBtn}
-              onClick={onPanLater}
-              disabled={isAtEnd}
-              title={t.panLater || 'Next months'}
-              aria-label={t.panLater || 'Next months'}
-            >
-              <ChevronRight size={15} />
-            </button>
+          <div className={styles.actionsGroup}>
+            {/* Pan Navigation Buttons */}
+            <div className={styles.buttonCluster}>
+              <button
+                type="button"
+                className={styles.iconBtn}
+                onClick={onPanEarlier}
+                disabled={isAtStart}
+                title={t.panEarlier || 'Previous months'}
+                aria-label={t.panEarlier || 'Previous months'}
+              >
+                <ChevronLeft size={15} />
+              </button>
+              <button
+                type="button"
+                className={styles.iconBtn}
+                onClick={onPanLater}
+                disabled={isAtEnd}
+                title={t.panLater || 'Next months'}
+                aria-label={t.panLater || 'Next months'}
+              >
+                <ChevronRight size={15} />
+              </button>
+            </div>
+
+            {/* Zoom In & Zoom Out Buttons */}
+            <div className={styles.buttonCluster}>
+              <button
+                type="button"
+                className={styles.iconBtn}
+                onClick={onZoomIn}
+                disabled={isAtMinZoom}
+                title={t.zoomIn || 'Zoom in'}
+                aria-label={t.zoomIn || 'Zoom in'}
+              >
+                <ZoomIn size={14} />
+              </button>
+              <button
+                type="button"
+                className={styles.iconBtn}
+                onClick={onZoomOut}
+                disabled={isAtMaxZoom}
+                title={t.zoomOut || 'Zoom out'}
+                aria-label={t.zoomOut || 'Zoom out'}
+              >
+                <ZoomOut size={14} />
+              </button>
+            </div>
+
+            {/* Reset Zoom Button */}
+            {isZoomed && (
+              <button
+                type="button"
+                className={styles.resetBtn}
+                onClick={onResetZoom}
+                title={t.resetZoom || 'Reset zoom'}
+                aria-label={t.resetZoom || 'Reset zoom'}
+              >
+                <RotateCcw size={12} />
+                <span className={styles.resetBtnLabel}>{t.resetZoom || 'Reset'}</span>
+              </button>
+            )}
           </div>
-
-          {/* Zoom In & Zoom Out Buttons */}
-          <div className={styles.buttonCluster}>
-            <button
-              type="button"
-              className={styles.iconBtn}
-              onClick={onZoomIn}
-              disabled={isAtMinZoom}
-              title={t.zoomIn || 'Zoom in'}
-              aria-label={t.zoomIn || 'Zoom in'}
-            >
-              <ZoomIn size={14} />
-            </button>
-            <button
-              type="button"
-              className={styles.iconBtn}
-              onClick={onZoomOut}
-              disabled={isAtMaxZoom}
-              title={t.zoomOut || 'Zoom out'}
-              aria-label={t.zoomOut || 'Zoom out'}
-            >
-              <ZoomOut size={14} />
-            </button>
-          </div>
-
-          {/* Reset Zoom Button */}
-          {isZoomed && (
-            <button
-              type="button"
-              className={styles.resetBtn}
-              onClick={onResetZoom}
-              title={t.resetZoom || 'Reset zoom'}
-              aria-label={t.resetZoom || 'Reset zoom'}
-            >
-              <RotateCcw size={12} />
-              <span>{t.resetZoom || 'Reset'}</span>
-            </button>
-          )}
         </div>
       </div>
     )

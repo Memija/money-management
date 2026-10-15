@@ -63,6 +63,8 @@ interface CategoryTrendChartProps {
    * timeline navigation (which only slices `data`) never restarts the tween.
    */
   animationKey?: unknown
+  /** When true, omits the floating tooltip (e.g. on mobile card view) */
+  disableTooltip?: boolean
 }
 
 /**
@@ -80,6 +82,7 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
     onCategoryHover,
     onCategorySelect,
     animationKey,
+    disableTooltip = false,
   }) => {
     const [isTooltipHovered, setIsTooltipHovered] = useState(false)
     const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -240,14 +243,16 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
                 ))}
               </defs>
               {sharedAxes}
-              <Tooltip
-                wrapperStyle={TOOLTIP_WRAPPER_STYLE}
-                content={tooltipContent}
-                cursor={STACKED_CURSOR}
-                offset={14}
-                isAnimationActive={false}
-                active={isTooltipHovered ? true : undefined}
-              />
+              {!disableTooltip && (
+                <Tooltip
+                  wrapperStyle={TOOLTIP_WRAPPER_STYLE}
+                  content={tooltipContent}
+                  cursor={STACKED_CURSOR}
+                  offset={14}
+                  isAnimationActive={false}
+                  active={isTooltipHovered ? true : undefined}
+                />
+              )}
               {categoryColors.map(({ cat, color }) => {
                 const isCatActive = activeCategory === cat
                 const isCatDimmed = activeCategory !== null && !isCatActive
@@ -290,13 +295,15 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
                 ))}
               </defs>
               {sharedAxes}
-              <Tooltip
-                wrapperStyle={TOOLTIP_WRAPPER_STYLE}
-                content={tooltipContent}
-                offset={14}
-                isAnimationActive={false}
-                active={isTooltipHovered ? true : undefined}
-              />
+              {!disableTooltip && (
+                <Tooltip
+                  wrapperStyle={TOOLTIP_WRAPPER_STYLE}
+                  content={tooltipContent}
+                  offset={14}
+                  isAnimationActive={false}
+                  active={isTooltipHovered ? true : undefined}
+                />
+              )}
               {categoryColors.map(({ cat, color }) => {
                 const isCatActive = activeCategory === cat
                 const isCatDimmed = activeCategory !== null && !isCatActive

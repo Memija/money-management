@@ -368,6 +368,27 @@ describe('CategoryTrend', () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       })
     })
+
+    it('hides timeline brush on mobile view but keeps chart pan/zoom enabled', () => {
+      act(() => {
+        window.innerWidth = 480
+        window.dispatchEvent(new Event('resize'))
+      })
+
+      render(<CategoryTrend data={twelveMonthsData} />)
+
+      // Timeline toolbar is still present for accessible controls
+      expect(screen.getByRole('region', { name: 'Timeline' })).toBeInTheDocument()
+
+      // Brush is hidden on mobile
+      expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
+
+      // Reset window width back to desktop
+      act(() => {
+        window.innerWidth = 1024
+        window.dispatchEvent(new Event('resize'))
+      })
+    })
   })
 })
 

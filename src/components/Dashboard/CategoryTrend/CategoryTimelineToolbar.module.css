@@ -17,11 +17,12 @@
   background: rgba(15, 23, 42, 0.02);
 }
 
-.leftGroup {
+/* Info row (Date range + Count) */
+.infoRow {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .rangeBadge {
@@ -35,6 +36,7 @@
   border: 1px solid rgba(16, 185, 129, 0.24);
   padding: 0.25rem 0.55rem;
   border-radius: 8px;
+  white-space: nowrap;
 }
 
 [data-theme='light'] .rangeBadge {
@@ -60,10 +62,20 @@
   padding: 0.2rem 0.45rem;
   border-radius: 6px;
   border: 1px solid var(--card-border);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 [data-theme='light'] .countPill {
   background: rgba(15, 23, 42, 0.03);
+}
+
+/* Controls row (Presets + Actions) */
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 /* Preset buttons */
@@ -75,6 +87,7 @@
   padding: 2px;
   border-radius: 8px;
   border: 1px solid var(--card-border);
+  flex-shrink: 0;
 }
 
 [data-theme='light'] .presetsGroup {
@@ -115,12 +128,12 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(16, 185, 129, 0.18);
 }
 
-/* Right Controls Group (Pan & Zoom) */
-.rightGroup {
+/* Actions group (Pan, Zoom, Reset) */
+.actionsGroup {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: 0.45rem;
+  flex-shrink: 0;
 }
 
 .buttonCluster {
@@ -130,6 +143,7 @@
   padding: 2px;
   border-radius: 8px;
   border: 1px solid var(--card-border);
+  flex-shrink: 0;
 }
 
 [data-theme='light'] .buttonCluster {
@@ -177,6 +191,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 [data-theme='light'] .resetBtn {
@@ -199,15 +215,80 @@
   color: #047857;
 }
 
+.resetBtnLabel {
+  display: inline;
+}
+
+/* ─────────────────────────────────────────────────
+   Mobile Responsive Layout (<= 640px)
+───────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .toolbar {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.5rem;
+    gap: 0.45rem;
+    padding: 0.45rem 0.55rem;
   }
 
-  .leftGroup,
-  .rightGroup {
+  /* Row 1: Info Row */
+  .infoRow {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    width: 100%;
+    gap: 0.4rem;
+  }
+
+  .rangeBadge {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.45rem;
+  }
+
+  .countPill {
+    font-size: 0.67rem;
+    padding: 0.18rem 0.4rem;
+  }
+
+  /* Row 2: Controls Row */
+  .controlsRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.35rem;
+    flex-wrap: nowrap;
+  }
+
+  .presetsGroup {
+    gap: 0.12rem;
+    padding: 2px;
+  }
+
+  .presetBtn {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .actionsGroup {
+    gap: 0.3rem;
+    flex-shrink: 0;
+  }
+
+  .iconBtn {
+    width: 26px;
+    height: 24px;
+  }
+
+  /* On mobile, reset button hides long text and displays as a sleek square icon button */
+  .resetBtn {
+    padding: 0;
+    width: 26px;
+    height: 24px;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  .resetBtnLabel {
+    display: none;
   }
 }

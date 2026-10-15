@@ -4,6 +4,7 @@ import { Layers, Maximize2, TrendingUp } from 'lucide-react'
 
 import type { MonthlyCategoryEntry } from '../../../hooks/useAnalytics'
 import { useFormatters } from '../../../hooks/useFormatters'
+import { useIsMobile } from '../../../hooks/useIsMobile'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { hasExtensiveCategoryData } from '../../../utils/category-utils'
@@ -12,6 +13,7 @@ import { CategoryTimelineToolbar } from './CategoryTimelineToolbar'
 import { CategoryTrendChart } from './CategoryTrendChart'
 import { CategoryTrendFullscreenModal } from './CategoryTrendFullscreenModal'
 import { CategoryTrendLegend } from './CategoryTrendLegend'
+import { useChartTimelineGestures } from './useChartTimelineGestures'
 import { useTimelineZoom } from './useTimelineZoom'
 
 import styles from './CategoryTrend.module.css'
@@ -29,6 +31,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
     const t = useLanguageStore((s) => s.t)
     const customCategories = useAppStore((s) => s.customCategories)
     const { formatCurrency, formatCategoryCount, formatMonthYear } = useFormatters()
+    const isMobile = useIsMobile(640)
 
     const [viewMode, setViewMode] = useState<'stacked' | 'area'>('stacked')
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -151,6 +154,20 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
     const endMonthLabel = formatMonthYear(data[endIndex]?.month ?? '')
     const canZoomAndNavigate = isExtensive && data.length > 3
 
+    const chartGesturesRef = useChartTimelineGestures({
+      enabled: canZoomAndNavigate && isMobile,
+      totalCount: data.length,
+      startIndex,
+      endIndex,
+      minWindow: 3,
+      onRangeChange: setRangeIndices,
+      onZoomIn: zoomIn,
+      onZoomOut: zoomOut,
+      onResetZoom: resetZoom,
+      onPanEarlier: panEarlier,
+      onPanLater: panLater,
+    })
+
     if (data.length === 0) {
       return null
     }
@@ -255,7 +272,10 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
         )}
 
         {/* Chart Canvas */}
-        <div className={styles.chartContainer}>
+        <div
+          ref={chartGesturesRef}
+          className={`${styles.chartContainer} ${canZoomAndNavigate && isMobile ? styles.chartContainerInteractive : ''}`}
+        >
           {categories.length === 0 ? (
             <div className={styles.emptyContainer}>
               <p className={styles.emptyText}>
@@ -272,12 +292,13 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
               activeCategory={activeCategory}
               onCategoryHover={setHoveredCategory}
               onCategorySelect={handleCategorySelect}
+              disableTooltip={isMobile}
             />
           )}
         </div>
 
-        {/* Timeline Slider (when extensive data points are present) */}
-        {canZoomAndNavigate && (
+        {/* Timeline Slider (when extensive data points are present; hidden on mobile in favor of in-chart pan/zoom) */}
+        {canZoomAndNavigate && !isMobile && (
           <CategoryTimelineSlider
             data={monthSummaries}
             startIndex={startIndex}
