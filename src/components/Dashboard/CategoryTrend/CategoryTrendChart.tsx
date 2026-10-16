@@ -17,6 +17,7 @@ import { useChartAnimation } from '../../../hooks/useChartAnimation'
 import type { CustomCategory } from '../../../types'
 import { adjustColor, getCategoryColor } from '../../../utils/category-colors'
 import { MonthYearAxisTick } from '../../shared/ChartAxisTicks'
+import { formatCompactEuro } from './category-trend-formatters'
 import { LocalizedTrendTooltip } from './CategoryTrendTooltip'
 
 import styles from './CategoryTrend.module.css'
@@ -28,14 +29,6 @@ const STACKED_MARGIN = { top: 16, right: 12, left: -10, bottom: 4 }
 const AREA_MARGIN = { top: 12, right: 10, left: -14, bottom: 0 }
 const STACKED_CURSOR = { fill: 'rgba(255, 255, 255, 0.08)', radius: 10 }
 const TOOLTIP_WRAPPER_STYLE = { pointerEvents: 'auto' as const, zIndex: 100 }
-
-const formatEuroThousands = (v: number): string => {
-  if (v === 0) {
-    return '€0'
-  }
-  const inK = v / 1000
-  return Number.isInteger(inK) ? `€${inK}k` : `€${inK.toFixed(1)}k`
-}
 
 const toGradientId = (prefix: string, cat: string): string =>
   `${prefix}-${cat.replace(/\s+/g, '-')}`
@@ -192,7 +185,13 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
           onTooltipHoverChange={handleTooltipHoverChange}
         />
       ),
-      [customCategories, activeCategory, onCategoryHover, onCategorySelect, handleTooltipHoverChange],
+      [
+        customCategories,
+        activeCategory,
+        onCategoryHover,
+        onCategorySelect,
+        handleTooltipHoverChange,
+      ],
     )
 
     const sharedAxes = useMemo(
@@ -209,7 +208,7 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
             axisLine={false}
             tickLine={false}
             tick={AXIS_TICK_STYLE}
-            tickFormatter={formatEuroThousands}
+            tickFormatter={formatCompactEuro}
           />
         </>
       ),
@@ -274,11 +273,7 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
               })}
             </BarChart>
           ) : (
-            <AreaChart
-              data={data}
-              margin={AREA_MARGIN}
-              onMouseMove={handleMouseMove}
-            >
+            <AreaChart data={data} margin={AREA_MARGIN} onMouseMove={handleMouseMove}>
               <defs>
                 {categoryColors.map(({ cat, color }) => (
                   <linearGradient

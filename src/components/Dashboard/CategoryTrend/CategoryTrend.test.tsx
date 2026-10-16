@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { formatCompactEuro, formatEuroThousands } from './category-trend-formatters'
 import { CategoryTrend, CustomTrendTooltip } from './CategoryTrend'
 
 // Mock Recharts
@@ -390,5 +391,48 @@ describe('CategoryTrend', () => {
       })
     })
   })
-})
 
+  describe('formatCompactEuro', () => {
+    it('formats 0 as €0', () => {
+      expect(formatCompactEuro(0)).toBe('€0')
+      expect(formatEuroThousands(0)).toBe('€0')
+    })
+
+    it('formats low values (< 1000) as exact euro amounts without 0.0k', () => {
+      expect(formatCompactEuro(5)).toBe('€5')
+      expect(formatCompactEuro(10)).toBe('€10')
+      expect(formatCompactEuro(15)).toBe('€15')
+      expect(formatCompactEuro(20)).toBe('€20')
+      expect(formatCompactEuro(50)).toBe('€50')
+      expect(formatCompactEuro(150)).toBe('€150')
+      expect(formatCompactEuro(999)).toBe('€999')
+    })
+
+    it('handles decimal values below 1000 cleanly without trailing zeros', () => {
+      expect(formatCompactEuro(0.5)).toBe('€0.5')
+      expect(formatCompactEuro(2.5)).toBe('€2.5')
+      expect(formatCompactEuro(12.5)).toBe('€12.5')
+      expect(formatCompactEuro(0.25)).toBe('€0.25')
+    })
+
+    it('formats thousands cleanly with k suffix', () => {
+      expect(formatCompactEuro(1000)).toBe('€1k')
+      expect(formatCompactEuro(1200)).toBe('€1.2k')
+      expect(formatCompactEuro(1500)).toBe('€1.5k')
+      expect(formatCompactEuro(10000)).toBe('€10k')
+      expect(formatCompactEuro(25400)).toBe('€25.4k')
+      expect(formatCompactEuro(100000)).toBe('€100k')
+      expect(formatCompactEuro(999000)).toBe('€999k')
+    })
+
+    it('formats millions cleanly with M suffix', () => {
+      expect(formatCompactEuro(1000000)).toBe('€1M')
+      expect(formatCompactEuro(2500000)).toBe('€2.5M')
+    })
+
+    it('handles negative values correctly', () => {
+      expect(formatCompactEuro(-15)).toBe('-€15')
+      expect(formatCompactEuro(-1500)).toBe('-€1.5k')
+    })
+  })
+})
