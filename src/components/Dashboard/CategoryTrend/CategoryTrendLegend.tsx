@@ -5,6 +5,7 @@ import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { CustomCategory } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryLabel } from '../../../utils/category-utils'
+import { CategoryIcon } from '../../shared/CategoryIcon'
 
 import styles from './CategoryTrendLegend.module.css'
 
@@ -66,7 +67,9 @@ export const CategoryTrendLegend: React.FC<CategoryTrendLegendProps> = React.mem
               title={getCategoryLabel(cat, t)}
               aria-label={getCategoryLabel(cat, t)}
             >
-              <span className={styles.legendDot} style={{ backgroundColor: color }} />
+              <span className={styles.legendIconWrapper}>
+                <CategoryIcon category={cat} size={12} customCategories={customCategories} />
+              </span>
               <span>{getCategoryLabel(cat, t)}</span>
             </button>
           )

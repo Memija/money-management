@@ -14,11 +14,11 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Shopping: '#ec4899', // Hot Pink
   Transport: '#3b82f6', // Vibrant Blue
   Utilities: '#eab308', // Electric Gold / Yellow
-  Communication: '#0284c7', // Sky Blue / Ocean Tech
-  Internet: '#0284c7',
+  Communication: '#0891b2', // Fiber-Optic Cyan
+  Internet: '#0891b2',
   Healthcare: '#ef4444', // Medical Red
   Entertainment: '#8b5cf6', // Violet / Purple
-  Insurance: '#64748b', // Slate Grey
+  Insurance: '#1d4ed8', // Shield Navy
   Savings: '#14b8a6', // Teal
   Cash: '#84cc16', // Lime Green
   Transfers: '#06b6d4', // Cyan
@@ -28,6 +28,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   BankFees: '#be123c',
   Fees: '#be123c',
   Donations: '#e11d48', // Rose Red / Heart Crimson
+  Education: '#7c3aed', // Scholar Purple / Deep Violet
   Other: '#a855f7', // Lilac
 }
 
@@ -50,11 +51,11 @@ export const ICON_COLORS: Record<string, string> = {
   Zap: '#eab308',
   Droplet: '#06b6d4',
   Flame: '#f97316',
-  Wifi: '#0284c7',
+  Wifi: '#0891b2',
   Wrench: '#64748b',
   Trash2: '#64748b',
   Key: '#f59e0b',
-  Building2: '#64748b',
+  Building2: '#1d4ed8',
   // Food & Drink
   ShoppingCart: '#f97316',
   Utensils: '#f43f5e',
@@ -95,6 +96,7 @@ export const ICON_COLORS: Record<string, string> = {
   Headphones: '#3b82f6',
   BookOpen: '#0ea5e9',
   Book: '#0ea5e9',
+  GraduationCap: '#7c3aed',
   // Miscellaneous
   Package: '#a855f7',
   MapPin: '#ef4444',

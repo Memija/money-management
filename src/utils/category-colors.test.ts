@@ -27,6 +27,8 @@ describe('category-colors', () => {
         'Crypto',
         'Bank Fees',
         'BankFees',
+        'Donations',
+        'Education',
         'Other',
       ]
 
@@ -73,6 +75,8 @@ describe('category-colors', () => {
       expect(ICON_COLORS.Plane).toBe(CATEGORY_COLORS.Travel)
       expect(ICON_COLORS.Receipt).toBe(CATEGORY_COLORS.Taxes)
       expect(ICON_COLORS.Percent).toBe(CATEGORY_COLORS['Bank Fees'])
+      expect(ICON_COLORS.GraduationCap).toBe(CATEGORY_COLORS.Education)
+      expect(ICON_COLORS.Building2).toBe(CATEGORY_COLORS.Insurance)
       expect(ICON_COLORS.Package).toBe(CATEGORY_COLORS.Other)
     })
   })
@@ -108,6 +112,8 @@ describe('category-colors', () => {
       expect(getCategoryColor('Bank Fees')).toBe(CATEGORY_COLORS['Bank Fees'])
       expect(getCategoryColor('BankFees')).toBe(CATEGORY_COLORS['Bank Fees'])
       expect(getCategoryColor('Fees')).toBe(CATEGORY_COLORS['Bank Fees'])
+      expect(getCategoryColor('Donations')).toBe(CATEGORY_COLORS.Donations)
+      expect(getCategoryColor('Education')).toBe(CATEGORY_COLORS.Education)
       expect(getCategoryColor('Other')).toBe(CATEGORY_COLORS.Other)
     })
 

@@ -6,6 +6,7 @@ import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { CustomCategory } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { formatCategoryPercent, getCategoryLabel } from '../../../utils/category-utils'
+import { CategoryIcon } from '../../shared/CategoryIcon'
 
 import styles from './CategoryTrend.module.css'
 
@@ -120,7 +121,9 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
               aria-label={`${getCategoryLabel(catKey, t, locale, customCategories)}: ${formatCurrency(val)} (${pct})`}
             >
               <div className={styles.tooltipCatInfo}>
-                <span className={styles.tooltipDot} style={{ backgroundColor: catColor }} />
+                <span className={styles.tooltipIconWrapper}>
+                  <CategoryIcon category={catKey} size={13} customCategories={customCategories} />
+                </span>
                 <span className={styles.tooltipCatName}>
                   {getCategoryLabel(catKey, t, locale, customCategories)}
                 </span>

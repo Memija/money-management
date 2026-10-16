@@ -63,12 +63,34 @@
   opacity: 0.35;
 }
 
-.legendDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+.legendIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
-  box-shadow: 0 0 5px currentColor;
+  transition: transform 0.18s ease;
+}
+
+[data-theme='light'] .legendIconWrapper {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.07);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .legendIconWrapper {
+    background: color-mix(in srgb, var(--pill-color, var(--primary)) 12%, transparent);
+    border-color: color-mix(in srgb, var(--pill-color, var(--primary)) 24%, transparent);
+  }
+}
+
+.legendPill:hover .legendIconWrapper,
+.legendPillActive .legendIconWrapper {
+  transform: scale(1.1);
 }
 
 .resetPill {
