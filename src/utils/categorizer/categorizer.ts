@@ -23,7 +23,7 @@ export interface CategorizeOptions {
  * Bump this number whenever new merchants, regexes, keywords, or categorization priorities are updated.
  * When bumped, the app automatically re-evaluates all unedited stored transactions on startup.
  */
-export const CATEGORIZER_RULES_VERSION = 4
+export const CATEGORIZER_RULES_VERSION = 5
 
 const WORD_CHAR_START = /^[\p{L}\p{N}]/u
 const WORD_CHAR_END = /[\p{L}\p{N}]$/u
@@ -221,7 +221,7 @@ const POLISH_ATM_WITHDRAWAL_REGEX =
 // Regex to detect SEPA and credit transfer / standing order reference patterns
 // (e.g. 'CCB.321.UE.328580', 'MOB.210.EE.POS00026333', 'CD-SCT-12345', 'SEPA-Überweisung', 'Dauerauftrag', 'Umbuchung', 'End-to-End-Ref ... Kundenreferenz ...')
 const SEPA_TRANSFER_REGEX =
-  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da|ee|ta|sct|inst)(?:\.[a-z0-9_-]+)?\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref\b.*\bkundenreferenz\b|\bkundenreferenz\b.*\bend-to-end-ref\b)|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*(?:notprovided|null|\d{8}-[a-z0-9_-]+|[a-z0-9_.-]*(?:ue|da|ee|ta|sct|inst|mob|si)[a-z0-9_.-]*)\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?(?:transfer|back)|geld[- ]?zur[uü]ck|sent\s+from|echtzeit[uü]berweisung|echtzeit[- ]?[uü]berweisung|instant[- ]?transfer|instant[- ]?payment)\b|(?:\b[a-z]{4}[a-z]{2}[a-z0-9]{2}(?:[a-z0-9]{3})?\s+[a-z]{2}\d{2}[a-z0-9]{11,30}\b|\b[a-z]{2}\d{2}[a-z0-9]{11,30}\b).*\b(?:end-to-end-ref|kundenreferenz)\b|\b(?:(?:max|anel)(?:\s+(?:mustermann|memic))?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*(?:erika|biljana)\s*(?:mustermann|memic)|(?:erika|biljana)(?:\s+(?:mustermann|memic))?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*(?:max|anel)\s*(?:mustermann|memic))\b)/i
+  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da|ee|ta|sct|inst)(?:\.[a-z0-9_-]+)?\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref\b.*\bkundenreferenz\b|\bkundenreferenz\b.*\bend-to-end-ref\b)|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*(?:notprovided|null|\d{8}-[a-z0-9_-]+|[a-z0-9_.-]*(?:ue|da|ee|ta|sct|inst|mob|si)[a-z0-9_.-]*)\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?(?:transfer|back)|geld[- ]?zur[uü]ck|sent\s+from|echtzeit[uü]berweisung|echtzeit[- ]?[uü]berweisung|instant[- ]?transfer|instant[- ]?payment)\b|(?:\b[a-z]{4}[a-z]{2}[a-z0-9]{2}(?:[a-z0-9]{3})?\s+[a-z]{2}\d{2}[a-z0-9]{11,30}\b|\b[a-z]{2}\d{2}[a-z0-9]{11,30}\b).*\b(?:end-to-end-ref|kundenreferenz)\b|\b(?:max(?:\s+mustermann)?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*erika\s*mustermann|erika(?:\s+mustermann)?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*max\s*mustermann)\b)/i
 
 // Regex to detect commercial purchase / order indicators in SEPA payments
 // to prevent business invoices, orders, and corporate collections with End-to-End-Ref from falling into Transfers.

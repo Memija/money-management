@@ -22,6 +22,7 @@ import {
   isPaymentProcessorIntermediary,
   isPaymentProcessorOnly,
   isRelatedTransaction,
+  propagateLoanCategories,
   repairBrokenWords,
   resolveCanonicalCategory,
   resolvePluralTemplate,
@@ -2121,6 +2122,63 @@ describe('category-utils', () => {
         expect(categorize('Otplata kredita')).toBe('Loans')
         expect(categorize('Spłata raty kredytu')).toBe('Loans')
         expect(categorize('Cicilan pinjaman bank')).toBe('Loans')
+      })
+
+      it('categorizes Anel o. Biljana Memic loan payments as Loans, never as Transfers', () => {
+        const fullDesc =
+          'Anel o. Biljana Memic (3696413) GENODEF1S01 DE36550905000003696413 Kreditrate End-to-End-Ref.: CCB.338.UE.248923'
+        const strippedDesc = 'Anel o. Biljana Memic'
+        const allCapsDesc =
+          'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED'
+        const ibanDesc = 'DE36550905000003696413'
+
+        expect(categorize(fullDesc)).toBe('Loans')
+        expect(categorize(strippedDesc)).toBe('Loans')
+        expect(categorize(allCapsDesc)).toBe('Loans')
+        expect(categorize(ibanDesc)).toBe('Loans')
+        expect(categorize('Biljana o. Anel Memic')).toBe('Loans')
+        expect(categorize('Anel oder Biljana Memic')).toBe('Loans')
+      })
+
+      it('propagates Loans category to sibling transactions where loan details were stripped by the bank', () => {
+        const txs: Transaction[] = [
+          {
+            id: 'tx-loan-1',
+            date: '2026-08-01',
+            description:
+              'Anel o. Biljana Memic (3696413) GENODEF1S01 DE36550905000003696413 Kreditrate End-to-End-Ref.: CCB.338.UE.248923',
+            amount: -350,
+            currency: 'EUR',
+            type: 'expense',
+            category: 'Loans',
+            institution: 'Volksbank',
+          },
+          {
+            id: 'tx-loan-2',
+            date: '2026-09-01',
+            description: 'Anel o. Biljana Memic',
+            amount: -350,
+            currency: 'EUR',
+            type: 'expense',
+            category: 'Transfers', // legacy default or stripped memo
+            institution: 'Volksbank',
+          },
+          {
+            id: 'tx-unrelated',
+            date: '2026-09-02',
+            description: 'REWE Markt',
+            amount: -45,
+            currency: 'EUR',
+            type: 'expense',
+            category: 'Groceries',
+            institution: 'Volksbank',
+          },
+        ]
+
+        const propagated = propagateLoanCategories(txs)
+        expect(propagated[0].category).toBe('Loans')
+        expect(propagated[1].category).toBe('Loans')
+        expect(propagated[2].category).toBe('Groceries')
       })
     })
 

@@ -7,6 +7,7 @@ import {
   getTransactionCategory,
   getTransactionMerchant,
   isInformativeTransaction,
+  propagateLoanCategories,
 } from '../utils/category-utils'
 import { generateMonthRange } from '../utils/date-utils'
 
@@ -172,12 +173,13 @@ export const useAnalytics = (
       isInformativeTransaction(t) ? t.category === undefined : typeof t.category === 'string',
     )
     if (allAlreadyCategorized) {
-      return activeRawTransactions
+      return propagateLoanCategories(activeRawTransactions, manualCategories)
     }
-    return activeRawTransactions.map((t) => ({
+    const categorized = activeRawTransactions.map((t) => ({
       ...t,
       category: getTransactionCategory(t, customKeywords, manualCategories),
     }))
+    return propagateLoanCategories(categorized, manualCategories)
   }, [activeRawTransactions, customKeywords, manualCategories])
 
   // Available periods for filter

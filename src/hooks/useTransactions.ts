@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
-import { getTransactionCategory } from '../utils/category-utils'
+import { getTransactionCategory, propagateLoanCategories } from '../utils/category-utils'
 import type { PeriodFilter } from './useAnalytics'
 
 function matchesPeriod(date: string, period?: PeriodFilter): boolean {
@@ -88,7 +88,7 @@ export function useTransactions(period?: PeriodFilter) {
         }
       }
     }
-    return list
+    return propagateLoanCategories(list, manualCategories)
   }, [importedAccounts, customKeywords, manualCategories])
 
   const ghostCount = useMemo(() => {

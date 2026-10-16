@@ -7,10 +7,13 @@ import type { CustomCategory, Transaction } from '../../../types'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryIcon } from '../../../utils/category-icons'
 import { getCategoryLabel, isInformativeTransaction } from '../../../utils/category-utils'
+import { CategoryIcon } from '../CategoryIcon'
 import { CopyButton } from '../CopyButton'
 import { DatePicker } from '../DatePicker'
 
 import styles from './TransactionPreviewModal.module.css'
+
+const ROW_CATEGORY_ICON_SIZE = 11
 
 export interface TransactionPreviewRowProps {
   index: number
@@ -80,6 +83,7 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
   const categoryColor = isZeroAmount
     ? 'var(--text-dim)'
     : getCategoryColor(tx.category || 'Other', customCategories)
+  const pillCategoryColor = getCategoryColor(tx.category || 'Other', customCategories)
   const isTxIncome = tx.type === 'income'
 
   return (
@@ -161,11 +165,24 @@ export const TransactionPreviewRow: React.FC<TransactionPreviewRowProps> = ({
                 <span>{tx.institution}</span>
               </span>
             )}
-            {(showInstitution || isExistingAccountTransfer) && tx.institution && tx.category && (
-              <span>•</span>
-            )}
             {tx.category && (
-              <span>{getCategoryLabel(tx.category, t, locale, customCategories)}</span>
+              <span
+                className={styles['category-pill']}
+                style={{
+                  borderColor: `${pillCategoryColor}40`,
+                  backgroundColor: `${pillCategoryColor}12`,
+                }}
+                data-testid={`preview-category-pill-${tx.id}`}
+              >
+                <CategoryIcon
+                  category={tx.category}
+                  size={ROW_CATEGORY_ICON_SIZE}
+                  customCategories={customCategories}
+                  description={tx.description}
+                  counterpartyIban={tx.counterpartyIban}
+                />
+                <span>{getCategoryLabel(tx.category, t, locale, customCategories)}</span>
+              </span>
             )}
             {isZeroAmount && (
               <span

@@ -352,4 +352,26 @@ describe('TransactionPreviewRow', () => {
 
     expect(copySpy).toHaveBeenCalledWith('Bakery Purchase')
   })
+
+  it('renders category pill with icon and matching colors when category is present', () => {
+    render(<TransactionPreviewRow {...defaultProps} />)
+
+    const pill = screen.getByTestId('preview-category-pill-tx-1')
+    expect(pill).toBeInTheDocument()
+    expect(pill).toHaveTextContent('Groceries')
+    expect(pill.style.borderColor).toBe('rgba(249, 115, 22, 0.25)')
+    expect(pill.style.backgroundColor).toBe('rgba(249, 115, 22, 0.07)')
+    expect(pill.querySelector('img, svg')).toBeInTheDocument()
+  })
+
+  it('does not render category pill when category is missing', () => {
+    const noCatTx: Transaction = {
+      ...mockTx,
+      id: 'tx-no-cat',
+      category: '',
+    }
+    render(<TransactionPreviewRow {...defaultProps} tx={noCatTx} />)
+
+    expect(screen.queryByTestId('preview-category-pill-tx-no-cat')).not.toBeInTheDocument()
+  })
 })

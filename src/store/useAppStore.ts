@@ -18,6 +18,7 @@ import {
   extractCleanDescription,
   isInformativeTransaction,
   isPaymentProcessorOnly,
+  propagateLoanCategories,
 } from '../utils/category-utils'
 import { createDebouncedJSONStorage } from '../utils/storage/debounced-json-storage'
 import { idbStorage } from '../utils/storage/idb-storage'
@@ -369,9 +370,26 @@ export function recategorizeAccounts(
       })
     }
 
-    const newTransactions = recatList(account.transactions) || []
-    const newDuplicates = recatList(account.duplicateTransactions)
-    const newModified = recatList(account.modifiedTransactions)
+    const rawTxs = recatList(account.transactions) || []
+    const newTransactions = propagateLoanCategories(rawTxs, manualCategories)
+    if (newTransactions !== rawTxs) {
+      accountChanged = true
+      changed = true
+    }
+
+    const rawDups = recatList(account.duplicateTransactions)
+    const newDuplicates = rawDups ? propagateLoanCategories(rawDups, manualCategories) : undefined
+    if (newDuplicates && newDuplicates !== rawDups) {
+      accountChanged = true
+      changed = true
+    }
+
+    const rawMod = recatList(account.modifiedTransactions)
+    const newModified = rawMod ? propagateLoanCategories(rawMod, manualCategories) : undefined
+    if (newModified && newModified !== rawMod) {
+      accountChanged = true
+      changed = true
+    }
 
     if (!accountChanged) return account
     return {
