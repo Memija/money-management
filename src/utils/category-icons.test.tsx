@@ -2330,23 +2330,42 @@ describe('category-icons', () => {
       expect(cobadeffInfo.logoComponent).toBe(MERCHANT_LOGOS.SiCommerzbank)
       expect(cobadeffInfo.suggestedCategory).toBe('Transfers')
 
-      // 14. KMK Immobilienverwaltung (with KMK in name -> belongs to KMK Immobilienverwaltung)
+      // 14. KMK Immobilienverwaltung (pure property management payment)
       const kmkInfo = getMerchantBrandInfo(
-        'WEG Landwehrweg 1, 61350 z. Hd. KMK   Immobilienverw. GmbH 556.101701 Mustermann Erika Lastschrif t 12/2024 End-to-End-Ref.: 556/101701 Mandatsref: cc804780000000000000000000000000 Gläubiger-ID: DE13ZZZ00000579310 SEPA-BASISLASTSCHRIFT wiederholend',
+        'KMK Immobilienverwaltung GmbH Hausgeld End-to-End-Ref.: 556/101701',
       )
       expect(kmkInfo.merchant?.id).toBe('kmk-immobilien')
       expect(kmkInfo.merchant?.name).toBe('KMK Immobilienverwaltung')
       expect(kmkInfo.logoComponent).toBe(MERCHANT_LOGOS.KmkImmobilienLogo)
       expect(kmkInfo.suggestedCategory).toBe('Rent')
 
-      // 14b. WEG Landwehrweg 1 (private condo association - does NOT use civic Bad Homburg city logo)
+      // 14b. WEG Landwehrweg 1 (unifies under condo association even when paid care-of z. Hd. KMK)
+      const wegCareOfInfo = getMerchantBrandInfo(
+        'WEG Landwehrweg 1, 61350 z. Hd. KMK   Immobilienverw. GmbH 556.101701 Mustermann Erika Lastschrif t 12/2024 End-to-End-Ref.: 556/101701 Mandatsref: cc804780000000000000000000000000 Gläubiger-ID: DE13ZZZ00000579310 SEPA-BASISLASTSCHRIFT wiederholend',
+      )
+      expect(wegCareOfInfo.merchant?.id).toBe('weg-landwehrweg')
+      expect(wegCareOfInfo.merchant?.name).toBe('WEG Landwehrweg 1')
+      expect(wegCareOfInfo.suggestedCategory).toBe('Rent')
+      expect(wegCareOfInfo.initials).toBeTruthy()
+
+      // 14c. WEG Landwehrweg 1 (direct condo association debit - does NOT use civic Bad Homburg city logo)
       const wegInfo = getMerchantBrandInfo(
         'WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld Landwehrweg End-to-End-Ref.: NOTPROVIDED Mandatsref: LANDWEHRCC25 Gläubiger-ID: DE85ZZZ00002471357 SEPA-BASISLASTSCHRIFT wiederholend',
       )
       expect(wegInfo.merchant?.id).toBe('weg-landwehrweg')
+      expect(wegInfo.merchant?.name).toBe('WEG Landwehrweg 1')
       expect(wegInfo.logoComponent).not.toBe(MERCHANT_LOGOS.BadHomburgLogo)
       expect(wegInfo.suggestedCategory).toBe('Rent')
       expect(wegInfo.initials).toBeTruthy()
+
+      // 14d. WEG Landwehrweg 1 (Sonderumlage transfer to KMK account for WEG Landwehrweg 1)
+      const wegSonderumlageInfo = getMerchantBrandInfo(
+        'KMK Immobilienverw. GmbH FFVBDEFFXXX DE64501900006401198340 WEG Landwehrweg 1 556.101701 Sonder umlage End-to-End-Ref.: CCB.143.UE.70818',
+      )
+      expect(wegSonderumlageInfo.merchant?.id).toBe('weg-landwehrweg')
+      expect(wegSonderumlageInfo.merchant?.name).toBe('WEG Landwehrweg 1')
+      expect(wegSonderumlageInfo.suggestedCategory).toBe('Rent')
+      expect(wegSonderumlageInfo.initials).toBeTruthy()
 
       // 14c. Heinz Otto GbR tenancy transaction does NOT match the retail OTTO logo
       const heinzOttoTx =

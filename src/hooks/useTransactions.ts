@@ -115,8 +115,9 @@ export function useTransactions(period?: PeriodFilter) {
       if (selectedSubAccount !== 'all' && t.subAccount !== selectedSubAccount) continue
       if (term) {
         const descMatch = t.description.toLowerCase().includes(term)
+        const partnerMatch = t.partner ? t.partner.toLowerCase().includes(term) : false
         const catMatch = t.category ? t.category.toLowerCase().includes(term) : false
-        if (!descMatch && !catMatch) continue
+        if (!descMatch && !partnerMatch && !catMatch) continue
       }
       result.push(t)
     }

@@ -235,5 +235,120 @@ describe('useAnalytics hook', () => {
     expect(result.current.monthlyCategoryData[0].Health).toBe(0)
     expect(result.current.monthlyCategoryData[5].Health).toBe(0)
   })
+
+  it('aggregates composite SEPA statements and counter-varied descriptions into single top merchants', () => {
+    const transactions: Transaction[] = [
+      {
+        id: 'tx-memic-1',
+        date: '2026-08-01',
+        description: 'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED',
+        amount: -150,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Loans',
+        institution: 'Volksbank',
+      },
+      {
+        id: 'tx-memic-2',
+        date: '2026-08-15',
+        description: 'Anel o. Biljana Memic',
+        amount: -250,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Loans',
+        institution: 'Volksbank',
+      },
+      {
+        id: 'tx-tax-1',
+        date: '2026-08-05',
+        description: 'Finanzkasse Schwalm-Eder HELADEFFXXX DE34500500000001000330 2',
+        amount: -80,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Taxes',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-tax-2',
+        date: '2026-08-20',
+        description: 'Finanzkasse Schwalm-Eder HELADEFFXXX DE34500500000001000330',
+        amount: -120,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Taxes',
+        institution: 'Commerzbank',
+      },
+    ]
+
+    const { result } = renderHook(() => useAnalytics(transactions, period, formatMonthYear))
+
+    expect(result.current.topMerchants).toHaveLength(2)
+
+    const memic = result.current.topMerchants.find(
+      (m) => m.name.toLowerCase() === 'anel o. biljana memic',
+    )
+    expect(memic).toBeDefined()
+    expect(memic?.name).toBe('Anel o. Biljana Memic')
+    expect(memic?.amount).toBe(400) // 150 + 250
+    expect(memic?.count).toBe(2)
+    expect(memic?.category).toBe('Loans')
+
+    const finanzkasse = result.current.topMerchants.find(
+      (m) => m.name.toLowerCase() === 'finanzkasse schwalm-eder',
+    )
+    expect(finanzkasse).toBeDefined()
+    expect(finanzkasse?.name).toBe('Finanzkasse Schwalm-Eder')
+    expect(finanzkasse?.amount).toBe(200) // 80 + 120
+    expect(finanzkasse?.count).toBe(2)
+    expect(finanzkasse?.category).toBe('Taxes')
+  })
+
+  it('unifies WEG Landwehrweg transactions under WEG Landwehrweg 1 in topMerchants even when paid care-of KMK', () => {
+    const transactions: Transaction[] = [
+      {
+        id: 'tx-weg-1',
+        date: '2026-08-02',
+        description:
+          'WEG Landwehrweg 1, 61350 z. Hd. KMK   Immobilienverw. GmbH 556.101701 Mustermann Erika Lastschrif t 12/2024 End-to-End-Ref.: 556/101701',
+        amount: -450,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Rent',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-weg-2',
+        date: '2026-08-15',
+        description:
+          'WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld Landwehrweg End-to-End-Ref.: NOTPROVIDED',
+        amount: -450,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Rent',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-weg-3',
+        date: '2026-08-20',
+        partner: 'KMK Immobilienverw. GmbH',
+        description:
+          'FFVBDEFFXXX DE64501900006401198340 WEG Landwehrweg 1 556.101701 Sonder umlage End-to-End-Ref.: CCB.143.UE.70818',
+        amount: -300,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Rent',
+        institution: 'Commerzbank',
+      },
+    ]
+
+    const { result } = renderHook(() => useAnalytics(transactions, period, formatMonthYear))
+
+    expect(result.current.topMerchants).toHaveLength(1)
+    const weg = result.current.topMerchants[0]
+    expect(weg.name).toBe('WEG Landwehrweg 1')
+    expect(weg.amount).toBe(1200)
+    expect(weg.count).toBe(3)
+    expect(weg.category).toBe('Rent')
+  })
 })
 

@@ -3,7 +3,11 @@ import { useMemo } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
 import { getCategoryColor } from '../utils/category-colors'
-import { getTransactionCategory, isInformativeTransaction } from '../utils/category-utils'
+import {
+  getTransactionCategory,
+  getTransactionMerchant,
+  isInformativeTransaction,
+} from '../utils/category-utils'
 import { generateMonthRange } from '../utils/date-utils'
 
 const sortCategories = (a: [string, number], b: [string, number]) => {
@@ -372,10 +376,19 @@ export const useAnalytics = (
     periodTransactions
       .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
       .forEach((t) => {
-        const name = t.description.trim().replace(/\s+/g, ' ')
-        const key = name.toLowerCase()
+        const merchant = getTransactionMerchant(t)
+        const key = merchant.toLowerCase()
         if (!map[key]) {
-          map[key] = { displayName: name, amount: 0, count: 0, categoryCounts: {} }
+          map[key] = { displayName: merchant, amount: 0, count: 0, categoryCounts: {} }
+        } else {
+          // If the new name has more natural casing (e.g. "Anel o. Biljana Memic" over "Anel O. Biljana Memic" or ALL-CAPS),
+          // update displayName to the more natural variant
+          const current = map[key].displayName
+          const currentLower = (current.match(/[a-z]/g) || []).length
+          const newLower = (merchant.match(/[a-z]/g) || []).length
+          if (newLower > currentLower || (merchant.includes('o.') && !current.includes('o.'))) {
+            map[key].displayName = merchant
+          }
         }
         map[key].amount += Math.abs(t.amount)
         map[key].count++

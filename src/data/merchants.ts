@@ -2182,7 +2182,6 @@ const GLOBAL_MERCHANTS: MerchantSuggestion[] = [
       'ffvbdeff',
       'de36550905000000000001',
       'de77501900000000922960',
-      'de64501900006401198340',
     ],
     category: 'Transfers',
     logo: 'VolksbankLogo',
@@ -2372,10 +2371,11 @@ const GLOBAL_MERCHANTS: MerchantSuggestion[] = [
   },
   {
     id: 'weg-landwehrweg',
-    name: 'WEG Landwehrweg 1 Bad Homburg',
+    name: 'WEG Landwehrweg 1',
     keyword: 'weg landwehrweg',
     aliases: [
       'weg landwehrweg 1',
+      'weg landwehrweg 1 bad homburg',
       'hausgeld landwehrweg',
       'landwehrcc25',
       'de85zzz00002471357',

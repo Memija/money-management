@@ -348,7 +348,7 @@ export function extractCleanDescription(desc: string): string {
   // Kunden-Nr.: ..., Rechnungsnr: ..., Vertrags-Nr.: ..., Zählernummer: ...,
   // Bitte geben Sie bei Bezahlung / Zahlung / Überweisung ...
   cleaned = cleaned.replace(
-    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|(?:von\s+)?(?:Karte|Card)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Card[-\s]?ID|(?:Kd|Kunden|Pers|Personen|Personal)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|(?:Rg|Rechnungs?)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer)|\bAz(?:\.|\s*Nr\.?)?\b)\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
+    /(?:\b(?:End[-\s]?to[-\s]?(?:End[-\s]?(?:Ref(?:\.|erenz|-Id)?)?|Ref(?:\.|erenz|-Id)?)?|EREF|KREF|MREF|CRED|DEBT|SVWZ|KRED\b|KREDIT(?:RATE)?\b|Mandatsref(?:\.|erenz)?|Referenz|Reference|Ref(?:\.|\s*Nr\.?)?|Gl[aä]ubiger[-\s]?ID|SEPA[-\s]?(?:BASIS|FIRMEN)?[-\s]?LASTSCHRIFT|(?:von\s+)?(?:Karte|Card)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Card[-\s]?ID|(?:Kd|Kunden|Pers|Personen|Personal)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|(?:Rg|Rechnungs?)[-\s.]?(?:Nr(?:\.|erenz)?|nummer)?|Vertrags[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Z[aä]hler[-\s]?(?:Nr(?:\.|erenz)?|nummer)|Akten[-\s]?(?:zeichen|nr(?:\.|erenz)?|nummer)|\bAz(?:\.|\s*Nr\.?)?\b)\s*[:+.-]?|\b(?:IBAN|BIC)\s*:\s*[A-Z0-9]+|\bBitte\s+(?:geben\s+Sie\s+)?(?:bei\s+)?(?:der\s+)?(?:Bezahlung|Zahlung|Überweisung|Ueberweisung|Zahlungsverkehr|Verwendungszweck)\b).*/i,
     '',
   )
 
@@ -415,9 +415,9 @@ export function extractCleanDescription(desc: string): string {
   cleaned = cleaned.replace(/\b(?:NYA|NNT)\*\s*/gi, ' ')
   cleaned = cleaned.replace(/\bsagt\s+danke\b/gi, ' ')
 
-  // 5. Remove standalone IBANs (compact or spaced) and SWIFT BICs
+  // 5. Remove standalone IBANs (compact or spaced), SWIFT BICs, and immediately trailing reference counters
   cleaned = cleaned.replace(
-    /\b[A-Za-z]{2}\d{2}(?:\s*[A-Za-z0-9]{4}){2,7}(?:\s*[A-Za-z0-9]{1,4})?\b/g,
+    /\b[A-Za-z]{2}\d{2}(?:\s*[A-Za-z0-9]{4}){2,7}(?:\s*[A-Za-z0-9]{1,4})?\b(?:\s+\d{1,4}\b)*/g,
     ' ',
   )
   cleaned = cleaned.replace(/\b[A-Za-z]{6}[A-Za-z0-9]{2}(?:[A-Za-z0-9]{3})?\b/gi, (match) => {
@@ -621,9 +621,12 @@ export function extractMerchantKeyword(desc: string): string {
 
   // 5. Remove remittance purpose/reason phrases and banking transaction types commonly appended after merchant name
   merchant = merchant.replace(
-    /\s+(?:abbuchung|lastschrift|gutschrift|auszahlung|einzahlung|r(?:ü|ue)ckzahlung|r(?:ü|ue)ckverg(?:ü|ue)tung\w*|r(?:ü|ue)ck[uü]berweisung\w*|geb(?:ü|ue)hrenerstattung\w*|entgelterstattung\w*|erstatt(?:\.|ung)?|est-veranl(?:\.|agung)?|steuererstattung|lizenzgeb(?:ü|ue)hr|kautionsabrechnung|abrechnung|miete|(?:monatliches\s+)?hausgeld|gerichtsgeb(?:ü|ue)hr(?:en)?|grundbuch(?:eintragung)?|geb(?:ü|ue)hr(?:en)?|notarkosten|notargeb(?:ü|ue)hr(?:en)?|reisespesen|reisekosten|spesen|order|bestellung|auftrag|rechnung|invoice)\b.*$/i,
+    /\s+(?:abbuchung|lastschrift|gutschrift|auszahlung|einzahlung|r(?:ü|ue)ckzahlung|r(?:ü|ue)ckverg(?:ü|ue)tung\w*|r(?:ü|ue)ck[uü]berweisung\w*|geb(?:ü|ue)hrenerstattung\w*|entgelterstattung\w*|erstatt(?:\.|ung)?|est-veranl(?:\.|agung)?|steuererstattung|lizenzgeb(?:ü|ue)hr|kautionsabrechnung|abrechnung|miete|(?:monatliches\s+)?hausgeld|gerichtsgeb(?:ü|ue)hr(?:en)?|grundbuch(?:eintragung)?|geb(?:ü|ue)hr(?:en)?|notarkosten|notargeb(?:ü|ue)hr(?:en)?|reisespesen|reisekosten|spesen|order|bestellung|auftrag|rechnung|invoice|kred\b|kredit\w*|kreditrate\w*|darlehen\w*|tilgung\w*|annuit[aä]t\w*)\b.*$/i,
     ' ',
   )
+
+  // Remove trailing reference numbers/counters (e.g. 'Finanzkasse Schwalm-Eder 2' -> 'Finanzkasse Schwalm-Eder')
+  merchant = merchant.replace(/\s+\d{1,2}\s*$/, '')
 
   // 6. Clean up spaces and punctuation
   merchant = merchant
@@ -636,12 +639,12 @@ export function extractMerchantKeyword(desc: string): string {
     return 'Uber'
   }
 
-  if (/\b(?:z\.?\s*hd\.?\s*kmk|kmk\s+immobilien(?:verw\w*|verwaltung)?)\b/i.test(merchant)) {
-    return 'KMK Immobilienverwaltung'
-  }
-
   if (/\bweg\s+landwehrweg\b/i.test(merchant)) {
     return 'WEG Landwehrweg 1'
+  }
+
+  if (/\b(?:z\.?\s*hd\.?\s*kmk|kmk\s+immobilien(?:verw\w*|verwaltung)?)\b/i.test(merchant)) {
+    return 'KMK Immobilienverwaltung'
   }
 
   return merchant.length >= 2
@@ -649,6 +652,96 @@ export function extractMerchantKeyword(desc: string): string {
     : isPaymentProcessorIntermediary(desc)
       ? ''
       : extractCleanDescription(desc)
+}
+
+/**
+ * Formats a merchant display name for human-readable display.
+ * If the string is in ALL CAPS and contains multiple words or a long word,
+ * it formats it in Title Case (e.g. "ANEL O. BILJANA MEMIC" -> "Anel O. Biljana Memic"),
+ * while preserving mixed-case names and short brand acronyms (e.g. "IKEA", "ALDI", "REWE").
+ */
+export function formatMerchantDisplayName(name: string): string {
+  const trimmed = name.trim().replace(/\s+/g, ' ')
+  if (!trimmed) return ''
+
+  // If already mixed case (contains both lowercase and uppercase letters), preserve as-is
+  if (/[a-z]/.test(trimmed) && /[A-Z]/.test(trimmed)) {
+    return trimmed
+  }
+
+  // If pure all-caps with multiple words or a word with length > 4
+  if (trimmed === trimmed.toUpperCase()) {
+    const words = trimmed.split(' ')
+    // Keep short brand acronyms (e.g. IKEA, ALDI, REWE, BMW, SAP, OBI, DM) as-is
+    if (words.length === 1 && words[0].length <= 4) {
+      return trimmed
+    }
+    return words
+      .map((word) => {
+        if (/^[A-Z]\.?$/.test(word)) return word
+        if (word.length <= 1) return word
+        return word
+          .split('-')
+          .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() : ''))
+          .join('-')
+      })
+      .join(' ')
+  }
+
+  return trimmed
+}
+
+/**
+ * Resolves the canonical merchant/payee name for a transaction.
+ * Checks both `partner` and `description`, strips banking and SEPA noise,
+ * and formats the display name cleanly.
+ */
+export function getTransactionMerchant(
+  tx: Transaction | { description: string; partner?: string },
+): string {
+  if (!tx) return ''
+
+  // Prioritize WEG Landwehrweg 1 when specified in description or partner,
+  // even if an intermediary property management firm (e.g. KMK Immobilienverwaltung) is listed as partner
+  if (tx.description && /\bweg\s+landwehrweg\b/i.test(tx.description)) {
+    return 'WEG Landwehrweg 1'
+  }
+  if (tx.partner && /\bweg\s+landwehrweg\b/i.test(tx.partner)) {
+    return 'WEG Landwehrweg 1'
+  }
+
+  if (tx.partner && tx.partner.trim()) {
+    const cleanPartner = extractMerchantKeyword(tx.partner)
+    if (cleanPartner && !isPaymentProcessorOnly(cleanPartner)) {
+      // If partner is a property management firm (e.g. KMK Immobilienverwaltung)
+      // and description specifies an underlying property or condo association, resolve merchant from description
+      if (
+        /kmk\s+immobilien(?:verw\w*|verwaltung)?/i.test(cleanPartner) &&
+        tx.description &&
+        /\bweg\b/i.test(tx.description)
+      ) {
+        const cleanDesc = extractMerchantKeyword(tx.description)
+        if (cleanDesc && !isPaymentProcessorOnly(cleanDesc)) {
+          return formatMerchantDisplayName(cleanDesc)
+        }
+      }
+      return formatMerchantDisplayName(cleanPartner)
+    }
+  }
+
+  if (tx.description && tx.description.trim()) {
+    const cleanDesc = extractMerchantKeyword(tx.description)
+    if (cleanDesc && !isPaymentProcessorOnly(cleanDesc)) {
+      return formatMerchantDisplayName(cleanDesc)
+    }
+    const fallback = extractCleanDescription(tx.description)
+    if (fallback && !isPaymentProcessorOnly(fallback)) {
+      return formatMerchantDisplayName(fallback)
+    }
+  }
+
+  const raw = (tx.partner && tx.partner.trim()) || tx.description.trim().replace(/\s+/g, ' ')
+  return formatMerchantDisplayName(raw)
 }
 
 /**

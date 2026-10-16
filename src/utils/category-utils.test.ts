@@ -11,10 +11,12 @@ import {
   formatCategoryCount,
   formatCategoryPercent,
   formatChargesCount,
+  formatMerchantDisplayName,
   formatPopularMerchantsCount,
   formatTransactionCount,
   getCategoryLabel,
   getTransactionCategory,
+  getTransactionMerchant,
   hasExtensiveCategoryData,
   isInformativeTransaction,
   isPaymentProcessorIntermediary,
@@ -1245,6 +1247,62 @@ describe('category-utils', () => {
         'Max Mustermann REVOLT21XXX LT153250000290000001 End-to-End-Ref.: MOB.147.UE.32306'
       expect(extractCleanDescription(desc)).toBe('Max Mustermann')
       expect(extractMerchantKeyword(desc)).toBe('Max Mustermann')
+    })
+
+    it('cleans SEPA bank transfer with BIC, IBAN, and loan reference KRED', () => {
+      const descWithIbanAndKred =
+        'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED'
+      expect(extractCleanDescription(descWithIbanAndKred)).toBe('ANEL O. BILJANA MEMIC')
+      expect(extractMerchantKeyword(descWithIbanAndKred)).toBe('ANEL O. BILJANA MEMIC')
+      expect(formatMerchantDisplayName('ANEL O. BILJANA MEMIC')).toBe('Anel O. Biljana Memic')
+      expect(formatMerchantDisplayName('IKEA')).toBe('IKEA')
+      expect(formatMerchantDisplayName('IKEA DEUTSCHLAND')).toBe('Ikea Deutschland')
+      expect(formatMerchantDisplayName('Anel o. Biljana Memic')).toBe('Anel o. Biljana Memic')
+      expect(getTransactionMerchant({ description: descWithIbanAndKred })).toBe(
+        'Anel O. Biljana Memic',
+      )
+      expect(getTransactionMerchant({ description: 'Anel o. Biljana Memic' })).toBe(
+        'Anel o. Biljana Memic',
+      )
+    })
+
+    it('cleans Finanzkasse tax office transfers with trailing reference counter numbers', () => {
+      const desc1 = 'Finanzkasse Schwalm-Eder HELADEFFXXX DE34500500000001000330 2'
+      const desc2 = 'Finanzkasse Schwalm-Eder HELADEFFXXX DE34500500000001000330'
+      expect(extractCleanDescription(desc1)).toBe('Finanzkasse Schwalm-Eder')
+      expect(extractCleanDescription(desc2)).toBe('Finanzkasse Schwalm-Eder')
+      expect(extractMerchantKeyword(desc1)).toBe('Finanzkasse Schwalm-Eder')
+      expect(extractMerchantKeyword(desc2)).toBe('Finanzkasse Schwalm-Eder')
+      expect(getTransactionMerchant({ description: desc1 })).toBe('Finanzkasse Schwalm-Eder')
+      expect(getTransactionMerchant({ description: desc2 })).toBe('Finanzkasse Schwalm-Eder')
+    })
+
+    it('unifies WEG Landwehrweg transactions under WEG Landwehrweg 1 even with z. Hd. KMK Immobilienverwaltung', () => {
+      const desc1 =
+        'WEG Landwehrweg 1, 61350 z. Hd. KMK   Immobilienverw. GmbH 556.101701 Mustermann Erika Lastschrif t 12/2024 End-to-End-Ref.: 556/101701'
+      const desc2 =
+        'WEG Landwehrweg 1, 61350 Bad Hombur g Monatliches Hausgeld Landwehrweg End-to-End-Ref.: NOTPROVIDED'
+      expect(extractMerchantKeyword(desc1)).toBe('WEG Landwehrweg 1')
+      expect(extractMerchantKeyword(desc2)).toBe('WEG Landwehrweg 1')
+      const desc3 =
+        'KMK Immobilienverw. GmbH FFVBDEFFXXX DE64501900006401198340 WEG Landwehrweg 1 556.101701 Sonder umlage End-to-End-Ref.: CCB.143.UE.70818'
+      expect(extractMerchantKeyword(desc3)).toBe('WEG Landwehrweg 1')
+      expect(getTransactionMerchant({ description: desc1 })).toBe('WEG Landwehrweg 1')
+      expect(getTransactionMerchant({ description: desc2 })).toBe('WEG Landwehrweg 1')
+      expect(getTransactionMerchant({ description: desc3 })).toBe('WEG Landwehrweg 1')
+      expect(
+        getTransactionMerchant({
+          partner: 'KMK Immobilienverw. GmbH',
+          description: desc3,
+        }),
+      ).toBe('WEG Landwehrweg 1')
+      expect(
+        getTransactionMerchant({
+          partner: 'KMK Immobilienverw. GmbH',
+          description:
+            'FFVBDEFFXXX DE64501900006401198340 WEG Landwehrweg 1 556.101701 Sonder umlage End-to-End-Ref.: CCB.143.UE.70818',
+        }),
+      ).toBe('WEG Landwehrweg 1')
     })
 
     it('accurately cleans and extracts core merchant from PayPal intermediary transactions and direct account debits', () => {

@@ -6,7 +6,7 @@ import { useFormatters } from '../../../hooks/useFormatters'
 import type { TranslationStrings } from '../../../i18n/translations'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
-import { getCategoryLabel } from '../../../utils/category-utils'
+import { getCategoryLabel, getTransactionMerchant } from '../../../utils/category-utils'
 import { TransactionPreviewModal } from '../../shared/TransactionPreviewModal'
 import { AvgDetailModal } from '../AvgDetailModal/AvgDetailModal'
 import { SavingsTrendModal } from '../SavingsTrendModal/SavingsTrendModal'
@@ -74,9 +74,12 @@ const buildDetailModalConfig = (
   }
   const { merchant } = modal
   const normalizedMerchant = normalizeMerchant(merchant)
-  const transactions = periodTransactions.filter(
-    (tx) => tx.type === 'expense' && normalizeMerchant(tx.description) === normalizedMerchant,
-  )
+  const transactions = periodTransactions.filter((tx) => {
+    if (tx.type !== 'expense') return false
+    const txMerchant = normalizeMerchant(getTransactionMerchant(tx))
+    if (txMerchant === normalizedMerchant) return true
+    return normalizeMerchant(tx.description) === normalizedMerchant
+  })
   return { title: merchant || t.topMerchants, variant: 'expense' as const, transactions }
 }
 

@@ -82,6 +82,7 @@ const PAYMENT_PROCESSOR_IDS = new Set<string>([
   'payoneer',
   'payone',
   'commerzbank',
+  'volksbank',
 ])
 
 /** Processors whose logo is shown when the underlying merchant has no logo of its own. */
@@ -142,6 +143,11 @@ function computeMatchingMerchant(text: string): MerchantSuggestion | undefined {
 
     // Reject false-positive matches for OTTO on personal names or rental transactions
     if (merchant.id === 'otto' && NON_RETAIL_OTTO_REGEX.test(textLower)) {
+      score = 0
+    }
+
+    // Prioritize WEG Landwehrweg 1 over KMK property management when condo association is specified
+    if (merchant.id === 'kmk-immobilien' && /\blandwehrweg\b/i.test(textLower)) {
       score = 0
     }
 
