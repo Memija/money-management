@@ -10,7 +10,19 @@ vi.mock('recharts', () => ({
   PieChart: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pie-chart">{children}</div>
   ),
-  Pie: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Pie: ({
+    children,
+    startAngle,
+    endAngle,
+  }: {
+    children: React.ReactNode
+    startAngle?: number
+    endAngle?: number
+  }) => (
+    <div data-testid="pie" data-startangle={startAngle} data-endangle={endAngle}>
+      {children}
+    </div>
+  ),
   Cell: () => <div>Cell</div>,
   Sector: () => <div>Sector</div>,
   Tooltip: () => <div>Tooltip</div>,
@@ -93,5 +105,19 @@ describe('ExpenseCategories', () => {
     const catBtn = screen.getByText('Category 1')
     fireEvent.click(catBtn)
     expect(handleCategoryClick).toHaveBeenCalledWith('Category 1')
+  })
+
+  it('renders donut chart with clockwise angles starting at 12 o\'clock (startAngle=90, endAngle=-270)', () => {
+    render(
+      <ExpenseCategories
+        categoryBreakdown={sampleCategories}
+        totalExpenses={36778.84}
+        onCategoryClick={vi.fn()}
+      />,
+    )
+
+    const pie = screen.getByTestId('pie')
+    expect(pie).toHaveAttribute('data-startangle', '90')
+    expect(pie).toHaveAttribute('data-endangle', '-270')
   })
 })
