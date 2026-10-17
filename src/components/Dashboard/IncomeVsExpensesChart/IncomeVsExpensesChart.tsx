@@ -3,8 +3,13 @@ import { motion } from 'framer-motion'
 import { TrendingDown, TrendingUp } from 'lucide-react'
 
 import type { MonthlyEntry } from '../../../hooks/useAnalytics'
+import { useChartTimelineGestures } from '../../../hooks/useChartTimelineGestures'
 import { useFormatters } from '../../../hooks/useFormatters'
+import { useIsMobile } from '../../../hooks/useIsMobile'
+import { useTimelineZoom } from '../../../hooks/useTimelineZoom'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { TimelineSlider } from '../../shared/TimelineSlider'
+import { TimelineToolbar } from '../../shared/TimelineToolbar'
 import { type IncomeChartEntry, IncomeVsExpensesPlot } from './IncomeVsExpensesPlot'
 import type { IncomeChartViewMode } from './IncomeVsExpensesTooltip'
 
@@ -20,9 +25,81 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
   ({ monthlyData, totalIncome: propIncome, totalExpenses: propExpenses }) => {
     const t = useLanguageStore((s) => s.t)
     const { formatCurrency, formatSavingsRate, formatMonthYear } = useFormatters()
+    const isMobile = useIsMobile(640)
     const [viewMode, setViewMode] = useState<IncomeChartViewMode>('monthly')
     const [hiddenSeries, setHiddenSeries] = useState<Record<string, boolean>>({})
     const hasNetLine = monthlyData.length > 1
+
+    // Enable zooming whenever there are at least 4 monthly points
+    const canZoom = monthlyData.length >= 4
+    const monthKeys = useMemo(
+      () => monthlyData.map((m) => m.rawMonth || m.name),
+      [monthlyData],
+    )
+
+    const {
+      startIndex,
+      endIndex,
+      visibleCount,
+      isZoomed,
+      isAtStart,
+      isAtEnd,
+      isAtMinZoom,
+      isAtMaxZoom,
+      activePreset,
+      zoomIn,
+      zoomOut,
+      panEarlier,
+      panLater,
+      resetZoom,
+      setPreset,
+      setRangeIndices,
+      scrubToRatio,
+    } = useTimelineZoom({
+      totalCount: monthlyData.length,
+      isLotsOfData: canZoom,
+      minCount: 4,
+      minWindow: 3,
+      monthKeys,
+    })
+
+    // Sliced dataset for the visible timeline window
+    const visibleData = useMemo(() => {
+      if (monthlyData.length <= 1) {
+        return monthlyData
+      }
+      return monthlyData.slice(startIndex, endIndex + 1)
+    }, [monthlyData, startIndex, endIndex])
+
+    const startMonthLabel = formatMonthYear(
+      monthlyData[startIndex]?.rawMonth || monthlyData[startIndex]?.name || '',
+    )
+    const endMonthLabel = formatMonthYear(
+      monthlyData[endIndex]?.rawMonth || monthlyData[endIndex]?.name || '',
+    )
+
+    // Pre-calculate monthly activity for the mini-map scrubber
+    const monthSummaries = useMemo(() => {
+      return monthlyData.map((m) => ({
+        month: m.rawMonth || m.name,
+        total: Math.max(m.income, m.expenses),
+      }))
+    }, [monthlyData])
+
+    // Touch and pointer gestures on the chart area
+    const chartGesturesRef = useChartTimelineGestures({
+      enabled: canZoom && isMobile,
+      totalCount: monthlyData.length,
+      startIndex,
+      endIndex,
+      minWindow: 3,
+      onRangeChange: setRangeIndices,
+      onZoomIn: zoomIn,
+      onZoomOut: zoomOut,
+      onResetZoom: resetZoom,
+      onPanEarlier: panEarlier,
+      onPanLater: panLater,
+    })
 
     const handleLegendClick = useCallback(
       (e: { dataKey?: unknown }) => {
@@ -39,9 +116,9 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
             }
 
             const nextHidden: Record<string, boolean> = { ...prev, [dataKey]: true }
-            const visibleCount = activeKeys.filter((key) => !nextHidden[key]).length
+            const visibleActiveCount = activeKeys.filter((key) => !nextHidden[key]).length
 
-            if (visibleCount === 0) {
+            if (visibleActiveCount === 0) {
               return prev
             }
           }
@@ -52,13 +129,20 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
       [hasNetLine],
     )
 
-    // Derive sums if not passed
+    // Derive sums: dynamically re-evaluate for visible slice when zoomed
     const { netSaved, savingsRate, isNetPositive, avgIncome, avgExpenses } = useMemo(() => {
-      const income = propIncome ?? monthlyData.reduce((acc, m) => acc + m.income, 0)
-      const expenses = propExpenses ?? monthlyData.reduce((acc, m) => acc + m.expenses, 0)
+      const dataForMetrics = isZoomed ? visibleData : monthlyData
+      const income =
+        !isZoomed && propIncome !== undefined
+          ? propIncome
+          : dataForMetrics.reduce((acc, m) => acc + m.income, 0)
+      const expenses =
+        !isZoomed && propExpenses !== undefined
+          ? propExpenses
+          : dataForMetrics.reduce((acc, m) => acc + m.expenses, 0)
       const net = income - expenses
       const rate = income > 0 ? Math.round((net / income) * 100) : expenses > 0 ? -100 : 0
-      const count = monthlyData.length || 1
+      const count = dataForMetrics.length || 1
       return {
         netSaved: net,
         savingsRate: rate,
@@ -66,18 +150,18 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
         avgIncome: income / count,
         avgExpenses: expenses / count,
       }
-    }, [monthlyData, propIncome, propExpenses])
+    }, [isZoomed, visibleData, monthlyData, propIncome, propExpenses])
 
     const chartData = useMemo(() => {
       const result: IncomeChartEntry[] = []
       let runningTotal = 0
-      for (const m of monthlyData) {
+      for (const m of visibleData) {
         const net = m.income - m.expenses
         runningTotal += net
         result.push({ ...m, net, cumulativeNet: runningTotal })
       }
       return result
-    }, [monthlyData])
+    }, [visibleData])
 
     const gradientOffset = useMemo(() => {
       if (chartData.length === 0) return 0
@@ -92,6 +176,29 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
       return dataMax / (dataMax - dataMin)
     }, [chartData])
 
+    const subtitleText = useMemo(() => {
+      if (monthlyData.length === 0) return ''
+      if (isZoomed) {
+        const template = t.showingMonths || '{visible} of {total} months'
+        const countText = template
+          .replace('{visible}', String(visibleCount))
+          .replace('{total}', String(monthlyData.length))
+        return startMonthLabel === endMonthLabel
+          ? `${countText} • ${startMonthLabel}`
+          : `${countText} • ${startMonthLabel} – ${endMonthLabel}`
+      }
+      return monthlyData.length === 1
+        ? startMonthLabel
+        : `${startMonthLabel} – ${endMonthLabel}`
+    }, [
+      monthlyData.length,
+      isZoomed,
+      t.showingMonths,
+      visibleCount,
+      startMonthLabel,
+      endMonthLabel,
+    ])
+
     return (
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -104,13 +211,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
           <div className={styles.headerMain}>
             <div className={styles.titleGroup}>
               <h3 className={styles.title}>{t.incomeVsExpenses || 'Income vs Expenses'}</h3>
-              {monthlyData.length > 0 && (
-                <p className={styles.subtitle}>
-                  {monthlyData.length === 1
-                    ? formatMonthYear(monthlyData[0].rawMonth || monthlyData[0].name)
-                    : `${formatMonthYear(monthlyData[0].rawMonth || monthlyData[0].name)} – ${formatMonthYear(monthlyData[monthlyData.length - 1].rawMonth || monthlyData[monthlyData.length - 1].name)}`}
-                </p>
-              )}
+              {monthlyData.length > 0 && <p className={styles.subtitle}>{subtitleText}</p>}
             </div>
 
             {/* Live summary pill */}
@@ -153,8 +254,33 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
           </div>
         </div>
 
-        {/* Chart container — memoized and locale-independent so language switches skip it */}
-        <div className={styles.chartContainer}>
+        {/* Timeline Navigation & Zoom Toolbar (when zooming is enabled) */}
+        {canZoom && (
+          <TimelineToolbar
+            visibleCount={visibleCount}
+            totalCount={monthlyData.length}
+            startMonthLabel={startMonthLabel}
+            endMonthLabel={endMonthLabel}
+            isZoomed={isZoomed}
+            isAtStart={isAtStart}
+            isAtEnd={isAtEnd}
+            isAtMinZoom={isAtMinZoom}
+            isAtMaxZoom={isAtMaxZoom}
+            activePreset={activePreset}
+            onZoomIn={zoomIn}
+            onZoomOut={zoomOut}
+            onPanEarlier={panEarlier}
+            onPanLater={panLater}
+            onResetZoom={resetZoom}
+            onSelectPreset={setPreset}
+          />
+        )}
+
+        {/* Chart container */}
+        <div
+          ref={chartGesturesRef}
+          className={`${styles.chartContainer} ${canZoom && isMobile ? styles.chartContainerInteractive : ''}`}
+        >
           {monthlyData.length > 0 ? (
             <IncomeVsExpensesPlot
               chartData={chartData}
@@ -165,6 +291,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
               showNetLine={hasNetLine}
               hiddenSeries={hiddenSeries}
               onLegendClick={handleLegendClick}
+              animationKey={monthlyData}
             />
           ) : (
             <div className={styles.emptyState}>
@@ -172,9 +299,23 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
             </div>
           )}
         </div>
+
+        {/* Timeline Slider Scrubber (when zooming is enabled; hidden on mobile) */}
+        {canZoom && !isMobile && (
+          <TimelineSlider
+            data={monthSummaries}
+            startIndex={startIndex}
+            endIndex={endIndex}
+            minWindow={3}
+            formatMonth={formatMonthYear}
+            onRangeChange={setRangeIndices}
+            onScrub={scrubToRatio}
+          />
+        )}
       </motion.div>
     )
   },
 )
 
 IncomeVsExpensesChart.displayName = 'IncomeVsExpensesChart'
+

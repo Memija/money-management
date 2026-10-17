@@ -66,6 +66,7 @@ interface IncomeVsExpensesPlotProps {
   showNetLine: boolean
   hiddenSeries: Record<string, boolean>
   onLegendClick: (entry: { dataKey?: unknown }) => void
+  animationKey?: unknown
 }
 
 /**
@@ -83,8 +84,12 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
     showNetLine,
     hiddenSeries,
     onLegendClick,
+    animationKey,
   }) => {
-    const animationTrigger = useMemo(() => ({ chartData, viewMode }), [chartData, viewMode])
+    const animationTrigger = useMemo(
+      () => ({ data: animationKey ?? chartData, viewMode }),
+      [animationKey, chartData, viewMode],
+    )
     const isAnimationActive = useChartAnimation(animationTrigger, CHART_ANIMATION_MS)
 
     const renderLegendText = useCallback(

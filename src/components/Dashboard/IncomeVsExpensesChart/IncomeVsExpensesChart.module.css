@@ -178,8 +178,19 @@
 .chartContainer {
   height: 320px;
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   position: relative;
+}
+
+.chartContainerInteractive {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.chartContainerInteractive:active {
+  cursor: grabbing;
 }
 
 .chartContainer *:focus,
