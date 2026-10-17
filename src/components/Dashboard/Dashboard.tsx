@@ -259,6 +259,7 @@ const Dashboard: React.FC = () => {
 
   const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(
     effectiveDashboardTransactions,
+    period,
   )
 
   const selectedAccountInfo = useMemo(() => {

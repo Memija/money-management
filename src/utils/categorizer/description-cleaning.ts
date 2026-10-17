@@ -545,6 +545,10 @@ export function extractMerchantKeyword(desc: string): string {
     '',
   )
   merchant = merchant.replace(/^(?:lastschrift\s+an|zahlung\s+an|zahlung)\s+/i, '')
+  merchant = merchant.replace(
+    /^(?:(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|bank[- ]?transfer|wire[- ]?transfer|money[- ]?transfer|standing[- ]?order)(?:\s+(?:an|to|f[uü]r|for))?\s*[:.-]?\s*)+/i,
+    '',
+  )
 
   // 1b. If the description contains a purchase phrase ("Ihr Einkauf bei ...", "Your purchase at ..."), extract the merchant
   const purchaseMatch = merchant.match(
