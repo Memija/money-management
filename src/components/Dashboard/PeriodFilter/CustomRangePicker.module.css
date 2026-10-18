@@ -1,0 +1,386 @@
+.container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+  white-space: nowrap;
+  outline: none;
+}
+
+.trigger:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: var(--dropdown-item-hover);
+}
+
+.trigger:focus-visible {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.triggerActive {
+  border-color: var(--primary);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.triggerIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.triggerLabel {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chevron {
+  color: var(--text-dim);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ─────────────────────────────────────────────────
+   Dropdown popover
+───────────────────────────────────────────────── */
+.dropdown {
+  position: fixed;
+  background: var(--bg-elevated);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 0.85rem;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-family: inherit;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-theme='light'] .dropdown {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+/* ─────────────────────────────────────────────────
+   Presets
+───────────────────────────────────────────────── */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.presetBtn {
+  padding: 0.25rem 0.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xs, 4px);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.presetBtn:hover {
+  background: var(--dropdown-item-hover);
+  color: var(--text-main);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.presetBtnActive {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--primary);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+/* ─────────────────────────────────────────────────
+   Inputs row
+───────────────────────────────────────────────── */
+.inputsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inputGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.inputLabel {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dateInput {
+  width: 100%;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xs, 4px);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 0.75rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.dateInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+/* ─────────────────────────────────────────────────
+   Calendar
+───────────────────────────────────────────────── */
+.calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.calHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.2rem;
+}
+
+.calTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs, 4px);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: var(--dropdown-item-hover);
+  color: var(--text-main);
+  border-color: var(--card-border);
+}
+
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  padding: 0.3rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.emptyCell {
+  height: 30px;
+}
+
+.dayBtn {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition:
+    background-color 0.12s,
+    color 0.12s;
+  font-family: inherit;
+  padding: 0;
+  position: relative;
+}
+
+.dayBtn:hover:not(:disabled) {
+  background: var(--dropdown-item-hover);
+  color: var(--text-main);
+}
+
+.today {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.inRange {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: var(--text-main);
+  border-radius: 0;
+}
+
+.rangeStart {
+  background: var(--primary) !important;
+  color: #fff !important;
+  font-weight: 700;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.rangeEnd {
+  background: var(--primary) !important;
+  color: #fff !important;
+  font-weight: 700;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.singleDayRange {
+  border-radius: 4px !important;
+}
+
+.hoverPreview {
+  background: rgba(16, 185, 129, 0.09) !important;
+  border-radius: 0;
+}
+
+/* ─────────────────────────────────────────────────
+   Actions footer
+───────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--card-border);
+  gap: 0.5rem;
+}
+
+.clearBtn {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xs, 4px);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.clearBtn:hover {
+  background: var(--dropdown-item-hover);
+  color: var(--text-main);
+}
+
+.applyBtn {
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-xs, 4px);
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.applyBtn:hover {
+  opacity: 0.9;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+@media (max-width: 480px) {
+  .dropdown {
+    width: 290px;
+    padding: 0.65rem;
+  }
+
+  .trigger {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.74rem;
+  }
+}

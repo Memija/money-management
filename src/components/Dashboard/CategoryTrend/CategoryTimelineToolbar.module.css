@@ -125,7 +125,9 @@
 [data-theme='light'] .presetBtnActive {
   background: #ffffff !important;
   color: #059669 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(16, 185, 129, 0.18);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(16, 185, 129, 0.18);
 }
 
 /* Actions group (Pan, Zoom, Reset) */

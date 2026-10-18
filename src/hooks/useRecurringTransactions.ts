@@ -203,7 +203,7 @@ export const clusterTxsByAmount = (items: Transaction[]): Transaction[][] => {
     let bestDiff = Infinity
     for (const c of clusters) {
       const diffPct = Math.abs(amt - c.avgAmount) / c.avgAmount
-      if (diffPct <= 0.20 && diffPct < bestDiff) {
+      if (diffPct <= 0.2 && diffPct < bestDiff) {
         bestDiff = diffPct
         bestCluster = c
       }
@@ -248,9 +248,7 @@ export const useRecurringTransactions = (
       if (time > maxTime) maxTime = time
     }
     const totalTimeframeDays =
-      minTime !== Infinity && maxTime !== -Infinity
-        ? Math.ceil((maxTime - minTime) / 86400000)
-        : 0
+      minTime !== Infinity && maxTime !== -Infinity ? Math.ceil((maxTime - minTime) / 86400000) : 0
 
     // 2. Group by recurrence grouping key
     const groups: Record<string, Transaction[]> = {}
@@ -440,7 +438,5 @@ export const useRecurringTransactions = (
       recurringExpenses: finalRecurring,
       totalMonthly,
     }
-
-
   }, [allRawTransactions, period, customKeywords, manualCategories])
 }

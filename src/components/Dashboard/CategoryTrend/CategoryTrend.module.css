@@ -367,7 +367,6 @@
   position: relative;
 }
 
-
 [data-theme='light'] .tooltipContainer {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.1);
@@ -666,5 +665,3 @@
   font-size: 0.88rem;
   text-align: center;
 }
-
-

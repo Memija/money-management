@@ -214,7 +214,8 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
     const firstLabel = formatLabel(data[0]?.month ?? '')
     const lastLabel = formatLabel(data[totalCount - 1]?.month ?? '')
     const timelineLabel = t.timelineRange || 'Timeline'
-    const showStartBadge = activeDragMode === 'start' || (hoveredTarget === 'start' && !activeDragMode)
+    const showStartBadge =
+      activeDragMode === 'start' || (hoveredTarget === 'start' && !activeDragMode)
     const showEndBadge = activeDragMode === 'end' || (hoveredTarget === 'end' && !activeDragMode)
     const showPanBadge = activeDragMode === 'pan'
     const selectedMonthCount = endIndex - startIndex + 1
@@ -357,9 +358,7 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
             <span className={styles.footerRangeText}>
               {startLabel === endLabel ? startLabel : `${startLabel} – ${endLabel}`}
             </span>
-            <span className={styles.footerRangeCount}>
-              {`(${monthsTrackedText})`}
-            </span>
+            <span className={styles.footerRangeCount}>{`(${monthsTrackedText})`}</span>
           </div>
 
           <div className={styles.footerBound}>

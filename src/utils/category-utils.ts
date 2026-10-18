@@ -169,8 +169,7 @@ export function propagateLoanCategories<T extends Transaction>(
     const cat = tx.category
     const desc = tx.description || ''
     const isExplicitLoan =
-      cat === 'Loans' ||
-      /\b(?:kreditrate|kredit-rate|darlehen|tilgung|annuit[aä]t)\b/i.test(desc)
+      cat === 'Loans' || /\b(?:kreditrate|kredit-rate|darlehen|tilgung|annuit[aä]t)\b/i.test(desc)
 
     if (isExplicitLoan) {
       loanRawDescriptions.push(desc)

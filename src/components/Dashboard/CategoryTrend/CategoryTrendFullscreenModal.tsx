@@ -164,7 +164,9 @@ export const CategoryTrendFullscreenModal: React.FC<CategoryTrendFullscreenModal
               <div className={styles.headerActions}>
                 <div className={styles.statPillsGroup}>
                   <div className={styles.statPill}>
-                    <span className={styles.statLabel}>{t.monthlyAverage || 'Monthly Average'}</span>
+                    <span className={styles.statLabel}>
+                      {t.monthlyAverage || 'Monthly Average'}
+                    </span>
                     <span className={`${styles.statValue} privacy-blur`}>
                       {formatCurrency(monthlyAverage)}
                     </span>
@@ -172,7 +174,9 @@ export const CategoryTrendFullscreenModal: React.FC<CategoryTrendFullscreenModal
                   {peakMonth.amount > 0 && (
                     <div className={styles.statPill}>
                       <span className={styles.statLabel}>{t.peakMonth || 'Peak Month'}</span>
-                      <span className={`${styles.statValue} ${styles.statValueHighlight} privacy-blur`}>
+                      <span
+                        className={`${styles.statValue} ${styles.statValueHighlight} privacy-blur`}
+                      >
                         {formatMonthYear(peakMonth.month)} • {formatCurrency(peakMonth.amount)}
                       </span>
                     </div>

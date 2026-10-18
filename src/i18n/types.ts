@@ -396,6 +396,15 @@ export interface TranslationStrings {
   periodYear: string
   periodQuarter: string
   periodMonth: string
+  periodCustom: string
+  customPeriodRange: string
+  selectDateRange: string
+  last30Days: string
+  last90Days: string
+  thisYear: string
+  lastYear: string
+  previousYear: string
+  nextYear: string
   ofTotal: string // "{percent}% of total"
   ofAvgIncome: string // "{percent}% of avg. income"
   savingsRateLabel: string

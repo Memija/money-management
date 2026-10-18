@@ -1251,8 +1251,7 @@ describe('category-utils', () => {
     })
 
     it('cleans SEPA bank transfer with BIC, IBAN, and loan reference KRED', () => {
-      const descWithIbanAndKred =
-        'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED'
+      const descWithIbanAndKred = 'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED'
       expect(extractCleanDescription(descWithIbanAndKred)).toBe('ANEL O. BILJANA MEMIC')
       expect(extractMerchantKeyword(descWithIbanAndKred)).toBe('ANEL O. BILJANA MEMIC')
       expect(formatMerchantDisplayName('ANEL O. BILJANA MEMIC')).toBe('Anel O. Biljana Memic')
@@ -2128,8 +2127,7 @@ describe('category-utils', () => {
         const fullDesc =
           'Anel o. Biljana Memic (3696413) GENODEF1S01 DE36550905000003696413 Kreditrate End-to-End-Ref.: CCB.338.UE.248923'
         const strippedDesc = 'Anel o. Biljana Memic'
-        const allCapsDesc =
-          'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED'
+        const allCapsDesc = 'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED'
         const ibanDesc = 'DE36550905000003696413'
 
         expect(categorize(fullDesc)).toBe('Loans')

@@ -14,11 +14,7 @@ import { CategoryTrendChart } from './CategoryTrendChart'
 import { CategoryTrendFullscreenModal } from './CategoryTrendFullscreenModal'
 import { CategoryTrendLegend } from './CategoryTrendLegend'
 import { useChartTimelineGestures } from './useChartTimelineGestures'
-import {
-  MIN_MONTHS_ZOOM_DESKTOP,
-  MIN_MONTHS_ZOOM_MOBILE,
-  useTimelineZoom,
-} from './useTimelineZoom'
+import { MIN_MONTHS_ZOOM_DESKTOP, MIN_MONTHS_ZOOM_MOBILE, useTimelineZoom } from './useTimelineZoom'
 
 import styles from './CategoryTrend.module.css'
 

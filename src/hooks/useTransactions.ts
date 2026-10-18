@@ -3,26 +3,7 @@ import { useMemo, useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
 import { getTransactionCategory, propagateLoanCategories } from '../utils/category-utils'
-import type { PeriodFilter } from './useAnalytics'
-
-function matchesPeriod(date: string, period?: PeriodFilter): boolean {
-  if (!period || period.mode === 'all') return true
-  switch (period.mode) {
-    case 'year':
-      return date.substring(0, 4) === period.value
-    case 'quarter': {
-      const [y, q] = period.value.split('-Q')
-      const month = parseInt(date.substring(5, 7), 10)
-      const qNum = parseInt(q, 10)
-      const tYear = date.substring(0, 4)
-      return tYear === y && month >= (qNum - 1) * 3 + 1 && month <= qNum * 3
-    }
-    case 'month':
-      return date.substring(0, 7) === period.value
-    default:
-      return true
-  }
-}
+import { matchesPeriod, type PeriodFilter } from './useAnalytics'
 
 export type TransactionTypeFilter =
   | 'all'

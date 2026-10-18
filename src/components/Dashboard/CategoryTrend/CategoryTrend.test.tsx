@@ -284,7 +284,20 @@ describe('CategoryTrend', () => {
 
     const twentyFourMonthsData = Array.from({ length: 24 }, (_, i) => {
       const year = 2022 + Math.floor(i / 12)
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      const monthNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ]
       return {
         month: `${monthNames[i % 12]} ${String(year).slice(-2)}`,
         Rent: 1000,

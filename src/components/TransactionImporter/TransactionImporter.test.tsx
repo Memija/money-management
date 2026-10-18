@@ -17,14 +17,12 @@ const {
 } = vi.hoisted(() => ({
   mockAddImportedAccount: vi.fn(),
   mockSetStep: vi.fn(),
-  mockGetDuplicateTransactionStats: vi
-    .fn()
-    .mockReturnValue({
-      duplicateCount: 0,
-      newCount: 0,
-      duplicateIds: [],
-      alreadyDuplicatedIds: [],
-    }),
+  mockGetDuplicateTransactionStats: vi.fn().mockReturnValue({
+    duplicateCount: 0,
+    newCount: 0,
+    duplicateIds: [],
+    alreadyDuplicatedIds: [],
+  }),
   mockReplaceImportedAccount: vi.fn(),
   mockImportedAccounts: { current: [] as unknown[] },
   mockAddDuplicateOverrideRule: vi.fn(),

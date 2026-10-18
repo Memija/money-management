@@ -4,6 +4,7 @@ import { Calendar } from 'lucide-react'
 import type { PeriodFilter as PeriodFilterType, PeriodMode } from '../../../hooks/useAnalytics'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { CustomPeriodPicker } from './CustomPeriodPicker'
+import { CustomRangePicker } from './CustomRangePicker'
 
 import styles from './PeriodFilter.module.css'
 
@@ -13,12 +14,22 @@ interface PeriodFilterProps {
   availableYears: string[]
   availableQuarters: string[]
   availableMonths: string[]
+  minDate?: string
+  maxDate?: string
 }
 
-const MODES: PeriodMode[] = ['all', 'year', 'quarter', 'month']
+const MODES: PeriodMode[] = ['all', 'year', 'quarter', 'month', 'custom']
 
 export const PeriodFilter: React.FC<PeriodFilterProps> = React.memo(
-  ({ period, onPeriodChange, availableYears, availableQuarters, availableMonths }) => {
+  ({
+    period,
+    onPeriodChange,
+    availableYears,
+    availableQuarters,
+    availableMonths,
+    minDate,
+    maxDate,
+  }) => {
     const t = useLanguageStore((s) => s.t)
 
     const modeLabels: Record<PeriodMode, string> = {
@@ -26,12 +37,31 @@ export const PeriodFilter: React.FC<PeriodFilterProps> = React.memo(
       year: t.periodYear,
       quarter: t.periodQuarter,
       month: t.periodMonth,
+      custom: t.periodCustom || 'Custom',
     }
 
     const handleModeChange = useCallback(
       (mode: PeriodMode) => {
         if (mode === 'all') {
           onPeriodChange({ mode, value: '' })
+          return
+        }
+
+        if (mode === 'custom') {
+          const start =
+            period.startDate ||
+            minDate ||
+            (availableMonths.length > 0 ? `${availableMonths[availableMonths.length - 1]}-01` : '')
+          const end =
+            period.endDate ||
+            maxDate ||
+            (availableMonths.length > 0 ? `${availableMonths[0]}-28` : '')
+          onPeriodChange({
+            mode: 'custom',
+            value: start && end ? `${start}..${end}` : '',
+            startDate: start,
+            endDate: end,
+          })
           return
         }
 
@@ -46,7 +76,16 @@ export const PeriodFilter: React.FC<PeriodFilterProps> = React.memo(
         }
         onPeriodChange({ mode, value: defaultValue })
       },
-      [onPeriodChange, availableYears, availableQuarters, availableMonths],
+      [
+        onPeriodChange,
+        availableYears,
+        availableQuarters,
+        availableMonths,
+        minDate,
+        maxDate,
+        period.startDate,
+        period.endDate,
+      ],
     )
 
     const handleValueChange = useCallback(
@@ -54,6 +93,18 @@ export const PeriodFilter: React.FC<PeriodFilterProps> = React.memo(
         onPeriodChange({ ...period, value })
       },
       [onPeriodChange, period],
+    )
+
+    const handleCustomRangeChange = useCallback(
+      (startDate: string, endDate: string) => {
+        onPeriodChange({
+          mode: 'custom',
+          value: startDate && endDate ? `${startDate}..${endDate}` : startDate || endDate || '',
+          startDate,
+          endDate,
+        })
+      },
+      [onPeriodChange],
     )
 
     const getOptions = (): string[] => {
@@ -87,13 +138,23 @@ export const PeriodFilter: React.FC<PeriodFilterProps> = React.memo(
             </button>
           ))}
         </div>
-        {period.mode !== 'all' && options.length > 0 && (
+        {period.mode !== 'all' && period.mode !== 'custom' && options.length > 0 && (
           <CustomPeriodPicker
             mode={period.mode}
             value={period.value}
             options={options}
             onChange={handleValueChange}
             ariaLabel={modeLabels[period.mode]}
+          />
+        )}
+        {period.mode === 'custom' && (
+          <CustomRangePicker
+            startDate={period.startDate}
+            endDate={period.endDate}
+            minDate={minDate}
+            maxDate={maxDate}
+            onChange={handleCustomRangeChange}
+            ariaLabel={t.customPeriodRange || modeLabels.custom}
           />
         )}
       </div>

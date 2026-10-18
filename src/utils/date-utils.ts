@@ -186,4 +186,3 @@ export function generateMonthRange(startMonth: string, endMonth: string): string
   }
   return months
 }
-

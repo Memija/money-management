@@ -231,4 +231,3 @@ describe('IncomeVsExpensesChart', () => {
     expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
   })
 })
-

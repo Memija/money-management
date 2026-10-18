@@ -107,7 +107,7 @@ describe('ExpenseCategories', () => {
     expect(handleCategoryClick).toHaveBeenCalledWith('Category 1')
   })
 
-  it('renders donut chart with clockwise angles starting at 12 o\'clock (startAngle=90, endAngle=-270)', () => {
+  it("renders donut chart with clockwise angles starting at 12 o'clock (startAngle=90, endAngle=-270)", () => {
     render(
       <ExpenseCategories
         categoryBreakdown={sampleCategories}

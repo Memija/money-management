@@ -350,5 +350,68 @@ describe('useAnalytics hook', () => {
     expect(weg.count).toBe(3)
     expect(weg.category).toBe('Rent')
   })
-})
 
+  it('correctly filters transactions and computes metrics for custom date ranges', () => {
+    const transactions: Transaction[] = [
+      {
+        id: 'tx-1',
+        date: '2024-01-10',
+        description: 'New Year Bonus',
+        amount: 2000,
+        currency: 'EUR',
+        type: 'income',
+        category: 'Salary',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-2',
+        date: '2024-02-14',
+        description: 'Valentine Gift',
+        amount: -120,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Gifts',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-3',
+        date: '2024-03-20',
+        description: 'Spring Shopping',
+        amount: -300,
+        currency: 'EUR',
+        type: 'expense',
+        category: 'Shopping',
+        institution: 'Commerzbank',
+      },
+      {
+        id: 'tx-4',
+        date: '2024-04-05',
+        description: 'April Salary',
+        amount: 3000,
+        currency: 'EUR',
+        type: 'income',
+        category: 'Salary',
+        institution: 'Commerzbank',
+      },
+    ]
+
+    const customPeriod: PeriodFilter = {
+      mode: 'custom',
+      value: '2024-02-01..2024-03-31',
+      startDate: '2024-02-01',
+      endDate: '2024-03-31',
+    }
+
+    const { result } = renderHook(() => useAnalytics(transactions, customPeriod, formatMonthYear))
+
+    expect(result.current.periodTransactions).toHaveLength(2)
+    expect(result.current.periodTransactions.map((t) => t.id)).toEqual(['tx-2', 'tx-3'])
+    expect(result.current.totalIncome).toBe(0)
+    expect(result.current.totalExpenses).toBe(420)
+    expect(result.current.topCategory?.name).toBe('Shopping')
+    expect(result.current.monthlyCategoryData.map((m) => m.rawMonth)).toEqual([
+      '2024-02',
+      '2024-03',
+    ])
+  })
+})

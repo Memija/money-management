@@ -18,12 +18,14 @@ const sortCategories = (a: [string, number], b: [string, number]) => {
   return a[0].localeCompare(b[0])
 }
 
-export type PeriodMode = 'all' | 'year' | 'quarter' | 'month'
+export type PeriodMode = 'all' | 'year' | 'quarter' | 'month' | 'custom'
 
 export interface PeriodFilter {
   mode: PeriodMode
-  /** e.g. '2025', '2025-Q1', '2025-01' */
+  /** e.g. '2025', '2025-Q1', '2025-01', or for custom '2025-01-01..2025-06-30' */
   value: string
+  startDate?: string
+  endDate?: string
 }
 
 export interface AnalyticsData {
@@ -119,30 +121,103 @@ export const getCategoryColorIndex = (categoryName: string) => {
 }
 
 /**
+ * Checks whether a transaction date matches the specified period filter.
+ */
+export const matchesPeriod = (date: string, period?: PeriodFilter): boolean => {
+  if (!period || period.mode === 'all') return true
+  const dateStr = date.substring(0, 10)
+  switch (period.mode) {
+    case 'year':
+      return date.substring(0, 4) === period.value
+    case 'quarter': {
+      const [y, q] = period.value.split('-Q')
+      const month = parseInt(date.substring(5, 7), 10)
+      const qNum = parseInt(q, 10)
+      const tYear = date.substring(0, 4)
+      return tYear === y && month >= (qNum - 1) * 3 + 1 && month <= qNum * 3
+    }
+    case 'month':
+      return date.substring(0, 7) === period.value
+    case 'custom': {
+      let start = period.startDate
+      let end = period.endDate
+      if (!start && !end && period.value.includes('..')) {
+        const [vStart, vEnd] = period.value.split('..')
+        start = vStart || undefined
+        end = vEnd || undefined
+      }
+      if (start && dateStr < start) return false
+      if (end && dateStr > end) return false
+      return true
+    }
+    default:
+      return true
+  }
+}
+
+/**
  * Filters transactions by the given period.
  */
 export const filterByPeriod = (txs: Transaction[], period: PeriodFilter): Transaction[] => {
   if (period.mode === 'all') {
     return txs
   }
+  return txs.filter((t) => matchesPeriod(t.date, period))
+}
 
-  return txs.filter((t) => {
-    switch (period.mode) {
-      case 'year':
-        return t.date.substring(0, 4) === period.value
-      case 'quarter': {
-        const [y, q] = period.value.split('-Q')
-        const month = parseInt(t.date.substring(5, 7), 10)
-        const qNum = parseInt(q, 10)
-        const tYear = t.date.substring(0, 4)
-        return tYear === y && month >= (qNum - 1) * 3 + 1 && month <= qNum * 3
-      }
-      case 'month':
-        return t.date.substring(0, 7) === period.value
-      default:
-        return true
+/**
+ * Computes the continuous list of 'YYYY-MM' strings representing the period.
+ */
+export const getMonthsForPeriod = (
+  period: PeriodFilter,
+  fallbackMonths: string[] = [],
+): string[] => {
+  if (period.mode === 'year') {
+    return Array.from({ length: 12 }, (_, i) => `${period.value}-${String(i + 1).padStart(2, '0')}`)
+  }
+  if (period.mode === 'quarter') {
+    const [y, q] = period.value.split('-Q')
+    const qNum = parseInt(q, 10)
+    const startM = (qNum - 1) * 3 + 1
+    return [
+      `${y}-${String(startM).padStart(2, '0')}`,
+      `${y}-${String(startM + 1).padStart(2, '0')}`,
+      `${y}-${String(startM + 2).padStart(2, '0')}`,
+    ]
+  }
+  if (period.mode === 'month') {
+    return [period.value]
+  }
+  if (period.mode === 'custom') {
+    let start = period.startDate
+    let end = period.endDate
+    if (!start && !end && period.value.includes('..')) {
+      const [vStart, vEnd] = period.value.split('..')
+      start = vStart || undefined
+      end = vEnd || undefined
     }
-  })
+    const startM = start ? start.substring(0, 7) : ''
+    const endM = end ? end.substring(0, 7) : ''
+    if (startM && endM) {
+      return generateMonthRange(startM, endM)
+    }
+    const validFallback = fallbackMonths.filter(Boolean).sort()
+    const firstM = startM || (validFallback.length > 0 ? validFallback[0] : '')
+    const lastM = endM || (validFallback.length > 0 ? validFallback[validFallback.length - 1] : '')
+    if (firstM && lastM) {
+      return generateMonthRange(firstM, lastM)
+    }
+    if (firstM) return [firstM]
+    if (lastM) return [lastM]
+    return []
+  }
+
+  // mode === 'all'
+  const validFallback = fallbackMonths.filter(Boolean).sort()
+  if (validFallback.length > 0) {
+    return generateMonthRange(validFallback[0], validFallback[validFallback.length - 1])
+  }
+  return []
 }
 
 /**
@@ -441,28 +516,8 @@ export const useAnalytics = (
     let monthsList: string[] = []
     if (targetMonthRange && targetMonthRange.length > 0) {
       monthsList = targetMonthRange
-    } else if (period.mode === 'year') {
-      monthsList = Array.from(
-        { length: 12 },
-        (_, i) => `${period.value}-${String(i + 1).padStart(2, '0')}`,
-      )
-    } else if (period.mode === 'quarter') {
-      const [y, q] = period.value.split('-Q')
-      const qNum = parseInt(q, 10)
-      const startM = (qNum - 1) * 3 + 1
-      monthsList = [
-        `${y}-${String(startM).padStart(2, '0')}`,
-        `${y}-${String(startM + 1).padStart(2, '0')}`,
-        `${y}-${String(startM + 2).padStart(2, '0')}`,
-      ]
-    } else if (period.mode === 'month') {
-      monthsList = [period.value]
     } else {
-      // mode === 'all'
-      const rawMonths = Object.keys(map).sort()
-      if (rawMonths.length > 0) {
-        monthsList = generateMonthRange(rawMonths[0], rawMonths[rawMonths.length - 1])
-      }
+      monthsList = getMonthsForPeriod(period, Object.keys(map).sort())
     }
 
     if (monthsList.length === 0) {

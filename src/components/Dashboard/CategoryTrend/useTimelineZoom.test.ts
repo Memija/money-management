@@ -321,16 +321,7 @@ describe('useTimelineZoom', () => {
     expect(result.current.endIndex).toBe(3)
 
     // Dataset prepends earlier months (e.g. 2024-11, 2024-12)
-    keys = [
-      '2024-11',
-      '2024-12',
-      '2025-01',
-      '2025-02',
-      '2025-03',
-      '2025-04',
-      '2025-05',
-      '2025-06',
-    ]
+    keys = ['2024-11', '2024-12', '2025-01', '2025-02', '2025-03', '2025-04', '2025-05', '2025-06']
     rerender()
 
     // 2025-02 is now index 3, and 2025-04 is index 5
@@ -338,5 +329,3 @@ describe('useTimelineZoom', () => {
     expect(result.current.endIndex).toBe(5)
   })
 })
-
-

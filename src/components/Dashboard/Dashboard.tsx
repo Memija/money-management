@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { TrendingDown, TrendingUp } from 'lucide-react'
 
 import { useAccountBalances } from '../../hooks/useAccountBalances'
-import type { PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
+import { getMonthsForPeriod, type PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
 import { useAnalytics } from '../../hooks/useAnalytics'
 import { useFormatters } from '../../hooks/useFormatters'
 import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
@@ -12,7 +12,6 @@ import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import { hasMerchantLogo } from '../../utils/category-icons'
 import { hasExtensiveCategoryData } from '../../utils/category-utils'
-import { generateMonthRange } from '../../utils/date-utils'
 import { CategoryTrend } from './CategoryTrend'
 import { type AvgDetailType, DashboardModals, type DetailModalState } from './DashboardModals'
 import { ExpenseCategories } from './ExpenseCategories'
@@ -42,8 +41,6 @@ const Dashboard: React.FC = () => {
 
   // Savings trend modal
   const [isSavingsTrendOpen, setIsSavingsTrendOpen] = useState(false)
-
-
 
   const handlePeriodChange = useCallback((nextPeriod: PeriodFilterType) => {
     startTransition(() => {
@@ -86,8 +83,6 @@ const Dashboard: React.FC = () => {
   const handleSavingsTrendClose = useCallback(() => {
     setIsSavingsTrendOpen(false)
   }, [])
-
-
 
   const handleAvgDetailClose = useCallback(() => {
     setAvgDetailType(null)
@@ -187,37 +182,25 @@ const Dashboard: React.FC = () => {
 
   // Complete continuous month sequence for the active period/account domain
   const fullPeriodMonths = useMemo(() => {
-    if (period.mode === 'year') {
-      return Array.from(
-        { length: 12 },
-        (_, i) => `${period.value}-${String(i + 1).padStart(2, '0')}`,
-      )
-    }
-    if (period.mode === 'quarter') {
-      const [y, q] = period.value.split('-Q')
-      const qNum = parseInt(q, 10)
-      const startM = (qNum - 1) * 3 + 1
-      return [
-        `${y}-${String(startM).padStart(2, '0')}`,
-        `${y}-${String(startM + 1).padStart(2, '0')}`,
-        `${y}-${String(startM + 2).padStart(2, '0')}`,
-      ]
-    }
-    if (period.mode === 'month') {
-      return [period.value]
-    }
-    // mode === 'all'
-    let minMonth = ''
-    let maxMonth = ''
+    const rawMonths: string[] = []
     for (const t of dashboardTransactions) {
       if (t.isGhost) continue
-      const m = t.date.substring(0, 7)
-      if (!minMonth || m < minMonth) minMonth = m
-      if (!maxMonth || m > maxMonth) maxMonth = m
+      rawMonths.push(t.date.substring(0, 7))
     }
-    if (!minMonth || !maxMonth) return []
-    return generateMonthRange(minMonth, maxMonth)
+    return getMonthsForPeriod(period, rawMonths)
   }, [dashboardTransactions, period])
+
+  // Dataset timeframe boundaries for custom range picker
+  const { minDate, maxDate } = useMemo(() => {
+    let min = ''
+    let max = ''
+    for (const t of dashboardTransactions) {
+      if (t.isGhost) continue
+      if (!min || t.date < min) min = t.date
+      if (!max || t.date > max) max = t.date
+    }
+    return { minDate: min, maxDate: max }
+  }, [dashboardTransactions])
 
   // Analytics — all derived data from one centralized hook
   const analytics = useAnalytics(
@@ -306,8 +289,9 @@ const Dashboard: React.FC = () => {
               availableYears={fullBankAnalytics.availableYears}
               availableQuarters={fullBankAnalytics.availableQuarters}
               availableMonths={fullBankAnalytics.availableMonths}
+              minDate={minDate}
+              maxDate={maxDate}
             />
-
           </div>
 
           {bankAccounts.length > 0 && (

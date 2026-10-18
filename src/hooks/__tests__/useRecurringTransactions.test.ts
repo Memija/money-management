@@ -500,8 +500,8 @@ describe('useRecurringTransactions hook', () => {
 
     const { result } = renderHook(() => useRecurringTransactions(txs))
 
-    const loanExpenses = result.current.recurringExpenses.filter((r) =>
-      r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
+    const loanExpenses = result.current.recurringExpenses.filter(
+      (r) => r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
     )
     expect(loanExpenses).toHaveLength(1)
     const mergedLoan = loanExpenses[0]
@@ -515,8 +515,8 @@ describe('useRecurringTransactions hook', () => {
     const { result: monthResult } = renderHook(() =>
       useRecurringTransactions(txs, { mode: 'month', value: '2026-09' }),
     )
-    const monthLoan = monthResult.current.recurringExpenses.filter((r) =>
-      r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
+    const monthLoan = monthResult.current.recurringExpenses.filter(
+      (r) => r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
     )
     expect(monthLoan).toHaveLength(1)
     expect(monthLoan[0].amount).toBe(1502.58)
@@ -526,12 +526,11 @@ describe('useRecurringTransactions hook', () => {
     const { result: yearResult } = renderHook(() =>
       useRecurringTransactions(txs, { mode: 'year', value: '2026' }),
     )
-    const yearLoan = yearResult.current.recurringExpenses.filter((r) =>
-      r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
+    const yearLoan = yearResult.current.recurringExpenses.filter(
+      (r) => r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
     )
     expect(yearLoan).toHaveLength(1)
     expect(yearLoan[0].amount).toBe(1502.58)
     expect(yearLoan[0].transactionCount).toBe(18) // 9 + 9
   })
 })
-

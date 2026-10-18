@@ -132,7 +132,9 @@
   background: rgba(16, 185, 129, 0.12);
   border-top: 2px solid #34d399;
   border-bottom: 2px solid #10b981;
-  box-shadow: inset 0 0 16px rgba(16, 185, 129, 0.18), 0 0 14px rgba(16, 185, 129, 0.14);
+  box-shadow:
+    inset 0 0 16px rgba(16, 185, 129, 0.18),
+    0 0 14px rgba(16, 185, 129, 0.14);
   cursor: grab;
   z-index: 3;
   box-sizing: border-box;
@@ -144,7 +146,9 @@
   cursor: grabbing;
   background: rgba(16, 185, 129, 0.2);
   border-color: #6ee7b7;
-  box-shadow: inset 0 0 20px rgba(52, 211, 153, 0.3), 0 0 16px rgba(16, 185, 129, 0.3);
+  box-shadow:
+    inset 0 0 20px rgba(52, 211, 153, 0.3),
+    0 0 16px rgba(16, 185, 129, 0.3);
 }
 
 [data-theme='light'] .selectionWindow {
@@ -212,8 +216,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
   touch-action: none;
   outline: none;
   box-sizing: border-box;
@@ -222,21 +231,28 @@
 [data-theme='light'] .handle {
   background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
   border-color: rgba(16, 185, 129, 0.45);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(16, 185, 129, 0.15), inset 0 1px 0 #ffffff;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(16, 185, 129, 0.15),
+    inset 0 1px 0 #ffffff;
 }
 
 .handle:hover,
 .handle:focus-visible,
 .handleActive {
   border-color: #34d399;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3), 0 4px 14px rgba(16, 185, 129, 0.5);
+  box-shadow:
+    0 0 0 3px rgba(16, 185, 129, 0.3),
+    0 4px 14px rgba(16, 185, 129, 0.5);
 }
 
 [data-theme='light'] .handle:hover,
 [data-theme='light'] .handle:focus-visible,
 [data-theme='light'] .handleActive {
   border-color: #059669;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22), 0 3px 10px rgba(16, 185, 129, 0.25);
+  box-shadow:
+    0 0 0 3px rgba(16, 185, 129, 0.22),
+    0 3px 10px rgba(16, 185, 129, 0.25);
 }
 
 .handleStart {
@@ -260,7 +276,9 @@
   height: 12px;
   background: rgba(16, 185, 129, 0.7);
   border-radius: 9999px;
-  transition: height 0.15s ease, background 0.15s ease;
+  transition:
+    height 0.15s ease,
+    background 0.15s ease;
 }
 
 [data-theme='light'] .handleGripBar {
@@ -293,7 +311,9 @@
   font-weight: 600;
   color: #ffffff;
   white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 10px rgba(16, 185, 129, 0.2);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.45),
+    0 0 10px rgba(16, 185, 129, 0.2);
   pointer-events: none;
   z-index: 10;
   letter-spacing: 0.02em;

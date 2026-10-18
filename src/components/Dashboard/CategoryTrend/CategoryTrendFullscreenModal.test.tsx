@@ -93,7 +93,9 @@ describe('CategoryTrendFullscreenModal', () => {
     expect(dialog).toBeInTheDocument()
 
     // Title and stats
-    expect(screen.getByRole('heading', { level: 2, name: 'Spending by Category' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Spending by Category' }),
+    ).toBeInTheDocument()
     expect(screen.getByText('Monthly Average')).toBeInTheDocument()
     expect(screen.getByText('Peak Month')).toBeInTheDocument()
 

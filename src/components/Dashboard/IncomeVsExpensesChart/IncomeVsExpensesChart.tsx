@@ -39,10 +39,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
     // Offer timeline zooming only with at least 12 months on mobile and 24 on desktop
     const minMonthsForZoom = isMobile ? MIN_MONTHS_ZOOM_MOBILE : MIN_MONTHS_ZOOM_DESKTOP
     const canZoom = monthlyData.length >= minMonthsForZoom
-    const monthKeys = useMemo(
-      () => monthlyData.map((m) => m.rawMonth || m.name),
-      [monthlyData],
-    )
+    const monthKeys = useMemo(() => monthlyData.map((m) => m.rawMonth || m.name), [monthlyData])
 
     const {
       startIndex,
@@ -194,9 +191,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
           ? `${countText} • ${startMonthLabel}`
           : `${countText} • ${startMonthLabel} – ${endMonthLabel}`
       }
-      return monthlyData.length === 1
-        ? startMonthLabel
-        : `${startMonthLabel} – ${endMonthLabel}`
+      return monthlyData.length === 1 ? startMonthLabel : `${startMonthLabel} – ${endMonthLabel}`
     }, [
       monthlyData.length,
       isZoomed,
@@ -325,4 +320,3 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
 )
 
 IncomeVsExpensesChart.displayName = 'IncomeVsExpensesChart'
-
