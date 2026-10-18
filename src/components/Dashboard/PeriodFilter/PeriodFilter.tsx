@@ -52,10 +52,12 @@ export const PeriodFilter: React.FC<PeriodFilterProps> = React.memo(
             period.startDate ||
             minDate ||
             (availableMonths.length > 0 ? `${availableMonths[availableMonths.length - 1]}-01` : '')
-          const end =
-            period.endDate ||
-            maxDate ||
-            (availableMonths.length > 0 ? `${availableMonths[0]}-28` : '')
+          let end = period.endDate || maxDate
+          if (!end && availableMonths.length > 0) {
+            const [y, m] = availableMonths[0].split('-').map(Number)
+            const lastDay = new Date(y, m, 0).getDate()
+            end = `${availableMonths[0]}-${String(lastDay).padStart(2, '0')}`
+          }
           onPeriodChange({
             mode: 'custom',
             value: start && end ? `${start}..${end}` : '',

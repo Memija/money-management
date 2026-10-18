@@ -59,20 +59,29 @@
   backdrop-filter: blur(12px);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
+  .container {
+    width: 100%;
+    display: flex;
+  }
+
   .trigger {
-    min-height: 32px;
-    padding: 0.35rem 0.55rem;
-    font-size: 0.74rem;
+    width: 100%;
+    min-height: 36px;
+    padding: 0.4rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    font-size: 0.76rem;
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 380px) {
   .trigger {
-    min-height: 30px;
-    padding: 0.3rem 0.45rem;
-    font-size: 0.7rem;
-    min-width: 76px;
+    min-height: 32px;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.72rem;
   }
 }
 

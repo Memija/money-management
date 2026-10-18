@@ -113,9 +113,10 @@ export const useDropdownPosition = ({
 
         // Dynamic height constraint
         const availableSpace = shouldFlip ? spaceAbove : spaceBelow
+        const targetHeight = Math.max(estimatedHeight, Math.round(dHeight))
         const maxAllowedHeight = Math.max(
           120,
-          Math.min(estimatedHeight, Math.floor(availableSpace - 4)),
+          Math.min(targetHeight, Math.floor(availableSpace - 4)),
         )
         dropdown.style.maxHeight = `${maxAllowedHeight}px`
         dropdown.style.setProperty('--dropdown-max-height', `${maxAllowedHeight}px`)

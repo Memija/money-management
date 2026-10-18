@@ -729,6 +729,16 @@
     gap: 0.35rem;
     flex-wrap: wrap;
   }
+
+  .subheader-left {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .subheader-left {
+    width: 100%;
+  }
 }
 
 @media (max-width: 360px) {

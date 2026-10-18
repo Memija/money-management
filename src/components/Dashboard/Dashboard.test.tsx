@@ -490,4 +490,29 @@ describe('Dashboard', () => {
     fireEvent.click(detachBtn)
     expect(defaultMockAppState.setDetachTransactionsFromDashboard).toHaveBeenCalledWith(false)
   })
+
+  it('matches display balance identically between general All Time and custom All Time preset', () => {
+    defaultMockAppState.detachTransactionsFromDashboard = false
+    render(<Dashboard />)
+
+    const heroSection = document.querySelector('section')!
+    // Initial mode is 'all'
+    expect(heroSection).toHaveTextContent(/1[.,]950/)
+
+    // Switch to Custom mode
+    const customModeBtn = screen.getByRole('button', { name: 'Custom' })
+    fireEvent.click(customModeBtn)
+
+    // Open custom range picker popover
+    const rangePickerBtn = screen.getByTitle(/01\/01\/2024 – 01\/03\/2024/)
+    fireEvent.click(rangePickerBtn)
+
+    // Click "All time" preset
+    const allTimePreset = screen.getByRole('button', { name: 'All time' })
+    fireEvent.click(allTimePreset)
+
+    // Balance in custom mode with All Time preset must match general All Time balance (1,950)
+    expect(heroSection).toHaveTextContent(/1[.,]950/)
+  })
 })
+

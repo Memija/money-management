@@ -195,9 +195,10 @@ const Dashboard: React.FC = () => {
     let min = ''
     let max = ''
     for (const t of dashboardTransactions) {
-      if (t.isGhost) continue
-      if (!min || t.date < min) min = t.date
-      if (!max || t.date > max) max = t.date
+      const d = t.date ? t.date.substring(0, 10) : ''
+      if (!d) continue
+      if (!min || d < min) min = d
+      if (!max || d > max) max = d
     }
     return { minDate: min, maxDate: max }
   }, [dashboardTransactions])
@@ -246,9 +247,21 @@ const Dashboard: React.FC = () => {
     return bankAccounts.find((a) => a.id === selectedInstitution || a.name === selectedInstitution)
   }, [bankAccounts, selectedInstitution])
 
+  // Determines if the active period encompasses the entire dataset domain
+  const isPeriodAllTime = useMemo(() => {
+    if (period.mode === 'all') return true
+    if (period.mode === 'custom') {
+      const hasNoBounds = !period.startDate && !period.endDate
+      const coversMin = !period.startDate || (minDate && period.startDate <= minDate)
+      const coversMax = !period.endDate || (maxDate && period.endDate >= maxDate)
+      return Boolean(hasNoBounds || (coversMin && coversMax))
+    }
+    return false
+  }, [period.mode, period.startDate, period.endDate, minDate, maxDate])
+
   // Current display balance: ensures complete ledger balance for 'all' period matches AccountSelector exactly
   const displayBalance = useMemo(() => {
-    if (isAnyFilterActive || period.mode !== 'all') {
+    if (isAnyFilterActive || !isPeriodAllTime) {
       return analytics.balance
     }
     if (selectedInstitution === 'all') {
@@ -261,7 +274,7 @@ const Dashboard: React.FC = () => {
     return selectedAccountInfo ? selectedAccountInfo.balance : analytics.balance
   }, [
     isAnyFilterActive,
-    period.mode,
+    isPeriodAllTime,
     selectedInstitution,
     selectedSubAccount,
     analytics.balance,

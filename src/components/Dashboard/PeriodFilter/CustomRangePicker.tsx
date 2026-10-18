@@ -1,12 +1,15 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  Calendar,
+  ArrowRight,
+  CalendarRange,
+  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  RotateCcw,
 } from 'lucide-react'
 
 import { useDropdownPosition } from '../../../hooks/useDropdownPosition'
@@ -37,8 +40,6 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
     const [isOpen, setIsOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null)
-    const fromInputId = useId()
-    const toInputId = useId()
 
     const t = useLanguageStore((s) => s.t)
     const locale = useLanguageStore((s) => s.locale)
@@ -49,25 +50,25 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
       triggerRef: containerRef,
       dropdownRef,
       padding: 12,
-      estimatedHeight: 390,
+      estimatedHeight: 520,
       usePortal: true,
       align: 'right',
     })
 
-    // Local draft dates
+    // Local draft state
     const [draftStart, setDraftStart] = useState<string>(startDate)
     const [draftEnd, setDraftEnd] = useState<string>(endDate)
     const [prevProps, setPrevProps] = useState({ startDate, endDate })
     const [hoverDate, setHoverDate] = useState<string | null>(null)
 
-    // Adjust state during render when props change
+    // Sync state when props change externally
     if (prevProps.startDate !== startDate || prevProps.endDate !== endDate) {
       setPrevProps({ startDate, endDate })
       setDraftStart(startDate)
       setDraftEnd(endDate)
     }
 
-    // Anchor view month/year based on start date or max date
+    // Anchor initial view month on startDate or maxDate
     const initialViewDate = useMemo(() => {
       const anchor = startDate || maxDate || formatDateToISO(new Date())
       const [y, m] = anchor.split('-').map(Number)
@@ -91,15 +92,19 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
           setIsOpen(false)
         }
       }
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && isOpen) {
+          setIsOpen(false)
+        }
+      }
+
       document.addEventListener('pointerdown', handleClickOutside)
-      document.addEventListener('mousedown', handleClickOutside)
-      document.addEventListener('touchstart', handleClickOutside)
+      document.addEventListener('keydown', handleKeyDown)
       return () => {
         document.removeEventListener('pointerdown', handleClickOutside)
-        document.removeEventListener('mousedown', handleClickOutside)
-        document.removeEventListener('touchstart', handleClickOutside)
+        document.removeEventListener('keydown', handleKeyDown)
       }
-    }, [])
+    }, [isOpen])
 
     const toggleDropdown = () => {
       if (!isOpen) {
@@ -121,7 +126,7 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
     const handlePrevYear = () => setViewDate(new Date(viewYear - 1, viewMonth, 1))
     const handleNextYear = () => setViewDate(new Date(viewYear + 1, viewMonth, 1))
 
-    // Preset handler
+    // Preset handlers
     const applyPreset = useCallback(
       (type: '30d' | '90d' | 'thisYear' | 'lastYear' | 'all') => {
         const anchor = maxDate || formatDateToISO(new Date())
@@ -146,8 +151,8 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
           s = `${anchorYear - 1}-01-01`
           e = `${anchorYear - 1}-12-31`
         } else if (type === 'all') {
-          s = minDate
-          e = maxDate
+          s = minDate ? minDate.substring(0, 10) : ''
+          e = maxDate ? maxDate.substring(0, 10) : ''
         }
 
         setDraftStart(s)
@@ -163,12 +168,10 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
 
     const handleDayClick = (dateStr: string) => {
       if (!draftStart || (draftStart && draftEnd)) {
-        // Start a fresh selection
         setDraftStart(dateStr)
         setDraftEnd('')
         onChange(dateStr, '')
       } else {
-        // Complete the selection
         if (dateStr < draftStart) {
           setDraftStart(dateStr)
           setDraftEnd(draftStart)
@@ -196,8 +199,16 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
     const firstDayIndex = (new Date(viewYear, viewMonth, 1).getDay() + 6) % 7
     const blanks = Array.from({ length: firstDayIndex }, (_, i) => i)
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1)
-
     const todayStr = formatDateToISO(new Date())
+
+    // Selected day duration calculation
+    const selectedDayCount = useMemo(() => {
+      if (!draftStart || !draftEnd) return 0
+      const d1 = new Date(draftStart)
+      const d2 = new Date(draftEnd)
+      const diffTime = Math.abs(d2.getTime() - d1.getTime())
+      return Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1
+    }, [draftStart, draftEnd])
 
     const triggerLabel = useMemo(() => {
       if (startDate && endDate) {
@@ -215,16 +226,20 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
     return (
       <div className={styles.container} ref={containerRef}>
         <button
+          type="button"
           className={`${styles.trigger} ${isOpen ? styles.triggerActive : ''}`}
           onClick={toggleDropdown}
           aria-label={ariaLabel || triggerLabel}
           title={triggerLabel}
           aria-expanded={isOpen}
         >
-          <Calendar size={13} className={styles.triggerIcon} />
+          <CalendarRange size={14} className={styles.triggerIcon} />
           <span className={styles.triggerLabel}>{triggerLabel}</span>
+          {startDate && endDate && selectedDayCount > 0 && (
+            <span className={styles.triggerBadge}>{selectedDayCount}d</span>
+          )}
           <ChevronDown
-            size={14}
+            size={13}
             className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
           />
         </button>
@@ -232,6 +247,7 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
         {isOpen &&
           createPortal(
             <div ref={dropdownRef} className={styles.dropdown} role="dialog" aria-modal="true">
+              {/* Presets segment */}
               <div className={styles.presets}>
                 <button
                   type="button"
@@ -266,45 +282,41 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
                   className={styles.presetBtn}
                   onClick={() => applyPreset('all')}
                 >
-                  {t.periodAll || 'All Time'}
+                  {t.periodAll || 'All time'}
                 </button>
               </div>
 
-              <div className={styles.inputsRow}>
-                <div className={styles.inputGroup}>
-                  <label htmlFor={fromInputId} className={styles.inputLabel}>
-                    {t.fromDate || 'From'}
-                  </label>
-                  <input
-                    id={fromInputId}
-                    type="date"
-                    className={styles.dateInput}
-                    value={draftStart}
-                    onChange={(e) => {
-                      setDraftStart(e.target.value)
-                      onChange(e.target.value, draftEnd)
-                    }}
-                    max={draftEnd || undefined}
-                  />
+              {/* Range Preview Card */}
+              <div className={styles.rangeDisplayCard}>
+                <div className={`${styles.rangeBox} ${!draftStart ? styles.rangeBoxActive : ''}`}>
+                  <span className={styles.rangeLabel}>{t.fromDate || 'From'}</span>
+                  <span className={draftStart ? styles.rangeDate : styles.rangePlaceholder}>
+                    {draftStart ? formatDate(draftStart) : t.selectDatePlaceholder || 'Start date'}
+                  </span>
                 </div>
-                <div className={styles.inputGroup}>
-                  <label htmlFor={toInputId} className={styles.inputLabel}>
-                    {t.toDate || 'To'}
-                  </label>
-                  <input
-                    id={toInputId}
-                    type="date"
-                    className={styles.dateInput}
-                    value={draftEnd}
-                    onChange={(e) => {
-                      setDraftEnd(e.target.value)
-                      onChange(draftStart, e.target.value)
-                    }}
-                    min={draftStart || undefined}
-                  />
+
+                <div className={styles.rangeConnector}>
+                  <div className={styles.arrowCircle}>
+                    <ArrowRight size={13} />
+                  </div>
+                  {selectedDayCount > 0 && (
+                    <span className={styles.durationPill}>
+                      {selectedDayCount} {selectedDayCount === 1 ? 'Tag' : 'Tage'}
+                    </span>
+                  )}
+                </div>
+
+                <div
+                  className={`${styles.rangeBox} ${draftStart && !draftEnd ? styles.rangeBoxActive : ''}`}
+                >
+                  <span className={styles.rangeLabel}>{t.toDate || 'To'}</span>
+                  <span className={draftEnd ? styles.rangeDate : styles.rangePlaceholder}>
+                    {draftEnd ? formatDate(draftEnd) : t.selectDatePlaceholder || 'End date'}
+                  </span>
                 </div>
               </div>
 
+              {/* Calendar Container */}
               <div className={styles.calendar}>
                 <div className={styles.calHeader}>
                   <div className={styles.navGroup}>
@@ -328,9 +340,10 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
                     </button>
                   </div>
 
-                  <span className={styles.calTitle}>
-                    {monthNames[viewMonth]} {viewYear}
-                  </span>
+                  <div className={styles.calTitleWrapper}>
+                    <span className={styles.calMonth}>{monthNames[viewMonth]}</span>
+                    <span className={styles.calYear}>{viewYear}</span>
+                  </div>
 
                   <div className={styles.navGroup}>
                     <button
@@ -354,6 +367,7 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
                   </div>
                 </div>
 
+                {/* Weekdays */}
                 <div className={styles.grid}>
                   {weekdays.map((wd) => (
                     <div key={wd} className={styles.weekday}>
@@ -381,38 +395,88 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
                       dateStr <= hoverDate,
                     )
                     const isToday = dateStr === todayStr
+                    const isDisabled = Boolean(
+                      (minDate && dateStr < minDate) || (maxDate && dateStr > maxDate),
+                    )
 
                     return (
-                      <button
-                        key={dateStr}
-                        type="button"
+                      <div
+                        key={`cell-${d}`}
                         className={`
-                          ${styles.dayBtn}
-                          ${isToday ? styles.today : ''}
-                          ${isStart ? styles.rangeStart : ''}
-                          ${isEnd ? styles.rangeEnd : ''}
-                          ${isSingleDay ? styles.singleDayRange : ''}
-                          ${isInRange ? styles.inRange : ''}
-                          ${isHoverPreview ? styles.hoverPreview : ''}
+                          ${styles.dayCell}
+                          ${isInRange ? styles.cellInRange : ''}
+                          ${isStart && !isEnd && draftEnd ? styles.cellRangeStart : ''}
+                          ${isEnd && !isStart ? styles.cellRangeEnd : ''}
+                          ${isHoverPreview ? styles.cellHoverPreview : ''}
                         `}
-                        onClick={() => handleDayClick(dateStr)}
-                        onMouseEnter={() => setHoverDate(dateStr)}
-                        onMouseLeave={() => setHoverDate(null)}
                       >
-                        {d}
-                      </button>
+                        <button
+                          type="button"
+                          className={`
+                            ${styles.dayBtn}
+                            ${isStart || isEnd ? styles.dayBtnSelected : ''}
+                            ${isToday ? styles.dayBtnToday : ''}
+                            ${isSingleDay ? styles.singleDayRange : ''}
+                          `}
+                          onClick={() => !isDisabled && handleDayClick(dateStr)}
+                          onMouseEnter={() =>
+                            draftStart && !draftEnd && setHoverDate(dateStr)
+                          }
+                          aria-label={`${d}`}
+                          disabled={isDisabled}
+                        >
+                          <span className={styles.dayNum}>{d}</span>
+                          {isToday && !(isStart || isEnd) && (
+                            <span className={styles.todayDot} />
+                          )}
+                        </button>
+                      </div>
                     )
                   })}
                 </div>
               </div>
 
+              {/* Footer with status and actions */}
               <div className={styles.actions}>
-                <button type="button" className={styles.clearBtn} onClick={handleClear}>
-                  {t.clearDate || 'Clear'}
-                </button>
-                <button type="button" className={styles.applyBtn} onClick={handleApply}>
-                  {t.done || 'Apply'}
-                </button>
+                <div className={styles.footerStatus}>
+                  {draftStart && draftEnd ? (
+                    <span className={styles.statusSuccess}>
+                      <Check size={13} className={styles.statusSuccessIcon} />
+                      {selectedDayCount} {selectedDayCount === 1 ? 'Tag' : 'Tage'}
+                    </span>
+                  ) : draftStart ? (
+                    <span className={styles.statusPending}>
+                      {t.selectDatePlaceholder || 'Enddatum wählen...'}
+                    </span>
+                  ) : (
+                    <span className={styles.statusMuted}>
+                      {t.selectDateRange || 'Zeitraum wählen'}
+                    </span>
+                  )}
+                </div>
+
+                <div className={styles.footerActions}>
+                  {(draftStart || draftEnd) && (
+                    <button
+                      type="button"
+                      className={styles.clearBtn}
+                      onClick={handleClear}
+                      aria-label={t.clearDate || t.clear || 'Clear'}
+                    >
+                      <RotateCcw size={12} />
+                      <span>{t.clearDate || t.clear || 'Clear'}</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={styles.applyBtn}
+                    onClick={handleApply}
+                    aria-label={t.done || 'Done'}
+                  >
+                    <Check size={13} />
+                    <span>{t.done || 'Done'}</span>
+                  </button>
+                </div>
               </div>
             </div>,
             document.body,

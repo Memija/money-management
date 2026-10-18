@@ -146,8 +146,10 @@ export const matchesPeriod = (date: string, period?: PeriodFilter): boolean => {
         start = vStart || undefined
         end = vEnd || undefined
       }
-      if (start && dateStr < start) return false
-      if (end && dateStr > end) return false
+      const s = start ? start.substring(0, 10) : ''
+      const e = end ? end.substring(0, 10) : ''
+      if (s && dateStr < s) return false
+      if (e && dateStr > e) return false
       return true
     }
     default:
