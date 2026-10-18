@@ -6,7 +6,11 @@ import type { MonthlyEntry } from '../../../hooks/useAnalytics'
 import { useChartTimelineGestures } from '../../../hooks/useChartTimelineGestures'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useIsMobile } from '../../../hooks/useIsMobile'
-import { useTimelineZoom } from '../../../hooks/useTimelineZoom'
+import {
+  MIN_MONTHS_ZOOM_DESKTOP,
+  MIN_MONTHS_ZOOM_MOBILE,
+  useTimelineZoom,
+} from '../../../hooks/useTimelineZoom'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { TimelineSlider } from '../../shared/TimelineSlider'
 import { TimelineToolbar } from '../../shared/TimelineToolbar'
@@ -14,6 +18,8 @@ import { type IncomeChartEntry, IncomeVsExpensesPlot } from './IncomeVsExpensesP
 import type { IncomeChartViewMode } from './IncomeVsExpensesTooltip'
 
 import styles from './IncomeVsExpensesChart.module.css'
+
+export { MIN_MONTHS_ZOOM_DESKTOP, MIN_MONTHS_ZOOM_MOBILE } from '../../../hooks/useTimelineZoom'
 
 interface IncomeVsExpensesChartProps {
   monthlyData: MonthlyEntry[]
@@ -30,8 +36,9 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
     const [hiddenSeries, setHiddenSeries] = useState<Record<string, boolean>>({})
     const hasNetLine = monthlyData.length > 1
 
-    // Enable zooming whenever there are at least 4 monthly points
-    const canZoom = monthlyData.length >= 4
+    // Offer timeline zooming only with at least 12 months on mobile and 24 on desktop
+    const minMonthsForZoom = isMobile ? MIN_MONTHS_ZOOM_MOBILE : MIN_MONTHS_ZOOM_DESKTOP
+    const canZoom = monthlyData.length >= minMonthsForZoom
     const monthKeys = useMemo(
       () => monthlyData.map((m) => m.rawMonth || m.name),
       [monthlyData],
@@ -58,7 +65,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
     } = useTimelineZoom({
       totalCount: monthlyData.length,
       isLotsOfData: canZoom,
-      minCount: 4,
+      minCount: minMonthsForZoom,
       minWindow: 3,
       monthKeys,
     })

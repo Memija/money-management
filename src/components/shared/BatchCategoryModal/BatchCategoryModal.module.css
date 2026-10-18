@@ -107,7 +107,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.75rem 0.25rem 0.5rem;
   border-radius: 20px;
   font-size: 0.775rem;
   font-weight: 600;

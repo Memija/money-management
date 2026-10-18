@@ -413,15 +413,6 @@ describe('Dashboard', () => {
     expect(heroSection).toHaveTextContent(/3[.,]150/)
   })
 
-  it('opens the social share snapshot modal on button click', () => {
-    render(<Dashboard />)
-    const shareBtn = screen.getByTestId('dashboard-share-snapshot-btn')
-    expect(shareBtn).toBeInTheDocument()
-
-    fireEvent.click(shareBtn)
-    expect(screen.getByTestId('share-card-download-btn')).toBeInTheDocument()
-  })
-
   it('updates dashboard analytics and balance when category filter is changed in All Transactions', () => {
     render(<Dashboard />)
 

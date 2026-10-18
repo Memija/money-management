@@ -282,17 +282,33 @@ describe('CategoryTrend', () => {
       { month: 'Dec 24', Rent: 1000, Groceries: 600 },
     ]
 
+    const twentyFourMonthsData = Array.from({ length: 24 }, (_, i) => {
+      const year = 2022 + Math.floor(i / 12)
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      return {
+        month: `${monthNames[i % 12]} ${String(year).slice(-2)}`,
+        Rent: 1000,
+        Groceries: 400 + (i % 5) * 20,
+      }
+    })
+
     it('does not render timeline navigation toolbar or brush when data is small', () => {
       render(<CategoryTrend data={sampleMonthlyData} />)
       expect(screen.queryByRole('region', { name: 'Timeline' })).not.toBeInTheDocument()
       expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
     })
 
-    it('renders timeline navigation toolbar and brush when lots of data points are present', () => {
+    it('does not render timeline navigation toolbar or brush on desktop when data has fewer than 24 months', () => {
       render(<CategoryTrend data={twelveMonthsData} />)
+      expect(screen.queryByRole('region', { name: 'Timeline' })).not.toBeInTheDocument()
+      expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
+    })
+
+    it('renders timeline navigation toolbar and brush on desktop when 24 or more months are present', () => {
+      render(<CategoryTrend data={twentyFourMonthsData} />)
       expect(screen.getByRole('region', { name: 'Timeline' })).toBeInTheDocument()
       expect(screen.getByTestId('timeline-brush')).toBeInTheDocument()
-      expect(screen.getByText('12 of 12 months')).toBeInTheDocument()
+      expect(screen.getByText('24 of 24 months')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Zoom in' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Zoom out' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Previous months' })).toBeInTheDocument()
@@ -300,7 +316,7 @@ describe('CategoryTrend', () => {
     })
 
     it('allows zooming in, zooming out and resetting zoom', () => {
-      render(<CategoryTrend data={twelveMonthsData} />)
+      render(<CategoryTrend data={twentyFourMonthsData} />)
 
       const zoomInBtn = screen.getByRole('button', { name: 'Zoom in' })
       fireEvent.click(zoomInBtn)
@@ -310,30 +326,34 @@ describe('CategoryTrend', () => {
       expect(resetBtn).toBeInTheDocument()
 
       // Subtitle and pill update to show zoomed range
-      expect(screen.getAllByText(/of 12 months/).length).toBeGreaterThanOrEqual(1)
+      expect(screen.getAllByText(/of 24 months/).length).toBeGreaterThanOrEqual(1)
 
-      // Resetting zoom restores 12 of 12 months
+      // Resetting zoom restores 24 of 24 months
       fireEvent.click(resetBtn)
-      expect(screen.getByText('12 of 12 months')).toBeInTheDocument()
+      expect(screen.getByText('24 of 24 months')).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Reset zoom' })).not.toBeInTheDocument()
     })
 
-    it('allows selecting presets such as 3M and 6M', () => {
-      render(<CategoryTrend data={twelveMonthsData} />)
+    it('allows selecting presets such as 3M, 6M and 1Y', () => {
+      render(<CategoryTrend data={twentyFourMonthsData} />)
 
       const preset3M = screen.getByRole('button', { name: '3M' })
       fireEvent.click(preset3M)
-      expect(screen.getByText('3 of 12 months')).toBeInTheDocument()
+      expect(screen.getByText('3 of 24 months')).toBeInTheDocument()
 
       const preset6M = screen.getByRole('button', { name: '6M' })
       fireEvent.click(preset6M)
-      expect(screen.getByText('6 of 12 months')).toBeInTheDocument()
+      expect(screen.getByText('6 of 24 months')).toBeInTheDocument()
+
+      const preset1Y = screen.getByRole('button', { name: '1Y' })
+      fireEvent.click(preset1Y)
+      expect(screen.getByText('12 of 24 months')).toBeInTheDocument()
     })
 
     it('allows panning earlier and later through the timeline', () => {
-      render(<CategoryTrend data={twelveMonthsData} />)
+      render(<CategoryTrend data={twentyFourMonthsData} />)
 
-      // Choose 3M (starts at Oct-Dec 24, so is at end)
+      // Choose 3M
       fireEvent.click(screen.getByRole('button', { name: '3M' }))
       const nextBtn = screen.getByRole('button', { name: 'Next months' })
       expect(nextBtn).toBeDisabled()
@@ -347,7 +367,7 @@ describe('CategoryTrend', () => {
     })
 
     it('allows opening and exiting full screen view', async () => {
-      render(<CategoryTrend data={twelveMonthsData} />)
+      render(<CategoryTrend data={twentyFourMonthsData} />)
 
       const fullscreenBtn = screen.getByTestId('category-trend-fullscreen-btn')
       expect(fullscreenBtn).toBeInTheDocument()
@@ -370,7 +390,26 @@ describe('CategoryTrend', () => {
       })
     })
 
-    it('hides timeline brush on mobile view but keeps chart pan/zoom enabled', () => {
+    it('does not render timeline navigation toolbar or brush on mobile when data has fewer than 12 months', () => {
+      act(() => {
+        window.innerWidth = 480
+        window.dispatchEvent(new Event('resize'))
+      })
+
+      const elevenMonthsData = twelveMonthsData.slice(0, 11)
+      render(<CategoryTrend data={elevenMonthsData} />)
+
+      expect(screen.queryByRole('region', { name: 'Timeline' })).not.toBeInTheDocument()
+      expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
+
+      // Reset window width back to desktop
+      act(() => {
+        window.innerWidth = 1024
+        window.dispatchEvent(new Event('resize'))
+      })
+    })
+
+    it('hides timeline brush on mobile view but renders timeline toolbar when 12 or more months are present', () => {
       act(() => {
         window.innerWidth = 480
         window.dispatchEvent(new Event('resize'))
@@ -378,7 +417,7 @@ describe('CategoryTrend', () => {
 
       render(<CategoryTrend data={twelveMonthsData} />)
 
-      // Timeline toolbar is still present for accessible controls
+      // Timeline toolbar is still present for accessible controls on mobile
       expect(screen.getByRole('region', { name: 'Timeline' })).toBeInTheDocument()
 
       // Brush is hidden on mobile

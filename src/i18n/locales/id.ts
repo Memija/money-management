@@ -572,26 +572,6 @@ export const id: TranslationStrings = {
   privacyModeActive: 'Mode Privasi Aktif',
   privacyModeTooltip: 'Alihkan Mode Privasi (Alt+P)',
 
-  // Share Snapshot Modal
-  shareSnapshot: 'Bagikan Ringkasan',
-  shareSnapshotTitle: 'Bagikan Ringkasan Keuangan',
-  shareSnapshotDesc:
-    'Buat kartu ringkasan keuangan yang estetis dan privat untuk dibagikan atau disimpan.',
-  shareCardTheme: 'Aksen Warna',
-  shareMaskAmounts: 'Sembunyikan jumlah pasti (hanya persentase)',
-  shareIncludeAmounts: 'Tampilkan jumlah pasti',
-  downloadImage: 'Unduh PNG',
-  copyImage: 'Salin Gambar',
-  copyTextSummary: 'Salin Ringkasan',
-  shareNative: 'Bagikan...',
-  imageCopiedSuccess: 'Gambar ringkasan berhasil disalin ke papan klip!',
-  textCopiedSuccess: 'Teks ringkasan berhasil disalin ke papan klip!',
-  badgeSuperSaver: 'Penyimpan Unggul',
-  badgeHealthySaver: 'Tabungan Kuat',
-  badgeBalanced: 'Anggaran Seimbang',
-  badgeBuilding: 'Membangun Modal',
-  badgeHighSpending: 'Pengeluaran Tinggi',
-  privateFinanceWatermark: '100% Privat & Lokal • saldio.app',
   dangerZone: 'Zona Bahaya',
   deleteAllDataTitle: 'Hapus Semua Data',
   deleteAllDataDesc:

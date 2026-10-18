@@ -84,7 +84,9 @@ const AvgRow: React.FC<AvgRowProps> = ({
     </div>
     <div className={styles['avg-row-content']}>
       <div className={styles['avg-row-header']}>
-        <span className={styles['avg-row-label']}>{label}</span>
+        <span className={styles['avg-row-label']} title={label}>
+          {label}
+        </span>
         <span
           className={`${styles['avg-row-value']} ${styles[`avg-value-${color}`]} privacy-blur`}
           style={customColor ? { color: customColor } : undefined}
@@ -341,7 +343,12 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(
               <div className={styles['card-text']}>
                 <p className={styles.label}>{card.label}</p>
                 <div className={styles['value-row']}>
-                  <p className={`${styles.value} ${i === 1 ? 'privacy-blur' : ''}`}>{card.value}</p>
+                  <p
+                    className={`${styles.value} ${i === 1 ? 'privacy-blur' : ''}`}
+                    title={typeof card.value === 'string' ? card.value : undefined}
+                  >
+                    {card.value}
+                  </p>
                   {card.tooltip && (
                     <span className={styles['info-tooltip-wrapper']}>
                       <Info size={14} className={styles['tooltip-icon']} />

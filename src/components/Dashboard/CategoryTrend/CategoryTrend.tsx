@@ -14,11 +14,16 @@ import { CategoryTrendChart } from './CategoryTrendChart'
 import { CategoryTrendFullscreenModal } from './CategoryTrendFullscreenModal'
 import { CategoryTrendLegend } from './CategoryTrendLegend'
 import { useChartTimelineGestures } from './useChartTimelineGestures'
-import { useTimelineZoom } from './useTimelineZoom'
+import {
+  MIN_MONTHS_ZOOM_DESKTOP,
+  MIN_MONTHS_ZOOM_MOBILE,
+  useTimelineZoom,
+} from './useTimelineZoom'
 
 import styles from './CategoryTrend.module.css'
 
 export { CustomTrendTooltip } from './CategoryTrendTooltip'
+export { MIN_MONTHS_ZOOM_DESKTOP, MIN_MONTHS_ZOOM_MOBILE } from './useTimelineZoom'
 
 interface CategoryTrendProps {
   data: MonthlyCategoryEntry[]
@@ -94,7 +99,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       return { month: maxMonth, amount: maxAmount }
     }, [data])
 
-    // High data volume flag to automatically expand card and offer timeline navigation
+    // High data volume flag to automatically expand card
     const isExtensive = useMemo(
       () => hasExtensiveCategoryData(data, categories.length),
       [data, categories.length],
@@ -115,6 +120,10 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
     }, [data])
 
     const monthKeys = useMemo(() => data.map((d) => d.rawMonth || d.month), [data])
+
+    // Offer timeline zooming only with at least 12 months on mobile and 24 on desktop
+    const minMonthsForZoom = isMobile ? MIN_MONTHS_ZOOM_MOBILE : MIN_MONTHS_ZOOM_DESKTOP
+    const canZoomAndNavigate = data.length >= minMonthsForZoom
 
     // Interactive timeline zoom & pan controller
     const {
@@ -137,7 +146,8 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       scrubToRatio,
     } = useTimelineZoom({
       totalCount: data.length,
-      isLotsOfData: isExtensive,
+      isLotsOfData: canZoomAndNavigate,
+      minCount: minMonthsForZoom,
       minWindow: 3,
       monthKeys,
     })
@@ -152,7 +162,6 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
 
     const startMonthLabel = formatMonthYear(data[startIndex]?.month ?? '')
     const endMonthLabel = formatMonthYear(data[endIndex]?.month ?? '')
-    const canZoomAndNavigate = isExtensive && data.length > 3
 
     const chartGesturesRef = useChartTimelineGestures({
       enabled: canZoomAndNavigate && isMobile,

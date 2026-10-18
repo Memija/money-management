@@ -567,26 +567,6 @@ export const en: TranslationStrings = {
   privacyModeActive: 'Privacy Mode Active',
   privacyModeTooltip: 'Toggle Privacy Mode (Alt+P)',
 
-  // Share Snapshot Modal
-  shareSnapshot: 'Share Snapshot',
-  shareSnapshotTitle: 'Share Financial Snapshot',
-  shareSnapshotDesc:
-    'Create a private, aesthetic card of your financial snapshot to share or save.',
-  shareCardTheme: 'Theme Accent',
-  shareMaskAmounts: 'Hide exact amounts (percentages only)',
-  shareIncludeAmounts: 'Show exact amounts',
-  downloadImage: 'Download PNG',
-  copyImage: 'Copy Image',
-  copyTextSummary: 'Copy Summary',
-  shareNative: 'Share...',
-  imageCopiedSuccess: 'Snapshot image copied to clipboard!',
-  textCopiedSuccess: 'Summary text copied to clipboard!',
-  badgeSuperSaver: 'Super Saver',
-  badgeHealthySaver: 'Solid Savings',
-  badgeBalanced: 'Balanced Budget',
-  badgeBuilding: 'Building Momentum',
-  badgeHighSpending: 'High Spending',
-  privateFinanceWatermark: '100% Private & Local • saldio.app',
   dangerZone: 'Danger Zone',
   deleteAllDataTitle: 'Delete All Data',
   deleteAllDataDesc:

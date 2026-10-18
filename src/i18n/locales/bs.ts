@@ -569,26 +569,6 @@ export const bs: TranslationStrings = {
   privacyModeActive: 'Privatni način aktivan',
   privacyModeTooltip: 'Uključi/isključi privatni način (Alt+P)',
 
-  // Share Snapshot Modal
-  shareSnapshot: 'Podijeli pregled',
-  shareSnapshotTitle: 'Podijeli finansijski pregled',
-  shareSnapshotDesc:
-    'Kreirajte privatan i vizuelno privlačan pregled svojih finansija za dijeljenje.',
-  shareCardTheme: 'Tema naglaska',
-  shareMaskAmounts: 'Sakrij tačne iznose (samo procenti)',
-  shareIncludeAmounts: 'Prikaži tačne iznose',
-  downloadImage: 'Preuzmi PNG',
-  copyImage: 'Kopiraj sliku',
-  copyTextSummary: 'Kopiraj sažetak',
-  shareNative: 'Podijeli...',
-  imageCopiedSuccess: 'Slika kopirana u međuspremnik!',
-  textCopiedSuccess: 'Tekstualni sažetak kopiran u međuspremnik!',
-  badgeSuperSaver: 'Vrhunski štediša',
-  badgeHealthySaver: 'Odlična štednja',
-  badgeBalanced: 'Uravnotežen budžet',
-  badgeBuilding: 'Zamah štednje',
-  badgeHighSpending: 'Povećana potrošnja',
-  privateFinanceWatermark: '100% Privatno i lokalno • saldio.app',
   dangerZone: 'Opasna zona',
   deleteAllDataTitle: 'Obriši sve podatke',
   deleteAllDataDesc:

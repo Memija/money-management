@@ -575,26 +575,6 @@ export const de: TranslationStrings = {
   privacyModeActive: 'Privatmodus aktiv',
   privacyModeTooltip: 'Privatmodus umschalten (Alt+P)',
 
-  // Share Snapshot Modal
-  shareSnapshot: 'Snapshot teilen',
-  shareSnapshotTitle: 'Finanz-Snapshot teilen',
-  shareSnapshotDesc:
-    'Erstellen Sie eine private, ansprechende Übersichtskarte für soziale Medien oder zum Speichern.',
-  shareCardTheme: 'Farbakzent',
-  shareMaskAmounts: 'Genaue Beträge verbergen (nur Prozentangaben)',
-  shareIncludeAmounts: 'Genaue Beträge anzeigen',
-  downloadImage: 'PNG herunterladen',
-  copyImage: 'Bild kopieren',
-  copyTextSummary: 'Zusammenfassung kopieren',
-  shareNative: 'Teilen...',
-  imageCopiedSuccess: 'Snapshot-Bild in die Zwischenablage kopiert!',
-  textCopiedSuccess: 'Zusammenfassung in die Zwischenablage kopiert!',
-  badgeSuperSaver: 'Spitzen-Sparer',
-  badgeHealthySaver: 'Solide Sparquote',
-  badgeBalanced: 'Ausgeglichenes Budget',
-  badgeBuilding: 'Vermögensaufbau',
-  badgeHighSpending: 'Erhöhte Ausgaben',
-  privateFinanceWatermark: '100% Privat & Lokal • saldio.app',
   dangerZone: 'Gefahrenbereich',
   deleteAllDataTitle: 'Alle Daten löschen',
   deleteAllDataDesc:

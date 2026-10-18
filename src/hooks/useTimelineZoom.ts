@@ -2,6 +2,9 @@ import { useCallback, useMemo, useState } from 'react'
 
 export type TimelinePreset = '3M' | '6M' | '1Y' | 'All'
 
+export const MIN_MONTHS_ZOOM_MOBILE = 12
+export const MIN_MONTHS_ZOOM_DESKTOP = 24
+
 export interface UseTimelineZoomOptions {
   totalCount: number
   isLotsOfData: boolean

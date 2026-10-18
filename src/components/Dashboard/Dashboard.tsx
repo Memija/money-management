@@ -1,6 +1,6 @@
 import React, { startTransition, useCallback, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
-import { Share2, TrendingDown, TrendingUp } from 'lucide-react'
+import { TrendingDown, TrendingUp } from 'lucide-react'
 
 import { useAccountBalances } from '../../hooks/useAccountBalances'
 import type { PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
@@ -43,8 +43,7 @@ const Dashboard: React.FC = () => {
   // Savings trend modal
   const [isSavingsTrendOpen, setIsSavingsTrendOpen] = useState(false)
 
-  // Social share snapshot modal
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+
 
   const handlePeriodChange = useCallback((nextPeriod: PeriodFilterType) => {
     startTransition(() => {
@@ -88,13 +87,7 @@ const Dashboard: React.FC = () => {
     setIsSavingsTrendOpen(false)
   }, [])
 
-  const handleShareModalClose = useCallback(() => {
-    setIsShareModalOpen(false)
-  }, [])
 
-  const handleShareModalOpen = useCallback(() => {
-    setIsShareModalOpen(true)
-  }, [])
 
   const handleAvgDetailClose = useCallback(() => {
     setAvgDetailType(null)
@@ -315,19 +308,6 @@ const Dashboard: React.FC = () => {
               availableMonths={fullBankAnalytics.availableMonths}
             />
 
-            <button
-              type="button"
-              className={styles['share-snapshot-btn']}
-              onClick={handleShareModalOpen}
-              title={t.shareSnapshot || 'Share Snapshot'}
-              aria-label={t.shareSnapshot || 'Share Snapshot'}
-              data-testid="dashboard-share-snapshot-btn"
-            >
-              <Share2 size={15} />
-              <span className={styles['share-btn-text']}>
-                {t.shareSnapshot || 'Share Snapshot'}
-              </span>
-            </button>
           </div>
 
           {bankAccounts.length > 0 && (
@@ -504,13 +484,10 @@ const Dashboard: React.FC = () => {
       </div>
 
       <DashboardModals
-        period={period}
         periodTransactions={analytics.periodTransactions}
         monthlyData={analytics.monthlyData}
-        categoryBreakdown={analytics.categoryBreakdown}
         totalIncome={analytics.totalIncome}
         totalExpenses={analytics.totalExpenses}
-        balance={analytics.balance}
         savingsRate={analytics.savingsRate}
         showInstitution={hasMultipleAccounts && selectedInstitution === 'all'}
         activeDetailModal={activeDetailModal}
@@ -519,8 +496,6 @@ const Dashboard: React.FC = () => {
         onAvgDetailClose={handleAvgDetailClose}
         isSavingsTrendOpen={isSavingsTrendOpen}
         onSavingsTrendClose={handleSavingsTrendClose}
-        isShareModalOpen={isShareModalOpen}
-        onShareModalClose={handleShareModalClose}
       />
     </div>
   )
