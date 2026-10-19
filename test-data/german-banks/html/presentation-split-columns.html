@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Online-Banking – Soll und Haben Zweispalten-Ansicht</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; background: #fdfdfd; color: #111; }
+    .header { padding: 1rem 0; border-bottom: 2px solid #333; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { border-bottom: 2px solid #444; padding: 10px 14px; text-align: left; background: #f5f5f5; }
+    td { border-bottom: 1px solid #ddd; padding: 10px 14px; }
+    .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Geschäfts- &amp; Privatkonto</h2>
+    <p>Konto: Privatgiro | IBAN: <strong>DE45 3705 0299 1234 5678 90</strong></p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Datum</th>
+        <th>Buchungstext / Empfänger</th>
+        <th class="num">Soll</th>
+        <th class="num">Haben</th>
+        <th class="num">Saldo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>14.10.2026</td>
+        <td>EDEKA Supermarkt – EC-Kartenzahlung Filiale 204</td>
+        <td class="num">35,80 EUR</td>
+        <td class="num"></td>
+        <td class="num">2.414,20 EUR</td>
+      </tr>
+      <tr>
+        <td>10.10.2026</td>
+        <td>Stadtwerke Energie AG – Abschlagszahlung Strom/Gas</td>
+        <td class="num">145,00 EUR</td>
+        <td class="num"></td>
+        <td class="num">2.450,00 EUR</td>
+      </tr>
+      <tr>
+        <td>01.10.2026</td>
+        <td>Software Solutions GmbH – Gehalt Gutschrift 10/2026</td>
+        <td class="num"></td>
+        <td class="num">2.850,00 EUR</td>
+        <td class="num">2.595,00 EUR</td>
+      </tr>
+      <tr>
+        <td>29.09.2026</td>
+        <td>Spotify Technology S.A. – Monatsabo Musik-Streaming</td>
+        <td class="num">10,99 EUR</td>
+        <td class="num"></td>
+        <td class="num">-255,00 EUR</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

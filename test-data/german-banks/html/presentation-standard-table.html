@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Online-Banking – Standard Tabellenansicht</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; background: #f8fafc; color: #1e293b; }
+    .header { background: #fff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
+    th { background: #f1f5f9; padding: 12px 16px; text-align: left; font-size: 0.85rem; border-bottom: 2px solid #cbd5e1; }
+    td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+    .amount { text-align: right; font-weight: 600; white-space: nowrap; }
+    .negative { color: #dc2626; }
+    .positive { color: #16a34a; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Girokonto Hauptkonto</h2>
+    <p>IBAN: <strong>DE12 5007 0010 0123 4567 89</strong></p>
+    <p>Kontostand: <strong>3.450,80 EUR</strong></p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Buchungstag</th>
+        <th>Wertstellung</th>
+        <th>Zahlungsbeteiligter / Verwendungszweck</th>
+        <th>Umsatzart</th>
+        <th style="text-align: right;">Betrag (€)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>15.10.2026</td>
+        <td>15.10.2026</td>
+        <td>REWE Markt GmbH – Einkauf Lebensmittel Filiale 104</td>
+        <td>Kartenzahlung</td>
+        <td class="amount negative">-48,50 EUR</td>
+      </tr>
+      <tr>
+        <td>12.10.2026</td>
+        <td>12.10.2026</td>
+        <td>Hausverwaltung Zentral GmbH – Miete Oktober 2026</td>
+        <td>Dauerauftrag</td>
+        <td class="amount negative">-920,00 EUR</td>
+      </tr>
+      <tr>
+        <td>01.10.2026</td>
+        <td>01.10.2026</td>
+        <td>Arbeitgeber Tech AG – Gehaltsabrechnung 10/2026</td>
+        <td>Überweisung</td>
+        <td class="amount positive">+3.450,00 EUR</td>
+      </tr>
+      <tr>
+        <td>28.09.2026</td>
+        <td>28.09.2026</td>
+        <td>Deutsche Bahn AG – Ticket Frankfurt-Berlin ICE 578</td>
+        <td>Onlinekauf</td>
+        <td class="amount negative">-69,90 EUR</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -21,12 +21,6 @@ test-data/german-banks/
 ├── html/                     # 54 Authentic Online-Banking web portals with HTML tables
 │   ├── <institution-id>.html
 │   └── index.html            # Hub with bank search & links
-├── paste-samples/            # 54 Web portal copy-paste texts (+ legacy aliases)
-│   ├── <institution-id>.txt
-│   ├── commerzbank-paste.txt
-│   ├── dkb-paste.txt
-│   ├── ing-paste.txt
-│   └── sparkasse-paste.txt
 └── README.md                 # This documentation file
 ```
 
@@ -101,7 +95,7 @@ test-data/german-banks/
 3. Choose any German bank (e.g. *Commerzbank*, *N26*, *DKB*, *ING*, *Berliner Sparkasse*, etc.).
 4. Select **Excel / CSV** and drag & drop (or browse to) the corresponding `.csv` file from `test-data/german-banks/`.
 5. Verify the preview modal displays the parsed dates, descriptions, amounts, and automatic categories.
-6. For **Copy & Paste** testing, select Copy & Paste and paste content from `test-data/german-banks/paste-samples/`.
+6. For **Copy & Paste** testing, open any bank portal or presentation archetype in `test-data/german-banks/html/` (via `index.html`), select and copy the transaction list or ledger, and paste into the application.
 
 ### Automated Testing:
 Run the automated test suites to verify all test files:
@@ -109,9 +103,6 @@ Run the automated test suites to verify all test files:
 # Test all CSV bank files (54 banks)
 npx vitest run src/utils/parsers/__tests__/german-banks-test-data.test.ts
 
-# Test all PDF statement files (54 banks)
-npx vitest run src/utils/parsers/__tests__/german-banks-pdf-test-data.test.ts
-
-# Test all Copy-Paste portal samples (54 banks + aliases)
+# Test authentic bank portals and web presentation archetypes for paste & HTML extraction
 npx vitest run src/utils/parsers/__tests__/german-banks-paste-test-data.test.ts
 ```

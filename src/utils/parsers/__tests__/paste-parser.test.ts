@@ -185,6 +185,29 @@ Buchungstag\tBegünstigter / Auftraggeber\tVerwendungszweck\tUmsatzart\tBetrag
       institution: 'Kreissparkasse Köln',
     })
   })
+
+  it('parses raw HTML table directly', () => {
+    const htmlText = `
+      <div class="account-header">
+        <p>IBAN: <strong>DE45 3705 0299 1234 5678 90</strong></p>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Datum</th><th>Empfänger</th><th>Verwendungszweck</th><th>Betrag</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>14.10.2026</td><td>REWE Markt</td><td>Einkauf</td><td>-42,50 EUR</td></tr>
+          <tr><td>01.10.2026</td><td>Arbeitgeber AG</td><td>Gehalt</td><td>+3.250,00 EUR</td></tr>
+        </tbody>
+      </table>
+    `
+    const result = parseBankStatementPaste(htmlText, 'Kreissparkasse Köln')
+    expect(result).toHaveLength(2)
+    expect(result[0].date).toBe('2026-10-14')
+    expect(result[0].amount).toBe(-42.5)
+    expect(result[1].date).toBe('2026-10-01')
+    expect(result[1].amount).toBe(3250)
+  })
 })
 
 describe('extractAccountIbansFromPaste', () => {
@@ -197,4 +220,11 @@ Saldo: 1.000,00 EUR
     const ibans = extractAccountIbansFromPaste(rawText)
     expect(ibans).toContain('DE35100110010000000001')
   })
+
+  it('extracts IBAN from raw HTML elements', () => {
+    const html = `<p class="account-iban">IBAN: <strong>DE89 3705 0198 1234 5678 90</strong></p>`
+    const ibans = extractAccountIbansFromPaste(html)
+    expect(ibans).toContain('DE89370501981234567890')
+  })
 })
+

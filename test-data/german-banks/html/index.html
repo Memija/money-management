@@ -3,737 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deutsche Banken Testportale &amp; Vorlagen</title>
+  <title>Online-Banking HTML Testportal Hub | Money Management</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #f8f9fa;
-      color: #212529;
-      line-height: 1.5;
-      padding: 32px 24px;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .header {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 32px;
-      margin-bottom: 24px;
-      border: 1px solid #e9ecef;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .header h1 {
-      font-size: 1.85rem;
-      margin-bottom: 8px;
-      color: #1a1a1a;
-    }
-    .header p {
-      color: #6c757d;
-      font-size: 0.95rem;
-      margin-bottom: 20px;
-    }
-    .search-box {
-      display: flex;
-      gap: 12px;
-    }
-    .search-box input {
-      flex: 1;
-      padding: 12px 16px;
-      border: 1px solid #ced4da;
-      border-radius: 8px;
-      font-size: 0.95rem;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 16px;
-    }
-    .card {
-      background: #ffffff;
-      border: 1px solid #e9ecef;
-      border-radius: 10px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    }
-    .card-top {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-    .card-logo {
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-      border-radius: 6px;
-      background: #f8f9fa;
-      padding: 4px;
-      border: 1px solid #dee2e6;
-    }
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #212529;
-    }
-    .card-links {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .link-btn {
-      text-decoration: none;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-align: center;
-      border: 1px solid #dee2e6;
-      color: #495057;
-      background: #f8f9fa;
-      transition: background 0.15s;
-    }
-    .link-btn:hover {
-      background: #e9ecef;
-      color: #212529;
-    }
-    .link-btn.primary {
-      background: #0d6efd;
-      color: #ffffff;
-      border-color: #0d6efd;
-      grid-column: span 2;
-    }
-    .link-btn.primary:hover {
-      background: #0b5ed7;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 2.5rem 1.5rem; line-height: 1.6; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; color: #38bdf8; }
+    p.lead { color: #94a3b8; font-size: 1.05rem; margin-bottom: 2rem; }
+    .section-title { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; margin: 2rem 0 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 1.25rem; transition: transform 0.15s, border-color 0.15s; text-decoration: none; color: inherit; display: block; }
+    .card:hover { transform: translateY(-2px); border-color: #38bdf8; }
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-bottom: 0.5rem; }
+    .badge-authentic { background: #065f46; color: #6ee7b7; }
+    .badge-variation { background: #1e3a8a; color: #93c5fd; }
+    .card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.25rem; color: #ffffff; }
+    .card p { font-size: 0.85rem; color: #94a3b8; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>🏛️ Testdaten &amp; Webportale aller 54 deutschen Banken</h1>
-      <p>Öffne ein beliebiges Online-Banking Webportal, markiere die Umsätze mit der Maus (Strg+C) und füge sie in die Money Management App ein.</p>
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Bank suchen (z. B. Kreissparkasse Köln, Deutsche Bank, ING, DKB, N26)..." oninput="filterBanks()">
-      </div>
+    <h1>Online-Banking HTML Testportal Hub</h1>
+    <p class="lead">Authentische Banking-Portaldemos und repräsentative Web-Präsentationsmuster zur Validierung von Copy &amp; Paste- und HTML-Transaktionsextraktionen.</p>
+
+    <h2 class="section-title">Authentische Online-Banking Portale (Live Core-Systeme)</h2>
+    <div class="grid">
+      <a class="card" href="berliner-sparkasse.html">
+        <span class="badge badge-authentic">Finanz Informatik IF6</span>
+        <h3>Berliner Sparkasse</h3>
+        <p>Authentisches Internet-Filiale IF6 Portal der Sparkassen-Finanzgruppe mit gruppierten Buchungstagen und Mkp-Karten.</p>
+      </a>
+
+      <a class="card" href="deutsche-bank.html">
+        <span class="badge badge-authentic">Cirrus Angular SPA</span>
+        <h3>Deutsche Bank</h3>
+        <p>Authentisches Cirrus Angular Portal mit db-list-row Komponenten und Datumsheadern.</p>
+      </a>
+
+      <a class="card" href="norisbank.html">
+        <span class="badge badge-authentic">Cirrus Dark Theme</span>
+        <h3>norisbank</h3>
+        <p>Authentisches norisbank Cirrus Webportal mit Dark-Orange Theme und Top-Girokonto.</p>
+      </a>
     </div>
 
-    <div class="grid" id="bankGrid">
-      <div class="card" data-name="deutsche bank deutsche-bank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/deutsche-bank.png" alt="Deutsche Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Deutsche Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./deutsche-bank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/deutsche-bank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../deutsche-bank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="commerzbank commerzbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/commerzbank.png" alt="Commerzbank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Commerzbank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./commerzbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/commerzbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../commerzbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="hypovereinsbank (unicredit) hypovereinsbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/hypovereinsbank.png" alt="HypoVereinsbank (UniCredit) Logo" onerror="this.style.display='none'">
-          <div class="card-title">HypoVereinsbank (UniCredit)</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./hypovereinsbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/hypovereinsbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../hypovereinsbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="postbank postbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/postbank.png" alt="Postbank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Postbank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./postbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/postbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../postbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="targobank targobank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/targobank.png" alt="Targobank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Targobank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./targobank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/targobank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../targobank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="santander deutschland santander-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/santander-de.png" alt="Santander Deutschland Logo" onerror="this.style.display='none'">
-          <div class="card-title">Santander Deutschland</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./santander-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/santander-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../santander-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="ing deutschland ing-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/ing-de.png" alt="ING Deutschland Logo" onerror="this.style.display='none'">
-          <div class="card-title">ING Deutschland</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./ing-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/ing-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../ing-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="berliner sparkasse berliner-sparkasse">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/berliner-sparkasse.png" alt="Berliner Sparkasse Logo" onerror="this.style.display='none'">
-          <div class="card-title">Berliner Sparkasse</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./berliner-sparkasse.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/berliner-sparkasse.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../berliner-sparkasse.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="hamburger sparkasse (haspa) hamburger-sparkasse">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/hamburger-sparkasse.png" alt="Hamburger Sparkasse (Haspa) Logo" onerror="this.style.display='none'">
-          <div class="card-title">Hamburger Sparkasse (Haspa)</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./hamburger-sparkasse.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/hamburger-sparkasse.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../hamburger-sparkasse.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="stadtsparkasse münchen stadtsparkasse-muenchen">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/stadtsparkasse-muenchen.png" alt="Stadtsparkasse München Logo" onerror="this.style.display='none'">
-          <div class="card-title">Stadtsparkasse München</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./stadtsparkasse-muenchen.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/stadtsparkasse-muenchen.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../stadtsparkasse-muenchen.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="kreissparkasse köln kreissparkasse-koeln">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/kreissparkasse-koeln.png" alt="Kreissparkasse Köln Logo" onerror="this.style.display='none'">
-          <div class="card-title">Kreissparkasse Köln</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./kreissparkasse-koeln.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/kreissparkasse-koeln.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../kreissparkasse-koeln.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="sparkasse kölnbonn sparkasse-koelnbonn">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/sparkasse-koelnbonn.png" alt="Sparkasse KölnBonn Logo" onerror="this.style.display='none'">
-          <div class="card-title">Sparkasse KölnBonn</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./sparkasse-koelnbonn.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/sparkasse-koelnbonn.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../sparkasse-koelnbonn.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="nassauische sparkasse (naspa) nassauische-sparkasse">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/nassauische-sparkasse.png" alt="Nassauische Sparkasse (Naspa) Logo" onerror="this.style.display='none'">
-          <div class="card-title">Nassauische Sparkasse (Naspa)</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./nassauische-sparkasse.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/nassauische-sparkasse.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../nassauische-sparkasse.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="frankfurter sparkasse frankfurter-sparkasse">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/frankfurter-sparkasse.png" alt="Frankfurter Sparkasse Logo" onerror="this.style.display='none'">
-          <div class="card-title">Frankfurter Sparkasse</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./frankfurter-sparkasse.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/frankfurter-sparkasse.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../frankfurter-sparkasse.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="sparkasse hannover sparkasse-hannover">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/sparkasse-hannover.png" alt="Sparkasse Hannover Logo" onerror="this.style.display='none'">
-          <div class="card-title">Sparkasse Hannover</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./sparkasse-hannover.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/sparkasse-hannover.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../sparkasse-hannover.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="sparkasse nürnberg sparkasse-nuernberg">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/sparkasse-nuernberg.png" alt="Sparkasse Nürnberg Logo" onerror="this.style.display='none'">
-          <div class="card-title">Sparkasse Nürnberg</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./sparkasse-nuernberg.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/sparkasse-nuernberg.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../sparkasse-nuernberg.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="other sparkasse sparkasse-other">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/sparkasse-other.png" alt="Other Sparkasse Logo" onerror="this.style.display='none'">
-          <div class="card-title">Other Sparkasse</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./sparkasse-other.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/sparkasse-other.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../sparkasse-other.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="dz bank dz-bank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/dz-bank.png" alt="DZ Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">DZ Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./dz-bank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/dz-bank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../dz-bank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="berliner volksbank berliner-volksbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/berliner-volksbank.png" alt="Berliner Volksbank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Berliner Volksbank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./berliner-volksbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/berliner-volksbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../berliner-volksbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="frankfurter volksbank rhein/main frankfurter-volksbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/frankfurter-volksbank.png" alt="Frankfurter Volksbank Rhein/Main Logo" onerror="this.style.display='none'">
-          <div class="card-title">Frankfurter Volksbank Rhein/Main</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./frankfurter-volksbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/frankfurter-volksbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../frankfurter-volksbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="münchner bank muenchner-bank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/muenchner-bank.png" alt="Münchner Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Münchner Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./muenchner-bank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/muenchner-bank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../muenchner-bank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="other volksbank / raiffeisenbank volksbank-other">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/volksbank-other.png" alt="Other Volksbank / Raiffeisenbank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Other Volksbank / Raiffeisenbank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./volksbank-other.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/volksbank-other.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../volksbank-other.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="dkb (deutsche kreditbank) dkb">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/dkb.png" alt="DKB (Deutsche Kreditbank) Logo" onerror="this.style.display='none'">
-          <div class="card-title">DKB (Deutsche Kreditbank)</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./dkb.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/dkb.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../dkb.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="comdirect comdirect">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/comdirect.png" alt="comdirect Logo" onerror="this.style.display='none'">
-          <div class="card-title">comdirect</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./comdirect.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/comdirect.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../comdirect.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="consorsbank consorsbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/consorsbank.png" alt="Consorsbank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Consorsbank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./consorsbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/consorsbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../consorsbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="norisbank norisbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/norisbank.png" alt="norisbank Logo" onerror="this.style.display='none'">
-          <div class="card-title">norisbank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./norisbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/norisbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../norisbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="1822direkt 1822direkt">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/1822direkt.png" alt="1822direkt Logo" onerror="this.style.display='none'">
-          <div class="card-title">1822direkt</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./1822direkt.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/1822direkt.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../1822direkt.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="n26 n26">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/n26.png" alt="N26 Logo" onerror="this.style.display='none'">
-          <div class="card-title">N26</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./n26.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/n26.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../n26.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="tomorrow bank tomorrow">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/tomorrow.png" alt="Tomorrow Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Tomorrow Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./tomorrow.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/tomorrow.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../tomorrow.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="vivid money vivid-money">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/vivid-money.png" alt="Vivid Money Logo" onerror="this.style.display='none'">
-          <div class="card-title">Vivid Money</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./vivid-money.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/vivid-money.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../vivid-money.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="c24 bank c24">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/c24.png" alt="C24 Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">C24 Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./c24.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/c24.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../c24.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="openbank openbank-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/openbank-de.png" alt="Openbank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Openbank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./openbank-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/openbank-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../openbank-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="revolut revolut-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/revolut-de.png" alt="Revolut Logo" onerror="this.style.display='none'">
-          <div class="card-title">Revolut</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./revolut-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/revolut-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../revolut-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="wise wise-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/wise-de.png" alt="Wise Logo" onerror="this.style.display='none'">
-          <div class="card-title">Wise</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./wise-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/wise-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../wise-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="bunq bunq-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/bunq-de.png" alt="bunq Logo" onerror="this.style.display='none'">
-          <div class="card-title">bunq</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./bunq-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/bunq-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../bunq-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="lbbw (landesbank baden-württemberg) lbbw">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/lbbw.png" alt="LBBW (Landesbank Baden-Württemberg) Logo" onerror="this.style.display='none'">
-          <div class="card-title">LBBW (Landesbank Baden-Württemberg)</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./lbbw.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/lbbw.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../lbbw.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="helaba (landesbank hessen-thüringen) helaba">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/helaba.png" alt="Helaba (Landesbank Hessen-Thüringen) Logo" onerror="this.style.display='none'">
-          <div class="card-title">Helaba (Landesbank Hessen-Thüringen)</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./helaba.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/helaba.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../helaba.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="bayernlb bayernlb">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/bayernlb.png" alt="BayernLB Logo" onerror="this.style.display='none'">
-          <div class="card-title">BayernLB</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./bayernlb.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/bayernlb.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../bayernlb.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="nord/lb norddeutsche-lb">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/norddeutsche-lb.png" alt="Nord/LB Logo" onerror="this.style.display='none'">
-          <div class="card-title">Nord/LB</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./norddeutsche-lb.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/norddeutsche-lb.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../norddeutsche-lb.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="trade republic trade-republic">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/trade-republic.png" alt="Trade Republic Logo" onerror="this.style.display='none'">
-          <div class="card-title">Trade Republic</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./trade-republic.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/trade-republic.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../trade-republic.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="scalable capital scalable-capital">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/scalable-capital.png" alt="Scalable Capital Logo" onerror="this.style.display='none'">
-          <div class="card-title">Scalable Capital</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./scalable-capital.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/scalable-capital.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../scalable-capital.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="flatex flatex">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/flatex.png" alt="flatex Logo" onerror="this.style.display='none'">
-          <div class="card-title">flatex</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./flatex.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/flatex.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../flatex.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="smartbroker+ smartbroker">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/smartbroker.png" alt="Smartbroker+ Logo" onerror="this.style.display='none'">
-          <div class="card-title">Smartbroker+</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./smartbroker.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/smartbroker.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../smartbroker.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="degiro degiro-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/degiro-de.png" alt="DEGIRO Logo" onerror="this.style.display='none'">
-          <div class="card-title">DEGIRO</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./degiro-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/degiro-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../degiro-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="apobank (deutsche apotheker- und ärztebank) apobank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/apobank.png" alt="apoBank (Deutsche Apotheker- und Ärztebank) Logo" onerror="this.style.display='none'">
-          <div class="card-title">apoBank (Deutsche Apotheker- und Ärztebank)</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./apobank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/apobank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../apobank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="psd bank psd-bank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/psd-bank.png" alt="PSD Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">PSD Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./psd-bank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/psd-bank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../psd-bank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="sparda-bank sparda-bank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/sparda-bank.png" alt="Sparda-Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Sparda-Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./sparda-bank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/sparda-bank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../sparda-bank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="gls bank gls-bank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/gls-bank.png" alt="GLS Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">GLS Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./gls-bank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/gls-bank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../gls-bank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="ethikbank ethikbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/ethikbank.png" alt="EthikBank Logo" onerror="this.style.display='none'">
-          <div class="card-title">EthikBank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./ethikbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/ethikbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../ethikbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="triodos bank triodos-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/triodos-de.png" alt="Triodos Bank Logo" onerror="this.style.display='none'">
-          <div class="card-title">Triodos Bank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./triodos-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/triodos-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../triodos-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="umweltbank umweltbank">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/umweltbank.png" alt="UmweltBank Logo" onerror="this.style.display='none'">
-          <div class="card-title">UmweltBank</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./umweltbank.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/umweltbank.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../umweltbank.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="paypal paypal-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/paypal-de.png" alt="PayPal Logo" onerror="this.style.display='none'">
-          <div class="card-title">PayPal</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./paypal-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/paypal-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../paypal-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="klarna klarna-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/klarna-de.png" alt="Klarna Logo" onerror="this.style.display='none'">
-          <div class="card-title">Klarna</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./klarna-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/klarna-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../klarna-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
-      <div class="card" data-name="other institution other-de">
-        <div class="card-top">
-          <img class="card-logo" src="../../../public/banks/other-de.png" alt="Other Institution Logo" onerror="this.style.display='none'">
-          <div class="card-title">Other Institution</div>
-        </div>
-        <div class="card-links">
-          <a class="link-btn primary" href="./other-de.html">🌐 Online-Banking Portal</a>
-          <a class="link-btn" href="../pdf/other-de.pdf" target="_blank">📄 PDF Auszug</a>
-          <a class="link-btn" href="../other-de.csv" download>📊 CSV Export</a>
-        </div>
-      </div>
+    <h2 class="section-title">Web-Präsentationsmuster (Mish/Mash Layout-Suite)</h2>
+    <div class="grid">
+      <a class="card" href="presentation-standard-table.html">
+        <span class="badge badge-variation">Standard Tabelle</span>
+        <h3>Klassische 5-Spalten-Tabelle</h3>
+        <p>Klassische Banktabelle (Buchungstag, Wertstellung, Zahlungsbeteiligter / Zweck, Umsatzart, Betrag in EUR).</p>
+      </a>
+
+      <a class="card" href="presentation-split-columns.html">
+        <span class="badge badge-variation">Soll &amp; Haben</span>
+        <h3>Getrennte Soll / Haben Spalten</h3>
+        <p>Bankauszug mit getrennten Belastungs- und Gutschriftsspalten sowie laufendem Saldo.</p>
+      </a>
+
+      <a class="card" href="presentation-multiline-cells.html">
+        <span class="badge badge-variation">Reiche Zellen</span>
+        <h3>Mehrzeilige Tabellenzellen</h3>
+        <p>Tabellenzellen mit verschachtelten &lt;br&gt;, Empfängernamen, Mandatsreferenzen und Verwendungszwecken.</p>
+      </a>
+
+      <a class="card" href="presentation-cards-feed.html">
+        <span class="badge badge-variation">Karten Feed</span>
+        <h3>Moderne Kartenliste (Flex/Grid)</h3>
+        <p>Transaktionsfeed aus Kartencontainern mit Metadaten, Kategorie-Badges und Betragselementen.</p>
+      </a>
+
+      <a class="card" href="presentation-timeline-feed.html">
+        <span class="badge badge-variation">Neobank Timeline</span>
+        <h3>Aktivitäts-Timeline (N26 / Revolut)</h3>
+        <p>Dunkle Neobank-Timeline mit Datumsseparatoren und Währungssymbolen vor dem Betrag (- € 13.99).</p>
+      </a>
+
+      <a class="card" href="presentation-multicurrency.html">
+        <span class="badge badge-variation">Multi-Währung</span>
+        <h3>Internationale Währungen</h3>
+        <p>Transaktionen in gemischten Währungen (EUR, USD, GBP, PLN mit Symbolen $, £, zł, €).</p>
+      </a>
     </div>
   </div>
-
-  <script>
-    function filterBanks() {
-      const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const cards = document.querySelectorAll('.card');
-      cards.forEach(card => {
-        const text = card.getAttribute('data-name');
-        card.style.display = text.includes(q) ? 'flex' : 'none';
-      });
-    }
-  </script>
 </body>
 </html>

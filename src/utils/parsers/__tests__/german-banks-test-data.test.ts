@@ -10,7 +10,7 @@ import { splitCsvLine } from '../helpers'
 import { parseBankStatementPaste } from '../paste-parser'
 
 const testDataDir = path.resolve(__dirname, '../../../../test-data/german-banks')
-const pasteDir = path.join(testDataDir, 'paste-samples')
+const htmlDir = path.join(testDataDir, 'html')
 
 describe('German Banks Test Data Suite', () => {
   it('has a test CSV file for every supported German bank in germanInstitutions', () => {
@@ -91,18 +91,17 @@ describe('German Banks Test Data Suite', () => {
     })
   })
 
-  describe('Paste samples import validation', () => {
-    const pasteSamples = [
-      { file: 'ing-paste.txt', institution: 'ING Deutschland' },
-      { file: 'sparkasse-paste.txt', institution: 'Berliner Sparkasse' },
-      { file: 'dkb-paste.txt', institution: 'DKB (Deutsche Kreditbank)' },
-      { file: 'commerzbank-paste.txt', institution: 'Commerzbank' },
+  describe('HTML samples import validation', () => {
+    const htmlSamples = [
+      { file: 'berliner-sparkasse.html', institution: 'Berliner Sparkasse' },
+      { file: 'deutsche-bank.html', institution: 'Deutsche Bank' },
+      { file: 'norisbank.html', institution: 'norisbank' },
     ]
 
-    it.each(pasteSamples)(
-      'parses copy-paste sample for $institution ($file)',
+    it.each(htmlSamples)(
+      'parses HTML web portal sample for $institution ($file)',
       ({ file, institution }) => {
-        const filePath = path.join(pasteDir, file)
+        const filePath = path.join(htmlDir, file)
         expect(fs.existsSync(filePath)).toBe(true)
 
         const content = fs.readFileSync(filePath, 'utf-8')
