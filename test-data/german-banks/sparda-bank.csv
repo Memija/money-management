@@ -1,0 +1,5 @@
+"Buchungstag";"Valutadatum";"Buchungstext";"Verwendungszweck";"Beguenstigter/Zahlungspflichtiger";"Betrag";"Währung"
+"14.10.2026";"14.10.2026";"Kartenzahlung";"Einkauf Filiale 512";"ALDI Sued";"-28,90";"EUR"
+"12.10.2026";"12.10.2026";"Dauerauftrag";"Miete Wohnung 10/2026";"Hausverwaltung Muster GmbH";"-850,00";"EUR"
+"09.10.2026";"09.10.2026";"Lastschrift";"Fahrkarte Deutsche Bahn";"Deutsche Bahn AG";"-69,90";"EUR"
+"01.10.2026";"01.10.2026";"Gutschrift";"Lohn/Gehalt 10/2026";"Musterfirma Arbeitgeber AG";"3250,00";"EUR"

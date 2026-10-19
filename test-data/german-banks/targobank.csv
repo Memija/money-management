@@ -1,0 +1,5 @@
+"Buchungsdatum";"Valuta";"Empfänger / Absender";"Verwendungszweck";"Buchungsart";"Betrag";"Währung"
+"14.10.2026";"14.10.2026";"REWE Markt GmbH";"Filialeinkauf Lebensmittel";"Lastschrift";"-42,50";"EUR"
+"12.10.2026";"12.10.2026";"Hausverwaltung Muster GmbH";"Miete 10/2026";"Dauerauftrag";"-850,00";"EUR"
+"08.10.2026";"08.10.2026";"FitX Deutschland GmbH";"Mitgliedsbeitrag Fitness";"Lastschrift";"-24,00";"EUR"
+"01.10.2026";"01.10.2026";"Musterfirma Arbeitgeber AG";"Gehalt Monatszahlung";"Überweisung";"3250,00";"EUR"

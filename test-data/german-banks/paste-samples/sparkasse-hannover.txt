@@ -1,0 +1,27 @@
+Girokonto
+IBAN: DE89 2505 0180 1234 5678 90
+Umsatzübersicht
+14.10.2026
+REWE Markt GmbH
+Kartenzahlung Filiale Hannover
+Kartenzahlung
+-42,50 EUR
+(Umsatzdetails öffnen)
+12.10.2026
+Hausverwaltung Muster GmbH
+Miete Wohnung 10/2026
+Dauerauftrag
+-850,00 EUR
+(Umsatzdetails öffnen)
+08.10.2026
+Nahverkehr Hannover Service
+Monatsticket Nahverkehr
+Lastschrift
+-49,00 EUR
+(Umsatzdetails öffnen)
+01.10.2026
+Musterfirma Arbeitgeber AG
+Gehaltszahlung 10/2026
+Überweisung
++3.250,00 EUR
+(Umsatzdetails öffnen)

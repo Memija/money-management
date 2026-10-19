@@ -22,6 +22,9 @@ export const ALL_SKIP_PATTERNS: RegExp[] = [
   // Structural patterns that apply regardless of locale
   /^[A-Z]{2}\d{2}\s(?:\d{4}\s)*\d{1,4}/i, // Generic spaced IBAN
   /^[A-Z]{2}\d{14,32}/i, // Generic continuous IBAN
+  /^(?:iban|konto(?:nummer)?|account|kontoinhaber):\s*.*/i, // Account header prefix with colon
+  /^(?:girokonto|tagesgeld(?:konto)?|depot(?:konto)?|verrechnungskonto|sparkonto|festgeldkonto)\b/i, // Account type label
+  /^(?:saldo|kontostand|alter kontostand|neuer kontostand):\s*.*/i, // Balance header label with colon
   ...Object.values(LOCALE_CONFIGS).flatMap((c) => c.skipPatterns),
 ]
 

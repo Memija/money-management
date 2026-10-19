@@ -11,7 +11,7 @@ import {
 export function extractAccountIbansFromPaste(rawText: string): string[] {
   const result = new Set<string>()
   const headerMatch = rawText.match(
-    /(?:iban|konto(?:nummer)?|account)[\s:]+([a-z]{2}\d{2}[a-z0-9\s]{11,32})/i,
+    /(?:iban|konto(?:nummer)?|account)[\s:]+([a-z]{2}\d{2}[a-z0-9 \t]{11,32})/i,
   )
   if (headerMatch) {
     for (const ib of extractIbans(headerMatch[1])) {
@@ -71,6 +71,7 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
   const cleanLines = getCleanLines(rawText)
 
   let currentDate = new Date().toISOString().split('T')[0]
+  let hasSeenDate = false
   const rawTxs: RawTx[] = []
 
   let buf: {
@@ -108,6 +109,7 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
     // Projected booking date annotation (pending transactions)
     const projMatch = line.match(ALL_PROJECTED_DATE_RE)
     if (projMatch) {
+      hasSeenDate = true
       // Find first captured group (date) — varies by locale branch
       const dateStr = projMatch.slice(1).find(Boolean)
       if (dateStr) {
@@ -118,8 +120,64 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
 
     // Date header line — new calendar day
     if (DATE_HEADER_RE.test(line)) {
+      hasSeenDate = true
       currentDate = parseDate(line)
       buf.date = currentDate
+      continue
+    }
+
+    // Tab-delimited row (copied from an HTML <table> on a bank website)
+    if (line.includes('\t')) {
+      const cells = line
+        .split('\t')
+        .map((c) => c.trim())
+        .filter(Boolean)
+      if (cells.length >= 2) {
+        const dateCell = cells.find(
+          (c) => /^\d{1,2}\.\d{1,2}\.\d{2,4}$/.test(c) || /^\d{4}-\d{2}-\d{2}$/.test(c),
+        )
+        const amtCell = cells.find(
+          (c) =>
+            AMOUNT_RE.test(c) ||
+            /^[+-]?\d{1,3}(?:[.,]\d{3})*[.,]\d{2}(?:\s*(?:EUR|€|USD|\$|GBP|£|PLN|zł))?$/i.test(c),
+        )
+
+        if (dateCell && amtCell) {
+          hasSeenDate = true
+          const remaining = cells.filter((c) => c !== dateCell && c !== amtCell)
+          const typeCell = remaining.find((c) => ALL_TX_TYPES.has(c.toLowerCase()))
+          const textCells = remaining.filter((c) => c !== typeCell)
+          const partner = textCells[0] || ''
+          const desc = textCells.slice(1).join(' ') || ''
+          let currency = 'EUR'
+          const amtMatch = amtCell.match(AMOUNT_RE)
+          if (amtMatch) {
+            let curr = amtMatch[2].toUpperCase()
+            if (curr === '€') {
+              curr = 'EUR'
+            } else if (curr === '$') {
+              curr = 'USD'
+            } else if (curr === '£') {
+              curr = 'GBP'
+            } else if (curr === 'ZŁ') {
+              curr = 'PLN'
+            }
+            currency = curr
+          }
+          rawTxs.push({
+            date: parseDate(dateCell),
+            partner,
+            desc,
+            type: typeCell || '',
+            amount: parseAmount(amtCell),
+            currency,
+          })
+          continue
+        }
+      }
+    }
+
+    if (!hasSeenDate) {
       continue
     }
 

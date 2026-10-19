@@ -1,0 +1,5 @@
+"date","time","status","reference","description","assetType","type","isin","shares","price","amount","fee","tax","currency"
+"2026-10-14","09:15:00","executed","ORDER-101","iShares Core MSCI World","ETF","savings_plan","IE00B4L5Y983","3.125","80.00","-250.00","0.00","0.00","EUR"
+"2026-10-08","14:30:00","executed","ORDER-102","Vanguard FTSE All-World","ETF","buy","IE00BK5BQT80","0.925","108.10","-100.00","0.99","0.00","EUR"
+"2026-10-04","08:00:00","executed","INTEREST-103","Zinsgutschrift Guthaben","Cash","interest","","0","0.00","15.20","0.00","0.00","EUR"
+"2026-10-01","07:30:00","executed","DEP-104","Einzahlung Referenzkonto","Cash","deposit","","0","0.00","500.00","0.00","0.00","EUR"

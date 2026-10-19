@@ -1,0 +1,21 @@
+Verrechnungskonto
+IBAN: DE89 3704 0044 0532 0130 00
+14.10.2026
+iShares Core MSCI World UCITS ETF
+Wertpapierkauf Sparplan
+Lastschrift
+-150,00 EUR
+10.10.2026
+Allianz SE Dividende
+Dividendengutschrift
+Gutschrift
++45,00 EUR
+05.10.2026
+Depotgebuehren Abrechnung
+Entgelt
+-2,50 EUR
+01.10.2026
+Max Mustermann
+Einzahlung Referenzkonto
+Überweisung
++500,00 EUR

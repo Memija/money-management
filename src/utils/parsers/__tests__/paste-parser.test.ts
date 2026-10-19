@@ -146,6 +146,45 @@ IBAN DE89370400440000000001
     expect(result).toHaveLength(1)
     expect(result[0].counterpartyIban).toBe('DE89370400440000000001')
   })
+
+  it('parses tab-delimited table rows copied from an HTML <table> on a bank website', () => {
+    const rawText = `
+IBAN: DE45 3705 0299 1234 5678 90
+Buchungstag\tBegünstigter / Auftraggeber\tVerwendungszweck\tUmsatzart\tBetrag
+14.10.2026\tREWE Markt GmbH\tKartenzahlung Filiale Köln\tKartenzahlung\t-42,50 EUR
+12.10.2026\tHausverwaltung Muster GmbH\tMiete Wohnung 10/2026\tDauerauftrag\t-850,00 EUR
+01.10.2026\tMusterfirma Arbeitgeber AG\tGehaltszahlung 10/2026\tÜberweisung\t+3.250,00 EUR
+    `
+    const result = parseBankStatementPaste(rawText, 'Kreissparkasse Köln')
+    expect(result).toHaveLength(3)
+
+    expect(result[0]).toMatchObject({
+      date: '2026-10-14',
+      description: 'REWE Markt GmbH – Kartenzahlung Filiale Köln',
+      amount: -42.5,
+      currency: 'EUR',
+      type: 'expense',
+      institution: 'Kreissparkasse Köln',
+    })
+
+    expect(result[1]).toMatchObject({
+      date: '2026-10-12',
+      description: 'Hausverwaltung Muster GmbH – Miete Wohnung 10/2026',
+      amount: -850,
+      currency: 'EUR',
+      type: 'expense',
+      institution: 'Kreissparkasse Köln',
+    })
+
+    expect(result[2]).toMatchObject({
+      date: '2026-10-01',
+      description: 'Musterfirma Arbeitgeber AG – Gehaltszahlung 10/2026',
+      amount: 3250,
+      currency: 'EUR',
+      type: 'income',
+      institution: 'Kreissparkasse Köln',
+    })
+  })
 })
 
 describe('extractAccountIbansFromPaste', () => {

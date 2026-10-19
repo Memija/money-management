@@ -1,0 +1,5 @@
+"Datum","Zeit","Zeitzone","Name","Typ","Status","Währung","Brutto","Gebühr","Netto","Guthaben","Transaktionscode"
+"14.10.2026","15:30:10","MESZ","Spotify AB","Zahlung im Einzugsverfahren","Abgeschlossen","EUR","-11,99","0,00","-11,99","125,50","PP-10101"
+"12.10.2026","18:45:22","MESZ","Steam Games Europe","Allgemeine Zahlung","Abgeschlossen","EUR","-29,99","0,00","-29,99","137,49","PP-10102"
+"09.10.2026","12:10:05","MESZ","Uber Eats Germany","Zahlung im Einzugsverfahren","Abgeschlossen","EUR","-24,50","0,00","-24,50","167,48","PP-10103"
+"05.10.2026","10:00:00","MESZ","Erika Musterfrau","Geld empfangen","Abgeschlossen","EUR","15,00","0,00","15,00","191,98","PP-10104"

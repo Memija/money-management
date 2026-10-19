@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Postbank – Online-Banking | Umsatzanzeige</title>
+  <style>
+    :root {
+      --primary-color: rgb(242, 184, 0);
+      --header-bg: rgb(255, 247, 224);
+      --text-main: #1d1d1b;
+      --text-muted: #5f6368;
+      --bg-page: #f5f6f8;
+      --card-bg: #ffffff;
+      --border-color: #e2e4e8;
+      --accent-red: #c92a2a;
+      --accent-green: #2b8a3e;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+    header.portal-header {
+      background-color: var(--card-bg);
+      border-bottom: 3px solid var(--primary-color);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand-logo {
+      height: 38px;
+      max-width: 140px;
+      object-fit: contain;
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      letter-spacing: -0.01em;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--header-bg);
+      border-radius: 20px;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    nav.portal-nav {
+      background-color: #212529;
+      color: #fff;
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 24px;
+    }
+    .nav-link {
+      padding: 12px 0;
+      color: #ced4da;
+      text-decoration: none;
+      font-size: 0.9rem;
+      border-bottom: 3px solid transparent;
+      display: inline-block;
+    }
+    .nav-link.active {
+      color: #ffffff;
+      font-weight: 600;
+      border-bottom-color: var(--primary-color);
+    }
+    main.portal-main {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+    .account-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .account-details h2 {
+      font-size: 1.25rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .account-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .account-meta strong {
+      color: var(--text-main);
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+    .account-balance {
+      text-align: right;
+    }
+    .balance-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .balance-amount {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid var(--border-color);
+      overflow-x: auto;
+    }
+    table.banking-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    table.banking-table th {
+      background-color: var(--header-bg);
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    table.banking-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+    table.banking-table tr:hover td {
+      background-color: #fafbfc;
+    }
+    .col-partner {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .col-desc {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #e9ecef;
+      color: #495057;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+    .col-amount {
+      text-align: right;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .col-amount.negative { color: var(--accent-red); }
+    .col-amount.positive { color: var(--accent-green); }
+    footer.portal-footer {
+      max-width: 1200px;
+      margin: 40px auto 20px;
+      padding: 20px 24px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header class="portal-header">
+    <div class="header-inner">
+      <div class="brand-group">
+        <img class="brand-logo" src="../../../public/banks/postbank.png" alt="Postbank Logo" onerror="this.style.display='none'">
+        <span class="brand-title">Postbank</span>
+      </div>
+      <div class="user-profile">
+        <span class="user-badge">👤 Max Mustermann</span>
+        <button class="btn-logout" type="button">Abmelden</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="portal-nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-link">Übersicht</a>
+      <a href="#" class="nav-link active">Umsätze &amp; Konten</a>
+      <a href="#" class="nav-link">Überweisungen</a>
+      <a href="#" class="nav-link">Daueraufträge</a>
+      <a href="#" class="nav-link">Service &amp; Postfach</a>
+    </div>
+  </nav>
+
+  <main class="portal-main">
+    <section class="account-card">
+      <div class="account-details">
+        <h2>Girokonto Plus</h2>
+        <div class="account-meta">
+          <span>IBAN: <strong>DE89 3704 0044 0532 0130 00</strong></span>
+          <span>BIC: <strong>WELADED1XXX</strong></span>
+          <span>Inhaber: <strong>Max Mustermann</strong></span>
+        </div>
+      </div>
+      <div class="account-balance">
+        <div class="balance-label">Aktueller Kontostand</div>
+        <div class="balance-amount">2.350,20 EUR</div>
+      </div>
+    </section>
+
+    <div class="section-header">
+      <h3 class="section-title">Umsatzübersicht</h3>
+    </div>
+
+    <!-- Desktop Table View (HTML <table>) -->
+    <div class="table-container" id="view-table">
+      <table class="banking-table" id="banking-table">
+        <thead>
+          <tr>
+            <th>Buchungstag</th>
+            <th>Zahlungsempfänger / Auftraggeber</th>
+            <th>Verwendungszweck</th>
+            <th>Umsatzart</th>
+            <th style="text-align: right;">Betrag</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>14.10.2026</td>
+            <td class="col-partner">Netflix Services Germany GmbH</td>
+            <td class="col-desc">Monatsabonnement Streaming</td>
+            <td><span class="badge">Lastschrift</span></td>
+            <td class="col-amount negative">-13,99 EUR</td>
+          </tr>
+          <tr>
+            <td>11.10.2026</td>
+            <td class="col-partner">LIDL Dienstleistung</td>
+            <td class="col-desc">Kartenzahlung Lebensmitteleinkauf</td>
+            <td><span class="badge">Kartenzahlung</span></td>
+            <td class="col-amount negative">-31,25 EUR</td>
+          </tr>
+          <tr>
+            <td>07.10.2026</td>
+            <td class="col-partner">Stadtwerke Energie GmbH</td>
+            <td class="col-desc">Abschlag Strom und Gas</td>
+            <td><span class="badge">Lastschrift</span></td>
+            <td class="col-amount negative">-85,00 EUR</td>
+          </tr>
+          <tr>
+            <td>01.10.2026</td>
+            <td class="col-partner">Musterfirma Arbeitgeber AG</td>
+            <td class="col-desc">Gehalt Oktober 2026</td>
+            <td><span class="badge">Gutschrift</span></td>
+            <td class="col-amount positive">+3.250,00 EUR</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="portal-footer">
+    <div>Postbank - eine Niederlassung der Deutsche Bank AG · Sitz: Bonn · Amtsgericht Frankfurt am Main HRB 30000</div>
+    <div>Sichere SSL-Verbindung · 100% Synthetische Testdaten</div>
+  </footer>
+</body>
+</html>

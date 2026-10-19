@@ -1,0 +1,5 @@
+"Date","Time","Description","Amount (EUR)","Pocket name","Counterparty Name","Counterparty IBAN"
+"2026-10-14","14:25:00","Einkauf Lebensmittel","-42.50","Main Pocket","REWE Markt GmbH","DE12100110011234567890"
+"2026-10-12","08:00:00","Miete Wohnung 10/2026","-850.00","Main Pocket","Hausverwaltung Muster GmbH","DE89100110010987654321"
+"2026-10-09","18:30:00","ICE Fahrkarte Berlin","-69.90","Reise Pocket","Deutsche Bahn AG","DE45100110014567890123"
+"2026-10-01","07:00:00","Gehaltszahlung","3250.00","Main Pocket","Musterfirma Arbeitgeber AG","DE33100110017890123456"

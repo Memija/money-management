@@ -1,0 +1,6 @@
+"Booking Date","Value Date","Partner Name","Partner Iban","Type","Payment Reference","Account Name","Amount (EUR)","Original Amount","Original Currency","Exchange Rate"
+"2026-10-14","2026-10-14","REWE Markt GmbH","DE12100110011234567890","MasterCard Payment","Kartenzahlung Supermarkt","Main Account","-42.50","","",""
+"2026-10-12","2026-10-12","Hausverwaltung Muster GmbH","DE89100110010987654321","Credit Transfer","Miete Wohnung 10/2026","Main Account","-850.00","","",""
+"2026-10-09","2026-10-09","Spotify AB","DE45100110014567890123","Direct Debit","Monatliches Musik Abo","Main Account","-11.99","","",""
+"2026-10-06","2026-10-06","Shell Tankstelle","DE67100110013456789012","MasterCard Payment","Kraftstoff Benzin","Main Account","-65.20","","",""
+"2026-10-01","2026-10-01","Musterfirma Arbeitgeber AG","DE33100110017890123456","Income","Gehalt Bezuege 10/2026","Main Account","3250.00","","",""

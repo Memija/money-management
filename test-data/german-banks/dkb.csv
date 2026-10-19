@@ -1,0 +1,5 @@
+"Buchungsdatum";"Wertstellung";"Status";"Zahlungspflichtige*r";"Zahlungsempfänger*in";"Verwendungszweck";"Umsatztyp";"IBAN";"Betrag (€)";"Gläubiger-ID";"Mandatsreferenz";"Kundenreferenz"
+"14.10.2026";"14.10.2026";"Gebucht";"REWE Markt GmbH";"";"Kartenzahlung Einkauf";"Lastschrift";"DE12120300001234567890";"-42,50";"DE58ZZZ00001234567";"MANDAT-123";""
+"12.10.2026";"12.10.2026";"Gebucht";"Hausverwaltung Muster GmbH";"";"Miete Oktober 2026";"Dauerauftrag";"DE89120300000987654321";"-850,00";"";"";""
+"09.10.2026";"09.10.2026";"Gebucht";"Netflix Services Germany GmbH";"";"Monatsabonnement Netflix";"Lastschrift";"DE45120300004567890123";"-13,99";"DE58ZZZ00002444586";"DD-987";""
+"01.10.2026";"01.10.2026";"Gebucht";"Musterfirma Arbeitgeber AG";"";"LOHN/GEHALT 10/2026";"Gutschrift";"DE33120300007890123456";"3250,00";"";"";""

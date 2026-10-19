@@ -1,0 +1,5 @@
+"Buchungsdatum";"Wertstellung";"Name des Partners";"Partner IBAN";"Verwendungszweck";"Betrag";"Währung";"Konto Name"
+"14.10.2026";"14.10.2026";"EDEKA Filiale";"DE12500105171234567890";"Kartenzahlung Filiale";"-36,80";"EUR";"Girokonto"
+"12.10.2026";"12.10.2026";"Hausverwaltung Muster GmbH";"DE89500105170987654321";"Miete 10/2026";"-850,00";"EUR";"Girokonto"
+"09.10.2026";"09.10.2026";"Spotify AB";"DE45500105174567890123";"Musik Streaming Monatsbeitrag";"-11,99";"EUR";"Girokonto"
+"01.10.2026";"01.10.2026";"Musterfirma Arbeitgeber AG";"DE33500105177890123456";"Gehalt Oktober 2026";"3250,00";"EUR";"Girokonto"

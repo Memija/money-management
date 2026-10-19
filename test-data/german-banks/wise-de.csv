@@ -1,0 +1,5 @@
+"TransferWise ID","Date","Amount","Currency","Description","Payment Reference","Running Balance","Exchange From","Exchange To","Exchange Rate","Payer Name","Payee Name","Payee Account Number"
+"TRANSFER-101","2026-10-14","-42.50","EUR","REWE Markt Kartenzahlung","Einkauf","1950.40","EUR","EUR","1.0","Max Mustermann","REWE Markt GmbH","DE12100110011234567890"
+"TRANSFER-102","2026-10-12","-850.00","EUR","Miete Wohnung 10/2026","Miete","1992.90","EUR","EUR","1.0","Max Mustermann","Hausverwaltung Muster GmbH","DE89100110010987654321"
+"TRANSFER-103","2026-10-08","-44.95","EUR","Telekom Deutschland Monatsrechnung","Internet","2842.90","EUR","EUR","1.0","Max Mustermann","Telekom Deutschland GmbH","DE45100110014567890123"
+"TRANSFER-104","2026-10-01","3250.00","EUR","Musterfirma Gehaltszahlung 10/2026","Gehalt","2887.85","EUR","EUR","1.0","Musterfirma Arbeitgeber AG","Max Mustermann","DE33100110017890123456"

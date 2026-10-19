@@ -1,0 +1,22 @@
+Girokonto
+IBAN: DE89 3704 0044 0532 0130 00
+14.10.2026
+EDEKA Filiale
+Kartenzahlung Einkauf Lebensmittel
+Lastschrift
+-36,80 EUR
+12.10.2026
+Hausverwaltung Muster GmbH
+Miete Wohnung 10/2026
+Dauerauftrag
+-850,00 EUR
+09.10.2026
+Spotify AB
+Monatliches Musik Streaming
+Lastschrift
+-11,99 EUR
+01.10.2026
+Musterfirma Arbeitgeber AG
+Gehaltsgutschrift 10/2026
+Gutschrift
++3.250,00 EUR

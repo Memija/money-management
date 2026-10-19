@@ -1,0 +1,6 @@
+"Buchungstag";"Wert";"Umsatzart";"Begünstigter / Auftraggeber";"Verwendungszweck";"IBAN";"BIC";"Kundenreferenz";"Mandatsreferenz";"Gläubiger ID";"Fremde Gebühren";"Betrag";"Abweichender Empfänger";"Anzahl der Aufträge";"Anzahl der Schecks";"Soll";"Haben";"Währung"
+"14.10.2026";"14.10.2026";"Lastschrift";"REWE Markt GmbH";"Einkauf Filiale";"DE12500700100123456789";"DEUTDEDDFXX";"";"";"";"";"0";"";"";"";"42,50";"";"EUR"
+"12.10.2026";"12.10.2026";"Dauerauftrag";"Hausverwaltung Muster GmbH";"Miete Wohnung 10/2026";"DE89500700100987654321";"DEUTDEDDFXX";"";"";"";"";"0";"";"";"";"850,00";"";"EUR"
+"09.10.2026";"09.10.2026";"Lastschrift";"Deutsche Bahn AG";"ICE Fahrkarte Berlin";"DE45500700100456789012";"DEUTDEDDFXX";"";"";"";"";"0";"";"";"";"69,90";"";"EUR"
+"05.10.2026";"05.10.2026";"Kartenzahlung";"dm-drogerie markt";"Drogerieartikel Filiale";"DE67500700100345678901";"DEUTDEDDFXX";"";"";"";"";"0";"";"";"";"19,45";"";"EUR"
+"01.10.2026";"01.10.2026";"Gutschrift";"Musterfirma Arbeitgeber AG";"Gehalt 10/2026";"DE33500700100789012345";"DEUTDEDDFXX";"";"";"";"";"0";"";"";"";"";"3250,00";"EUR"

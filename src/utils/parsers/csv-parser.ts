@@ -26,7 +26,7 @@ export function findHeaderRowIndex(rows: string[][]): number {
     'valutadatum',
     'wertstellung',
   ]
-  const AMOUNT_HINTS = ['betrag', 'amount', 'umsatz', 'saldo', 'sum']
+  const AMOUNT_HINTS = ['betrag', 'amount', 'umsatz', 'saldo', 'sum', 'brutto', 'gross']
 
   for (let i = 0; i < Math.min(rows.length, 10); i++) {
     const cells = rows[i].map((c) => c.toLowerCase().trim())
@@ -106,6 +106,8 @@ function detectColumnIndices(header: string[]): ColumnIndices {
         'partner',
         'partnername',
         'transaktionspartner',
+        'title',
+        'product',
       ],
       // Full-phrase overrides (e.g. slash-separated compound headers)
       [
@@ -121,13 +123,41 @@ function detectColumnIndices(header: string[]): ColumnIndices {
   )
 
   // ── Dedicated Partner / Payee column ──────────────────────────────────────────
-  const partnerIdx = header.findIndex((h) =>
-    headerMatches(
+  const partnerIdx = header.findIndex((h) => {
+    if (
+      h.includes('account') ||
+      h.includes('konto') ||
+      h.includes('file') ||
+      h.includes('datei') ||
+      h.includes('pocket') ||
+      h.includes('space') ||
+      h.includes('subaccount') ||
+      h.includes('unterkonto')
+    ) {
+      return false
+    }
+    return headerMatches(
       h,
-      ['partner', 'partnername', 'transaktionspartner', 'payee', 'empfanger', 'empfänger'],
-      ['partner name', 'partnername', 'name des partners', 'transaktionspartner'],
-    ),
-  )
+      [
+        'partner',
+        'partnername',
+        'transaktionspartner',
+        'counterparty',
+        'payee',
+        'empfanger',
+        'empfänger',
+        'name',
+      ],
+      [
+        'partner name',
+        'partnername',
+        'name des partners',
+        'transaktionspartner',
+        'counterparty',
+        'name',
+      ],
+    )
+  })
 
   // ── Dedicated Sender / Payer column ───────────────────────────────────────────
   const senderIdx = header.findIndex((h) =>
@@ -251,7 +281,7 @@ function detectColumnIndices(header: string[]): ColumnIndices {
     headerMatches(
       h,
       // Token-level keywords
-      ['betrag', 'amount', 'umsatzbetrag', 'sum'],
+      ['betrag', 'amount', 'umsatzbetrag', 'sum', 'brutto', 'gross'],
       // Full-phrase overrides
       [
         'umsatz in eur',
@@ -260,12 +290,22 @@ function detectColumnIndices(header: string[]): ColumnIndices {
         'amount (usd)',
         'umsatz', // standalone 'Umsatz' column (Volksbank) — only matched as exact phrase
         'saldo',
+        'brutto',
+        'gross',
       ],
     ),
   )
 
-  // Prefer 'Betrag' over 'Saldo' when both exist (saldo = running balance, not amount)
-  const betragIdx = header.findIndex((h) => h === 'betrag' || h.startsWith('betrag'))
+  // Prefer 'Betrag', 'Brutto', or 'Gross' over 'Saldo' when both exist (saldo = running balance, not amount)
+  const betragIdx = header.findIndex(
+    (h) =>
+      h === 'betrag' ||
+      h.startsWith('betrag') ||
+      h === 'brutto' ||
+      h.startsWith('brutto') ||
+      h === 'gross' ||
+      h.startsWith('gross'),
+  )
   if (betragIdx !== -1 && betragIdx !== amountIdx) amountIdx = betragIdx
 
   // ── Soll / Haben split columns (Deutsche Bank and some older formats) ────────

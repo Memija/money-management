@@ -1,0 +1,5 @@
+"Buchungstag";"Valutadatum";"Buchungstext";"Verwendungszweck";"Beguenstigter/Zahlungspflichtiger";"Betrag";"Währung"
+"14.10.2026";"14.10.2026";"Kartenzahlung";"Einkauf Lebensmittelfiliale";"REWE Markt GmbH";"-42,50";"EUR"
+"12.10.2026";"12.10.2026";"Dauerauftrag";"Praxismiete / Wohnung 10/2026";"Hausverwaltung Muster GmbH";"-850,00";"EUR"
+"07.10.2026";"07.10.2026";"Lastschrift";"Praxisbedarf Medizinbedarf";"DocCheck Shop GmbH";"-75,80";"EUR"
+"01.10.2026";"01.10.2026";"Gutschrift";"Gehaltsbezuege Klinikum 10/2026";"Klinikum Musterstadt";"3450,00";"EUR"

@@ -1,0 +1,5 @@
+"Buchungstag";"Wert";"Umsatzart";"Begünstigter / Auftraggeber";"Verwendungszweck";"IBAN";"BIC";"Kundenreferenz";"Mandatsreferenz";"Gläubiger ID";"Fremde Gebühren";"Betrag";"Abweichender Empfänger";"Anzahl der Aufträge";"Anzahl der Schecks";"Soll";"Haben";"Währung"
+"14.10.2026";"14.10.2026";"Lastschrift";"REWE Markt GmbH";"Einkauf Filiale";"DE12760700241234567890";"DEUTDEDBNOR";"";"";"";"";"0";"";"";"";"42,50";"";"EUR"
+"12.10.2026";"12.10.2026";"Dauerauftrag";"Hausverwaltung Muster GmbH";"Miete Oktober";"DE89760700240987654321";"DEUTDEDBNOR";"";"";"";"";"0";"";"";"";"850,00";"";"EUR"
+"07.10.2026";"07.10.2026";"Lastschrift";"Telekom Deutschland GmbH";"Internet & Telefon";"DE45760700244567890123";"DEUTDEDBNOR";"";"";"";"";"0";"";"";"";"44,95";"";"EUR"
+"01.10.2026";"01.10.2026";"Gutschrift";"Musterfirma Arbeitgeber AG";"Gehalt 10/2026";"DE33760700247890123456";"DEUTDEDBNOR";"";"";"";"";"0";"";"";"";"";"3250,00";"EUR"

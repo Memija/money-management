@@ -1,0 +1,22 @@
+Klarna Card & Bank
+IBAN: DE89 3704 0044 0532 0130 00
+14.10.2026
+Zalando SE
+Online-Shopping Kleidung
+Kartenzahlung
+-64,90 EUR
+11.10.2026
+ASOS Germany
+Bestellung Mode
+Kartenzahlung
+-39,50 EUR
+08.10.2026
+Rückzahlung Rate
+Kauf auf Rechnung
+Lastschrift
+-50,00 EUR
+01.10.2026
+Einzahlung Verrechnungskonto
+Guthaben Aufladung
+Überweisung
++200,00 EUR

@@ -23,7 +23,11 @@ export function extractAccountIbansFromPdf(fullText: string, fileName?: string):
   )
   if (headerMatch) {
     for (const ib of extractIbans(headerMatch[1])) {
-      result.add(ib)
+      if (ib.startsWith('DE') && ib.length >= 22) {
+        result.add(ib.slice(0, 22))
+      } else {
+        result.add(ib)
+      }
     }
   }
   return Array.from(result)

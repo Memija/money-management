@@ -1,0 +1,5 @@
+"Buchungstag";"Wertstellung";"Buchungstext";"Umsatzart";"IBAN";"BIC";"Betrag";"Währung"
+"14.10.2026";"14.10.2026";"ALDI Sued Filiale Einkauf";"Kartenzahlung";"DE12760300801234567890";"CSDBDE71XXX";"-28,90";"EUR"
+"12.10.2026";"12.10.2026";"Hausverwaltung Muster GmbH Miete";"Dauerauftrag";"DE89760300800987654321";"CSDBDE71XXX";"-850,00";"EUR"
+"09.10.2026";"09.10.2026";"Deutsche Bahn AG ICE Ticket";"Kartenzahlung";"DE45760300804567890123";"CSDBDE71XXX";"-69,90";"EUR"
+"01.10.2026";"01.10.2026";"Musterfirma Arbeitgeber AG Gehalt";"Gutschrift";"DE33760300807890123456";"CSDBDE71XXX";"3250,00";"EUR"

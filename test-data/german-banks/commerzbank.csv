@@ -1,0 +1,6 @@
+"Buchungstag";"Wertstellung";"Umsatzart";"Buchungstext";"Betrag";"Währung";"IBAN Kontoinhaber";"Kategorie"
+"14.10.2026";"14.10.2026";"Lastschrift";"EDEKA Filiale Einkauf Lebensmittel";"-36,80";"EUR";"DE89370400440532013000";""
+"12.10.2026";"12.10.2026";"Dauerauftrag";"Hausverwaltung Muster GmbH Miete 10/2026";"-850,00";"EUR";"DE89370400440532013000";""
+"09.10.2026";"09.10.2026";"Lastschrift";"Spotify AB Monatliches Musik Streaming";"-11,99";"EUR";"DE89370400440532013000";""
+"06.10.2026";"06.10.2026";"Kartenzahlung";"Shell Tankstelle Benzin Kraftstoff";"-65,20";"EUR";"DE89370400440532013000";""
+"01.10.2026";"01.10.2026";"Überweisung";"Musterfirma Arbeitgeber AG Gehalt 10/2026";"3250,00";"EUR";"DE89370400440532013000";"Einnahmen"

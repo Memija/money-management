@@ -1,0 +1,5 @@
+"Date","Time","Product","ISIN","Description","Amount","Currency"
+"2026-10-14","11:30:00","Vanguard S&P 500","IE00B3XXRP09","Buy order executed","-150.00","EUR"
+"2026-10-10","15:45:00","Apple Inc","US0378331005","Dividend payment","14.80","EUR"
+"2026-10-06","09:15:00","DEGIRO Connectivity fee","","Exchange connection fee","-2.50","EUR"
+"2026-10-01","08:00:00","Deposit","","Bank deposit transfer","300.00","EUR"

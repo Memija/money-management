@@ -1,0 +1,30 @@
+Girokonto
+IBAN: DE89 3704 0044 0532 0130 00
+14.10.2026
+RE
+REWE Markt GmbH
+Kartenzahlung Einkauf Filiale
+Lastschrift
+-42,50 EUR
+Menü öffnen
+12.10.2026
+HV
+Hausverwaltung Muster GmbH
+Miete Wohnung Oktober 2026
+Dauerauftrag
+-850,00 EUR
+Menü öffnen
+09.10.2026
+DB
+Deutsche Bahn AG
+Fahrkarte ICE Reise
+Lastschrift
+-69,90 EUR
+Menü öffnen
+01.10.2026
+AG
+Musterfirma Arbeitgeber AG
+LOHN/GEHALT Bezuege 10/2026
+Gutschrift
++3.250,00 EUR
+Menü öffnen
