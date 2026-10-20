@@ -44,6 +44,26 @@ interface PinchState {
 }
 
 /**
+ * Shifts a [start, end] window back inside [0, maxCount - 1] while preserving its span when possible.
+ * @returns Clamped `[start, end]` tuple
+ */
+const clampWindow = (start: number, end: number, maxCount: number): [number, number] => {
+  let newStart = start
+  let newEnd = end
+  if (newStart < 0) {
+    newEnd = Math.min(maxCount - 1, newEnd + Math.abs(newStart))
+    newStart = 0
+  }
+  if (newEnd > maxCount - 1) {
+    newStart = Math.max(0, newStart - (newEnd - (maxCount - 1)))
+    newEnd = maxCount - 1
+  }
+  newStart = Math.max(0, newStart)
+  newEnd = Math.min(maxCount - 1, Math.max(newStart, newEnd))
+  return [newStart, newEnd]
+}
+
+/**
  * Custom hook providing touch gestures (swipe-to-pan, pinch-to-zoom, double-tap)
  * and pointer drag on the chart canvas when floating tooltips are disabled on mobile.
  */
@@ -103,10 +123,29 @@ export function useChartTimelineGestures({
     const dragRef = { current: null as DragState | null }
     const pinchRef = { current: null as PinchState | null }
     const lastTapRef = { current: { time: 0, x: 0, y: 0 } }
+    // Last range emitted during the active gesture; move events that resolve to the same
+    // month window are dropped so the charts don't re-render for sub-month finger movement
+    const lastEmitted = { start: -1, end: -1 }
+
+    const resetEmitted = () => {
+      lastEmitted.start = latestRef.current.startIndex
+      lastEmitted.end = latestRef.current.endIndex
+    }
+
+    const emitRange = (start: number, end: number) => {
+      const [newStart, newEnd] = clampWindow(start, end, latestRef.current.totalCount)
+      if (newStart === lastEmitted.start && newEnd === lastEmitted.end) {
+        return
+      }
+      lastEmitted.start = newStart
+      lastEmitted.end = newEnd
+      latestRef.current.onRangeChange(newStart, newEnd)
+    }
 
     const handleTouchStart = (e: TouchEvent) => {
       const rect = el.getBoundingClientRect()
       const chartWidth = Math.max(1, rect.width)
+      resetEmitted()
 
       if (e.touches.length === 1) {
         const touch = e.touches[0]
@@ -176,21 +215,8 @@ export function useChartTimelineGestures({
         const clampedSpan = Math.max(minWin, Math.min(maxCount, targetSpan))
 
         const anchor = p.initialStart + p.centerRatio * (p.initialSpan - 1)
-        let newStart = Math.round(anchor - p.centerRatio * (clampedSpan - 1))
-        let newEnd = newStart + clampedSpan - 1
-
-        if (newStart < 0) {
-          newEnd = Math.min(maxCount - 1, newEnd + Math.abs(newStart))
-          newStart = 0
-        }
-        if (newEnd > maxCount - 1) {
-          newStart = Math.max(0, newStart - (newEnd - (maxCount - 1)))
-          newEnd = maxCount - 1
-        }
-        newStart = Math.max(0, newStart)
-        newEnd = Math.min(maxCount - 1, Math.max(newStart, newEnd))
-
-        latestRef.current.onRangeChange(newStart, newEnd)
+        const newStart = Math.round(anchor - p.centerRatio * (clampedSpan - 1))
+        emitRange(newStart, newStart + clampedSpan - 1)
         return
       }
 
@@ -218,22 +244,7 @@ export function useChartTimelineGestures({
           if (e.cancelable) e.preventDefault()
           const span = drag.endIdx - drag.startIdx + 1
           const deltaMonths = -Math.round((dx / drag.chartWidth) * span)
-          const maxCount = latestRef.current.totalCount
-          let newStart = drag.startIdx + deltaMonths
-          let newEnd = drag.endIdx + deltaMonths
-
-          if (newStart < 0) {
-            newEnd = Math.min(maxCount - 1, newEnd + Math.abs(newStart))
-            newStart = 0
-          }
-          if (newEnd > maxCount - 1) {
-            newStart = Math.max(0, newStart - (newEnd - (maxCount - 1)))
-            newEnd = maxCount - 1
-          }
-          newStart = Math.max(0, newStart)
-          newEnd = Math.min(maxCount - 1, Math.max(newStart, newEnd))
-
-          latestRef.current.onRangeChange(newStart, newEnd)
+          emitRange(drag.startIdx + deltaMonths, drag.endIdx + deltaMonths)
         }
       }
     }
@@ -259,6 +270,7 @@ export function useChartTimelineGestures({
     const handlePointerDown = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse' || e.button !== 0) return
       const rect = el.getBoundingClientRect()
+      resetEmitted()
       mouseDragState = {
         startX: e.clientX,
         startIdx: latestRef.current.startIndex,
@@ -283,22 +295,7 @@ export function useChartTimelineGestures({
       if (mouseDragState.isDragging) {
         const span = mouseDragState.endIdx - mouseDragState.startIdx + 1
         const deltaMonths = -Math.round((dx / mouseDragState.chartWidth) * span)
-        const maxCount = latestRef.current.totalCount
-        let newStart = mouseDragState.startIdx + deltaMonths
-        let newEnd = mouseDragState.endIdx + deltaMonths
-
-        if (newStart < 0) {
-          newEnd = Math.min(maxCount - 1, newEnd + Math.abs(newStart))
-          newStart = 0
-        }
-        if (newEnd > maxCount - 1) {
-          newStart = Math.max(0, newStart - (newEnd - (maxCount - 1)))
-          newEnd = maxCount - 1
-        }
-        newStart = Math.max(0, newStart)
-        newEnd = Math.min(maxCount - 1, Math.max(newStart, newEnd))
-
-        latestRef.current.onRangeChange(newStart, newEnd)
+        emitRange(mouseDragState.startIdx + deltaMonths, mouseDragState.endIdx + deltaMonths)
       }
     }
 

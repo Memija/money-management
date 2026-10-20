@@ -1,10 +1,14 @@
-import React, { startTransition, useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { TrendingDown, TrendingUp } from 'lucide-react'
 
 import { useAccountBalances } from '../../hooks/useAccountBalances'
-import { getMonthsForPeriod, type PeriodFilter as PeriodFilterType } from '../../hooks/useAnalytics'
-import { useAnalytics } from '../../hooks/useAnalytics'
+import {
+  getAvailablePeriods,
+  getMonthsForPeriod,
+  type PeriodFilter as PeriodFilterType,
+  useAnalytics,
+} from '../../hooks/useAnalytics'
 import { useFormatters } from '../../hooks/useFormatters'
 import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
 import { useTransactions } from '../../hooks/useTransactions'
@@ -12,6 +16,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { useLanguageStore } from '../../store/useLanguageStore'
 import { hasMerchantLogo } from '../../utils/category-icons'
 import { hasExtensiveCategoryData } from '../../utils/category-utils'
+import { getDateBounds } from '../../utils/period-utils'
 import { CategoryTrend } from './CategoryTrend'
 import { type AvgDetailType, DashboardModals, type DetailModalState } from './DashboardModals'
 import { ExpenseCategories } from './ExpenseCategories'
@@ -30,8 +35,11 @@ const Dashboard: React.FC = () => {
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency } = useFormatters()
 
-  // Period filter state
+  // Period filter state. `period` drives the filter UI immediately, while `deferredPeriod`
+  // feeds the heavy analytics so React can recompute them in the background without
+  // blocking the pills or the custom date picker.
   const [period, setPeriod] = useState<PeriodFilterType>({ mode: 'all', value: '' })
+  const deferredPeriod = useDeferredValue(period)
 
   // Detail modal state (consolidates filter, category, and merchant drilldowns)
   const [activeDetailModal, setActiveDetailModal] = useState<DetailModalState>(null)
@@ -41,12 +49,6 @@ const Dashboard: React.FC = () => {
 
   // Savings trend modal
   const [isSavingsTrendOpen, setIsSavingsTrendOpen] = useState(false)
-
-  const handlePeriodChange = useCallback((nextPeriod: PeriodFilterType) => {
-    startTransition(() => {
-      setPeriod(nextPeriod)
-    })
-  }, [])
 
   const handleIncomeDetailClick = useCallback(() => {
     setActiveDetailModal({ type: 'filter', filter: 'income' })
@@ -113,7 +115,11 @@ const Dashboard: React.FC = () => {
     setSortOrder,
     setShowGhost,
     ghostCount,
-  } = useTransactions(period)
+  } = useTransactions(deferredPeriod)
+
+  // Search drives the input immediately; analytics follow the deferred value
+  const deferredSearchTerm = useDeferredValue(searchTerm)
+  const isAnalyticsStale = period !== deferredPeriod || searchTerm !== deferredSearchTerm
 
   const detachTransactionsFromDashboard = useAppStore((s) => s.detachTransactionsFromDashboard)
   const setDetachTransactionsFromDashboard = useAppStore(
@@ -138,7 +144,7 @@ const Dashboard: React.FC = () => {
   const filteredDashboardTransactions = useMemo(() => {
     let txs = dashboardTransactions
 
-    const term = searchTerm.trim().toLowerCase()
+    const term = deferredSearchTerm.trim().toLowerCase()
     if (term) {
       txs = txs.filter((t) => {
         const descMatch = t.description.toLowerCase().includes(term)
@@ -168,11 +174,11 @@ const Dashboard: React.FC = () => {
     }
 
     return txs
-  }, [dashboardTransactions, searchTerm, selectedCategory, typeFilter])
+  }, [dashboardTransactions, deferredSearchTerm, selectedCategory, typeFilter])
 
   const isAnyFilterActive =
     !detachTransactionsFromDashboard &&
-    (searchTerm.trim().length > 0 ||
+    (deferredSearchTerm.trim().length > 0 ||
       (Boolean(selectedCategory) && selectedCategory !== 'all') ||
       (Boolean(typeFilter) && typeFilter !== 'all'))
 
@@ -180,47 +186,37 @@ const Dashboard: React.FC = () => {
     ? dashboardTransactions
     : filteredDashboardTransactions
 
-  // Complete continuous month sequence for the active period/account domain
-  const fullPeriodMonths = useMemo(() => {
-    const rawMonths: string[] = []
-    for (const t of dashboardTransactions) {
-      if (t.isGhost) continue
-      rawMonths.push(t.date.substring(0, 7))
-    }
-    return getMonthsForPeriod(period, rawMonths)
-  }, [dashboardTransactions, period])
+  // Internal transfers count as real activity in single-account views or when explicitly filtered
+  const shouldIncludeGhosts =
+    isSingleAccountView || (!detachTransactionsFromDashboard && typeFilter === 'transfers')
 
-  // Dataset timeframe boundaries for custom range picker
-  const { minDate, maxDate } = useMemo(() => {
-    let min = ''
-    let max = ''
-    for (const t of dashboardTransactions) {
-      const d = t.date ? t.date.substring(0, 10) : ''
-      if (!d) continue
-      if (!min || d < min) min = d
-      if (!max || d > max) max = d
-    }
-    return { minDate: min, maxDate: max }
-  }, [dashboardTransactions])
+  // Single dataset domain shared by the "All" period, the custom picker bounds and its
+  // "All time" preset, so every all-time view starts and ends on the same month
+  const { minDate, maxDate } = useMemo(
+    () => getDateBounds(dashboardTransactions, shouldIncludeGhosts),
+    [dashboardTransactions, shouldIncludeGhosts],
+  )
+
+  // Complete continuous month sequence for the active period/account domain
+  const fullPeriodMonths = useMemo(
+    () => getMonthsForPeriod(deferredPeriod, [minDate.substring(0, 7), maxDate.substring(0, 7)]),
+    [deferredPeriod, minDate, maxDate],
+  )
 
   // Analytics — all derived data from one centralized hook
   const analytics = useAnalytics(
     effectiveDashboardTransactions,
-    period,
+    deferredPeriod,
     undefined,
     'cat-color-',
-    isSingleAccountView || (!detachTransactionsFromDashboard && typeFilter === 'transfers'),
+    shouldIncludeGhosts,
     fullPeriodMonths,
   )
 
-  // Full bank analytics for period picker options (so period options always show full account range)
-  const fullBankAnalytics = useAnalytics(
-    dashboardTransactions,
-    period,
-    undefined,
-    'cat-color-',
-    isSingleAccountView,
-    fullPeriodMonths,
+  // Period picker options always reflect the full account range (cheap scan, no full analytics)
+  const periodOptions = useMemo(
+    () => getAvailablePeriods(dashboardTransactions, isSingleAccountView),
+    [dashboardTransactions, isSingleAccountView],
   )
 
   // Allow Spending by Category (and Top Merchants) to occupy full row on desktop when lots of data are present
@@ -236,7 +232,7 @@ const Dashboard: React.FC = () => {
 
   const { recurringExpenses, totalMonthly: recurringMonthlyTotal } = useRecurringTransactions(
     effectiveDashboardTransactions,
-    period,
+    deferredPeriod,
   )
 
   const selectedAccountInfo = useMemo(() => {
@@ -249,15 +245,16 @@ const Dashboard: React.FC = () => {
 
   // Determines if the active period encompasses the entire dataset domain
   const isPeriodAllTime = useMemo(() => {
-    if (period.mode === 'all') return true
-    if (period.mode === 'custom') {
-      const hasNoBounds = !period.startDate && !period.endDate
-      const coversMin = !period.startDate || (minDate && period.startDate <= minDate)
-      const coversMax = !period.endDate || (maxDate && period.endDate >= maxDate)
+    if (deferredPeriod.mode === 'all') return true
+    if (deferredPeriod.mode === 'custom') {
+      const { startDate, endDate } = deferredPeriod
+      const hasNoBounds = !startDate && !endDate
+      const coversMin = !startDate || (minDate && startDate <= minDate)
+      const coversMax = !endDate || (maxDate && endDate >= maxDate)
       return Boolean(hasNoBounds || (coversMin && coversMax))
     }
     return false
-  }, [period.mode, period.startDate, period.endDate, minDate, maxDate])
+  }, [deferredPeriod, minDate, maxDate])
 
   // Current display balance: ensures complete ledger balance for 'all' period matches AccountSelector exactly
   const displayBalance = useMemo(() => {
@@ -298,10 +295,10 @@ const Dashboard: React.FC = () => {
           <div className={styles['subheader-left']}>
             <PeriodFilter
               period={period}
-              onPeriodChange={handlePeriodChange}
-              availableYears={fullBankAnalytics.availableYears}
-              availableQuarters={fullBankAnalytics.availableQuarters}
-              availableMonths={fullBankAnalytics.availableMonths}
+              onPeriodChange={setPeriod}
+              availableYears={periodOptions.availableYears}
+              availableQuarters={periodOptions.availableQuarters}
+              availableMonths={periodOptions.availableMonths}
               minDate={minDate}
               maxDate={maxDate}
             />
@@ -363,7 +360,10 @@ const Dashboard: React.FC = () => {
           <div className={styles['orb-2']} />
           <div className={styles['orb-3']} />
         </div>
-        <main className="container">
+        <main
+          className={`container ${isAnalyticsStale ? styles.stale : ''}`}
+          aria-busy={isAnalyticsStale}
+        >
           <motion.section
             ref={heroRef}
             initial={{ opacity: 0, y: 24 }}

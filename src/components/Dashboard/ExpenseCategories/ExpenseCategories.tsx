@@ -8,6 +8,7 @@ import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { getCategoryLabel } from '../../../utils/category-utils'
 import { CategoryIcon } from '../../shared/CategoryIcon'
+import { RenderWhenVisible } from '../../shared/RenderWhenVisible'
 import { ExpenseCategoriesDonut } from './ExpenseCategoriesDonut'
 
 import styles from './ExpenseCategories.module.css'
@@ -126,13 +127,15 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(
         <div className={styles.content}>
           {/* Donut Chart Container with Center Stats & Glass Disc */}
           <div className={styles.chartWrapper}>
-            <ExpenseCategoriesDonut
-              categories={sortedCategories}
-              totalExpenses={totalExpenses}
-              activeIndex={activeIndex}
-              onActiveIndexChange={setActiveIndex}
-              onCategoryClick={onCategoryClick}
-            />
+            <RenderWhenVisible>
+              <ExpenseCategoriesDonut
+                categories={sortedCategories}
+                totalExpenses={totalExpenses}
+                activeIndex={activeIndex}
+                onActiveIndexChange={setActiveIndex}
+                onCategoryClick={onCategoryClick}
+              />
+            </RenderWhenVisible>
 
             {/* Interactive Center Donut Display with Frosted Glass Disc */}
             <div className={styles.centerStats}>

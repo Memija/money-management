@@ -29,6 +29,30 @@ interface DragState {
   initialEnd: number
 }
 
+interface MicroBar {
+  key: string
+  height: string
+}
+
+/** Minimum visual height (in %) of a micro-bar so empty months stay visible. */
+const MIN_BAR_HEIGHT_PCT = 10
+
+/**
+ * Renders a static row of micro-bars. The output only depends on the dataset, so it can be
+ * memoized and reused across drag frames without React reconciling every bar.
+ * @param bars - Precomputed bar keys and heights
+ * @param variantClass - Visual variant applied to every bar in the layer
+ * @returns Array of bar elements
+ */
+const renderMicroBars = (bars: MicroBar[], variantClass: string): React.ReactElement[] =>
+  bars.map((bar) => (
+    <div
+      key={bar.key}
+      className={`${styles.microBar} ${variantClass}`}
+      style={{ '--bar-height': bar.height } as React.CSSProperties}
+    />
+  ))
+
 /**
  * Ultra-responsive, hardware-accelerated timeline scrubber for timeline datasets.
  * Features an illuminated selection lens, frosted boundary curtains, tactile grip handles,
@@ -63,6 +87,20 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
       }
       return max > 0 ? max : 1
     }, [data])
+
+    const microBars = useMemo<MicroBar[]>(
+      () =>
+        data.map((item, idx) => ({
+          key: `mb-${item.month}-${idx}`,
+          height: `${Math.max(MIN_BAR_HEIGHT_PCT, Math.round((item.total / maxSpend) * 100))}%`,
+        })),
+      [data, maxSpend],
+    )
+    const inactiveBars = useMemo(
+      () => renderMicroBars(microBars, styles.microBarInactive),
+      [microBars],
+    )
+    const activeBars = useMemo(() => renderMicroBars(microBars, styles.microBarActive), [microBars])
 
     const startPct = totalCount > 0 ? (startIndex / totalCount) * 100 : 0
     const widthPct = totalCount > 0 ? ((endIndex - startIndex + 1) / totalCount) * 100 : 100
@@ -243,22 +281,15 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
             } as React.CSSProperties
           }
         >
-          {/* Micro-bars background silhouette of full timeline */}
+          {/* Micro-bars silhouette: static base layer + active layer clipped to the window */}
           <div className={styles.microBarsTrack}>
-            {data.map((item, idx) => {
-              const isHighlighted = idx >= startIndex && idx <= endIndex
-              const heightPct = Math.max(10, Math.round((item.total / maxSpend) * 100))
-              return (
-                <div
-                  key={`mb-${item.month}-${idx}`}
-                  className={`${styles.microBar} ${isHighlighted ? styles.microBarActive : styles.microBarInactive}`}
-                  style={{ '--bar-height': `${heightPct}%` } as React.CSSProperties}
-                />
-              )
-            })}
+            <div className={styles.microBarsLayer}>{inactiveBars}</div>
+            <div className={`${styles.microBarsLayer} ${styles.microBarsLayerActive}`}>
+              {activeBars}
+            </div>
           </div>
 
-          {/* Frosted boundary curtains over unselected regions */}
+          {/* Boundary curtains over unselected regions */}
           <div className={styles.curtainLeft} />
           <div className={styles.curtainRight} />
 

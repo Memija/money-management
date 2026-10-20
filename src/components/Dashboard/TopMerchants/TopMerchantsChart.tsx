@@ -5,6 +5,7 @@ import type { MerchantEntry } from '../../../hooks/useAnalytics'
 import { useChartAnimation } from '../../../hooks/useChartAnimation'
 import type { MerchantBrandInfo } from '../../../utils/category-icons'
 import { CurrencyAxisTick } from '../../shared/ChartAxisTicks'
+import { RenderWhenVisible } from '../../shared/RenderWhenVisible'
 import { TopMerchantsTooltip } from './TopMerchantsTooltip'
 
 import styles from './TopMerchants.module.css'
@@ -160,35 +161,37 @@ export const TopMerchantsChart: React.FC<TopMerchantsChartProps> = React.memo(
             {hoveredLabel.name}
           </div>
         )}
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={merchants} layout="vertical" margin={margin}>
-            <XAxis type="number" axisLine={false} tickLine={false} tick={AMOUNT_TICK} />
-            <YAxis
-              type="category"
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              width={isMobile ? Y_AXIS_WIDTH.mobile : Y_AXIS_WIDTH.desktop}
-              tick={yAxisTick}
-            />
-            <Tooltip
-              wrapperStyle={tooltipWrapperStyle}
-              allowEscapeViewBox={TOOLTIP_ESCAPE_VIEWBOX}
-              animationDuration={TOOLTIP_ANIMATION_MS}
-              content={tooltipContent}
-              cursor={TOOLTIP_CURSOR}
-            />
-            <Bar
-              dataKey="amount"
-              radius={BAR_RADIUS}
-              isAnimationActive={isAnimationActive}
-              onClick={handleBarClick}
-              className={!isMobile && onMerchantClick ? styles.merchantRowClickable : undefined}
-            >
-              {cells}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <RenderWhenVisible>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={merchants} layout="vertical" margin={margin}>
+              <XAxis type="number" axisLine={false} tickLine={false} tick={AMOUNT_TICK} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                width={isMobile ? Y_AXIS_WIDTH.mobile : Y_AXIS_WIDTH.desktop}
+                tick={yAxisTick}
+              />
+              <Tooltip
+                wrapperStyle={tooltipWrapperStyle}
+                allowEscapeViewBox={TOOLTIP_ESCAPE_VIEWBOX}
+                animationDuration={TOOLTIP_ANIMATION_MS}
+                content={tooltipContent}
+                cursor={TOOLTIP_CURSOR}
+              />
+              <Bar
+                dataKey="amount"
+                radius={BAR_RADIUS}
+                isAnimationActive={isAnimationActive}
+                onClick={handleBarClick}
+                className={!isMobile && onMerchantClick ? styles.merchantRowClickable : undefined}
+              >
+                {cells}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </RenderWhenVisible>
       </div>
     )
   },

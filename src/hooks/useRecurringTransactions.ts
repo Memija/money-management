@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
+import { createBoundedCache } from '../utils/bounded-cache'
 import {
   extractCleanDescription,
   formatMerchantDisplayName,
@@ -10,7 +11,7 @@ import {
   isInformativeTransaction,
   normalizeDescription,
 } from '../utils/category-utils'
-import { filterByPeriod, type PeriodFilter } from './useAnalytics'
+import { filterByPeriod, type PeriodFilter } from '../utils/period-utils'
 
 export interface RecurringExpense {
   id: string
@@ -123,14 +124,11 @@ export const getRecurrenceGroupingKey = (t: Transaction): string => {
   return norm
 }
 
-const recurrenceKeyCache = new Map<string, string>()
+const recurrenceKeyCache = createBoundedCache<string>()
 const getCachedRecurrenceKey = (t: Transaction): string => {
   const cacheKey = `${t.description}__${t.partner || ''}__${Math.round(Math.abs(t.amount))}`
   let cached = recurrenceKeyCache.get(cacheKey)
   if (cached === undefined) {
-    if (recurrenceKeyCache.size > 1000) {
-      recurrenceKeyCache.clear()
-    }
     cached = getRecurrenceGroupingKey(t)
     recurrenceKeyCache.set(cacheKey, cached)
   }
@@ -219,6 +217,79 @@ export const clusterTxsByAmount = (items: Transaction[]): Transaction[][] => {
   return clusters.map((c) => c.txs)
 }
 
+/** Minimum length of a grouping key to be considered meaningful. */
+const MIN_GROUP_KEY_LENGTH = 3
+
+interface RecurrenceGroup {
+  normName: string
+  /** Amount clusters with at least 2 transactions, each sorted by date ascending */
+  clusters: Transaction[][]
+}
+
+interface RecurrenceGroupingResult {
+  groups: RecurrenceGroup[]
+  maxTime: number
+  totalTimeframeDays: number
+}
+
+/**
+ * Period-independent preparation: categorizes expenses, groups them by recurrence key
+ * and splits each group into date-sorted amount clusters.
+ */
+const buildRecurrenceGroups = (
+  allRawTransactions: Transaction[],
+  customKeywords: Record<string, string[]>,
+  manualCategories: Record<string, string>,
+): RecurrenceGroupingResult | null => {
+  const expenses = allRawTransactions
+    .filter((t) => t.type === 'expense' && !t.isGhost && !isInformativeTransaction(t))
+    .map((t) => ({
+      ...t,
+      category: getTransactionCategory(t, customKeywords, manualCategories),
+    }))
+
+  if (expenses.length === 0) {
+    return null
+  }
+
+  // Determine overall dataset timeframe boundaries for multi-year checks
+  let minTime = Infinity
+  let maxTime = -Infinity
+  for (let i = 0; i < expenses.length; i++) {
+    const time = Date.parse(expenses[i].date)
+    if (time < minTime) minTime = time
+    if (time > maxTime) maxTime = time
+  }
+  const totalTimeframeDays =
+    minTime !== Infinity && maxTime !== -Infinity ? Math.ceil((maxTime - minTime) / 86400000) : 0
+
+  const byKey: Record<string, Transaction[]> = {}
+  for (const t of expenses) {
+    const key = getCachedRecurrenceKey(t)
+    if (key.length < MIN_GROUP_KEY_LENGTH) {
+      continue
+    }
+    if (!byKey[key]) {
+      byKey[key] = []
+    }
+    byKey[key].push(t)
+  }
+
+  const groups: RecurrenceGroup[] = []
+  for (const [normName, allTxs] of Object.entries(byKey)) {
+    if (allTxs.length < 2) continue
+    const clusters = clusterTxsByAmount(allTxs)
+      .filter((cluster) => cluster.length >= 2)
+      // Sort by date ascending (fast ASCII comparison for YYYY-MM-DD)
+      .map((cluster) => cluster.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)))
+    if (clusters.length > 0) {
+      groups.push({ normName, clusters })
+    }
+  }
+
+  return { groups, maxTime, totalTimeframeDays }
+}
+
 export const useRecurringTransactions = (
   allRawTransactions: Transaction[],
   period?: PeriodFilter,
@@ -226,59 +297,27 @@ export const useRecurringTransactions = (
   const customKeywords = useAppStore((s) => s.customKeywords)
   const manualCategories = useAppStore((s) => s.manualCategories)
 
-  return useMemo(() => {
-    // 1. Filter for non-ghost expenses and ensure category is present
-    const expenses = allRawTransactions
-      .filter((t) => t.type === 'expense' && !t.isGhost && !isInformativeTransaction(t))
-      .map((t) => ({
-        ...t,
-        category: getTransactionCategory(t, customKeywords, manualCategories),
-      }))
+  // Expensive grouping only reruns when the transactions or categorization rules change
+  const grouping = useMemo(
+    () => buildRecurrenceGroups(allRawTransactions, customKeywords, manualCategories),
+    [allRawTransactions, customKeywords, manualCategories],
+  )
 
-    if (expenses.length === 0) {
+  return useMemo(() => {
+    if (!grouping) {
       return { recurringExpenses: [], totalMonthly: 0 }
     }
-
-    // Determine overall dataset timeframe boundaries for multi-year checks
-    let minTime = Infinity
-    let maxTime = -Infinity
-    for (let i = 0; i < expenses.length; i++) {
-      const time = Date.parse(expenses[i].date)
-      if (time < minTime) minTime = time
-      if (time > maxTime) maxTime = time
-    }
-    const totalTimeframeDays =
-      minTime !== Infinity && maxTime !== -Infinity ? Math.ceil((maxTime - minTime) / 86400000) : 0
-
-    // 2. Group by recurrence grouping key
-    const groups: Record<string, Transaction[]> = {}
-    expenses.forEach((t) => {
-      const key = getCachedRecurrenceKey(t)
-      // Only group if the key is meaningful (e.g., at least 3 chars)
-      if (key.length >= 3) {
-        if (!groups[key]) {
-          groups[key] = []
-        }
-        groups[key].push(t)
-      }
-    })
+    const { groups, maxTime, totalTimeframeDays } = grouping
 
     const recurringExpenses: RecurringExpense[] = []
     const isAllPeriod = !period || period.mode === 'all'
 
-    // 3. Analyze each group and its amount clusters
-    for (const [normName, allTxs] of Object.entries(groups)) {
-      if (allTxs.length < 2) continue
-
-      const clusters = clusterTxsByAmount(allTxs)
+    // Analyze each group and its amount clusters
+    for (const { normName, clusters } of groups) {
       const recurringInGroup: RecurringExpense[] = []
 
       for (let clusterIdx = 0; clusterIdx < clusters.length; clusterIdx++) {
         const cluster = clusters[clusterIdx]
-        if (cluster.length < 2) continue
-
-        // Sort by date ascending (fast ASCII comparison for YYYY-MM-DD)
-        cluster.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
 
         // Filter transactions that fall into the selected period
         const txsInPeriod = isAllPeriod ? cluster : filterByPeriod(cluster, period)
@@ -438,5 +477,5 @@ export const useRecurringTransactions = (
       recurringExpenses: finalRecurring,
       totalMonthly,
     }
-  }, [allRawTransactions, period, customKeywords, manualCategories])
+  }, [grouping, period])
 }

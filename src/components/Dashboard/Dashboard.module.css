@@ -135,6 +135,14 @@
   z-index: 1;
   padding-left: max(1rem, env(safe-area-inset-left, 0px));
   padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  transition: opacity 0.15s ease;
+}
+
+/* Analytics are recomputing in the background after a period/search change.
+   Delayed so quick updates never flicker; restoring full opacity is immediate. */
+.scroll-area > main.stale {
+  opacity: 0.65;
+  transition-delay: 0.12s;
 }
 
 /* ─────────────────────────────────────────────────

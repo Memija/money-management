@@ -1,5 +1,5 @@
 import type { Transaction } from '../../types'
-import { memoizeStringFn } from '../bounded-cache'
+import { createBoundedCache, memoizeStringFn } from '../bounded-cache'
 
 /**
  * Checks whether a transaction is an informative entry with a value of 0 euro.
@@ -330,10 +330,16 @@ export const normalizeDescription = (desc: string): string => {
  * Strips SEPA payment references, bank noise prefixes, transaction IDs,
  * timestamps, and dates from a transaction description to extract the
  * clean core payee/merchant/purpose description.
+ * Results are memoized because the ~30 cleaning regexes are costly to run per render.
  */
 export function extractCleanDescription(desc: string): string {
   if (!desc || typeof desc !== 'string') return ''
+  return memoizedComputeCleanDescription(desc)
+}
 
+const memoizedComputeCleanDescription = memoizeStringFn(computeCleanDescription)
+
+function computeCleanDescription(desc: string): string {
   let cleaned = repairBrokenWords(desc.trim())
 
   // 1. Remove common German / European banking prefixes
@@ -695,16 +701,32 @@ export function formatMerchantDisplayName(name: string): string {
   return trimmed
 }
 
+/** Separator for the merchant cache key; cannot appear in bank descriptions. */
+const MERCHANT_CACHE_KEY_SEPARATOR = '\u0000'
+const merchantCache = createBoundedCache<string>()
+
 /**
  * Resolves the canonical merchant/payee name for a transaction.
  * Checks both `partner` and `description`, strips banking and SEPA noise,
  * and formats the display name cleanly.
+ * Results are memoized per (partner, description) pair.
  */
 export function getTransactionMerchant(
   tx: Transaction | { description: string; partner?: string },
 ): string {
   if (!tx) return ''
 
+  const cacheKey = `${tx.partner ?? ''}${MERCHANT_CACHE_KEY_SEPARATOR}${tx.description ?? ''}`
+  const cached = merchantCache.get(cacheKey)
+  if (cached !== undefined) {
+    return cached
+  }
+  const merchant = computeTransactionMerchant(tx)
+  merchantCache.set(cacheKey, merchant)
+  return merchant
+}
+
+function computeTransactionMerchant(tx: { description: string; partner?: string }): string {
   // Prioritize WEG Landwehrweg 1 when specified in description or partner,
   // even if an intermediary property management firm (e.g. KMK Immobilienverwaltung) is listed as partner
   if (tx.description && /\bweg\s+landwehrweg\b/i.test(tx.description)) {

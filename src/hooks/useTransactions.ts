@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
 import { getTransactionCategory, propagateLoanCategories } from '../utils/category-utils'
-import { matchesPeriod, type PeriodFilter } from './useAnalytics'
+import { matchesPeriod, type PeriodFilter } from '../utils/period-utils'
 
 export type TransactionTypeFilter =
   | 'all'
@@ -26,10 +26,10 @@ export function useTransactions(period?: PeriodFilter) {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest')
   const [showGhost, setShowGhost] = useState(false)
 
-  const handleSetSelectedInstitution = (inst: string) => {
+  const handleSetSelectedInstitution = useCallback((inst: string) => {
     setSelectedInstitution(inst)
     setSelectedSubAccount('all')
-  }
+  }, [])
 
   const allTransactions: Transaction[] = useMemo(() => {
     const list: Transaction[] = []

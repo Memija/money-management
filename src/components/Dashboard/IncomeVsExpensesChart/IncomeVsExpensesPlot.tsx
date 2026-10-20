@@ -16,7 +16,9 @@ import {
 
 import type { MonthlyEntry } from '../../../hooks/useAnalytics'
 import { useChartAnimation } from '../../../hooks/useChartAnimation'
+import type { CornerRadii } from '../../../utils/svg-paths'
 import { MonthYearAxisTick } from '../../shared/ChartAxisTicks'
+import { type ChartBarShapeProps, renderBarPath } from '../../shared/ChartBarShape'
 import {
   type IncomeChartViewMode,
   LocalizedIncomeTooltip,
@@ -31,11 +33,15 @@ const MONTH_TICK = (
   <MonthYearAxisTick fill="var(--text-dim)" fontSize={11} offsetY={X_TICK_OFFSET_PX} />
 )
 const CHART_MARGIN = { top: 12, right: 8, left: -16, bottom: 4 }
-const BAR_RADIUS: [number, number, number, number] = [5, 5, 0, 0]
+const BAR_RADIUS: CornerRadii = [5, 5, 0, 0]
 const MONTHLY_CURSOR = { fill: 'rgba(255, 255, 255, 0.04)', radius: 8 }
 const LEGEND_WRAPPER_STYLE = { paddingTop: '10px', cursor: 'pointer' }
 const NET_DOT = { r: 4, strokeWidth: 2 }
 const NET_ACTIVE_DOT = { r: 6, strokeWidth: 0 }
+
+/** Stateless rounded bar (avoids Recharts' Rectangle remount cost while panning). */
+const renderMonthlyBar = (barProps: unknown): React.ReactElement | null =>
+  renderBarPath(barProps as ChartBarShapeProps, { radius: BAR_RADIUS })
 
 /** Compact axis label: 1.2k, 3M, -450 */
 const formatCompactAxis = (v: number): string => {
@@ -145,7 +151,7 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
               dataKey="income"
               name="income"
               fill="url(#chartIncomeGrad)"
-              radius={BAR_RADIUS}
+              shape={renderMonthlyBar}
               maxBarSize={36}
               hide={hiddenSeries['income']}
               isAnimationActive={isAnimationActive}
@@ -154,7 +160,7 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
               dataKey="expenses"
               name="expenses"
               fill="url(#chartExpenseGrad)"
-              radius={BAR_RADIUS}
+              shape={renderMonthlyBar}
               maxBarSize={36}
               hide={hiddenSeries['expenses']}
               isAnimationActive={isAnimationActive}

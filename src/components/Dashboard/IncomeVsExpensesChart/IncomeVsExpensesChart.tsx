@@ -4,6 +4,7 @@ import { TrendingDown, TrendingUp } from 'lucide-react'
 
 import type { MonthlyEntry } from '../../../hooks/useAnalytics'
 import { useChartTimelineGestures } from '../../../hooks/useChartTimelineGestures'
+import { useDeferredTimelineSlice } from '../../../hooks/useDeferredTimelineSlice'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useIsMobile } from '../../../hooks/useIsMobile'
 import {
@@ -12,6 +13,7 @@ import {
   useTimelineZoom,
 } from '../../../hooks/useTimelineZoom'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { RenderWhenVisible } from '../../shared/RenderWhenVisible'
 import { TimelineSlider } from '../../shared/TimelineSlider'
 import { TimelineToolbar } from '../../shared/TimelineToolbar'
 import { type IncomeChartEntry, IncomeVsExpensesPlot } from './IncomeVsExpensesPlot'
@@ -67,13 +69,12 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
       monthKeys,
     })
 
-    // Sliced dataset for the visible timeline window
-    const visibleData = useMemo(() => {
-      if (monthlyData.length <= 1) {
-        return monthlyData
-      }
-      return monthlyData.slice(startIndex, endIndex + 1)
-    }, [monthlyData, startIndex, endIndex])
+    // Deferred visible window: controls update instantly, the plot catches up in the background
+    const {
+      data: chartSourceData,
+      visibleData,
+      isZoomed: isChartZoomed,
+    } = useDeferredTimelineSlice(monthlyData, startIndex, endIndex)
 
     const startMonthLabel = formatMonthYear(
       monthlyData[startIndex]?.rawMonth || monthlyData[startIndex]?.name || '',
@@ -133,15 +134,15 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
       [hasNetLine],
     )
 
-    // Derive sums: dynamically re-evaluate for visible slice when zoomed
+    // Derive sums: dynamically re-evaluate for visible slice when zoomed (kept in sync with the plot)
     const { netSaved, savingsRate, isNetPositive, avgIncome, avgExpenses } = useMemo(() => {
-      const dataForMetrics = isZoomed ? visibleData : monthlyData
+      const dataForMetrics = isChartZoomed ? visibleData : chartSourceData
       const income =
-        !isZoomed && propIncome !== undefined
+        !isChartZoomed && propIncome !== undefined
           ? propIncome
           : dataForMetrics.reduce((acc, m) => acc + m.income, 0)
       const expenses =
-        !isZoomed && propExpenses !== undefined
+        !isChartZoomed && propExpenses !== undefined
           ? propExpenses
           : dataForMetrics.reduce((acc, m) => acc + m.expenses, 0)
       const net = income - expenses
@@ -154,7 +155,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
         avgIncome: income / count,
         avgExpenses: expenses / count,
       }
-    }, [isZoomed, visibleData, monthlyData, propIncome, propExpenses])
+    }, [isChartZoomed, visibleData, chartSourceData, propIncome, propExpenses])
 
     const chartData = useMemo(() => {
       const result: IncomeChartEntry[] = []
@@ -170,8 +171,12 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
     const gradientOffset = useMemo(() => {
       if (chartData.length === 0) return 0
 
-      const dataMax = Math.max(...chartData.map((d) => d.cumulativeNet))
-      const dataMin = Math.min(...chartData.map((d) => d.cumulativeNet))
+      let dataMax = -Infinity
+      let dataMin = Infinity
+      for (const d of chartData) {
+        if (d.cumulativeNet > dataMax) dataMax = d.cumulativeNet
+        if (d.cumulativeNet < dataMin) dataMin = d.cumulativeNet
+      }
 
       if (dataMax <= 0) return 0
       if (dataMin >= 0) return 1
@@ -284,17 +289,19 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
           className={`${styles.chartContainer} ${canZoom && isMobile ? styles.chartContainerInteractive : ''}`}
         >
           {monthlyData.length > 0 ? (
-            <IncomeVsExpensesPlot
-              chartData={chartData}
-              viewMode={viewMode}
-              gradientOffset={gradientOffset}
-              avgIncome={avgIncome}
-              avgExpenses={avgExpenses}
-              showNetLine={hasNetLine}
-              hiddenSeries={hiddenSeries}
-              onLegendClick={handleLegendClick}
-              animationKey={monthlyData}
-            />
+            <RenderWhenVisible>
+              <IncomeVsExpensesPlot
+                chartData={chartData}
+                viewMode={viewMode}
+                gradientOffset={gradientOffset}
+                avgIncome={avgIncome}
+                avgExpenses={avgExpenses}
+                showNetLine={hasNetLine}
+                hiddenSeries={hiddenSeries}
+                onLegendClick={handleLegendClick}
+                animationKey={chartSourceData}
+              />
+            </RenderWhenVisible>
           ) : (
             <div className={styles.emptyState}>
               <p>{t.noTransactionsInPeriod || 'No data available for this period.'}</p>

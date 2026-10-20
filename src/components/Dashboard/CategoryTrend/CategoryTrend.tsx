@@ -3,11 +3,13 @@ import { motion } from 'framer-motion'
 import { Layers, Maximize2, TrendingUp } from 'lucide-react'
 
 import type { MonthlyCategoryEntry } from '../../../hooks/useAnalytics'
+import { useDeferredTimelineSlice } from '../../../hooks/useDeferredTimelineSlice'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useIsMobile } from '../../../hooks/useIsMobile'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { hasExtensiveCategoryData } from '../../../utils/category-utils'
+import { RenderWhenVisible } from '../../shared/RenderWhenVisible'
 import { CategoryTimelineSlider } from './CategoryTimelineSlider'
 import { CategoryTimelineToolbar } from './CategoryTimelineToolbar'
 import { CategoryTrendChart } from './CategoryTrendChart'
@@ -50,6 +52,10 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       },
       [onCategoryClick],
     )
+
+    const handleClearCategorySelect = useCallback(() => setSelectedCategory(null), [])
+    const handleOpenFullscreen = useCallback(() => setIsFullscreen(true), [])
+    const handleCloseFullscreen = useCallback(() => setIsFullscreen(false), [])
 
     // Collect all unique categories across all months and sort by overall spend descending
     const categories = useMemo(() => {
@@ -148,13 +154,13 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       monthKeys,
     })
 
-    // Slice dataset to active viewport window immediately for instant responsiveness
-    const visibleData = useMemo(() => {
-      if (data.length <= 1) {
-        return data
-      }
-      return data.slice(startIndex, endIndex + 1)
-    }, [data, startIndex, endIndex])
+    // The chart renders a deferred window so zoom/pan controls stay instant while the
+    // Recharts canvas catches up in the background
+    const { data: chartSourceData, visibleData } = useDeferredTimelineSlice(
+      data,
+      startIndex,
+      endIndex,
+    )
 
     const startMonthLabel = formatMonthYear(data[startIndex]?.month ?? '')
     const endMonthLabel = formatMonthYear(data[endIndex]?.month ?? '')
@@ -245,7 +251,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
               type="button"
               data-testid="category-trend-fullscreen-btn"
               className={styles.fullscreenBtn}
-              onClick={() => setIsFullscreen(true)}
+              onClick={handleOpenFullscreen}
               title={t.fullscreen || 'Full Screen'}
               aria-label={t.fullscreen || 'Full Screen'}
             >
@@ -288,17 +294,20 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
               </p>
             </div>
           ) : (
-            <CategoryTrendChart
-              data={visibleData}
-              animationKey={data}
-              categories={categories}
-              customCategories={customCategories}
-              viewMode={viewMode}
-              activeCategory={activeCategory}
-              onCategoryHover={setHoveredCategory}
-              onCategorySelect={handleCategorySelect}
-              disableTooltip={isMobile}
-            />
+            // Paused while fullscreen: the modal renders its own copy on top of this one
+            <RenderWhenVisible isPaused={isFullscreen}>
+              <CategoryTrendChart
+                data={visibleData}
+                animationKey={chartSourceData}
+                categories={categories}
+                customCategories={customCategories}
+                viewMode={viewMode}
+                activeCategory={activeCategory}
+                onCategoryHover={setHoveredCategory}
+                onCategorySelect={handleCategorySelect}
+                disableTooltip={isMobile}
+              />
+            </RenderWhenVisible>
           )}
         </div>
 
@@ -325,14 +334,14 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
             activeCategory={activeCategory}
             onCategoryHover={setHoveredCategory}
             onCategorySelect={handleCategorySelect}
-            onClearCategorySelect={() => setSelectedCategory(null)}
+            onClearCategorySelect={handleClearCategorySelect}
           />
         )}
 
         {/* Fullscreen Expanded View Modal */}
         <CategoryTrendFullscreenModal
           isOpen={isFullscreen}
-          onClose={() => setIsFullscreen(false)}
+          onClose={handleCloseFullscreen}
           data={data}
           visibleData={visibleData}
           monthSummaries={monthSummaries}
@@ -368,7 +377,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
           onViewModeChange={setViewMode}
           onCategoryHover={setHoveredCategory}
           onCategorySelect={handleCategorySelect}
-          onClearCategorySelect={() => setSelectedCategory(null)}
+          onClearCategorySelect={handleClearCategorySelect}
         />
       </motion.div>
     )

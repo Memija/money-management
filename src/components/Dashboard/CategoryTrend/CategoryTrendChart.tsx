@@ -5,7 +5,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Rectangle,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -16,7 +15,9 @@ import type { MonthlyCategoryEntry } from '../../../hooks/useAnalytics'
 import { useChartAnimation } from '../../../hooks/useChartAnimation'
 import type { CustomCategory } from '../../../types'
 import { adjustColor, getCategoryColor } from '../../../utils/category-colors'
+import type { CornerRadii } from '../../../utils/svg-paths'
 import { MonthYearAxisTick } from '../../shared/ChartAxisTicks'
+import { type ChartBarShapeProps, renderBarPath } from '../../shared/ChartBarShape'
 import { formatCompactEuro } from './category-trend-formatters'
 import { LocalizedTrendTooltip } from './CategoryTrendTooltip'
 
@@ -29,17 +30,57 @@ const STACKED_MARGIN = { top: 16, right: 12, left: -10, bottom: 4 }
 const AREA_MARGIN = { top: 12, right: 10, left: -14, bottom: 0 }
 const STACKED_CURSOR = { fill: 'rgba(255, 255, 255, 0.08)', radius: 10 }
 const TOOLTIP_WRAPPER_STYLE = { pointerEvents: 'auto' as const, zIndex: 100 }
+const SEGMENT_OUTER_RADIUS = 8
+const SEGMENT_INNER_RADIUS = 3
+const SEGMENT_MIN_HEIGHT = 1.5
 
 const toGradientId = (prefix: string, cat: string): string =>
   `${prefix}-${cat.replace(/\s+/g, '-')}`
 
-interface BarShapeProps {
-  x?: number
-  y?: number
-  width?: number
-  height?: number
-  payload?: Record<string, unknown>
-  dataKey?: string
+interface MonthBounds {
+  top: string
+  bottom: string
+}
+
+/** Gap between stacked capsules, shrinking for thin segments so they stay visible. */
+const getSegmentGap = (height: number): number => (height > 10 ? 2.5 : height > 4 ? 1.5 : 0.5)
+
+/**
+ * Finds the first (bottom) and last (top) category with spend in a month entry.
+ * @param entry - Month entry keyed by category
+ * @param categories - Categories in stacking order
+ */
+const findMonthBounds = (entry: Record<string, unknown>, categories: string[]): MonthBounds => {
+  let bottom = ''
+  let top = ''
+  for (const cat of categories) {
+    if (Number(entry[cat]) > 0) {
+      if (!bottom) {
+        bottom = cat
+      }
+      top = cat
+    }
+  }
+  return { top, bottom }
+}
+
+/**
+ * Creates a bounds lookup cached by entry identity. Timeline slices reuse the same entry
+ * objects, so panning never recomputes bounds.
+ * @param categories - Categories in stacking order
+ */
+const createMonthBoundsLookup = (
+  categories: string[],
+): ((entry: Record<string, unknown>) => MonthBounds) => {
+  const cache = new WeakMap<object, MonthBounds>()
+  return (entry) => {
+    let bounds = cache.get(entry)
+    if (!bounds) {
+      bounds = findMonthBounds(entry, categories)
+      cache.set(entry, bounds)
+    }
+    return bounds
+  }
 }
 
 interface CategoryTrendChartProps {
@@ -115,56 +156,40 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
       [categories, customCategories],
     )
 
-    // Precompute top/bottom category per month to avoid O(N*M) loops in renderStackedBar
-    const monthBoundsMap = useMemo(() => {
-      const map = new Map<string, { top: string; bottom: string }>()
-      const reversed = [...categories].reverse()
-      for (const entry of data) {
-        const top = reversed.find((cat) => Number(entry[cat]) > 0) ?? ''
-        const bottom = categories.find((cat) => Number(entry[cat]) > 0) ?? ''
-        map.set(String(entry.month), { top, bottom })
-      }
-      return map
-    }, [data, categories])
+    // Cached top/bottom category per month entry; stable while categories are unchanged,
+    // so the shape callback keeps its identity during timeline navigation
+    const getMonthBounds = useMemo(() => createMonthBoundsLookup(categories), [categories])
 
     // Custom shape: each category renders as a floating capsule segment with rounded ends.
-    // Memoized with stable reference so mouse movement across data points incurs zero DOM re-creations.
+    // Stable across navigation and hover, and renders a stateless path (see renderBarPath).
     const renderStackedBar = useCallback(
       (barProps: unknown) => {
-        const p = barProps as BarShapeProps
+        const p = barProps as ChartBarShapeProps
         if (!p || !p.height || p.height <= 0 || !p.width || p.width <= 0) {
           return null
         }
 
-        const monthKey = String(p.payload?.month ?? '')
-        const bounds = monthBoundsMap.get(monthKey)
-        const isTop = bounds ? p.dataKey === bounds.top : false
-        const isBottom = bounds ? p.dataKey === bounds.bottom : false
-        const outer = 8
-        const inner = 3
-        const radius: [number, number, number, number] = [
-          isTop ? outer : inner,
-          isTop ? outer : inner,
-          isBottom ? outer : inner,
-          isBottom ? outer : inner,
-        ]
+        const bounds = p.payload ? getMonthBounds(p.payload) : undefined
+        const topRadius =
+          bounds && p.dataKey === bounds.top ? SEGMENT_OUTER_RADIUS : SEGMENT_INNER_RADIUS
+        const bottomRadius =
+          bounds && p.dataKey === bounds.bottom ? SEGMENT_OUTER_RADIUS : SEGMENT_INNER_RADIUS
+        const radius: CornerRadii = [topRadius, topRadius, bottomRadius, bottomRadius]
 
-        const rawHeight = p.height
-        const gap = rawHeight > 10 ? 2.5 : rawHeight > 4 ? 1.5 : 0.5
-
-        return (
-          <Rectangle
-            {...(barProps as Record<string, unknown>)}
-            x={p.x ?? 0}
-            y={(p.y ?? 0) + gap / 2}
-            width={p.width}
-            height={Math.max(1.5, rawHeight - gap)}
-            radius={radius}
-            className={styles.barSegment}
-          />
-        )
+        return renderBarPath(p, {
+          radius,
+          className: styles.barSegment,
+          gap: getSegmentGap(p.height),
+          minHeight: SEGMENT_MIN_HEIGHT,
+        })
       },
-      [monthBoundsMap],
+      [getMonthBounds],
+    )
+
+    // Stable per-category click handlers so bars don't receive new callbacks every render
+    const categoryClickHandlers = useMemo(
+      () => new Map(categories.map((cat) => [cat, () => onCategorySelect(cat)])),
+      [categories, onCategorySelect],
     )
 
     const handleMouseMove = useCallback(() => {
@@ -267,7 +292,7 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
                     shape={renderStackedBar}
                     isAnimationActive={isAnimationActive}
                     animationDuration={CHART_ANIMATION_MS}
-                    onClick={() => onCategorySelect(cat)}
+                    onClick={categoryClickHandlers.get(cat)}
                   />
                 )
               })}

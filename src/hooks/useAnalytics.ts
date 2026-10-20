@@ -9,23 +9,28 @@ import {
   isInformativeTransaction,
   propagateLoanCategories,
 } from '../utils/category-utils'
-import { generateMonthRange } from '../utils/date-utils'
+import {
+  filterByPeriod,
+  getAvailablePeriods,
+  getMonthsForPeriod,
+  type PeriodFilter,
+} from '../utils/period-utils'
+
+export type { PeriodFilter, PeriodMode } from '../utils/period-utils'
+export {
+  filterByPeriod,
+  getAvailablePeriods,
+  getMonthsForPeriod,
+  matchesPeriod,
+} from '../utils/period-utils'
+
+const TOP_CATEGORIES_LIMIT = 2
 
 const sortCategories = (a: [string, number], b: [string, number]) => {
   if (a[0] === 'Other' && b[0] !== 'Other') return 1
   if (b[0] === 'Other' && a[0] !== 'Other') return -1
   if (b[1] !== a[1]) return b[1] - a[1]
   return a[0].localeCompare(b[0])
-}
-
-export type PeriodMode = 'all' | 'year' | 'quarter' | 'month' | 'custom'
-
-export interface PeriodFilter {
-  mode: PeriodMode
-  /** e.g. '2025', '2025-Q1', '2025-01', or for custom '2025-01-01..2025-06-30' */
-  value: string
-  startDate?: string
-  endDate?: string
 }
 
 export interface AnalyticsData {
@@ -121,108 +126,6 @@ export const getCategoryColorIndex = (categoryName: string) => {
 }
 
 /**
- * Checks whether a transaction date matches the specified period filter.
- */
-export const matchesPeriod = (date: string, period?: PeriodFilter): boolean => {
-  if (!period || period.mode === 'all') return true
-  const dateStr = date.substring(0, 10)
-  switch (period.mode) {
-    case 'year':
-      return date.substring(0, 4) === period.value
-    case 'quarter': {
-      const [y, q] = period.value.split('-Q')
-      const month = parseInt(date.substring(5, 7), 10)
-      const qNum = parseInt(q, 10)
-      const tYear = date.substring(0, 4)
-      return tYear === y && month >= (qNum - 1) * 3 + 1 && month <= qNum * 3
-    }
-    case 'month':
-      return date.substring(0, 7) === period.value
-    case 'custom': {
-      let start = period.startDate
-      let end = period.endDate
-      if (!start && !end && period.value.includes('..')) {
-        const [vStart, vEnd] = period.value.split('..')
-        start = vStart || undefined
-        end = vEnd || undefined
-      }
-      const s = start ? start.substring(0, 10) : ''
-      const e = end ? end.substring(0, 10) : ''
-      if (s && dateStr < s) return false
-      if (e && dateStr > e) return false
-      return true
-    }
-    default:
-      return true
-  }
-}
-
-/**
- * Filters transactions by the given period.
- */
-export const filterByPeriod = (txs: Transaction[], period: PeriodFilter): Transaction[] => {
-  if (period.mode === 'all') {
-    return txs
-  }
-  return txs.filter((t) => matchesPeriod(t.date, period))
-}
-
-/**
- * Computes the continuous list of 'YYYY-MM' strings representing the period.
- */
-export const getMonthsForPeriod = (
-  period: PeriodFilter,
-  fallbackMonths: string[] = [],
-): string[] => {
-  if (period.mode === 'year') {
-    return Array.from({ length: 12 }, (_, i) => `${period.value}-${String(i + 1).padStart(2, '0')}`)
-  }
-  if (period.mode === 'quarter') {
-    const [y, q] = period.value.split('-Q')
-    const qNum = parseInt(q, 10)
-    const startM = (qNum - 1) * 3 + 1
-    return [
-      `${y}-${String(startM).padStart(2, '0')}`,
-      `${y}-${String(startM + 1).padStart(2, '0')}`,
-      `${y}-${String(startM + 2).padStart(2, '0')}`,
-    ]
-  }
-  if (period.mode === 'month') {
-    return [period.value]
-  }
-  if (period.mode === 'custom') {
-    let start = period.startDate
-    let end = period.endDate
-    if (!start && !end && period.value.includes('..')) {
-      const [vStart, vEnd] = period.value.split('..')
-      start = vStart || undefined
-      end = vEnd || undefined
-    }
-    const startM = start ? start.substring(0, 7) : ''
-    const endM = end ? end.substring(0, 7) : ''
-    if (startM && endM) {
-      return generateMonthRange(startM, endM)
-    }
-    const validFallback = fallbackMonths.filter(Boolean).sort()
-    const firstM = startM || (validFallback.length > 0 ? validFallback[0] : '')
-    const lastM = endM || (validFallback.length > 0 ? validFallback[validFallback.length - 1] : '')
-    if (firstM && lastM) {
-      return generateMonthRange(firstM, lastM)
-    }
-    if (firstM) return [firstM]
-    if (lastM) return [lastM]
-    return []
-  }
-
-  // mode === 'all'
-  const validFallback = fallbackMonths.filter(Boolean).sort()
-  if (validFallback.length > 0) {
-    return generateMonthRange(validFallback[0], validFallback[validFallback.length - 1])
-  }
-  return []
-}
-
-/**
  * Central analytics hook that computes all derived metrics from transactions.
  * All computations are memoized for performance.
  */
@@ -260,26 +163,10 @@ export const useAnalytics = (
   }, [activeRawTransactions, customKeywords, manualCategories])
 
   // Available periods for filter
-  const { availableYears, availableQuarters, availableMonths } = useMemo(() => {
-    const years = new Set<string>()
-    const quarters = new Set<string>()
-    const months = new Set<string>()
-
-    allTransactions.forEach((t) => {
-      const y = t.date.substring(0, 4)
-      const m = parseInt(t.date.substring(5, 7), 10)
-      const q = Math.ceil(m / 3)
-      years.add(y)
-      quarters.add(`${y}-Q${q}`)
-      months.add(t.date.substring(0, 7))
-    })
-
-    return {
-      availableYears: [...years].sort((a, b) => (b < a ? -1 : b > a ? 1 : 0)),
-      availableQuarters: [...quarters].sort((a, b) => (b < a ? -1 : b > a ? 1 : 0)),
-      availableMonths: [...months].sort((a, b) => (b < a ? -1 : b > a ? 1 : 0)),
-    }
-  }, [allTransactions])
+  const { availableYears, availableQuarters, availableMonths } = useMemo(
+    () => getAvailablePeriods(allTransactions),
+    [allTransactions],
+  )
 
   // Period-filtered transactions
   const periodTransactions = useMemo(
@@ -357,68 +244,44 @@ export const useAnalytics = (
     }
   }, [periodTransactions, allRawTransactions, period])
 
-  // Top category
-  const topCategory = useMemo(() => {
+  // Expense totals per category, sorted — computed once and shared by top category,
+  // top categories and the category breakdown
+  const sortedExpenseCategories = useMemo(() => {
     const map: Record<string, number> = {}
-    periodTransactions
-      .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
-      .forEach((t) => {
-        const cat = t.category || 'Other'
-        map[cat] = (map[cat] || 0) + Math.abs(t.amount)
-      })
-
-    const entries = Object.entries(map).sort(sortCategories)
-    if (entries.length === 0) {
-      return null
+    for (const t of periodTransactions) {
+      if (t.type !== 'expense' || isInformativeTransaction(t)) {
+        continue
+      }
+      const cat = t.category || 'Other'
+      map[cat] = (map[cat] || 0) + Math.abs(t.amount)
     }
+    return Object.entries(map).sort(sortCategories)
+  }, [periodTransactions])
 
-    const [name, amount] = entries[0]
-    const percent = totalExpenses > 0 ? Math.round((amount / totalExpenses) * 100) : 0
-    return { name, amount, percent }
-  }, [periodTransactions, totalExpenses])
-
-  // Top categories (top 2 for insight card breakdown)
-  const topCategories = useMemo(() => {
-    const map: Record<string, number> = {}
-    periodTransactions
-      .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
-      .forEach((t) => {
-        const cat = t.category || 'Other'
-        map[cat] = (map[cat] || 0) + Math.abs(t.amount)
-      })
-
-    return Object.entries(map)
-      .sort(sortCategories)
-      .slice(0, 2)
-      .map(([name, amount]) => ({
+  // Top categories (top 2 for insight card breakdown); the first entry is the top category
+  const topCategories = useMemo(
+    () =>
+      sortedExpenseCategories.slice(0, TOP_CATEGORIES_LIMIT).map(([name, amount]) => ({
         name,
         amount,
         percent: totalExpenses > 0 ? Math.round((amount / totalExpenses) * 100) : 0,
-      }))
-  }, [periodTransactions, totalExpenses])
+      })),
+    [sortedExpenseCategories, totalExpenses],
+  )
+
+  const topCategory = topCategories.length > 0 ? topCategories[0] : null
 
   // Category breakdown (for pie chart)
-  const categoryBreakdown = useMemo(() => {
-    const map: Record<string, number> = {}
-    periodTransactions
-      .filter((t) => t.type === 'expense' && !isInformativeTransaction(t))
-      .forEach((t) => {
-        const cat = t.category || 'Other'
-        map[cat] = (map[cat] || 0) + Math.abs(t.amount)
-      })
-
-    return Object.entries(map)
-      .sort(sortCategories)
-      .map(([name, value]) => {
-        const colorIdx = getCategoryColorIndex(name)
-        return {
-          name,
-          value: Math.round(value * 100) / 100,
-          color: getCategoryColor(name, customCategories),
-          colorClass: `${catColorClassPrefix}${colorIdx}`,
-        }
-      })
-  }, [periodTransactions, catColorClassPrefix, customCategories])
+  const categoryBreakdown = useMemo(
+    () =>
+      sortedExpenseCategories.map(([name, value]) => ({
+        name,
+        value: Math.round(value * 100) / 100,
+        color: getCategoryColor(name, customCategories),
+        colorClass: `${catColorClassPrefix}${getCategoryColorIndex(name)}`,
+      })),
+    [sortedExpenseCategories, catColorClassPrefix, customCategories],
+  )
 
   // Monthly income vs expenses
   const monthlyData = useMemo(() => {
