@@ -3,6 +3,7 @@ import { afterEach, vi } from 'vitest'
 
 import { registerTranslations } from '../i18n/locale-loader'
 import { translations } from '../i18n/translations'
+import { useTimelineSelectionStore } from '../store/useTimelineSelectionStore'
 
 import '@testing-library/jest-dom'
 
@@ -12,6 +13,8 @@ registerTranslations(translations)
 // Run cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {
   cleanup()
+  // Shared (session-only) timeline windows must not leak between test cases
+  useTimelineSelectionStore.getState().resetSelections()
 })
 
 // Mock ResizeObserver which is used by Recharts but not provided by jsdom

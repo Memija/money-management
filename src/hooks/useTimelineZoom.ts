@@ -1,6 +1,24 @@
 import { useCallback, useMemo, useState } from 'react'
 
-export type TimelinePreset = '3M' | '6M' | '1Y' | 'All'
+import { useTimelineSelectionStore } from '../store/useTimelineSelectionStore'
+import {
+  createTimelineSelection,
+  DEFAULT_TIMELINE_SELECTION,
+  getSortableTimelineKeys,
+  isSameTimelineSelection,
+  resolveTimelineSelection,
+  type TimelineSelection,
+} from '../utils/timeline-selection'
+import {
+  clampWindow,
+  detectPreset,
+  getPresetRange,
+  type TimelinePreset,
+  type TimelineRange,
+  zoomWindow,
+} from '../utils/timeline-window'
+
+export type { TimelinePreset, TimelineRange } from '../utils/timeline-window'
 
 export const MIN_MONTHS_ZOOM_MOBILE = 12
 export const MIN_MONTHS_ZOOM_DESKTOP = 24
@@ -9,13 +27,14 @@ export interface UseTimelineZoomOptions {
   totalCount: number
   isLotsOfData: boolean
   minWindow?: number
+  /** Sortable calendar keys (`'YYYY-MM'`) used to keep the window aligned when data changes. */
   monthKeys?: string[]
   minCount?: number
-}
-
-export interface TimelineRange {
-  startIndex: number
-  endIndex: number
+  /**
+   * Charts with the same sync key share one calendar window (e.g. all dashboard charts).
+   * Without it, the hook keeps its own local selection.
+   */
+  syncKey?: string
 }
 
 export interface UseTimelineZoomReturn {
@@ -42,86 +61,65 @@ export interface UseTimelineZoomReturn {
 
 const DEFAULT_MIN_WINDOW = 3
 
+/**
+ * Selection state: local by default, or shared through the timeline selection store when a
+ * sync key is given. Updates with an identical selection are skipped to avoid re-renders.
+ */
+const useTimelineSelection = (
+  syncKey: string | undefined,
+): [TimelineSelection, (next: TimelineSelection) => void] => {
+  const [localSelection, setLocalSelection] = useState<TimelineSelection>(
+    DEFAULT_TIMELINE_SELECTION,
+  )
+  const sharedSelection = useTimelineSelectionStore((state) =>
+    syncKey ? state.selections[syncKey] : undefined,
+  )
+  const setSharedSelection = useTimelineSelectionStore((state) => state.setSelection)
+
+  const updateSelection = useCallback(
+    (next: TimelineSelection) => {
+      if (syncKey) {
+        setSharedSelection(syncKey, next)
+        return
+      }
+      setLocalSelection((prev) => (isSameTimelineSelection(prev, next) ? prev : next))
+    },
+    [syncKey, setSharedSelection],
+  )
+
+  const selection = syncKey ? (sharedSelection ?? DEFAULT_TIMELINE_SELECTION) : localSelection
+  return [selection, updateSelection]
+}
+
 export function useTimelineZoom({
   totalCount,
   isLotsOfData,
   minWindow = DEFAULT_MIN_WINDOW,
   monthKeys,
   minCount = 5,
+  syncKey,
 }: UseTimelineZoomOptions): UseTimelineZoomReturn {
   // Timeline zooming and navigation is enabled when data volume criteria and minimum threshold are met
   const canZoomAndNavigate = isLotsOfData && totalCount >= minCount
   const effectiveMin = Math.min(minWindow, Math.max(1, totalCount))
 
-  const [selectedPreset, setSelectedPreset] = useState<TimelinePreset | null>('All')
-  const [prevTotalCount, setPrevTotalCount] = useState(totalCount)
-  const [prevMonthKeys, setPrevMonthKeys] = useState<string[] | undefined>(monthKeys)
-  const [range, setRange] = useState<TimelineRange>(() => ({
-    startIndex: 0,
-    endIndex: Math.max(0, totalCount - 1),
-  }))
+  const [selection, updateSelection] = useTimelineSelection(syncKey)
 
-  const keysChanged =
-    monthKeys && prevMonthKeys
-      ? monthKeys.length !== prevMonthKeys.length ||
-        monthKeys[0] !== prevMonthKeys[0] ||
-        monthKeys[monthKeys.length - 1] !== prevMonthKeys[prevMonthKeys.length - 1]
-      : false
+  const keys = useMemo(
+    () => getSortableTimelineKeys(monthKeys, totalCount),
+    [monthKeys, totalCount],
+  )
 
-  // Synchronize range when totalCount or monthKeys change while preserving active preset or custom zoom span
-  if (prevTotalCount !== totalCount || keysChanged) {
-    const oldKeys = prevMonthKeys
-    setPrevTotalCount(totalCount)
-    setPrevMonthKeys(monthKeys)
-
-    if (totalCount <= 0) {
-      setRange({ startIndex: 0, endIndex: 0 })
-    } else if (selectedPreset === 'All') {
-      setRange({
-        startIndex: 0,
-        endIndex: Math.max(0, totalCount - 1),
-      })
-    } else if (selectedPreset === '3M' || selectedPreset === '6M' || selectedPreset === '1Y') {
-      const targetSpan = selectedPreset === '3M' ? 3 : selectedPreset === '6M' ? 6 : 12
-      const span = Math.min(targetSpan, totalCount)
-      setRange({
-        startIndex: Math.max(0, totalCount - span),
-        endIndex: Math.max(0, totalCount - 1),
-      })
-    } else {
-      // Custom range: attempt calendar reconciliation using date keys first
-      let matchedByDate = false
-      if (oldKeys && monthKeys && oldKeys[range.startIndex] && oldKeys[range.endIndex]) {
-        const startKey = oldKeys[range.startIndex]
-        const endKey = oldKeys[range.endIndex]
-        const newStart = monthKeys.indexOf(startKey)
-        const newEnd = monthKeys.indexOf(endKey)
-        if (newStart !== -1 && newEnd !== -1 && newStart <= newEnd) {
-          setRange({ startIndex: newStart, endIndex: newEnd })
-          matchedByDate = true
-        }
-      }
-
-      if (!matchedByDate) {
-        // Fall back to preserving window size and anchor position
-        setRange((prev) => {
-          const prevSpan = prev.endIndex - prev.startIndex + 1
-          const span = Math.min(Math.max(effectiveMin, prevSpan), totalCount)
-          const wasAtEnd = prevTotalCount > 0 && prev.endIndex >= prevTotalCount - 1
-
-          if (wasAtEnd) {
-            const end = Math.max(0, totalCount - 1)
-            const start = Math.max(0, end - span + 1)
-            return { startIndex: start, endIndex: end }
-          }
-
-          const start = Math.max(0, Math.min(prev.startIndex, totalCount - span))
-          const end = Math.min(totalCount - 1, start + span - 1)
-          return { startIndex: start, endIndex: end }
-        })
-      }
-    }
-  }
+  // The window is derived from the (calendar based) selection, so presets, custom windows and
+  // shared windows automatically follow dataset changes without extra reconciliation state.
+  // A synced chart without zoom UI always shows everything instead of a window it can't control.
+  const range = useMemo<TimelineRange>(
+    () =>
+      syncKey && !canZoomAndNavigate
+        ? getPresetRange('All', totalCount)
+        : resolveTimelineSelection(selection, keys, effectiveMin),
+    [syncKey, canZoomAndNavigate, totalCount, selection, keys, effectiveMin],
+  )
 
   // Clamp current indices safely within [0, totalCount - 1]
   const startIndex = Math.max(0, Math.min(range.startIndex, totalCount - 1))
@@ -134,229 +132,71 @@ export function useTimelineZoom({
   const isAtMinZoom = visibleCount <= effectiveMin
   const isAtMaxZoom = !isZoomed
 
-  const activePreset = useMemo<TimelinePreset | null>(() => {
-    if (totalCount === 0) return null
-    if (selectedPreset === '6M' && visibleCount === 6 && isAtEnd) return '6M'
-    if (selectedPreset === '3M' && visibleCount === 3 && isAtEnd) return '3M'
-    if (selectedPreset === '1Y' && visibleCount === 12 && isAtEnd) return '1Y'
-    if (startIndex === 0 && endIndex === totalCount - 1) return 'All'
-    if (isAtEnd && visibleCount === 3) return '3M'
-    if (isAtEnd && visibleCount === 6) return '6M'
-    if (isAtEnd && visibleCount === 12) return '1Y'
-    return null
-  }, [totalCount, startIndex, endIndex, isAtEnd, visibleCount, selectedPreset])
-
-  const zoomIn = useCallback(() => {
-    if (totalCount <= effectiveMin) return
-    setSelectedPreset(null)
-
-    setRange((prev) => {
-      const curSpan = prev.endIndex - prev.startIndex + 1
-      if (curSpan <= effectiveMin) return prev
-
-      const step = Math.max(1, Math.round(curSpan * 0.25))
-      const targetSpan = Math.max(effectiveMin, curSpan - step)
-      const diff = curSpan - targetSpan
-
-      const trimStart = Math.floor(diff / 2)
-      const trimEnd = diff - trimStart
-
-      const newStart = Math.min(prev.startIndex + trimStart, totalCount - targetSpan)
-      const newEnd = Math.max(prev.endIndex - trimEnd, newStart + targetSpan - 1)
-
-      return {
-        startIndex: Math.max(0, newStart),
-        endIndex: Math.min(totalCount - 1, newEnd),
-      }
-    })
-  }, [totalCount, effectiveMin])
-
-  const zoomOut = useCallback(() => {
-    if (totalCount <= 0) return
-
-    setRange((prev) => {
-      if (prev.startIndex <= 0 && prev.endIndex >= totalCount - 1) return prev
-
-      const curSpan = prev.endIndex - prev.startIndex + 1
-      if (curSpan >= totalCount) return prev
-
-      const step = Math.max(1, Math.round(curSpan * 0.3))
-      const addStart = Math.ceil(step / 2)
-      const addEnd = step - addStart
-
-      let newStart = prev.startIndex - addStart
-      let newEnd = prev.endIndex + addEnd
-
-      if (newStart < 0) {
-        newEnd += Math.abs(newStart)
-        newStart = 0
-      }
-      if (newEnd > totalCount - 1) {
-        newStart -= newEnd - (totalCount - 1)
-        newEnd = totalCount - 1
-      }
-
-      const clampedStart = Math.max(0, newStart)
-      const clampedEnd = Math.min(totalCount - 1, newEnd)
-
-      if (clampedStart === 0 && clampedEnd === totalCount - 1) {
-        setSelectedPreset('All')
-      } else {
-        setSelectedPreset(null)
-      }
-
-      return {
-        startIndex: clampedStart,
-        endIndex: clampedEnd,
-      }
-    })
-  }, [totalCount])
-
-  const panEarlier = useCallback(() => {
-    setSelectedPreset(null)
-    setRange((prev) => {
-      if (prev.startIndex <= 0) return prev
-      const span = prev.endIndex - prev.startIndex
-      const newStart = Math.max(0, prev.startIndex - 1)
-      const newEnd = newStart + span
-      return { startIndex: newStart, endIndex: newEnd }
-    })
-  }, [])
-
-  const panLater = useCallback(() => {
-    setSelectedPreset(null)
-    setRange((prev) => {
-      if (prev.endIndex >= totalCount - 1) return prev
-      const span = prev.endIndex - prev.startIndex
-      const newEnd = Math.min(totalCount - 1, prev.endIndex + 1)
-      const newStart = Math.max(0, newEnd - span)
-      return { startIndex: newStart, endIndex: newEnd }
-    })
-  }, [totalCount])
-
-  const resetZoom = useCallback(() => {
-    setSelectedPreset('All')
-    setRange({
-      startIndex: 0,
-      endIndex: Math.max(0, totalCount - 1),
-    })
-  }, [totalCount])
-
-  const setPreset = useCallback(
-    (preset: TimelinePreset) => {
-      setSelectedPreset(preset)
-      if (preset === 'All') {
-        setRange({ startIndex: 0, endIndex: Math.max(0, totalCount - 1) })
-        return
-      }
-
-      const targetSpan = preset === '3M' ? 3 : preset === '6M' ? 6 : 12
-      const span = Math.min(targetSpan, totalCount)
-      const start = Math.max(0, totalCount - span)
-      const end = Math.max(0, totalCount - 1)
-      setRange({ startIndex: start, endIndex: end })
-    },
-    [totalCount],
-  )
-
-  const handleBrushChange = useCallback(
-    (newRange: { startIndex?: number; endIndex?: number } | null | undefined) => {
-      if (
-        newRange &&
-        typeof newRange.startIndex === 'number' &&
-        typeof newRange.endIndex === 'number'
-      ) {
-        const start = Math.max(0, Math.min(newRange.startIndex, totalCount - 1))
-        const end = Math.max(start, Math.min(newRange.endIndex, totalCount - 1))
-
-        const isEnd = end >= totalCount - 1
-        const span = end - start + 1
-        if (start === 0 && end === totalCount - 1) {
-          setSelectedPreset('All')
-        } else if (isEnd && span === 6) {
-          setSelectedPreset('6M')
-        } else if (isEnd && span === 3) {
-          setSelectedPreset('3M')
-        } else if (isEnd && span === 12) {
-          setSelectedPreset('1Y')
-        } else {
-          setSelectedPreset(null)
-        }
-
-        setRange((prev) => {
-          if (prev.startIndex === start && prev.endIndex === end) {
-            return prev
-          }
-          return { startIndex: start, endIndex: end }
-        })
-      }
-    },
-    [totalCount],
+  const activePreset = useMemo<TimelinePreset | null>(
+    () => detectPreset(startIndex, endIndex, totalCount),
+    [startIndex, endIndex, totalCount],
   )
 
   const setRangeIndices = useCallback(
     (newStart: number, newEnd: number) => {
+      if (totalCount <= 0) {
+        return
+      }
       const start = Math.max(0, Math.min(newStart, totalCount - 1))
       const end = Math.max(start, Math.min(newEnd, totalCount - 1))
-
-      const isEnd = end >= totalCount - 1
-      const span = end - start + 1
-      if (start === 0 && end === totalCount - 1) {
-        setSelectedPreset('All')
-      } else if (isEnd && span === 6) {
-        setSelectedPreset('6M')
-      } else if (isEnd && span === 3) {
-        setSelectedPreset('3M')
-      } else if (isEnd && span === 12) {
-        setSelectedPreset('1Y')
-      } else {
-        setSelectedPreset(null)
-      }
-
-      setRange((prev) => {
-        if (prev.startIndex === start && prev.endIndex === end) {
-          return prev
-        }
-        return { startIndex: start, endIndex: end }
-      })
+      updateSelection(createTimelineSelection(start, end, keys))
     },
-    [totalCount],
+    [totalCount, keys, updateSelection],
+  )
+
+  const zoomIn = useCallback(() => {
+    const [start, end] = zoomWindow(startIndex, endIndex, totalCount, effectiveMin, 'in')
+    setRangeIndices(start, end)
+  }, [startIndex, endIndex, totalCount, effectiveMin, setRangeIndices])
+
+  const zoomOut = useCallback(() => {
+    const [start, end] = zoomWindow(startIndex, endIndex, totalCount, effectiveMin, 'out')
+    setRangeIndices(start, end)
+  }, [startIndex, endIndex, totalCount, effectiveMin, setRangeIndices])
+
+  const panEarlier = useCallback(() => {
+    const [start, end] = clampWindow(startIndex - 1, endIndex - 1, totalCount)
+    setRangeIndices(start, end)
+  }, [startIndex, endIndex, totalCount, setRangeIndices])
+
+  const panLater = useCallback(() => {
+    const [start, end] = clampWindow(startIndex + 1, endIndex + 1, totalCount)
+    setRangeIndices(start, end)
+  }, [startIndex, endIndex, totalCount, setRangeIndices])
+
+  const setPreset = useCallback(
+    (preset: TimelinePreset) => updateSelection({ kind: 'preset', preset }),
+    [updateSelection],
+  )
+
+  const resetZoom = useCallback(() => setPreset('All'), [setPreset])
+
+  const handleBrushChange = useCallback(
+    (newRange: { startIndex?: number; endIndex?: number } | null | undefined) => {
+      if (typeof newRange?.startIndex === 'number' && typeof newRange.endIndex === 'number') {
+        setRangeIndices(newRange.startIndex, newRange.endIndex)
+      }
+    },
+    [setRangeIndices],
   )
 
   const scrubToRatio = useCallback(
     (ratio: number) => {
-      if (totalCount <= 0) return
-      setSelectedPreset(null)
+      if (totalCount <= 0) {
+        return
+      }
       const clampedRatio = Math.max(0, Math.min(1, ratio))
       const targetCenter = Math.round(clampedRatio * (totalCount - 1))
-
-      setRange((prev) => {
-        const currentSpan = prev.endIndex - prev.startIndex + 1
-        const halfSpan = Math.floor(currentSpan / 2)
-
-        let newStart = targetCenter - halfSpan
-        let newEnd = newStart + currentSpan - 1
-
-        if (newStart < 0) {
-          newEnd = Math.min(totalCount - 1, newEnd + Math.abs(newStart))
-          newStart = 0
-        }
-        if (newEnd > totalCount - 1) {
-          newStart = Math.max(0, newStart - (newEnd - (totalCount - 1)))
-          newEnd = totalCount - 1
-        }
-
-        if (newStart === 0 && newEnd === totalCount - 1) {
-          setSelectedPreset('All')
-        }
-
-        if (prev.startIndex === newStart && prev.endIndex === newEnd) {
-          return prev
-        }
-        return { startIndex: newStart, endIndex: newEnd }
-      })
+      const newStart = targetCenter - Math.floor(visibleCount / 2)
+      const [start, end] = clampWindow(newStart, newStart + visibleCount - 1, totalCount)
+      setRangeIndices(start, end)
     },
-    [totalCount],
+    [totalCount, visibleCount, setRangeIndices],
   )
 
   return {

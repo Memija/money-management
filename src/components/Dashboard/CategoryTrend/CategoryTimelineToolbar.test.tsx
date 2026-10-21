@@ -4,110 +4,90 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { CategoryTimelineToolbar } from './CategoryTimelineToolbar'
 
+type ToolbarProps = React.ComponentProps<typeof CategoryTimelineToolbar>
+
+const renderToolbar = (overrides: Partial<ToolbarProps> = {}) => {
+  const props: ToolbarProps = {
+    visibleCount: 6,
+    totalCount: 12,
+    startMonthLabel: 'Jan 25',
+    endMonthLabel: 'Jun 25',
+    isAtStart: false,
+    isAtEnd: false,
+    isAtMinZoom: false,
+    isAtMaxZoom: false,
+    activePreset: null,
+    onZoomIn: vi.fn(),
+    onZoomOut: vi.fn(),
+    onPanEarlier: vi.fn(),
+    onPanLater: vi.fn(),
+    onSelectPreset: vi.fn(),
+    ...overrides,
+  }
+  render(<CategoryTimelineToolbar {...props} />)
+  return props
+}
+
 describe('CategoryTimelineToolbar', () => {
   beforeEach(() => {
     useLanguageStore.getState().setLocale('en')
   })
 
   it('renders range text and showing pill', () => {
-    render(
-      <CategoryTimelineToolbar
-        visibleCount={6}
-        totalCount={12}
-        startMonthLabel="Jan 25"
-        endMonthLabel="Jun 25"
-        isZoomed={true}
-        isAtStart={false}
-        isAtEnd={false}
-        isAtMinZoom={false}
-        isAtMaxZoom={false}
-        activePreset={null}
-        onZoomIn={vi.fn()}
-        onZoomOut={vi.fn()}
-        onPanEarlier={vi.fn()}
-        onPanLater={vi.fn()}
-        onResetZoom={vi.fn()}
-        onSelectPreset={vi.fn()}
-      />,
-    )
+    renderToolbar()
 
     expect(screen.getByText('Jan 25 – Jun 25')).toBeInTheDocument()
     expect(screen.getByText('6 of 12 months')).toBeInTheDocument()
   })
 
-  it('handles navigation and zoom clicks', () => {
-    const onZoomIn = vi.fn()
-    const onZoomOut = vi.fn()
-    const onPanEarlier = vi.fn()
-    const onPanLater = vi.fn()
-    const onResetZoom = vi.fn()
-    const onSelectPreset = vi.fn()
-
-    render(
-      <CategoryTimelineToolbar
-        visibleCount={6}
-        totalCount={12}
-        startMonthLabel="Jan 25"
-        endMonthLabel="Jun 25"
-        isZoomed={true}
-        isAtStart={false}
-        isAtEnd={false}
-        isAtMinZoom={false}
-        isAtMaxZoom={false}
-        activePreset={null}
-        onZoomIn={onZoomIn}
-        onZoomOut={onZoomOut}
-        onPanEarlier={onPanEarlier}
-        onPanLater={onPanLater}
-        onResetZoom={onResetZoom}
-        onSelectPreset={onSelectPreset}
-      />,
-    )
+  it('handles navigation, zoom and preset clicks', () => {
+    const props = renderToolbar()
 
     fireEvent.click(screen.getByRole('button', { name: 'Previous months' }))
-    expect(onPanEarlier).toHaveBeenCalledTimes(1)
+    expect(props.onPanEarlier).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByRole('button', { name: 'Next months' }))
-    expect(onPanLater).toHaveBeenCalledTimes(1)
+    expect(props.onPanLater).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }))
-    expect(onZoomIn).toHaveBeenCalledTimes(1)
+    expect(props.onZoomIn).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }))
-    expect(onZoomOut).toHaveBeenCalledTimes(1)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Reset zoom' }))
-    expect(onResetZoom).toHaveBeenCalledTimes(1)
+    expect(props.onZoomOut).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByRole('button', { name: '3M' }))
-    expect(onSelectPreset).toHaveBeenCalledWith('3M')
+    expect(props.onSelectPreset).toHaveBeenCalledWith('3M')
+  })
+
+  it('marks the active preset as pressed', () => {
+    renderToolbar({ activePreset: '6M' })
+
+    expect(screen.getByRole('button', { name: '6M' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('only offers presets that fit within the available months', () => {
+    renderToolbar({ totalCount: 8 })
+
+    expect(screen.getByRole('button', { name: '6M' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '1Y' })).not.toBeInTheDocument()
   })
 
   it('disables buttons when bounds are reached', () => {
-    render(
-      <CategoryTimelineToolbar
-        visibleCount={3}
-        totalCount={12}
-        startMonthLabel="Jan 25"
-        endMonthLabel="Mar 25"
-        isZoomed={true}
-        isAtStart={true}
-        isAtEnd={false}
-        isAtMinZoom={true}
-        isAtMaxZoom={false}
-        activePreset={null}
-        onZoomIn={vi.fn()}
-        onZoomOut={vi.fn()}
-        onPanEarlier={vi.fn()}
-        onPanLater={vi.fn()}
-        onResetZoom={vi.fn()}
-        onSelectPreset={vi.fn()}
-      />,
-    )
+    renderToolbar({ visibleCount: 3, endMonthLabel: 'Mar 25', isAtStart: true, isAtMinZoom: true })
 
     expect(screen.getByRole('button', { name: 'Previous months' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Zoom in' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Next months' })).not.toBeDisabled()
     expect(screen.getByRole('button', { name: 'Zoom out' })).not.toBeDisabled()
+  })
+
+  it('reduces to presets only when a timeline overview slider is shown', () => {
+    renderToolbar({ hasOverview: true })
+
+    expect(screen.getByRole('button', { name: '3M' })).toBeInTheDocument()
+    expect(screen.queryByText('6 of 12 months')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Zoom in' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Previous months' })).not.toBeInTheDocument()
   })
 })

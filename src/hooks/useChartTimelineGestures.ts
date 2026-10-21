@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { clampWindow, zoomWindow } from '../utils/timeline-window'
+
 export interface UseChartTimelineGesturesOptions {
   /** Whether direct in-chart gestures (pan & zoom) are active */
   enabled: boolean
@@ -13,16 +15,10 @@ export interface UseChartTimelineGesturesOptions {
   minWindow?: number
   /** Callback invoked when the user pans or zooms to a new range */
   onRangeChange: (startIndex: number, endIndex: number) => void
-  /** Optional callback to zoom in */
+  /** Optional callback to zoom in (double-tap on a fully zoomed-out chart) */
   onZoomIn?: () => void
-  /** Optional callback to zoom out */
-  onZoomOut?: () => void
-  /** Optional callback to reset zoom */
+  /** Optional callback to reset zoom (double-tap on a zoomed chart) */
   onResetZoom?: () => void
-  /** Optional callback to step back one month */
-  onPanEarlier?: () => void
-  /** Optional callback to step forward one month */
-  onPanLater?: () => void
 }
 
 interface DragState {
@@ -43,29 +39,42 @@ interface PinchState {
   centerRatio: number
 }
 
+interface MouseDragState {
+  startX: number
+  startIdx: number
+  endIdx: number
+  chartWidth: number
+  isDragging: boolean
+}
+
+/** Pixels of finger/mouse travel before a gesture is classified as a pan */
+const DRAG_THRESHOLD_PX = 8
+const MOUSE_DRAG_THRESHOLD_PX = 5
+const DOUBLE_TAP_MS = 320
+const DOUBLE_TAP_RADIUS_PX = 30
+/** Accumulated Ctrl+wheel delta required for one zoom step (one mouse-wheel notch ≈ 100) */
+const WHEEL_ZOOM_THRESHOLD = 50
+/** Pixel size of one "line" when the browser reports wheel deltas in lines (Firefox) */
+const WHEEL_LINE_HEIGHT_PX = 16
+
 /**
- * Shifts a [start, end] window back inside [0, maxCount - 1] while preserving its span when possible.
- * @returns Clamped `[start, end]` tuple
+ * Normalizes wheel deltas to pixels regardless of the browser's delta mode.
  */
-const clampWindow = (start: number, end: number, maxCount: number): [number, number] => {
-  let newStart = start
-  let newEnd = end
-  if (newStart < 0) {
-    newEnd = Math.min(maxCount - 1, newEnd + Math.abs(newStart))
-    newStart = 0
+const toPixels = (delta: number, deltaMode: number, pageSize: number): number => {
+  if (deltaMode === 1) {
+    return delta * WHEEL_LINE_HEIGHT_PX
   }
-  if (newEnd > maxCount - 1) {
-    newStart = Math.max(0, newStart - (newEnd - (maxCount - 1)))
-    newEnd = maxCount - 1
+  if (deltaMode === 2) {
+    return delta * pageSize
   }
-  newStart = Math.max(0, newStart)
-  newEnd = Math.min(maxCount - 1, Math.max(newStart, newEnd))
-  return [newStart, newEnd]
+  return delta
 }
 
 /**
- * Custom hook providing touch gestures (swipe-to-pan, pinch-to-zoom, double-tap)
- * and pointer drag on the chart canvas when floating tooltips are disabled on mobile.
+ * Custom hook providing direct manipulation of the visible timeline window on the chart canvas:
+ * - Touch: swipe-to-pan, pinch-to-zoom, double-tap to zoom in / reset
+ * - Mouse: click-drag to pan, Ctrl/⌘ + wheel to zoom around the cursor
+ * - Trackpad: horizontal scroll to pan
  */
 export function useChartTimelineGestures({
   enabled,
@@ -75,10 +84,7 @@ export function useChartTimelineGestures({
   minWindow = 3,
   onRangeChange,
   onZoomIn,
-  onZoomOut,
   onResetZoom,
-  onPanEarlier,
-  onPanLater,
 }: UseChartTimelineGesturesOptions) {
   const [element, setElement] = useState<HTMLDivElement | null>(null)
   const containerRef = useCallback((node: HTMLDivElement | null) => {
@@ -93,10 +99,7 @@ export function useChartTimelineGestures({
     minWindow,
     onRangeChange,
     onZoomIn,
-    onZoomOut,
     onResetZoom,
-    onPanEarlier,
-    onPanLater,
   })
 
   useEffect(() => {
@@ -107,10 +110,7 @@ export function useChartTimelineGestures({
       minWindow,
       onRangeChange,
       onZoomIn,
-      onZoomOut,
       onResetZoom,
-      onPanEarlier,
-      onPanLater,
     }
   })
 
@@ -123,6 +123,10 @@ export function useChartTimelineGestures({
     const dragRef = { current: null as DragState | null }
     const pinchRef = { current: null as PinchState | null }
     const lastTapRef = { current: { time: 0, x: 0, y: 0 } }
+    let mouseDrag: MouseDragState | null = null
+    let shouldSuppressClick = false
+    let wheelZoomAccumulator = 0
+    let wheelPanAccumulator = 0
     // Last range emitted during the active gesture; move events that resolve to the same
     // month window are dropped so the charts don't re-render for sub-month finger movement
     const lastEmitted = { start: -1, end: -1 }
@@ -142,6 +146,26 @@ export function useChartTimelineGestures({
       latestRef.current.onRangeChange(newStart, newEnd)
     }
 
+    const handleDoubleTap = (touch: Touch): boolean => {
+      const now = Date.now()
+      const lastTap = lastTapRef.current
+      const isDoubleTap =
+        now - lastTap.time < DOUBLE_TAP_MS &&
+        Math.hypot(touch.clientX - lastTap.x, touch.clientY - lastTap.y) < DOUBLE_TAP_RADIUS_PX
+      if (!isDoubleTap) {
+        lastTapRef.current = { time: now, x: touch.clientX, y: touch.clientY }
+        return false
+      }
+      lastTapRef.current = { time: 0, x: 0, y: 0 }
+      const { startIndex: start, endIndex: end, totalCount: total } = latestRef.current
+      if (end - start + 1 < total) {
+        latestRef.current.onResetZoom?.()
+      } else {
+        latestRef.current.onZoomIn?.()
+      }
+      return true
+    }
+
     const handleTouchStart = (e: TouchEvent) => {
       const rect = el.getBoundingClientRect()
       const chartWidth = Math.max(1, rect.width)
@@ -158,39 +182,18 @@ export function useChartTimelineGestures({
           isLocked: false,
           isPan: false,
         }
-
-        // Double-tap detection
-        const now = Date.now()
-        const lastTap = lastTapRef.current
-        if (
-          now - lastTap.time < 320 &&
-          Math.hypot(touch.clientX - lastTap.x, touch.clientY - lastTap.y) < 30
-        ) {
-          lastTapRef.current = { time: 0, x: 0, y: 0 }
-          const currentSpan = latestRef.current.endIndex - latestRef.current.startIndex + 1
-          if (currentSpan < latestRef.current.totalCount) {
-            latestRef.current.onResetZoom?.()
-          } else {
-            latestRef.current.onZoomIn?.()
-          }
-          return
-        }
-        lastTapRef.current = { time: now, x: touch.clientX, y: touch.clientY }
+        handleDoubleTap(touch)
       } else if (e.touches.length === 2) {
-        const t1 = e.touches[0]
-        const t2 = e.touches[1]
+        const [t1, t2] = [e.touches[0], e.touches[1]]
         const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY)
         const centerX = (t1.clientX + t2.clientX) / 2
-        const centerRatio = Math.max(0, Math.min(1, (centerX - rect.left) / chartWidth))
-
         pinchRef.current = {
           initialDist: Math.max(10, dist),
           initialSpan: latestRef.current.endIndex - latestRef.current.startIndex + 1,
           initialStart: latestRef.current.startIndex,
           initialEnd: latestRef.current.endIndex,
-          centerRatio,
+          centerRatio: Math.max(0, Math.min(1, (centerX - rect.left) / chartWidth)),
         }
-
         if (dragRef.current) {
           dragRef.current.isPan = false
           dragRef.current.isLocked = true
@@ -198,54 +201,51 @@ export function useChartTimelineGestures({
       }
     }
 
+    const handlePinchMove = (e: TouchEvent, p: PinchState) => {
+      if (e.cancelable) e.preventDefault()
+      const [t1, t2] = [e.touches[0], e.touches[1]]
+      const scale = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY) / p.initialDist
+      if (scale <= 0) return
+
+      const { minWindow: minWin, totalCount: maxCount } = latestRef.current
+      const targetSpan = Math.round(p.initialSpan / scale)
+      const clampedSpan = Math.max(minWin ?? 3, Math.min(maxCount, targetSpan))
+      const anchor = p.initialStart + p.centerRatio * (p.initialSpan - 1)
+      const newStart = Math.round(anchor - p.centerRatio * (clampedSpan - 1))
+      emitRange(newStart, newStart + clampedSpan - 1)
+    }
+
     const handleTouchMove = (e: TouchEvent) => {
-      // 2-finger pinch-to-zoom
       if (e.touches.length === 2 && pinchRef.current) {
-        if (e.cancelable) e.preventDefault()
-        const t1 = e.touches[0]
-        const t2 = e.touches[1]
-        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY)
-        const p = pinchRef.current
-        const scale = dist / p.initialDist
-        if (scale <= 0) return
-
-        const targetSpan = Math.round(p.initialSpan / scale)
-        const minWin = latestRef.current.minWindow ?? 3
-        const maxCount = latestRef.current.totalCount
-        const clampedSpan = Math.max(minWin, Math.min(maxCount, targetSpan))
-
-        const anchor = p.initialStart + p.centerRatio * (p.initialSpan - 1)
-        const newStart = Math.round(anchor - p.centerRatio * (clampedSpan - 1))
-        emitRange(newStart, newStart + clampedSpan - 1)
+        handlePinchMove(e, pinchRef.current)
         return
       }
 
       // 1-finger horizontal pan (preserving vertical page scroll)
-      if (e.touches.length === 1 && dragRef.current) {
-        const drag = dragRef.current
-        const touch = e.touches[0]
-        const dx = touch.clientX - drag.startX
-        const dy = touch.clientY - drag.startY
+      const drag = dragRef.current
+      if (e.touches.length !== 1 || !drag) return
+      const touch = e.touches[0]
+      const dx = touch.clientX - drag.startX
+      const dy = touch.clientY - drag.startY
 
-        if (!drag.isLocked) {
-          // If vertical displacement is greater, lock out pan to let page scroll
-          if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 8) {
-            drag.isLocked = true
-            drag.isPan = false
-            return
-          }
-          if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) > 8) {
-            drag.isLocked = true
-            drag.isPan = true
-          }
+      if (!drag.isLocked) {
+        // If vertical displacement is greater, lock out pan to let page scroll
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > DRAG_THRESHOLD_PX) {
+          drag.isLocked = true
+          drag.isPan = false
+          return
         }
+        if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) > DRAG_THRESHOLD_PX) {
+          drag.isLocked = true
+          drag.isPan = true
+        }
+      }
 
-        if (drag.isPan) {
-          if (e.cancelable) e.preventDefault()
-          const span = drag.endIdx - drag.startIdx + 1
-          const deltaMonths = -Math.round((dx / drag.chartWidth) * span)
-          emitRange(drag.startIdx + deltaMonths, drag.endIdx + deltaMonths)
-        }
+      if (drag.isPan) {
+        if (e.cancelable) e.preventDefault()
+        const span = drag.endIdx - drag.startIdx + 1
+        const deltaMonths = -Math.round((dx / drag.chartWidth) * span)
+        emitRange(drag.startIdx + deltaMonths, drag.endIdx + deltaMonths)
       }
     }
 
@@ -258,33 +258,24 @@ export function useChartTimelineGestures({
       }
     }
 
-    // Pointer events for desktop testing / mouse drag
-    let mouseDragState: {
-      startX: number
-      startIdx: number
-      endIdx: number
-      chartWidth: number
-      isDragging: boolean
-    } | null = null
-
     const handlePointerDown = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse' || e.button !== 0) return
-      const rect = el.getBoundingClientRect()
+      shouldSuppressClick = false
       resetEmitted()
-      mouseDragState = {
+      mouseDrag = {
         startX: e.clientX,
         startIdx: latestRef.current.startIndex,
         endIdx: latestRef.current.endIndex,
-        chartWidth: Math.max(1, rect.width),
+        chartWidth: Math.max(1, el.getBoundingClientRect().width),
         isDragging: false,
       }
     }
 
     const handlePointerMove = (e: PointerEvent) => {
-      if (!mouseDragState) return
-      const dx = e.clientX - mouseDragState.startX
-      if (!mouseDragState.isDragging && Math.abs(dx) > 5) {
-        mouseDragState.isDragging = true
+      if (!mouseDrag) return
+      const dx = e.clientX - mouseDrag.startX
+      if (!mouseDrag.isDragging && Math.abs(dx) > MOUSE_DRAG_THRESHOLD_PX) {
+        mouseDrag.isDragging = true
         try {
           el.setPointerCapture(e.pointerId)
         } catch {
@@ -292,39 +283,81 @@ export function useChartTimelineGestures({
         }
       }
 
-      if (mouseDragState.isDragging) {
-        const span = mouseDragState.endIdx - mouseDragState.startIdx + 1
-        const deltaMonths = -Math.round((dx / mouseDragState.chartWidth) * span)
-        emitRange(mouseDragState.startIdx + deltaMonths, mouseDragState.endIdx + deltaMonths)
+      if (mouseDrag.isDragging) {
+        const span = mouseDrag.endIdx - mouseDrag.startIdx + 1
+        const deltaMonths = -Math.round((dx / mouseDrag.chartWidth) * span)
+        emitRange(mouseDrag.startIdx + deltaMonths, mouseDrag.endIdx + deltaMonths)
       }
     }
 
     const handlePointerUp = (e: PointerEvent) => {
-      if (mouseDragState?.isDragging) {
+      if (mouseDrag?.isDragging) {
+        // The click that follows a drag must not select a bar/category underneath the cursor
+        shouldSuppressClick = true
         try {
           el.releasePointerCapture(e.pointerId)
         } catch {
           // ignore
         }
       }
-      mouseDragState = null
+      mouseDrag = null
+    }
+
+    const handleClickCapture = (e: MouseEvent) => {
+      if (!shouldSuppressClick) return
+      shouldSuppressClick = false
+      e.stopPropagation()
+      e.preventDefault()
+    }
+
+    const handleWheelZoom = (e: WheelEvent, rect: DOMRect) => {
+      if (e.cancelable) e.preventDefault()
+      const deltaY = toPixels(e.deltaY, e.deltaMode, rect.height)
+      // Restart accumulation when the scroll direction flips
+      if (Math.sign(deltaY) !== Math.sign(wheelZoomAccumulator)) {
+        wheelZoomAccumulator = 0
+      }
+      wheelZoomAccumulator += deltaY
+      if (Math.abs(wheelZoomAccumulator) < WHEEL_ZOOM_THRESHOLD) return
+
+      const direction = wheelZoomAccumulator < 0 ? 'in' : 'out'
+      wheelZoomAccumulator = 0
+      const { startIndex: start, endIndex: end, totalCount: total } = latestRef.current
+      const anchorRatio = (e.clientX - rect.left) / Math.max(1, rect.width)
+      const [newStart, newEnd] = zoomWindow(
+        start,
+        end,
+        total,
+        latestRef.current.minWindow ?? 3,
+        direction,
+        anchorRatio,
+      )
+      emitRange(newStart, newEnd)
+    }
+
+    const handleWheelPan = (e: WheelEvent, rect: DOMRect) => {
+      if (e.cancelable) e.preventDefault()
+      const chartWidth = Math.max(1, rect.width)
+      const { startIndex: start, endIndex: end } = latestRef.current
+      const span = end - start + 1
+      wheelPanAccumulator += toPixels(e.deltaX, e.deltaMode, chartWidth)
+      const deltaMonths = Math.trunc((wheelPanAccumulator / chartWidth) * span)
+      if (deltaMonths === 0) return
+      wheelPanAccumulator -= (deltaMonths * chartWidth) / span
+      emitRange(start + deltaMonths, end + deltaMonths)
     }
 
     const handleWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.cancelable) e.preventDefault()
-        if (e.deltaY < 0) {
-          latestRef.current.onZoomIn?.()
-        } else if (e.deltaY > 0) {
-          latestRef.current.onZoomOut?.()
-        }
-      } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 12) {
-        if (e.cancelable) e.preventDefault()
-        if (e.deltaX > 0) {
-          latestRef.current.onPanLater?.()
-        } else if (e.deltaX < 0) {
-          latestRef.current.onPanEarlier?.()
-        }
+      const isZoomGesture = e.ctrlKey || e.metaKey
+      const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY)
+      if (!isZoomGesture && !isHorizontal) return
+
+      resetEmitted()
+      const rect = el.getBoundingClientRect()
+      if (isZoomGesture) {
+        handleWheelZoom(e, rect)
+      } else {
+        handleWheelPan(e, rect)
       }
     }
 
@@ -336,6 +369,7 @@ export function useChartTimelineGestures({
     el.addEventListener('pointermove', handlePointerMove)
     el.addEventListener('pointerup', handlePointerUp)
     el.addEventListener('pointercancel', handlePointerUp)
+    el.addEventListener('click', handleClickCapture, { capture: true })
     el.addEventListener('wheel', handleWheel, { passive: false })
 
     return () => {
@@ -347,6 +381,7 @@ export function useChartTimelineGestures({
       el.removeEventListener('pointermove', handlePointerMove)
       el.removeEventListener('pointerup', handlePointerUp)
       el.removeEventListener('pointercancel', handlePointerUp)
+      el.removeEventListener('click', handleClickCapture, { capture: true })
       el.removeEventListener('wheel', handleWheel)
     }
   }, [element, enabled, totalCount])

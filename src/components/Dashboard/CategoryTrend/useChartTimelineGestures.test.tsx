@@ -20,10 +20,7 @@ describe('useChartTimelineGestures', () => {
       minWindow: 3,
       onRangeChange: vi.fn(),
       onZoomIn: vi.fn(),
-      onZoomOut: vi.fn(),
       onResetZoom: vi.fn(),
-      onPanEarlier: vi.fn(),
-      onPanLater: vi.fn(),
       ...props,
     }
 
@@ -201,27 +198,95 @@ describe('useChartTimelineGestures', () => {
     expect(onResetZoom).toHaveBeenCalled()
   })
 
-  it('handles mouse wheel and horizontal scroll', () => {
-    const onPanLater = vi.fn()
-    const onPanEarlier = vi.fn()
-    const onZoomIn = vi.fn()
-    const onZoomOut = vi.fn()
-    const { el } = setupChart({ onPanEarlier, onPanLater, onZoomIn, onZoomOut })
+  it('pans proportionally on horizontal wheel / trackpad scroll', () => {
+    const onRangeChange = vi.fn()
+    const { el } = setupChart({ startIndex: 3, endIndex: 8, onRangeChange })
 
     act(() => {
-      // Horizontal scroll later
-      fireEvent.wheel(el, { deltaX: 40, deltaY: 0 })
-      // Horizontal scroll earlier
-      fireEvent.wheel(el, { deltaX: -40, deltaY: 0 })
-      // Ctrl+wheel zoom in
-      fireEvent.wheel(el, { ctrlKey: true, deltaY: -20 })
-      // Ctrl+wheel zoom out
-      fireEvent.wheel(el, { ctrlKey: true, deltaY: 20 })
+      // 100px of 300px with a 6-month window → 2 months
+      fireEvent.wheel(el, { deltaX: 100, deltaY: 0 })
+    })
+    expect(onRangeChange).toHaveBeenLastCalledWith(5, 10)
+
+    act(() => {
+      fireEvent.wheel(el, { deltaX: -100, deltaY: 0 })
+    })
+    expect(onRangeChange).toHaveBeenLastCalledWith(1, 6)
+  })
+
+  it('ignores plain vertical wheel so the page keeps scrolling', () => {
+    const onRangeChange = vi.fn()
+    const { el } = setupChart({ startIndex: 3, endIndex: 8, onRangeChange })
+
+    act(() => {
+      fireEvent.wheel(el, { deltaY: 120 })
+    })
+    expect(onRangeChange).not.toHaveBeenCalled()
+  })
+
+  it('zooms one ladder step around the cursor on Ctrl+wheel', () => {
+    const onRangeChange = vi.fn()
+    const { el } = setupChart({ startIndex: 3, endIndex: 8, onRangeChange })
+
+    act(() => {
+      // Zoom in at the center: 6 → 3 months
+      fireEvent.wheel(el, { ctrlKey: true, deltaY: -100, clientX: 150 })
+    })
+    expect(onRangeChange).toHaveBeenLastCalledWith(5, 7)
+
+    act(() => {
+      // Zoom out at the center: 6 → 9 months
+      fireEvent.wheel(el, { ctrlKey: true, deltaY: 100, clientX: 150 })
+    })
+    expect(onRangeChange).toHaveBeenLastCalledWith(2, 10)
+  })
+
+  it('accumulates small trackpad pinch deltas before zooming', () => {
+    const onRangeChange = vi.fn()
+    const { el } = setupChart({ startIndex: 0, endIndex: 11, onRangeChange })
+
+    act(() => {
+      fireEvent.wheel(el, { ctrlKey: true, deltaY: -10, clientX: 150 })
+      fireEvent.wheel(el, { ctrlKey: true, deltaY: -10, clientX: 150 })
+    })
+    expect(onRangeChange).not.toHaveBeenCalled()
+
+    act(() => {
+      fireEvent.wheel(el, { ctrlKey: true, deltaY: -40, clientX: 150 })
+    })
+    expect(onRangeChange).toHaveBeenCalledTimes(1)
+  })
+
+  it('suppresses the click that follows a mouse drag', () => {
+    const onRangeChange = vi.fn()
+    const onChildClick = vi.fn()
+    const { el } = setupChart({ startIndex: 3, endIndex: 8, onRangeChange })
+    const child = document.createElement('button')
+    child.addEventListener('click', onChildClick)
+    el.appendChild(child)
+
+    const pointer = (type: string, clientX: number) =>
+      Object.assign(new MouseEvent(type, { bubbles: true, clientX, button: 0 }), {
+        pointerType: 'mouse',
+        pointerId: 1,
+      })
+
+    act(() => {
+      child.dispatchEvent(pointer('pointerdown', 200))
+      child.dispatchEvent(pointer('pointermove', 100))
+      child.dispatchEvent(pointer('pointerup', 100))
+      child.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
 
-    expect(onPanLater).toHaveBeenCalled()
-    expect(onPanEarlier).toHaveBeenCalled()
-    expect(onZoomIn).toHaveBeenCalled()
-    expect(onZoomOut).toHaveBeenCalled()
+    expect(onRangeChange).toHaveBeenCalledWith(5, 10)
+    expect(onChildClick).not.toHaveBeenCalled()
+
+    // A normal click afterwards still works
+    act(() => {
+      child.dispatchEvent(pointer('pointerdown', 100))
+      child.dispatchEvent(pointer('pointerup', 100))
+      child.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+    expect(onChildClick).toHaveBeenCalledTimes(1)
   })
 })

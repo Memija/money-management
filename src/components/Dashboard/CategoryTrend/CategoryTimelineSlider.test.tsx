@@ -29,7 +29,7 @@ describe('CategoryTimelineSlider', () => {
     )
 
     const sliders = screen.getAllByRole('slider')
-    expect(sliders).toHaveLength(2)
+    expect(sliders).toHaveLength(3)
 
     // Start handle
     expect(sliders[0]).toHaveAttribute('aria-label', expect.stringContaining('Start'))
@@ -40,6 +40,9 @@ describe('CategoryTimelineSlider', () => {
     expect(sliders[1]).toHaveAttribute('aria-label', expect.stringContaining('End'))
     expect(sliders[1]).toHaveAttribute('aria-valuenow', '4')
     expect(sliders[1]).toHaveAttribute('aria-valuetext', 'May 24')
+
+    // Selection window (pans the whole range)
+    expect(sliders[2]).toHaveAttribute('aria-valuetext', 'Feb 24 – May 24')
   })
 
   it('does not render when data has 1 or fewer elements', () => {
@@ -136,5 +139,83 @@ describe('CategoryTimelineSlider', () => {
 
     fireEvent.click(track, { clientX: 200 })
     expect(onScrub).toHaveBeenCalledWith(0.5)
+  })
+
+  describe('pointer dragging', () => {
+    const twelveMonths = Array.from({ length: 12 }, (_, i) => ({ month: `M${i}`, total: 100 }))
+
+    const setupDrag = (startIndex: number, endIndex: number) => {
+      const onRangeChange = vi.fn()
+      render(
+        <CategoryTimelineSlider
+          data={twelveMonths}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          onRangeChange={onRangeChange}
+        />,
+      )
+      vi.spyOn(screen.getByTestId('timeline-track'), 'getBoundingClientRect').mockReturnValue({
+        left: 0,
+        top: 0,
+        width: 240,
+        height: 42,
+        right: 240,
+        bottom: 42,
+        x: 0,
+        y: 0,
+        toJSON: () => {},
+      })
+      // jsdom does not implement pointer capture
+      Element.prototype.setPointerCapture = vi.fn()
+      Element.prototype.releasePointerCapture = vi.fn()
+      return { onRangeChange, sliders: screen.getAllByRole('slider') }
+    }
+
+    it('does not jump when a handle is grabbed and nudged less than one month', () => {
+      // 12 months over 240px → 20px per month; end handle of window 2..5 sits at 120px
+      const { onRangeChange, sliders } = setupDrag(2, 5)
+      const endHandle = sliders[1]
+
+      fireEvent.pointerDown(endHandle, { clientX: 118, pointerId: 1 })
+      fireEvent.pointerMove(endHandle, { clientX: 121, pointerId: 1 })
+      expect(onRangeChange).not.toHaveBeenCalled()
+
+      fireEvent.pointerMove(endHandle, { clientX: 158, pointerId: 1 })
+      expect(onRangeChange).toHaveBeenLastCalledWith(2, 7)
+      fireEvent.pointerUp(endHandle, { pointerId: 1 })
+    })
+
+    it('respects the minimum window when dragging the start handle past the end', () => {
+      const { onRangeChange, sliders } = setupDrag(2, 5)
+      const startHandle = sliders[0]
+
+      fireEvent.pointerDown(startHandle, { clientX: 40, pointerId: 1 })
+      fireEvent.pointerMove(startHandle, { clientX: 200, pointerId: 1 })
+      expect(onRangeChange).toHaveBeenLastCalledWith(3, 5)
+    })
+  })
+
+  it('pans the whole window with keyboard on the selection slider', () => {
+    const onRangeChange = vi.fn()
+    render(
+      <CategoryTimelineSlider
+        data={sampleSummaries}
+        startIndex={1}
+        endIndex={3}
+        onRangeChange={onRangeChange}
+      />,
+    )
+
+    const windowSlider = screen.getAllByRole('slider')[2]
+    expect(windowSlider).toHaveAttribute('aria-valuetext', 'Feb 24 – Apr 24')
+
+    fireEvent.keyDown(windowSlider, { key: 'ArrowRight' })
+    expect(onRangeChange).toHaveBeenLastCalledWith(2, 4)
+
+    fireEvent.keyDown(windowSlider, { key: 'PageDown' })
+    expect(onRangeChange).toHaveBeenLastCalledWith(3, 5)
+
+    fireEvent.keyDown(windowSlider, { key: 'Home' })
+    expect(onRangeChange).toHaveBeenLastCalledWith(0, 2)
   })
 })

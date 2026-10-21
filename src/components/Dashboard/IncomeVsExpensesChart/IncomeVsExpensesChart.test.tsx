@@ -107,7 +107,7 @@ describe('IncomeVsExpensesChart', () => {
       <IncomeVsExpensesChart monthlyData={sampleData} totalIncome={6500} totalExpenses={3500} />,
     )
 
-    // Net Saved +€3,000.00
+    // Net Saved +â‚¬3,000.00
     expect(screen.getByTitle('Net Saved')).toBeInTheDocument()
   })
 
@@ -146,7 +146,7 @@ describe('IncomeVsExpensesChart', () => {
     expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
   })
 
-  it('renders zoom toolbar and timeline slider scrubber on desktop when data has 24 or more months', () => {
+  it('renders presets and timeline slider on desktop when data has 24 or more months', () => {
     render(<IncomeVsExpensesChart monthlyData={createMonthsData(MIN_MONTHS_ZOOM_DESKTOP)} />)
 
     expect(screen.getByRole('region', { name: 'Timeline' })).toBeInTheDocument()
@@ -157,58 +157,34 @@ describe('IncomeVsExpensesChart', () => {
     expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
   })
 
-  it('allows zooming in, zooming out, selecting presets, and resetting zoom on desktop with 24 months', async () => {
-    const user = userEvent.setup()
-    const data24 = createMonthsData(24)
-    render(<IncomeVsExpensesChart monthlyData={data24} />)
+  it('omits step controls and duplicate range info on desktop because the slider covers them', () => {
+    render(<IncomeVsExpensesChart monthlyData={createMonthsData(24)} />)
 
-    // Initially All (24 of 24 months)
-    expect(screen.getByText('24 of 24 months')).toBeInTheDocument()
-
-    // Select 3M preset
-    const preset3M = screen.getByRole('button', { name: '3M' })
-    await user.click(preset3M)
-
-    // Now zoomed in to 3 months (3 of 24 months)
-    expect(screen.getByText('3 of 24 months')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
-
-    // Select 1Y preset
-    const preset1Y = screen.getByRole('button', { name: '1Y' })
-    await user.click(preset1Y)
-    expect(screen.getByText('12 of 24 months')).toBeInTheDocument()
-
-    // Reset zoom
-    const resetBtn = screen.getByRole('button', { name: 'Reset' })
-    await user.click(resetBtn)
-
-    expect(screen.getByText('24 of 24 months')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Zoom in' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Previous months' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument()
-
-    // Zoom in via ZoomIn button
-    const zoomInBtn = screen.getByRole('button', { name: 'Zoom in' })
-    await user.click(zoomInBtn)
-    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
-
-    // Zoom out via ZoomOut button
-    const zoomOutBtn = screen.getByRole('button', { name: 'Zoom out' })
-    await user.click(zoomOutBtn)
+    expect(screen.queryByText('24 of 24 months')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('timeline-position-indicator')).not.toBeInTheDocument()
   })
 
-  it('allows panning earlier and later when zoomed', async () => {
+  it('updates the visible window when selecting presets on desktop', async () => {
     const user = userEvent.setup()
-    const data24 = createMonthsData(24)
-    render(<IncomeVsExpensesChart monthlyData={data24} />)
+    render(<IncomeVsExpensesChart monthlyData={createMonthsData(24)} />)
+    const brush = screen.getByTestId('timeline-brush')
 
-    // Select 3M
+    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
+
     await user.click(screen.getByRole('button', { name: '3M' }))
+    expect(brush).toHaveAttribute('data-start', '21')
+    expect(brush).toHaveAttribute('data-end', '23')
+    expect(screen.getByRole('button', { name: '3M' })).toHaveAttribute('aria-pressed', 'true')
 
-    const panEarlierBtn = screen.getByRole('button', { name: 'Previous months' })
-    expect(panEarlierBtn).not.toBeDisabled()
+    await user.click(screen.getByRole('button', { name: '1Y' }))
+    expect(brush).toHaveAttribute('data-start', '12')
 
-    await user.click(panEarlierBtn)
-    // Slices shifted earlier
-    expect(screen.getByRole('button', { name: 'Next months' })).not.toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'All' }))
+    expect(brush).toHaveAttribute('data-start', '0')
+    expect(brush).toHaveAttribute('data-end', '23')
   })
 
   it('does not offer zoom on mobile when data has fewer than 12 months', () => {
@@ -219,15 +195,33 @@ describe('IncomeVsExpensesChart', () => {
     expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
   })
 
-  it('offers zoom on mobile when data has 12 or more months (toolbar shown, slider hidden)', () => {
+  it('offers full toolbar and position indicator on mobile when data has 12 or more months', () => {
     window.innerWidth = 500
     render(<IncomeVsExpensesChart monthlyData={createMonthsData(MIN_MONTHS_ZOOM_MOBILE)} />)
 
-    // Toolbar is offered
     expect(screen.getByRole('region', { name: 'Timeline' })).toBeInTheDocument()
     expect(screen.getByText('12 of 12 months')).toBeInTheDocument()
+    expect(screen.getByTestId('timeline-position-indicator')).toBeInTheDocument()
 
-    // TimelineSlider scrubber is hidden on mobile to conserve screen space
+    // The full slider is replaced by in-chart gestures on mobile
     expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
+  })
+
+  it('allows zooming and panning with toolbar buttons on mobile', async () => {
+    window.innerWidth = 500
+    const user = userEvent.setup()
+    render(<IncomeVsExpensesChart monthlyData={createMonthsData(24)} />)
+
+    await user.click(screen.getByRole('button', { name: 'Zoom in' }))
+    expect(screen.getByText('18 of 24 months')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Zoom out' }))
+    expect(screen.getByText('24 of 24 months')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: '3M' }))
+    expect(screen.getByRole('button', { name: 'Next months' })).toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: 'Previous months' }))
+    expect(screen.getByRole('button', { name: 'Next months' })).not.toBeDisabled()
   })
 })

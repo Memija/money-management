@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { clampWindow, formatMonthRange, resizeWindowEdge } from '../../../utils/timeline-window'
+import { type TimelineHandleEdge, TimelineSliderHandle } from './TimelineSliderHandle'
 
 import styles from './TimelineSlider.module.css'
 
@@ -20,7 +22,7 @@ export interface TimelineSliderProps {
   'data-testid'?: string
 }
 
-type DragMode = 'start' | 'end' | 'pan'
+type DragMode = TimelineHandleEdge | 'pan'
 
 interface DragState {
   mode: DragMode
@@ -36,6 +38,8 @@ interface MicroBar {
 
 /** Minimum visual height (in %) of a micro-bar so empty months stay visible. */
 const MIN_BAR_HEIGHT_PCT = 10
+/** Badges closer than this (in % of the track) to an edge are pinned inside the track. */
+const BADGE_CLAMP_PCT = 12
 
 /**
  * Renders a static row of micro-bars. The output only depends on the dataset, so it can be
@@ -54,9 +58,66 @@ const renderMicroBars = (bars: MicroBar[], variantClass: string): React.ReactEle
   ))
 
 /**
- * Ultra-responsive, hardware-accelerated timeline scrubber for timeline datasets.
- * Features an illuminated selection lens, frosted boundary curtains, tactile grip handles,
- * and adaptive floating date badges.
+ * Computes the window resulting from a drag of `deltaMonths` in the given mode.
+ * Drags are relative to where the pointer went down, so grabbing a handle never makes it jump.
+ */
+const getDraggedRange = (
+  state: DragState,
+  deltaMonths: number,
+  totalCount: number,
+  minWindow: number,
+): [number, number] => {
+  if (state.mode === 'pan') {
+    return clampWindow(state.initialStart + deltaMonths, state.initialEnd + deltaMonths, totalCount)
+  }
+  return resizeWindowEdge(
+    state.mode,
+    state.initialStart,
+    state.initialEnd,
+    deltaMonths,
+    totalCount,
+    minWindow,
+  )
+}
+
+/**
+ * Maps a keyboard key to the resulting window for a handle or for the whole selection window.
+ * @returns The new `[start, end]` tuple, or `null` when the key is not handled
+ */
+const getKeyboardRange = (
+  mode: DragMode,
+  key: string,
+  start: number,
+  end: number,
+  totalCount: number,
+  minWindow: number,
+): [number, number] | null => {
+  const span = end - start + 1
+  if (mode === 'pan') {
+    const shifts: Record<string, number> = {
+      ArrowLeft: -1,
+      ArrowRight: 1,
+      PageUp: -span,
+      PageDown: span,
+      Home: -start,
+      End: totalCount - 1 - end,
+    }
+    return key in shifts ? clampWindow(start + shifts[key], end + shifts[key], totalCount) : null
+  }
+  const edgeShifts: Record<string, number> = {
+    ArrowLeft: -1,
+    ArrowRight: 1,
+    ...(mode === 'start' ? { Home: -start } : { End: totalCount - 1 - end }),
+  }
+  if (!(key in edgeShifts)) {
+    return null
+  }
+  return resizeWindowEdge(mode, start, end, edgeShifts[key], totalCount, minWindow)
+}
+
+/**
+ * Overview + detail timeline scrubber. A silhouette of monthly activity sits underneath a
+ * draggable selection window with resize handles; clicking the track recenters the window.
  */
 export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
   ({
@@ -72,30 +133,19 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
     const t = useLanguageStore((s) => s.t)
     const trackRef = useRef<HTMLDivElement>(null)
     const [activeDragMode, setActiveDragMode] = useState<DragMode | null>(null)
-    const [hoveredTarget, setHoveredTarget] = useState<'start' | 'end' | null>(null)
+    const [hoveredTarget, setHoveredTarget] = useState<TimelineHandleEdge | null>(null)
     const dragStateRef = useRef<DragState | null>(null)
 
     const totalCount = data.length
     const effectiveMin = Math.min(minWindow, Math.max(1, totalCount))
 
-    const maxSpend = useMemo(() => {
-      let max = 0
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].total > max) {
-          max = data[i].total
-        }
-      }
-      return max > 0 ? max : 1
+    const microBars = useMemo<MicroBar[]>(() => {
+      const maxSpend = data.reduce((max, item) => Math.max(max, item.total), 0) || 1
+      return data.map((item, idx) => ({
+        key: `mb-${item.month}-${idx}`,
+        height: `${Math.max(MIN_BAR_HEIGHT_PCT, Math.round((item.total / maxSpend) * 100))}%`,
+      }))
     }, [data])
-
-    const microBars = useMemo<MicroBar[]>(
-      () =>
-        data.map((item, idx) => ({
-          key: `mb-${item.month}-${idx}`,
-          height: `${Math.max(MIN_BAR_HEIGHT_PCT, Math.round((item.total / maxSpend) * 100))}%`,
-        })),
-      [data, maxSpend],
-    )
     const inactiveBars = useMemo(
       () => renderMicroBars(microBars, styles.microBarInactive),
       [microBars],
@@ -105,6 +155,15 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
     const startPct = totalCount > 0 ? (startIndex / totalCount) * 100 : 0
     const widthPct = totalCount > 0 ? ((endIndex - startIndex + 1) / totalCount) * 100 : 100
     const endPct = startPct + widthPct
+
+    const applyRange = useCallback(
+      ([newStart, newEnd]: [number, number]) => {
+        if (newStart !== startIndex || newEnd !== endIndex) {
+          onRangeChange(newStart, newEnd)
+        }
+      },
+      [startIndex, endIndex, onRangeChange],
+    )
 
     const startDrag = useCallback(
       (e: React.PointerEvent<HTMLDivElement>, mode: DragMode) => {
@@ -125,63 +184,21 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
     const handlePointerMove = useCallback(
       (e: React.PointerEvent<HTMLDivElement>) => {
         const state = dragStateRef.current
-        const track = trackRef.current
-        if (!state || !track || totalCount <= 0) {
+        const width = trackRef.current?.getBoundingClientRect().width ?? 0
+        if (!state || width <= 0 || totalCount <= 0) {
           return
         }
-
-        const rect = track.getBoundingClientRect()
-        if (rect.width <= 0) {
-          return
-        }
-
-        const currentX = e.clientX
-
-        if (state.mode === 'start') {
-          const ratio = Math.max(0, Math.min(1, (currentX - rect.left) / rect.width))
-          const targetIndex = Math.round(ratio * (totalCount - 1))
-          const maxStart = state.initialEnd - effectiveMin + 1
-          const newStart = Math.max(0, Math.min(targetIndex, maxStart))
-          if (newStart !== startIndex) {
-            onRangeChange(newStart, state.initialEnd)
-          }
-        } else if (state.mode === 'end') {
-          const ratio = Math.max(0, Math.min(1, (currentX - rect.left) / rect.width))
-          const targetIndex = Math.round(ratio * (totalCount - 1))
-          const minEnd = state.initialStart + effectiveMin - 1
-          const newEnd = Math.min(totalCount - 1, Math.max(targetIndex, minEnd))
-          if (newEnd !== endIndex) {
-            onRangeChange(state.initialStart, newEnd)
-          }
-        } else if (state.mode === 'pan') {
-          const deltaX = currentX - state.startX
-          const deltaMonths = Math.round((deltaX / rect.width) * totalCount)
-          const span = state.initialEnd - state.initialStart
-          let newStart = state.initialStart + deltaMonths
-          let newEnd = newStart + span
-
-          if (newStart < 0) {
-            newStart = 0
-            newEnd = span
-          }
-          if (newEnd > totalCount - 1) {
-            newEnd = totalCount - 1
-            newStart = Math.max(0, newEnd - span)
-          }
-
-          if (newStart !== startIndex || newEnd !== endIndex) {
-            onRangeChange(newStart, newEnd)
-          }
-        }
+        const deltaMonths = Math.round(((e.clientX - state.startX) / width) * totalCount)
+        applyRange(getDraggedRange(state, deltaMonths, totalCount, effectiveMin))
       },
-      [totalCount, effectiveMin, startIndex, endIndex, onRangeChange],
+      [totalCount, effectiveMin, applyRange],
     )
 
     const endDrag = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
       try {
         e.currentTarget.releasePointerCapture(e.pointerId)
       } catch {
-        // Pointer capture release
+        // Pointer capture may already be released
       }
       dragStateRef.current = null
       setActiveDragMode(null)
@@ -193,71 +210,38 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
         if (target.closest(`.${styles.selectionWindow}`) || target.closest(`.${styles.handle}`)) {
           return
         }
-        const track = trackRef.current
-        if (!track || !onScrub) {
-          return
-        }
-        const rect = track.getBoundingClientRect()
-        if (rect.width > 0) {
-          const ratio = (e.clientX - rect.left) / rect.width
-          onScrub(ratio)
+        const rect = trackRef.current?.getBoundingClientRect()
+        if (rect && rect.width > 0 && onScrub) {
+          onScrub((e.clientX - rect.left) / rect.width)
         }
       },
       [onScrub],
     )
 
-    const handleStartKeyDown = useCallback(
-      (e: React.KeyboardEvent) => {
-        if (e.key === 'ArrowLeft') {
+    const createKeyHandler = useCallback(
+      (mode: DragMode) => (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const next = getKeyboardRange(mode, e.key, startIndex, endIndex, totalCount, effectiveMin)
+        if (next) {
           e.preventDefault()
-          onRangeChange(Math.max(0, startIndex - 1), endIndex)
-        } else if (e.key === 'ArrowRight') {
-          e.preventDefault()
-          onRangeChange(Math.min(endIndex - effectiveMin + 1, startIndex + 1), endIndex)
-        } else if (e.key === 'Home') {
-          e.preventDefault()
-          onRangeChange(0, endIndex)
+          applyRange(next)
         }
       },
-      [startIndex, endIndex, effectiveMin, onRangeChange],
-    )
-
-    const handleEndKeyDown = useCallback(
-      (e: React.KeyboardEvent) => {
-        if (e.key === 'ArrowLeft') {
-          e.preventDefault()
-          onRangeChange(startIndex, Math.max(startIndex + effectiveMin - 1, endIndex - 1))
-        } else if (e.key === 'ArrowRight') {
-          e.preventDefault()
-          onRangeChange(startIndex, Math.min(totalCount - 1, endIndex + 1))
-        } else if (e.key === 'End') {
-          e.preventDefault()
-          onRangeChange(startIndex, totalCount - 1)
-        }
-      },
-      [startIndex, endIndex, effectiveMin, totalCount, onRangeChange],
-    )
-
-    const formatLabel = useCallback(
-      (rawMonth: string) => (formatMonth ? formatMonth(rawMonth) : rawMonth),
-      [formatMonth],
+      [startIndex, endIndex, totalCount, effectiveMin, applyRange],
     )
 
     if (totalCount <= 1) {
       return null
     }
 
+    const formatLabel = (rawMonth: string) => (formatMonth ? formatMonth(rawMonth) : rawMonth)
     const startLabel = formatLabel(data[startIndex]?.month ?? '')
     const endLabel = formatLabel(data[endIndex]?.month ?? '')
-    const firstLabel = formatLabel(data[0]?.month ?? '')
-    const lastLabel = formatLabel(data[totalCount - 1]?.month ?? '')
+    const rangeLabel = formatMonthRange(startLabel, endLabel)
     const timelineLabel = t.timelineRange || 'Timeline'
-    const showStartBadge =
-      activeDragMode === 'start' || (hoveredTarget === 'start' && !activeDragMode)
-    const showEndBadge = activeDragMode === 'end' || (hoveredTarget === 'end' && !activeDragMode)
-    const showPanBadge = activeDragMode === 'pan'
+    const isBadgeVisible = (edge: TimelineHandleEdge) =>
+      activeDragMode === edge || (hoveredTarget === edge && !activeDragMode)
     const selectedMonthCount = endIndex - startIndex + 1
-    const monthsTrackedTemplate = t.monthsTracked || '{count} Monate'
+    const monthsTrackedTemplate = t.monthsTracked || '{count} months'
     const monthsTrackedText = monthsTrackedTemplate.includes('{count}')
       ? monthsTrackedTemplate.replace('{count}', String(selectedMonthCount))
       : `${selectedMonthCount} ${monthsTrackedTemplate}`
@@ -293,88 +277,62 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
           <div className={styles.curtainLeft} />
           <div className={styles.curtainRight} />
 
-          {/* Draggable Selection Lens Window */}
+          <TimelineSliderHandle
+            edge="start"
+            ariaLabel={`${timelineLabel} Start (${startLabel})`}
+            valueMin={0}
+            valueMax={endIndex - effectiveMin + 1}
+            valueNow={startIndex}
+            valueText={startLabel}
+            isActive={activeDragMode === 'start'}
+            showBadge={isBadgeVisible('start')}
+            isBadgeClamped={startPct < BADGE_CLAMP_PCT}
+            onPointerDown={startDrag}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onKeyDown={createKeyHandler('start')}
+            onHoverChange={setHoveredTarget}
+          />
+          <TimelineSliderHandle
+            edge="end"
+            ariaLabel={`${timelineLabel} End (${endLabel})`}
+            valueMin={startIndex + effectiveMin - 1}
+            valueMax={totalCount - 1}
+            valueNow={endIndex}
+            valueText={endLabel}
+            isActive={activeDragMode === 'end'}
+            showBadge={isBadgeVisible('end')}
+            isBadgeClamped={endPct > 100 - BADGE_CLAMP_PCT}
+            onPointerDown={startDrag}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onKeyDown={createKeyHandler('end')}
+            onHoverChange={setHoveredTarget}
+          />
+
+          {/* Draggable selection window (arrow keys / PageUp / PageDown / Home / End pan it) */}
           <div
+            role="slider"
+            tabIndex={0}
+            aria-label={`${timelineLabel} (${monthsTrackedText})`}
+            aria-valuemin={0}
+            aria-valuemax={totalCount - selectedMonthCount}
+            aria-valuenow={startIndex}
+            aria-valuetext={rangeLabel}
             className={`${styles.selectionWindow} ${activeDragMode === 'pan' ? styles.selectionWindowDragging : ''}`}
             onPointerDown={(e) => startDrag(e, 'pan')}
             onPointerMove={handlePointerMove}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
+            onKeyDown={createKeyHandler('pan')}
           >
-            {/* Center pan grab indicator */}
             <div className={styles.panGripIndicator}>
               <span className={styles.panDot} />
               <span className={styles.panDot} />
               <span className={styles.panDot} />
             </div>
 
-            {showPanBadge && (
-              <span className={styles.floatingBadge}>
-                {startLabel === endLabel ? startLabel : `${startLabel} – ${endLabel}`}
-              </span>
-            )}
-
-            {/* Left Traveller Handle */}
-            <div
-              role="slider"
-              tabIndex={0}
-              aria-label={`${timelineLabel} Start (${startLabel})`}
-              aria-valuemin={0}
-              aria-valuemax={endIndex - effectiveMin + 1}
-              aria-valuenow={startIndex}
-              aria-valuetext={startLabel}
-              className={`${styles.handle} ${styles.handleStart} ${activeDragMode === 'start' ? styles.handleActive : ''}`}
-              onPointerDown={(e) => startDrag(e, 'start')}
-              onPointerMove={handlePointerMove}
-              onPointerUp={endDrag}
-              onPointerCancel={endDrag}
-              onMouseEnter={() => setHoveredTarget('start')}
-              onMouseLeave={() => setHoveredTarget(null)}
-              onKeyDown={handleStartKeyDown}
-            >
-              {showStartBadge && (
-                <span
-                  className={`${styles.floatingBadge} ${startPct < 12 ? styles.floatingBadgeClampLeft : ''}`}
-                >
-                  {startLabel}
-                </span>
-              )}
-              <div className={styles.handleGrip}>
-                <span className={styles.handleGripBar} />
-                <span className={styles.handleGripBar} />
-              </div>
-            </div>
-
-            {/* Right Traveller Handle */}
-            <div
-              role="slider"
-              tabIndex={0}
-              aria-label={`${timelineLabel} End (${endLabel})`}
-              aria-valuemin={startIndex + effectiveMin - 1}
-              aria-valuemax={totalCount - 1}
-              aria-valuenow={endIndex}
-              aria-valuetext={endLabel}
-              className={`${styles.handle} ${styles.handleEnd} ${activeDragMode === 'end' ? styles.handleActive : ''}`}
-              onPointerDown={(e) => startDrag(e, 'end')}
-              onPointerMove={handlePointerMove}
-              onPointerUp={endDrag}
-              onPointerCancel={endDrag}
-              onMouseEnter={() => setHoveredTarget('end')}
-              onMouseLeave={() => setHoveredTarget(null)}
-              onKeyDown={handleEndKeyDown}
-            >
-              {showEndBadge && (
-                <span
-                  className={`${styles.floatingBadge} ${endPct > 88 ? styles.floatingBadgeClampRight : ''}`}
-                >
-                  {endLabel}
-                </span>
-              )}
-              <div className={styles.handleGrip}>
-                <span className={styles.handleGripBar} />
-                <span className={styles.handleGripBar} />
-              </div>
-            </div>
+            {activeDragMode === 'pan' && <span className={styles.floatingBadge}>{rangeLabel}</span>}
           </div>
         </div>
 
@@ -382,18 +340,18 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = React.memo(
         <div className={styles.timelineFooter}>
           <div className={styles.footerBound}>
             <span className={styles.footerDot} />
-            <span className={styles.footerLabel}>{firstLabel}</span>
+            <span className={styles.footerLabel}>{formatLabel(data[0]?.month ?? '')}</span>
           </div>
 
           <div className={styles.footerRangeBadge}>
-            <span className={styles.footerRangeText}>
-              {startLabel === endLabel ? startLabel : `${startLabel} – ${endLabel}`}
-            </span>
+            <span className={styles.footerRangeText}>{rangeLabel}</span>
             <span className={styles.footerRangeCount}>{`(${monthsTrackedText})`}</span>
           </div>
 
           <div className={styles.footerBound}>
-            <span className={styles.footerLabel}>{lastLabel}</span>
+            <span className={styles.footerLabel}>
+              {formatLabel(data[totalCount - 1]?.month ?? '')}
+            </span>
             <span className={styles.footerDot} />
           </div>
         </div>

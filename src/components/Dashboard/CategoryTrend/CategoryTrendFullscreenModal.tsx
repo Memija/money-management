@@ -11,6 +11,7 @@ import { CategoryTimelineSlider, type MonthSummary } from './CategoryTimelineSli
 import { CategoryTimelineToolbar } from './CategoryTimelineToolbar'
 import { CategoryTrendChart } from './CategoryTrendChart'
 import { CategoryTrendLegend } from './CategoryTrendLegend'
+import { useChartTimelineGestures } from './useChartTimelineGestures'
 import type { TimelinePreset } from './useTimelineZoom'
 
 import styles from './CategoryTrendFullscreenModal.module.css'
@@ -99,6 +100,17 @@ export const CategoryTrendFullscreenModal: React.FC<CategoryTrendFullscreenModal
   const t = useLanguageStore((s) => s.t)
   const { formatCurrency, formatCategoryCount, formatMonthYear } = useFormatters()
   const modalRef = useRef<HTMLDivElement>(null)
+
+  const chartGesturesRef = useChartTimelineGestures({
+    enabled: isOpen && canZoomAndNavigate,
+    totalCount,
+    startIndex,
+    endIndex,
+    minWindow: 3,
+    onRangeChange,
+    onZoomIn,
+    onResetZoom,
+  })
 
   // Escape key listener to close fullscreen
   useEffect(() => {
@@ -227,23 +239,25 @@ export const CategoryTrendFullscreenModal: React.FC<CategoryTrendFullscreenModal
                 totalCount={totalCount}
                 startMonthLabel={startMonthLabel}
                 endMonthLabel={endMonthLabel}
-                isZoomed={isZoomed}
                 isAtStart={isAtStart}
                 isAtEnd={isAtEnd}
                 isAtMinZoom={isAtMinZoom}
                 isAtMaxZoom={isAtMaxZoom}
                 activePreset={activePreset}
+                hasOverview
                 onZoomIn={onZoomIn}
                 onZoomOut={onZoomOut}
                 onPanEarlier={onPanEarlier}
                 onPanLater={onPanLater}
-                onResetZoom={onResetZoom}
                 onSelectPreset={onSelectPreset}
               />
             )}
 
             {/* Chart Area */}
-            <div className={styles.chartContainer}>
+            <div
+              ref={chartGesturesRef}
+              className={`${styles.chartContainer} ${canZoomAndNavigate ? styles.chartContainerInteractive : ''}`}
+            >
               <CategoryTrendChart
                 data={visibleData}
                 animationKey={data}

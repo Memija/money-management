@@ -13,8 +13,9 @@ import {
   useTimelineZoom,
 } from '../../../hooks/useTimelineZoom'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { DASHBOARD_TIMELINE_SYNC_KEY } from '../../../store/useTimelineSelectionStore'
 import { RenderWhenVisible } from '../../shared/RenderWhenVisible'
-import { TimelineSlider } from '../../shared/TimelineSlider'
+import { TimelinePositionIndicator, TimelineSlider } from '../../shared/TimelineSlider'
 import { TimelineToolbar } from '../../shared/TimelineToolbar'
 import { type IncomeChartEntry, IncomeVsExpensesPlot } from './IncomeVsExpensesPlot'
 import type { IncomeChartViewMode } from './IncomeVsExpensesTooltip'
@@ -67,6 +68,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
       minCount: minMonthsForZoom,
       minWindow: 3,
       monthKeys,
+      syncKey: DASHBOARD_TIMELINE_SYNC_KEY,
     })
 
     // Deferred visible window: controls update instantly, the plot catches up in the background
@@ -91,19 +93,16 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
       }))
     }, [monthlyData])
 
-    // Touch and pointer gestures on the chart area
+    // Direct manipulation on the chart: touch pan/pinch on mobile, drag and Ctrl+wheel on desktop
     const chartGesturesRef = useChartTimelineGestures({
-      enabled: canZoom && isMobile,
+      enabled: canZoom,
       totalCount: monthlyData.length,
       startIndex,
       endIndex,
       minWindow: 3,
       onRangeChange: setRangeIndices,
       onZoomIn: zoomIn,
-      onZoomOut: zoomOut,
       onResetZoom: resetZoom,
-      onPanEarlier: panEarlier,
-      onPanLater: panLater,
     })
 
     const handleLegendClick = useCallback(
@@ -268,17 +267,16 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
             totalCount={monthlyData.length}
             startMonthLabel={startMonthLabel}
             endMonthLabel={endMonthLabel}
-            isZoomed={isZoomed}
             isAtStart={isAtStart}
             isAtEnd={isAtEnd}
             isAtMinZoom={isAtMinZoom}
             isAtMaxZoom={isAtMaxZoom}
             activePreset={activePreset}
+            hasOverview={!isMobile}
             onZoomIn={zoomIn}
             onZoomOut={zoomOut}
             onPanEarlier={panEarlier}
             onPanLater={panLater}
-            onResetZoom={resetZoom}
             onSelectPreset={setPreset}
           />
         )}
@@ -286,7 +284,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
         {/* Chart container */}
         <div
           ref={chartGesturesRef}
-          className={`${styles.chartContainer} ${canZoom && isMobile ? styles.chartContainerInteractive : ''}`}
+          className={`${styles.chartContainer} ${canZoom ? styles.chartContainerInteractive : ''}`}
         >
           {monthlyData.length > 0 ? (
             <RenderWhenVisible>
@@ -309,18 +307,27 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
           )}
         </div>
 
-        {/* Timeline Slider Scrubber (when zooming is enabled; hidden on mobile) */}
-        {canZoom && !isMobile && (
-          <TimelineSlider
-            data={monthSummaries}
-            startIndex={startIndex}
-            endIndex={endIndex}
-            minWindow={3}
-            formatMonth={formatMonthYear}
-            onRangeChange={setRangeIndices}
-            onScrub={scrubToRatio}
-          />
-        )}
+        {/* Timeline overview: full slider on desktop, slim position indicator on mobile */}
+        {canZoom &&
+          (isMobile ? (
+            <TimelinePositionIndicator
+              startIndex={startIndex}
+              endIndex={endIndex}
+              totalCount={monthlyData.length}
+              startMonthLabel={startMonthLabel}
+              endMonthLabel={endMonthLabel}
+            />
+          ) : (
+            <TimelineSlider
+              data={monthSummaries}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              minWindow={3}
+              formatMonth={formatMonthYear}
+              onRangeChange={setRangeIndices}
+              onScrub={scrubToRatio}
+            />
+          ))}
       </motion.div>
     )
   },

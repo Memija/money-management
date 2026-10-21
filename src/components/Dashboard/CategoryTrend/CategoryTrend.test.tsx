@@ -317,33 +317,15 @@ describe('CategoryTrend', () => {
       expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()
     })
 
-    it('renders timeline navigation toolbar and brush on desktop when 24 or more months are present', () => {
+    it('renders presets and slider on desktop when 24 or more months are present', () => {
       render(<CategoryTrend data={twentyFourMonthsData} />)
       expect(screen.getByRole('region', { name: 'Timeline' })).toBeInTheDocument()
       expect(screen.getByTestId('timeline-brush')).toBeInTheDocument()
-      expect(screen.getByText('24 of 24 months')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Zoom in' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Zoom out' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Previous months' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Next months' })).toBeInTheDocument()
-    })
+      expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
 
-    it('allows zooming in, zooming out and resetting zoom', () => {
-      render(<CategoryTrend data={twentyFourMonthsData} />)
-
-      const zoomInBtn = screen.getByRole('button', { name: 'Zoom in' })
-      fireEvent.click(zoomInBtn)
-
-      // Reset button should now be visible
-      const resetBtn = screen.getByRole('button', { name: 'Reset zoom' })
-      expect(resetBtn).toBeInTheDocument()
-
-      // Subtitle and pill update to show zoomed range
-      expect(screen.getAllByText(/of 24 months/).length).toBeGreaterThanOrEqual(1)
-
-      // Resetting zoom restores 24 of 24 months
-      fireEvent.click(resetBtn)
-      expect(screen.getByText('24 of 24 months')).toBeInTheDocument()
+      // Step controls are covered by the slider on desktop
+      expect(screen.queryByRole('button', { name: 'Zoom in' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Previous months' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Reset zoom' })).not.toBeInTheDocument()
     })
 
@@ -352,31 +334,30 @@ describe('CategoryTrend', () => {
 
       const preset3M = screen.getByRole('button', { name: '3M' })
       fireEvent.click(preset3M)
-      expect(screen.getByText('3 of 24 months')).toBeInTheDocument()
+      expect(screen.getByText(/^3 of 24 months/)).toBeInTheDocument()
 
       const preset6M = screen.getByRole('button', { name: '6M' })
       fireEvent.click(preset6M)
-      expect(screen.getByText('6 of 24 months')).toBeInTheDocument()
+      expect(screen.getByText(/^6 of 24 months/)).toBeInTheDocument()
 
       const preset1Y = screen.getByRole('button', { name: '1Y' })
       fireEvent.click(preset1Y)
-      expect(screen.getByText('12 of 24 months')).toBeInTheDocument()
+      expect(screen.getByText(/^12 of 24 months/)).toBeInTheDocument()
+
+      fireEvent.click(screen.getByRole('button', { name: 'All' }))
+      expect(screen.queryByText(/of 24 months/)).not.toBeInTheDocument()
     })
 
-    it('allows panning earlier and later through the timeline', () => {
+    it('pans the window with the keyboard on the slider selection', () => {
       render(<CategoryTrend data={twentyFourMonthsData} />)
-
-      // Choose 3M
       fireEvent.click(screen.getByRole('button', { name: '3M' }))
-      const nextBtn = screen.getByRole('button', { name: 'Next months' })
-      expect(nextBtn).toBeDisabled()
 
-      const prevBtn = screen.getByRole('button', { name: 'Previous months' })
-      expect(prevBtn).not.toBeDisabled()
+      const brush = screen.getByTestId('timeline-brush')
+      const panSlider = screen.getAllByRole('slider')[2]
+      fireEvent.keyDown(panSlider, { key: 'ArrowLeft' })
 
-      fireEvent.click(prevBtn)
-      // Now it's not at the end anymore, nextBtn becomes enabled
-      expect(nextBtn).not.toBeDisabled()
+      expect(brush).toHaveAttribute('data-start', '20')
+      expect(brush).toHaveAttribute('data-end', '22')
     })
 
     it('allows opening and exiting full screen view', async () => {
@@ -422,7 +403,7 @@ describe('CategoryTrend', () => {
       })
     })
 
-    it('hides timeline brush on mobile view but renders timeline toolbar when 12 or more months are present', () => {
+    it('shows full toolbar and position indicator instead of the slider on mobile', () => {
       act(() => {
         window.innerWidth = 480
         window.dispatchEvent(new Event('resize'))
@@ -430,8 +411,10 @@ describe('CategoryTrend', () => {
 
       render(<CategoryTrend data={twelveMonthsData} />)
 
-      // Timeline toolbar is still present for accessible controls on mobile
+      // Timeline toolbar keeps accessible step controls on mobile
       expect(screen.getByRole('region', { name: 'Timeline' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Zoom in' })).toBeInTheDocument()
+      expect(screen.getByTestId('timeline-position-indicator')).toBeInTheDocument()
 
       // Brush is hidden on mobile
       expect(screen.queryByTestId('timeline-brush')).not.toBeInTheDocument()

@@ -85,6 +85,21 @@ describe('useTimelineZoom', () => {
     expect(result.current.isZoomed).toBe(false)
   })
 
+  it('zooms in and out symmetrically back to the original span', () => {
+    const { result } = renderHook(() => useTimelineZoom({ totalCount: 24, isLotsOfData: true }))
+
+    act(() => {
+      result.current.zoomIn()
+    })
+    expect(result.current.visibleCount).toBe(18)
+
+    act(() => {
+      result.current.zoomOut()
+    })
+    expect(result.current.visibleCount).toBe(24)
+    expect(result.current.activePreset).toBe('All')
+  })
+
   it('pans earlier and later across the timeline', () => {
     const { result } = renderHook(() =>
       useTimelineZoom({ totalCount: 8, isLotsOfData: true, minWindow: 3 }),
@@ -327,5 +342,55 @@ describe('useTimelineZoom', () => {
     // 2025-02 is now index 3, and 2025-04 is index 5
     expect(result.current.startIndex).toBe(3)
     expect(result.current.endIndex).toBe(5)
+  })
+
+  describe('with a shared syncKey', () => {
+    const CONTINUOUS = ['2025-01', '2025-02', '2025-03', '2025-04', '2025-05', '2025-06']
+    const WITH_GAPS = ['2025-01', '2025-03', '2025-04', '2025-05', '2025-06']
+
+    const renderSynced = (keys: string[]) =>
+      renderHook(() =>
+        useTimelineZoom({
+          totalCount: keys.length,
+          isLotsOfData: true,
+          minWindow: 1,
+          monthKeys: keys,
+          syncKey: 'test',
+        }),
+      )
+
+    it('should keep two charts on the same calendar window', () => {
+      const { result: first } = renderSynced(CONTINUOUS)
+      const { result: second } = renderSynced(WITH_GAPS)
+
+      act(() => {
+        first.current.setRangeIndices(2, 3) // 2025-03 … 2025-04
+      })
+
+      expect(second.current.startIndex).toBe(1)
+      expect(second.current.endIndex).toBe(2)
+
+      act(() => {
+        second.current.setPreset('3M')
+      })
+
+      expect(first.current.activePreset).toBe('3M')
+      expect(first.current.startIndex).toBe(3)
+      expect(first.current.endIndex).toBe(5)
+    })
+
+    it('should show the full range when the synced chart cannot zoom', () => {
+      const { result: zoomable } = renderSynced(CONTINUOUS)
+      const { result: locked } = renderHook(() =>
+        useTimelineZoom({ totalCount: 3, isLotsOfData: false, syncKey: 'test' }),
+      )
+
+      act(() => {
+        zoomable.current.setPreset('3M')
+      })
+
+      expect(locked.current.startIndex).toBe(0)
+      expect(locked.current.endIndex).toBe(2)
+    })
   })
 })

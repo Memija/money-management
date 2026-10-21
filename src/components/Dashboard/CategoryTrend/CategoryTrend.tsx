@@ -8,8 +8,11 @@ import { useFormatters } from '../../../hooks/useFormatters'
 import { useIsMobile } from '../../../hooks/useIsMobile'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { DASHBOARD_TIMELINE_SYNC_KEY } from '../../../store/useTimelineSelectionStore'
+import { computeCategoryTrendStats } from '../../../utils/category-trend-stats'
 import { hasExtensiveCategoryData } from '../../../utils/category-utils'
 import { RenderWhenVisible } from '../../shared/RenderWhenVisible'
+import { TimelinePositionIndicator } from '../../shared/TimelineSlider'
 import { CategoryTimelineSlider } from './CategoryTimelineSlider'
 import { CategoryTimelineToolbar } from './CategoryTimelineToolbar'
 import { CategoryTrendChart } from './CategoryTrendChart'
@@ -57,49 +60,11 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
     const handleOpenFullscreen = useCallback(() => setIsFullscreen(true), [])
     const handleCloseFullscreen = useCallback(() => setIsFullscreen(false), [])
 
-    // Collect all unique categories across all months and sort by overall spend descending
-    const categories = useMemo(() => {
-      const categoryTotals: Record<string, number> = {}
-      data.forEach((entry) => {
-        Object.entries(entry).forEach(([key, val]) => {
-          if (key !== 'month' && typeof val === 'number') {
-            categoryTotals[key] = (categoryTotals[key] || 0) + val
-          }
-        })
-      })
-
-      return Object.keys(categoryTotals).sort((a, b) => categoryTotals[b] - categoryTotals[a])
-    }, [data])
-
-    // Calculate overall monthly average spend
-    const monthlyAverage = useMemo(() => {
-      if (data.length === 0) {
-        return 0
-      }
-      const total = data.reduce((sum, entry) => {
-        const monthSum = Object.entries(entry).reduce((s, [k, v]) => {
-          return k !== 'month' && typeof v === 'number' ? s + v : s
-        }, 0)
-        return sum + monthSum
-      }, 0)
-      return total / data.length
-    }, [data])
-
-    // Detect highest spending month
-    const peakMonth = useMemo(() => {
-      let maxMonth = ''
-      let maxAmount = 0
-      data.forEach((entry) => {
-        const total = Object.entries(entry).reduce((sum, [k, v]) => {
-          return k !== 'month' && typeof v === 'number' ? sum + v : sum
-        }, 0)
-        if (total > maxAmount) {
-          maxAmount = total
-          maxMonth = entry.month
-        }
-      })
-      return { month: maxMonth, amount: maxAmount }
-    }, [data])
+    // Sorted categories, monthly average, peak month and slider silhouette totals in a single pass
+    const { categories, monthlyAverage, peakMonth, monthSummaries } = useMemo(
+      () => computeCategoryTrendStats(data),
+      [data],
+    )
 
     // High data volume flag to automatically expand card
     const isExtensive = useMemo(
@@ -107,19 +72,6 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       [data, categories.length],
     )
     const isFullWidth = fullWidth ?? isExtensive
-
-    // Pre-calculate aggregate monthly sums for the timeline scrubber silhouette
-    const monthSummaries = useMemo(() => {
-      return data.map((entry) => {
-        let total = 0
-        for (const [key, val] of Object.entries(entry)) {
-          if (key !== 'month' && typeof val === 'number') {
-            total += val
-          }
-        }
-        return { month: entry.month, total }
-      })
-    }, [data])
 
     const monthKeys = useMemo(() => data.map((d) => d.rawMonth || d.month), [data])
 
@@ -152,6 +104,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
       minCount: minMonthsForZoom,
       minWindow: 3,
       monthKeys,
+      syncKey: DASHBOARD_TIMELINE_SYNC_KEY,
     })
 
     // The chart renders a deferred window so zoom/pan controls stay instant while the
@@ -165,18 +118,16 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
     const startMonthLabel = formatMonthYear(data[startIndex]?.month ?? '')
     const endMonthLabel = formatMonthYear(data[endIndex]?.month ?? '')
 
+    // Direct manipulation on the chart: touch pan/pinch on mobile, drag and Ctrl+wheel on desktop
     const chartGesturesRef = useChartTimelineGestures({
-      enabled: canZoomAndNavigate && isMobile,
+      enabled: canZoomAndNavigate,
       totalCount: data.length,
       startIndex,
       endIndex,
       minWindow: 3,
       onRangeChange: setRangeIndices,
       onZoomIn: zoomIn,
-      onZoomOut: zoomOut,
       onResetZoom: resetZoom,
-      onPanEarlier: panEarlier,
-      onPanLater: panLater,
     })
 
     if (data.length === 0) {
@@ -267,17 +218,16 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
             totalCount={data.length}
             startMonthLabel={startMonthLabel}
             endMonthLabel={endMonthLabel}
-            isZoomed={isZoomed}
             isAtStart={isAtStart}
             isAtEnd={isAtEnd}
             isAtMinZoom={isAtMinZoom}
             isAtMaxZoom={isAtMaxZoom}
             activePreset={activePreset}
+            hasOverview={!isMobile}
             onZoomIn={zoomIn}
             onZoomOut={zoomOut}
             onPanEarlier={panEarlier}
             onPanLater={panLater}
-            onResetZoom={resetZoom}
             onSelectPreset={setPreset}
           />
         )}
@@ -285,7 +235,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
         {/* Chart Canvas */}
         <div
           ref={chartGesturesRef}
-          className={`${styles.chartContainer} ${canZoomAndNavigate && isMobile ? styles.chartContainerInteractive : ''}`}
+          className={`${styles.chartContainer} ${canZoomAndNavigate ? styles.chartContainerInteractive : ''}`}
         >
           {categories.length === 0 ? (
             <div className={styles.emptyContainer}>
@@ -311,18 +261,27 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
           )}
         </div>
 
-        {/* Timeline Slider (when extensive data points are present; hidden on mobile in favor of in-chart pan/zoom) */}
-        {canZoomAndNavigate && !isMobile && (
-          <CategoryTimelineSlider
-            data={monthSummaries}
-            startIndex={startIndex}
-            endIndex={endIndex}
-            minWindow={3}
-            formatMonth={formatMonthYear}
-            onRangeChange={setRangeIndices}
-            onScrub={scrubToRatio}
-          />
-        )}
+        {/* Timeline overview: full slider on desktop, slim position indicator on mobile */}
+        {canZoomAndNavigate &&
+          (isMobile ? (
+            <TimelinePositionIndicator
+              startIndex={startIndex}
+              endIndex={endIndex}
+              totalCount={data.length}
+              startMonthLabel={startMonthLabel}
+              endMonthLabel={endMonthLabel}
+            />
+          ) : (
+            <CategoryTimelineSlider
+              data={monthSummaries}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              minWindow={3}
+              formatMonth={formatMonthYear}
+              onRangeChange={setRangeIndices}
+              onScrub={scrubToRatio}
+            />
+          ))}
 
         {/* Interactive Category Legend with Spotlight Filter */}
         {categories.length > 0 && (
