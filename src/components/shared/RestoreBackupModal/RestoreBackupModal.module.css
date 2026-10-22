@@ -35,15 +35,48 @@
   width: 100%;
 }
 
+.modalCancelButton,
+.modalConfirmButton {
+  margin: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  width: auto !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 1.25rem !important;
+  font-size: 0.875rem !important;
+  border-radius: var(--radius-sm) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
+  align-self: center !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  flex-shrink: 0;
+}
+
 .modalCancelButton {
   min-width: 90px;
 }
 
+:global([data-theme='light']) .modalCancelButton {
+  background: rgba(15, 23, 42, 0.03) !important;
+  border: 1px solid rgba(15, 23, 42, 0.22) !important;
+  color: var(--text-muted) !important;
+}
+
+:global([data-theme='light']) .modalCancelButton:hover {
+  background: rgba(15, 23, 42, 0.08) !important;
+  border-color: rgba(15, 23, 42, 0.45) !important;
+  color: var(--text-main) !important;
+}
+
 .modalConfirmButton {
   min-width: 130px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 0.5rem;
 }
 

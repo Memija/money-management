@@ -6,7 +6,12 @@ import { useAppStore } from '../../../store/useAppStore'
 import { type LanguageState, useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
 import * as clipboardModule from '../../../utils/clipboard'
+import { isLocalEnvironment } from '../../../utils/env-utils'
 import { TransactionList } from './TransactionList'
+
+vi.mock('../../../utils/env-utils', () => ({
+  isLocalEnvironment: vi.fn(() => true),
+}))
 
 // Mock the framer-motion module
 vi.mock('framer-motion', () => ({
@@ -126,6 +131,7 @@ const mockTransactions: Transaction[] = [
 
 describe('TransactionList Component', () => {
   beforeEach(() => {
+    vi.mocked(isLocalEnvironment).mockReturnValue(true)
     useAppStore.setState({ filterTransactionsWithoutLogos: false })
     ;(useLanguageStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector) => {
       const state = { t: mockTranslations, locale: 'en' } as unknown as LanguageState
@@ -1610,6 +1616,27 @@ describe('TransactionList Component', () => {
       expect(screen.getByText('Merchant with Logo')).toBeInTheDocument()
       expect(screen.getByText('Local Bakery No Brand')).toBeInTheDocument()
       expect(screen.queryByTestId('without-logos-filter-badge')).not.toBeInTheDocument()
+    })
+
+    it('does not display without-logos category option when not running in local environment', () => {
+      vi.mocked(isLocalEnvironment).mockReturnValue(false)
+      useAppStore.setState({ filterTransactionsWithoutLogos: true })
+
+      render(
+        <TransactionList
+          filteredTx={mockTransactions}
+          institutionNames={['Bank A']}
+          searchTerm=""
+          setSearchTerm={vi.fn()}
+          selectedInstitution="all"
+          setSelectedInstitution={vi.fn()}
+          sortOrder="newest"
+          setSortOrder={vi.fn()}
+        />,
+      )
+
+      const categorySelect = screen.getByLabelText('Filter by category')
+      expect(categorySelect).not.toHaveTextContent('Without logos')
     })
   })
 

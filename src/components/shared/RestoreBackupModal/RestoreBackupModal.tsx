@@ -58,6 +58,8 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
             className={`secondary-button ${styles.modalCancelButton}`}
             onClick={onClose}
             disabled={isRestoring}
+            title={t.cancel || 'Cancel'}
+            aria-label={t.cancel || 'Cancel'}
           >
             {t.cancel || 'Cancel'}
           </button>
@@ -67,6 +69,16 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
             onClick={onConfirm}
             disabled={isRestoring}
             data-testid="confirm-restore-button"
+            title={
+              isRestoring
+                ? t.loading || 'Loading...'
+                : t.restoreBackupConfirmButton || 'Restore Data'
+            }
+            aria-label={
+              isRestoring
+                ? t.loading || 'Loading...'
+                : t.restoreBackupConfirmButton || 'Restore Data'
+            }
           >
             {isRestoring ? (
               <>

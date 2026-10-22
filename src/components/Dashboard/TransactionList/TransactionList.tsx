@@ -31,6 +31,7 @@ import {
   isPaymentProcessorOnly,
 } from '../../../utils/category-utils'
 import { getVisiblePages } from '../../../utils/pagination-utils'
+import { isLocalEnvironment } from '../../../utils/env-utils'
 import { BatchCategoryModal } from '../../shared/BatchCategoryModal'
 import { Select } from '../../shared/Select'
 import { TransactionItem } from './TransactionItem'
@@ -90,7 +91,9 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
     const setManualCategoriesBulk = useAppStore((s) => s.setManualCategoriesBulk)
     const customKeywords = useAppStore((s) => s.customKeywords)
     const setCustomKeywords = useAppStore((s) => s.setCustomKeywords)
-    const filterTransactionsWithoutLogos = useAppStore((s) => s.filterTransactionsWithoutLogos)
+    const storeFilterWithoutLogos = useAppStore((s) => s.filterTransactionsWithoutLogos)
+    const isLocal = isLocalEnvironment()
+    const filterTransactionsWithoutLogos = isLocal && storeFilterWithoutLogos
     const storeDetach = useAppStore((s) => s.detachTransactionsFromDashboard)
     const storeSetDetach = useAppStore((s) => s.setDetachTransactionsFromDashboard)
     const detachTransactionsFromDashboard = propDetach !== undefined ? propDetach : storeDetach
