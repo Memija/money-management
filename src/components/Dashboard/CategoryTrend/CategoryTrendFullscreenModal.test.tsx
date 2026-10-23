@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import { CategoryTrendFullscreenModal } from './CategoryTrendFullscreenModal'
 
 // Mock Recharts
@@ -17,7 +18,15 @@ vi.mock('recharts', () => ({
   Area: () => <div>Area</div>,
   CartesianGrid: () => <div>CartesianGrid</div>,
   XAxis: () => <div>XAxis</div>,
-  YAxis: () => <div>YAxis</div>,
+  YAxis: (props: { tick?: unknown; className?: string }) => (
+    <div
+      data-testid="y-axis"
+      data-tick={props.tick === false ? 'hidden' : 'visible'}
+      className={props.className}
+    >
+      YAxis
+    </div>
+  ),
   Tooltip: () => <div>Tooltip</div>,
 }))
 
@@ -38,6 +47,7 @@ const sampleSummaries = [
 describe('CategoryTrendFullscreenModal', () => {
   beforeEach(() => {
     useLanguageStore.getState().setLocale('en')
+    usePrivacyStore.getState().setPrivacyMode(false)
   })
 
   const defaultProps = {
@@ -130,5 +140,20 @@ describe('CategoryTrendFullscreenModal', () => {
     fireEvent.click(trendBtn)
 
     expect(onViewModeChange).toHaveBeenCalledWith('area')
+  })
+
+  it('hides Y-axis tick values in privacy mode inside the fullscreen modal', () => {
+    act(() => {
+      usePrivacyStore.getState().setPrivacyMode(true)
+    })
+    render(<CategoryTrendFullscreenModal {...defaultProps} />)
+
+    const yAxis = screen.getByTestId('y-axis')
+    expect(yAxis).toHaveAttribute('data-tick', 'hidden')
+    expect(yAxis).toHaveClass('category-trend-y-axis')
+
+    act(() => {
+      usePrivacyStore.getState().setPrivacyMode(false)
+    })
   })
 })

@@ -219,6 +219,27 @@
   -webkit-tap-highlight-color: transparent !important;
 }
 
+/* ── Privacy Mode: Hide Y-Axis Values ── */
+:global([data-privacy-mode='true']) .chartContainer :global(.income-expenses-y-axis .recharts-cartesian-axis-tick text),
+:global([data-privacy-mode='true']) .chartContainer :global(.income-expenses-y-axis .recharts-cartesian-axis-tick),
+:global([data-privacy-mode='true']) .chartContainer :global(.income-expenses-y-axis text),
+:global([data-privacy-mode='true']) .chartContainer :global(.recharts-yAxis .recharts-cartesian-axis-tick text),
+:global([data-privacy-mode='true']) .chartContainer :global(.recharts-yAxis .recharts-cartesian-axis-tick),
+:global([data-privacy-mode='true']) .chartContainer :global(.recharts-yAxis text) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+:global([data-privacy-mode='true']) .chartContainer :global(.income-expenses-y-axis:hover text),
+:global([data-privacy-mode='true']) .chartContainer :global(.recharts-yAxis:hover text) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* ── Custom Glassmorphic Tooltip ── */
 .tooltipContainer {
   background: rgba(15, 17, 23, 0.92);

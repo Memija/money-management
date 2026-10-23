@@ -134,7 +134,9 @@ export const AvgDetailModal: React.FC<AvgDetailModalProps> = ({
               </div>
               <div>
                 <p className={styles['avg-hero-label']}>{t.avgPerTransaction}</p>
-                <p className={styles['avg-hero-value']}>{formatCurrency(stats.avg)}</p>
+                <p className={`${styles['avg-hero-value']} privacy-blur`}>
+                  {formatCurrency(stats.avg)}
+                </p>
               </div>
             </div>
 

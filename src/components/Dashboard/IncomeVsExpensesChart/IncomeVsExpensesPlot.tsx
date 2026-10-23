@@ -16,6 +16,7 @@ import {
 
 import type { MonthlyEntry } from '../../../hooks/useAnalytics'
 import { useChartAnimation } from '../../../hooks/useChartAnimation'
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import type { CornerRadii } from '../../../utils/svg-paths'
 import { MonthYearAxisTick } from '../../shared/ChartAxisTicks'
 import { type ChartBarShapeProps, renderBarPath } from '../../shared/ChartBarShape'
@@ -92,6 +93,7 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
     onLegendClick,
     animationKey,
   }) => {
+    const isPrivacyMode = usePrivacyStore((s) => s.isPrivacyMode)
     const animationTrigger = useMemo(
       () => ({ data: animationKey ?? chartData, viewMode }),
       [animationKey, chartData, viewMode],
@@ -118,9 +120,10 @@ export const IncomeVsExpensesPlot: React.FC<IncomeVsExpensesPlotProps> = React.m
         />
         <XAxis dataKey="rawMonth" axisLine={false} tickLine={false} tick={MONTH_TICK} />
         <YAxis
+          className="income-expenses-y-axis"
           axisLine={false}
           tickLine={false}
-          tick={AXIS_TICK_STYLE}
+          tick={isPrivacyMode ? false : AXIS_TICK_STYLE}
           tickFormatter={formatCompactAxis}
         />
       </>

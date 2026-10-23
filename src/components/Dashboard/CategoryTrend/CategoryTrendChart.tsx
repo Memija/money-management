@@ -13,6 +13,7 @@ import {
 
 import type { MonthlyCategoryEntry } from '../../../hooks/useAnalytics'
 import { useChartAnimation } from '../../../hooks/useChartAnimation'
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import type { CustomCategory } from '../../../types'
 import { adjustColor, getCategoryColor } from '../../../utils/category-colors'
 import type { CornerRadii } from '../../../utils/svg-paths'
@@ -118,6 +119,7 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
     animationKey,
     disableTooltip = false,
   }) => {
+    const isPrivacyMode = usePrivacyStore((s) => s.isPrivacyMode)
     const [isTooltipHovered, setIsTooltipHovered] = useState(false)
     const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -230,14 +232,15 @@ export const CategoryTrendChart: React.FC<CategoryTrendChartProps> = React.memo(
           />
           <XAxis dataKey="month" axisLine={false} tickLine={false} tick={MONTH_TICK} />
           <YAxis
+            className="category-trend-y-axis"
             axisLine={false}
             tickLine={false}
-            tick={AXIS_TICK_STYLE}
+            tick={isPrivacyMode ? false : AXIS_TICK_STYLE}
             tickFormatter={formatCompactEuro}
           />
         </>
       ),
-      [],
+      [isPrivacyMode],
     )
 
     return (

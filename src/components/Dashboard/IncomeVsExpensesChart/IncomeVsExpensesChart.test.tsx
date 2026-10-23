@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import {
   IncomeVsExpensesChart,
   MIN_MONTHS_ZOOM_DESKTOP,
@@ -26,7 +27,15 @@ vi.mock('recharts', () => ({
   Legend: () => <div>Legend</div>,
   ReferenceLine: () => <div>ReferenceLine</div>,
   XAxis: () => <div>XAxis</div>,
-  YAxis: () => <div>YAxis</div>,
+  YAxis: (props: { tick?: unknown; className?: string }) => (
+    <div
+      data-testid="y-axis"
+      data-tick={props.tick === false ? 'hidden' : 'visible'}
+      className={props.className}
+    >
+      YAxis
+    </div>
+  ),
   Tooltip: () => <div>Tooltip</div>,
   CartesianGrid: () => <div>CartesianGrid</div>,
 }))
@@ -92,6 +101,32 @@ describe('IncomeVsExpensesChart', () => {
 
   afterEach(() => {
     window.innerWidth = originalInnerWidth
+    usePrivacyStore.getState().setPrivacyMode(false)
+  })
+
+  it('hides Y-axis tick values in privacy mode and restores them in normal mode', () => {
+    act(() => {
+      usePrivacyStore.getState().setPrivacyMode(false)
+    })
+    const { rerender } = render(<IncomeVsExpensesChart monthlyData={sampleData} />)
+
+    const yAxis = screen.getByTestId('y-axis')
+    expect(yAxis).toHaveAttribute('data-tick', 'visible')
+    expect(yAxis).toHaveClass('income-expenses-y-axis')
+
+    act(() => {
+      usePrivacyStore.getState().setPrivacyMode(true)
+    })
+    rerender(<IncomeVsExpensesChart monthlyData={sampleData} />)
+
+    expect(screen.getByTestId('y-axis')).toHaveAttribute('data-tick', 'hidden')
+
+    act(() => {
+      usePrivacyStore.getState().setPrivacyMode(false)
+    })
+    rerender(<IncomeVsExpensesChart monthlyData={sampleData} />)
+
+    expect(screen.getByTestId('y-axis')).toHaveAttribute('data-tick', 'visible')
   })
 
   it('renders title and chart when data is present', () => {
@@ -117,7 +152,10 @@ describe('IncomeVsExpensesChart', () => {
       <IncomeVsExpensesChart monthlyData={deficitData} totalIncome={1000} totalExpenses={2500} />,
     )
 
-    expect(screen.getByTitle('Net Deficit')).toBeInTheDocument()
+    const pill = screen.getByTitle('Net Deficit')
+    expect(pill).toBeInTheDocument()
+    const blurred = pill.querySelectorAll('.privacy-blur')
+    expect(blurred.length).toBe(2)
   })
 
   it('toggles between monthly and cumulative view', async () => {

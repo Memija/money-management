@@ -601,6 +601,22 @@ svg.recharts-surface *:focus-visible {
     opacity 0.2s ease;
 }
 
+/* Hide values on Y axis in privacy mode so financial scale details are not revealed */
+[data-privacy-mode='true'] .recharts-yAxis .recharts-cartesian-axis-tick text,
+[data-privacy-mode='true'] .recharts-yAxis .recharts-cartesian-axis-tick,
+[data-privacy-mode='true'] .recharts-yAxis text,
+[data-privacy-mode='true'] .income-expenses-y-axis .recharts-cartesian-axis-tick text,
+[data-privacy-mode='true'] .income-expenses-y-axis .recharts-cartesian-axis-tick,
+[data-privacy-mode='true'] .income-expenses-y-axis text,
+[data-privacy-mode='true'] .category-trend-y-axis .recharts-cartesian-axis-tick text,
+[data-privacy-mode='true'] .category-trend-y-axis .recharts-cartesian-axis-tick,
+[data-privacy-mode='true'] .category-trend-y-axis text {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* ─── Hover / Focus / Active reveal ─── */
 [data-privacy-mode='true'] .privacy-blur:hover,
 [data-privacy-mode='true'] .privacy-blur:focus-visible,
@@ -620,4 +636,20 @@ svg.recharts-surface *:focus-visible {
 [data-privacy-mode='true'] .recharts-pie-label-text:hover {
   filter: blur(0px) !important;
   opacity: 1 !important;
+}
+
+/* Never reveal Y-axis ticks on hover in privacy mode */
+[data-privacy-mode='true'] .recharts-yAxis:hover .recharts-cartesian-axis-tick text,
+[data-privacy-mode='true'] .recharts-yAxis .recharts-cartesian-axis-tick:hover text,
+[data-privacy-mode='true'] .recharts-yAxis:hover text,
+[data-privacy-mode='true'] .income-expenses-y-axis:hover .recharts-cartesian-axis-tick text,
+[data-privacy-mode='true'] .income-expenses-y-axis .recharts-cartesian-axis-tick:hover text,
+[data-privacy-mode='true'] .income-expenses-y-axis:hover text,
+[data-privacy-mode='true'] .category-trend-y-axis:hover .recharts-cartesian-axis-tick text,
+[data-privacy-mode='true'] .category-trend-y-axis .recharts-cartesian-axis-tick:hover text,
+[data-privacy-mode='true'] .category-trend-y-axis:hover text {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

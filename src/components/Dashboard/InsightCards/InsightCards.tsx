@@ -157,6 +157,7 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(
         label: t.insightTransactions,
         value: transactionCount.toLocaleString(),
         accent: 'blue' as const,
+        isPrivate: false,
         extra: (
           <div className={styles['tx-breakdown']}>
             <div className={styles['tx-pills']}>
@@ -203,6 +204,7 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(
         label: t.insightAvgTransaction,
         value: formatCurrency(avgExpense),
         accent: 'rose' as const,
+        isPrivate: true,
         extra: (
           <div className={styles['avg-breakdown']}>
             <AvgRow
@@ -234,6 +236,7 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(
           ? getCategoryLabel(topCategory.name, t, currentLocale, customCategories)
           : '—',
         accent: 'amber' as const,
+        isPrivate: false,
         extra:
           topCategories && topCategories.length > 0 ? (
             <div className={styles['avg-breakdown']}>
@@ -282,6 +285,7 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(
               'You spent much more than you earned. For example, a value of 2x means your expenses were twice your income.'
             : undefined,
         accent: savingsRate >= 0 ? ('emerald' as const) : ('rose' as const),
+        isPrivate: true,
         extra:
           totalIncome > 0 ? (
             <div className={styles['avg-breakdown']}>
@@ -344,7 +348,7 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(
                 <p className={styles.label}>{card.label}</p>
                 <div className={styles['value-row']}>
                   <p
-                    className={`${styles.value} ${i === 1 ? 'privacy-blur' : ''}`}
+                    className={`${styles.value} ${card.isPrivate ? 'privacy-blur' : ''}`}
                     title={typeof card.value === 'string' ? card.value : undefined}
                   >
                     {card.value}

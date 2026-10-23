@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useLanguageStore } from '../../../store/useLanguageStore'
+import { usePrivacyStore } from '../../../store/usePrivacyStore'
 import { formatCompactEuro, formatEuroThousands } from './category-trend-formatters'
 import { CategoryTrend, CustomTrendTooltip } from './CategoryTrend'
 
@@ -18,7 +19,15 @@ vi.mock('recharts', () => ({
   Area: () => <div>Area</div>,
   CartesianGrid: () => <div>CartesianGrid</div>,
   XAxis: () => <div>XAxis</div>,
-  YAxis: () => <div>YAxis</div>,
+  YAxis: (props: { tick?: unknown; className?: string }) => (
+    <div
+      data-testid="y-axis"
+      data-tick={props.tick === false ? 'hidden' : 'visible'}
+      className={props.className}
+    >
+      YAxis
+    </div>
+  ),
   Tooltip: () => <div>Tooltip</div>,
   Brush: (props: { startIndex?: number; endIndex?: number }) => (
     <div data-testid="timeline-brush" data-start={props?.startIndex} data-end={props?.endIndex}>
@@ -36,6 +45,32 @@ const sampleMonthlyData = [
 describe('CategoryTrend', () => {
   beforeEach(() => {
     useLanguageStore.getState().setLocale('en')
+    usePrivacyStore.getState().setPrivacyMode(false)
+  })
+
+  it('hides Y-axis tick values in privacy mode and restores them in normal mode', () => {
+    act(() => {
+      usePrivacyStore.getState().setPrivacyMode(false)
+    })
+    const { rerender } = render(<CategoryTrend data={sampleMonthlyData} />)
+
+    const yAxis = screen.getByTestId('y-axis')
+    expect(yAxis).toHaveAttribute('data-tick', 'visible')
+    expect(yAxis).toHaveClass('category-trend-y-axis')
+
+    act(() => {
+      usePrivacyStore.getState().setPrivacyMode(true)
+    })
+    rerender(<CategoryTrend data={sampleMonthlyData} />)
+
+    expect(screen.getByTestId('y-axis')).toHaveAttribute('data-tick', 'hidden')
+
+    act(() => {
+      usePrivacyStore.getState().setPrivacyMode(false)
+    })
+    rerender(<CategoryTrend data={sampleMonthlyData} />)
+
+    expect(screen.getByTestId('y-axis')).toHaveAttribute('data-tick', 'visible')
   })
 
   it('renders Spending by Category header, months count and stat pills', () => {

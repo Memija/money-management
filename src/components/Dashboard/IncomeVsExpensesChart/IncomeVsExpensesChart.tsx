@@ -236,7 +236,9 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
                     {isNetPositive ? '+' : ''}
                     {formatCurrency(netSaved)}
                   </span>
-                  <span className={styles.pillLabel}>({formatSavingsRate(savingsRate)})</span>
+                  <span className={`${styles.pillLabel} privacy-blur`}>
+                    ({formatSavingsRate(savingsRate)})
+                  </span>
                 </div>
               </div>
             )}

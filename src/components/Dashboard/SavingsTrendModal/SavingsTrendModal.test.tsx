@@ -253,7 +253,9 @@ describe('SavingsTrendModal', () => {
       const heroScope = within(hero as HTMLElement)
       expect(heroScope.getByText('Net Deficit')).toBeInTheDocument()
       expect(heroScope.getByText(/-.*1,500/)).toBeInTheDocument()
-      expect(heroScope.getByText('-75%')).toBeInTheDocument()
+      const rateEl = heroScope.getByText('-75%')
+      expect(rateEl).toBeInTheDocument()
+      expect(rateEl).toHaveClass('privacy-blur')
     })
 
     it('shows multiplier tooltip in hero when savingsRate is <= -100', () => {

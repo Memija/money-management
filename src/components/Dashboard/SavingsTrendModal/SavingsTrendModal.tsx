@@ -71,7 +71,7 @@ const MonthRow: React.FC<MonthRowProps> = ({
         {formatCurrency(saved)}
       </td>
       <td
-        className={`${styles['month-rate']} ${isPositive ? styles['rate-positive'] : styles['rate-negative']}`}
+        className={`${styles['month-rate']} ${isPositive ? styles['rate-positive'] : styles['rate-negative']} privacy-blur`}
       >
         <div className={styles['rate-cell']}>
           <span>{formatSavingsRate(rate)}</span>
@@ -112,7 +112,7 @@ const ChartTooltip = ({
         {formatMonthYear ? formatMonthYear(label ?? '') : label}
       </p>
       <p
-        className={`${styles['chart-tooltip-value']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']}`}
+        className={`${styles['chart-tooltip-value']} ${isPositive ? styles['saved-positive'] : styles['saved-negative']} privacy-blur`}
       >
         {isPositive ? '+' : ''}
         {formatCurrency(saved)}
@@ -194,7 +194,7 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
           <div
             className={`${styles['hero-rate']} ${isPositive ? styles['rate-positive'] : styles['rate-negative']}`}
           >
-            {formatSavingsRate(savingsRate)}
+            <span className="privacy-blur">{formatSavingsRate(savingsRate)}</span>
             {savingsRate <= -100 && (
               <span className={styles['info-tooltip-wrapper']}>
                 <Info size={14} className={styles['info-icon']} />
