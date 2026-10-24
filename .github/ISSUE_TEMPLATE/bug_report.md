@@ -1,6 +1,6 @@
 ---
 name: '🐛 Bug Report'
-about: 'Report a bug or unexpected behavior in Home Management'
+about: 'Report a bug or unexpected behavior in Saldio'
 title: '[BUG] '
 labels: ['bug 🐛']
 assignees: []

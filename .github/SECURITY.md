@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-The following versions of Home Management are currently supported with security updates:
+The following versions of Saldio are currently supported with security updates:
 
 | Version | Supported |
 | ------- | --------- |
@@ -11,7 +11,7 @@ The following versions of Home Management are currently supported with security 
 
 ## Reporting a Vulnerability
 
-We take the security of Home Management seriously. If you believe you have found a security vulnerability, please do NOT open a public GitHub Issue. Instead, please report it privately.
+We take the security of Saldio seriously. If you believe you have found a security vulnerability, please do NOT open a public GitHub Issue. Instead, please report it privately.
 
 ### Reporting Process
 
@@ -28,4 +28,4 @@ We take the security of Home Management seriously. If you believe you have found
 
 ---
 
-Thank you for helping keep Home Management safe!
+Thank you for helping keep Saldio safe!
