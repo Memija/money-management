@@ -10,6 +10,7 @@ import { getCategoryLabel } from '../../../utils/category-utils'
 import { CategoryIcon } from '../../shared/CategoryIcon'
 import { RenderWhenVisible } from '../../shared/RenderWhenVisible'
 import { ExpenseCategoriesDonut } from './ExpenseCategoriesDonut'
+import { ExpenseCategoryCard } from './ExpenseCategoryCard'
 
 import styles from './ExpenseCategories.module.css'
 
@@ -20,19 +21,6 @@ interface ExpenseCategoriesProps {
 }
 
 const CATEGORY_ICON_SIZE = 16
-
-const getRankBadgeClass = (index: number) => {
-  if (index === 0) {
-    return styles.rankGold
-  }
-  if (index === 1) {
-    return styles.rankSilver
-  }
-  if (index === 2) {
-    return styles.rankBronze
-  }
-  return styles.rankDefault
-}
 
 export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(
   ({ categoryBreakdown, totalExpenses, onCategoryClick }) => {
@@ -220,66 +208,19 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(
 
           {/* Category Cards Grid with Rank Badges */}
           <div className={styles.categoryGrid}>
-            {sortedCategories.map((cat, index) => {
-              const isHovered = activeIndex === index
-              const percentage = totalExpenses > 0 ? (cat.value / totalExpenses) * 100 : 0
-
-              return (
-                <button
-                  key={cat.name}
-                  type="button"
-                  className={`${styles.categoryCard} ${isHovered ? styles.activeCard : ''}`}
-                  style={
-                    {
-                      '--active-card-color': cat.color,
-                      '--active-card-glow': `${cat.color}35`,
-                    } as React.CSSProperties
-                  }
-                  onMouseEnter={() => setActiveIndex(index)}
-                  onMouseLeave={() => setActiveIndex(null)}
-                  onClick={() => onCategoryClick(cat.name)}
-                  aria-label={`${getCategoryLabel(cat.name, t, locale, customCategories)}: ${formatCurrency(cat.value)}`}
-                >
-                  <div className={styles.cardTop}>
-                    <div className={styles.cardCategoryInfo}>
-                      <span className={`${styles.rankPill} ${getRankBadgeClass(index)}`}>
-                        #{index + 1}
-                      </span>
-                      <div className={styles.iconBox}>
-                        <CategoryIcon
-                          category={cat.name}
-                          size={CATEGORY_ICON_SIZE}
-                          customCategories={customCategories}
-                        />
-                      </div>
-                      <span
-                        className={styles.categoryName}
-                        title={getCategoryLabel(cat.name, t, locale, customCategories)}
-                      >
-                        {getCategoryLabel(cat.name, t, locale, customCategories)}
-                      </span>
-                    </div>
-                    <span className={`${styles.cardValue} privacy-blur`}>
-                      {formatCurrency(cat.value)}
-                    </span>
-                  </div>
-
-                  <div className={styles.cardBottom}>
-                    <div className={styles.progressBarBg}>
-                      <div
-                        className={styles.progressBarFill}
-                        style={{
-                          width: `${Math.min(100, Math.max(2, percentage))}%`,
-                        }}
-                      />
-                    </div>
-                    <span className={styles.percentText}>
-                      {percentage > 0 && percentage < 0.1 ? '<0.1%' : `${percentage.toFixed(1)}%`}
-                    </span>
-                  </div>
-                </button>
-              )
-            })}
+            {sortedCategories.map((cat, index) => (
+              <ExpenseCategoryCard
+                key={cat.name}
+                category={cat}
+                index={index}
+                totalExpenses={totalExpenses}
+                isHovered={activeIndex === index}
+                customCategories={customCategories}
+                onMouseEnter={() => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
+                onClick={() => onCategoryClick(cat.name)}
+              />
+            ))}
           </div>
         </div>
       </motion.div>

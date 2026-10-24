@@ -5,7 +5,7 @@ import { AlertCircle, ArrowLeft, Upload } from 'lucide-react'
 import type { TranslationStrings } from '../../i18n/types'
 import type { ImportMethod } from '../../types'
 
-import styles from './TransactionImporter.module.css'
+import styles from './ImportUploadArea.module.css'
 
 const ACCEPT_TYPES: Record<ImportMethod, string> = {
   spreadsheet: '.xlsx,.xls,.csv',

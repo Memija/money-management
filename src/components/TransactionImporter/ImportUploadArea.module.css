@@ -1,0 +1,118 @@
+.import-upload-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.back-button-aligned {
+  align-self: flex-start;
+}
+
+.drop-zone {
+  padding: 3rem 2rem;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--primary);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.drop-zone-icon {
+  color: var(--text-dim);
+}
+
+.drop-zone.drag-over .drop-zone-icon {
+  color: var(--primary);
+}
+
+.drop-zone-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.drop-zone-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.drop-zone-formats {
+  margin-top: 0.25rem;
+}
+
+.file-name-label {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.hidden {
+  display: none;
+}
+
+.paste-area-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.paste-textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.paste-textarea:focus {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.paste-textarea::placeholder {
+  color: var(--text-dim);
+}
+
+.import-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  border-radius: var(--radius-md);
+  color: #fb7185;
+  font-size: 0.9rem;
+  font-weight: normal;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.08);
+}
+
+.import-error svg {
+  flex-shrink: 0;
+  color: #f43f5e;
+  margin-top: 0.1rem;
+}
+
+.import-error span {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}

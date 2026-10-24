@@ -1,0 +1,83 @@
+/* ─────────────────────────────────────────────────
+   Chart View
+───────────────────────────────────────────────── */
+.chartContainer {
+  height: 360px;
+  width: 100%;
+  margin-top: 0.5rem;
+  position: relative;
+}
+
+.chartContainer *:focus,
+.chartContainer *:focus-visible,
+.chartContainer svg:focus,
+.chartContainer svg:focus-visible,
+.chartContainer :global(.recharts-wrapper):focus,
+.chartContainer :global(.recharts-wrapper):focus-visible,
+.chartContainer :global(.recharts-surface):focus,
+.chartContainer :global(.recharts-surface):focus-visible,
+.chartContainer :global(.recharts-layer):focus,
+.chartContainer :global(.recharts-layer):focus-visible,
+.chartContainer :global(.recharts-bar-rectangle):focus,
+.chartContainer :global(.recharts-bar-rectangle):focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Custom Tick styling */
+.yAxisTick {
+  font-size: 11px;
+  fill: var(--text-muted);
+  font-weight: 500;
+  cursor: default;
+  transition: fill 0.15s ease;
+  pointer-events: all;
+}
+
+.yAxisTickTruncated {
+  cursor: help;
+  pointer-events: all;
+}
+
+.yAxisTick:hover {
+  fill: var(--text-main);
+}
+
+/* Floating Tooltip for Truncated Merchant Column Labels */
+.axisTooltip {
+  position: absolute;
+  left: 8px;
+  top: var(--tooltip-top, 0px);
+  transform: translateY(-50%);
+  background: rgba(15, 17, 23, 0.96);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-main);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 100;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+}
+
+[data-theme='light'] .axisTooltip {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.15);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+}
+
+.merchantRowClickable {
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .chartContainer {
+    height: 320px;
+  }
+}

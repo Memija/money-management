@@ -5,10 +5,6 @@ import {
   CalendarRange,
   Check,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   RotateCcw,
 } from 'lucide-react'
 
@@ -16,6 +12,7 @@ import { useDropdownPosition } from '../../../hooks/useDropdownPosition'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { getLocalizedMonthNames, getLocalizedWeekdays } from '../../../utils/date-utils'
+import { RangeCalendar } from './RangeCalendar'
 
 import styles from './CustomRangePicker.module.css'
 
@@ -319,120 +316,27 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
               </div>
 
               {/* Calendar Container */}
-              <div className={styles.calendar}>
-                <div className={styles.calHeader}>
-                  <div className={styles.navGroup}>
-                    <button
-                      type="button"
-                      className={styles.navBtn}
-                      onClick={handlePrevYear}
-                      title={t.previousYear || 'Previous year'}
-                      aria-label={t.previousYear || 'Previous year'}
-                    >
-                      <ChevronsLeft size={15} />
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.navBtn}
-                      onClick={handlePrevMonth}
-                      title={t.previousMonth || 'Previous month'}
-                      aria-label={t.previousMonth || 'Previous month'}
-                    >
-                      <ChevronLeft size={15} />
-                    </button>
-                  </div>
-
-                  <div className={styles.calTitleWrapper}>
-                    <span className={styles.calMonth}>{monthNames[viewMonth]}</span>
-                    <span className={styles.calYear}>{viewYear}</span>
-                  </div>
-
-                  <div className={styles.navGroup}>
-                    <button
-                      type="button"
-                      className={styles.navBtn}
-                      onClick={handleNextMonth}
-                      title={t.nextMonth || 'Next month'}
-                      aria-label={t.nextMonth || 'Next month'}
-                    >
-                      <ChevronRight size={15} />
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.navBtn}
-                      onClick={handleNextYear}
-                      title={t.nextYear || 'Next year'}
-                      aria-label={t.nextYear || 'Next year'}
-                    >
-                      <ChevronsRight size={15} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Weekdays */}
-                <div className={styles.grid}>
-                  {weekdays.map((wd) => (
-                    <div key={wd} className={styles.weekday}>
-                      {wd}
-                    </div>
-                  ))}
-
-                  {blanks.map((b) => (
-                    <div key={`blank-${b}`} className={styles.emptyCell} />
-                  ))}
-
-                  {days.map((d) => {
-                    const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-                    const isStart = dateStr === draftStart
-                    const isEnd = dateStr === draftEnd
-                    const isSingleDay = isStart && isEnd
-                    const isInRange = Boolean(
-                      draftStart && draftEnd && dateStr > draftStart && dateStr < draftEnd,
-                    )
-                    const isHoverPreview = Boolean(
-                      draftStart &&
-                      !draftEnd &&
-                      hoverDate &&
-                      dateStr > draftStart &&
-                      dateStr <= hoverDate,
-                    )
-                    const isToday = dateStr === todayStr
-                    const isDisabled = Boolean(
-                      (minDate && dateStr < minDate) || (maxDate && dateStr > maxDate),
-                    )
-
-                    return (
-                      <div
-                        key={`cell-${d}`}
-                        className={`
-                          ${styles.dayCell}
-                          ${isInRange ? styles.cellInRange : ''}
-                          ${isStart && !isEnd && draftEnd ? styles.cellRangeStart : ''}
-                          ${isEnd && !isStart ? styles.cellRangeEnd : ''}
-                          ${isHoverPreview ? styles.cellHoverPreview : ''}
-                        `}
-                      >
-                        <button
-                          type="button"
-                          className={`
-                            ${styles.dayBtn}
-                            ${isStart || isEnd ? styles.dayBtnSelected : ''}
-                            ${isToday ? styles.dayBtnToday : ''}
-                            ${isSingleDay ? styles.singleDayRange : ''}
-                          `}
-                          onClick={() => !isDisabled && handleDayClick(dateStr)}
-                          onMouseEnter={() => draftStart && !draftEnd && setHoverDate(dateStr)}
-                          aria-label={`${d}`}
-                          disabled={isDisabled}
-                        >
-                          <span className={styles.dayNum}>{d}</span>
-                          {isToday && !(isStart || isEnd) && <span className={styles.todayDot} />}
-                        </button>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
+              <RangeCalendar
+                viewYear={viewYear}
+                viewMonth={viewMonth}
+                monthNames={monthNames}
+                weekdays={weekdays}
+                blanks={blanks}
+                days={days}
+                draftStart={draftStart}
+                draftEnd={draftEnd}
+                hoverDate={hoverDate}
+                todayStr={todayStr}
+                minDate={minDate}
+                maxDate={maxDate}
+                onPrevYear={handlePrevYear}
+                onPrevMonth={handlePrevMonth}
+                onNextMonth={handleNextMonth}
+                onNextYear={handleNextYear}
+                onDayClick={handleDayClick}
+                onDayHover={setHoverDate}
+                t={t}
+              />
 
               {/* Footer with status and actions */}
               <div className={styles.actions}>

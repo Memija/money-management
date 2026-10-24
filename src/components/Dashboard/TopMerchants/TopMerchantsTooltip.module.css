@@ -1,0 +1,287 @@
+/* Custom Tooltip (Hover Modal) */
+.tooltipContainer {
+  background: rgba(15, 17, 23, 0.94);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  min-width: 220px;
+  max-width: 320px;
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  pointer-events: none;
+}
+
+[data-theme='light'] .tooltipContainer {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.tooltipHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.1rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.tooltipLogoBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.tooltipLogoBox img,
+.tooltipLogoBox svg[data-brand-logo='true'],
+.tooltipLogoBox :global(.brand-logo-full),
+.tooltipLogoBox svg[aria-label] {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+  display: block !important;
+}
+
+[data-theme='light'] .tooltipLogoBox {
+  background: #f1f5f9;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.tooltipInitialsAvatar {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.tooltipCategoryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 500;
+  padding: 0.1rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  width: fit-content;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme='light'] .tooltipCategoryBadge {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.tooltipHeaderInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.tooltipTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.tooltipBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.75rem;
+}
+
+.tooltipLabel {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.tooltipValue {
+  font-weight: 700;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.tooltipShareBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--card-border);
+}
+
+.tooltipShareHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tooltipShareLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tooltipShareBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 5px;
+  padding: 0.08rem 0.35rem;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+[data-theme='light'] .tooltipShareBadge {
+  color: #059669;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.22);
+}
+
+.tooltipShareTrack {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+[data-theme='light'] .tooltipShareTrack {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.tooltipShareFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.tooltipActionBtn {
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  display: block;
+  transition: all 0.2s;
+  pointer-events: auto;
+}
+
+.tooltipActionBtn:hover,
+.tooltipActionBtn:active {
+  background: rgba(16, 185, 129, 0.25);
+  color: #fff;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .tooltipContainer {
+    min-width: 160px;
+    max-width: min(260px, calc(100vw - 32px));
+    width: max-content;
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
+    gap: 0.3rem;
+    box-sizing: border-box;
+  }
+
+  .tooltipHeader {
+    gap: 0.45rem;
+    padding-bottom: 0.35rem;
+    margin-bottom: 0.05rem;
+  }
+
+  .tooltipLogoBox {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+
+  .tooltipInitialsAvatar {
+    font-size: 0.62rem;
+  }
+
+  .tooltipTitle {
+    font-size: 0.82rem;
+    max-width: 170px;
+  }
+
+  .tooltipCategoryBadge {
+    font-size: 0.6rem;
+    padding: 0.08rem 0.3rem;
+  }
+
+  .tooltipRow {
+    font-size: 0.72rem;
+    gap: 0.6rem;
+    align-items: baseline;
+  }
+
+  .tooltipLabel {
+    font-size: 0.72rem;
+  }
+
+  .tooltipValue {
+    font-size: 0.74rem;
+  }
+
+  .tooltipShareBox {
+    padding-top: 0.35rem;
+    gap: 0.25rem;
+  }
+
+  .tooltipShareLabel {
+    font-size: 0.68rem;
+  }
+
+  .tooltipShareBadge {
+    font-size: 0.68rem;
+    padding: 0.06rem 0.3rem;
+  }
+}

@@ -2,6 +2,14 @@ import React, { Suspense } from 'react'
 
 import AppHeader from './components/layout/AppHeader'
 import { ErrorBoundary } from './components/shared/ErrorBoundary'
+import { useAppStore } from './store/useAppStore'
+import { useLanguageStore } from './store/useLanguageStore'
+
+import styles from './App.module.css'
+
+if (typeof window !== 'undefined') {
+  ;(window as unknown as { __store: unknown }).__store = useAppStore
+}
 
 /** Delay before warming onboarding chunks when the app starts outside onboarding. */
 const DEFERRED_PREFETCH_DELAY_MS = 3000
@@ -11,7 +19,7 @@ const loadInstitutionSelector = () => import('./components/InstitutionSelector')
 const loadTransactionImporter = () => import('./components/TransactionImporter')
 const loadImportReview = () => import('./components/ImportReview')
 
-const LazyDashboard = React.lazy(() => import('./components/Dashboard'))
+const LazyDashboard = React.lazy(() => import('./components/Dashboard/Dashboard'))
 const Settings = React.lazy(() => import('./components/Settings'))
 const CountrySelector = React.lazy(loadCountrySelector)
 const InstitutionSelector = React.lazy(loadInstitutionSelector)
@@ -38,7 +46,7 @@ const preloadDashboard = (): Promise<void> => {
   if (preloadedDashboardComponent) {
     return Promise.resolve()
   }
-  return import('./components/Dashboard')
+  return import('./components/Dashboard/Dashboard')
     .then((mod) => {
       preloadedDashboardComponent = mod.default
     })
@@ -47,15 +55,6 @@ const preloadDashboard = (): Promise<void> => {
 
 // Preload dashboard immediately in the background
 preloadDashboard()
-
-import { useAppStore } from './store/useAppStore'
-import { useLanguageStore } from './store/useLanguageStore'
-
-import styles from './App.module.css'
-
-if (typeof window !== 'undefined') {
-  ;(window as unknown as { __store: unknown }).__store = useAppStore
-}
 
 const LoadingFallback: React.FC = () => {
   const loading = useLanguageStore((s) => s.t.loading)

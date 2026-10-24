@@ -8,7 +8,7 @@ import { CurrencyAxisTick } from '../../shared/ChartAxisTicks'
 import { RenderWhenVisible } from '../../shared/RenderWhenVisible'
 import { TopMerchantsTooltip } from './TopMerchantsTooltip'
 
-import styles from './TopMerchants.module.css'
+import styles from './TopMerchantsChart.module.css'
 
 const AMOUNT_TICK = <CurrencyAxisTick fill="var(--text-dim)" fontSize={11} />
 const BAR_RADIUS: [number, number, number, number] = [0, 6, 6, 0]

@@ -10,7 +10,7 @@ import { getCategoryColor } from '../../../utils/category-colors'
 import { CategoryIcon } from '../../shared/CategoryIcon'
 import { CategorySelect } from '../../shared/CategorySelect/CategorySelect'
 
-import styles from './RecurringExpenses.module.css'
+import styles from './RecurringExpenseCard.module.css'
 
 const MONTHS_PER_YEAR = 12
 const BRAND_ICON_SIZE = 20

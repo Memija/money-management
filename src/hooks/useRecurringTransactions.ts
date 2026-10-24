@@ -2,16 +2,19 @@ import { useMemo } from 'react'
 
 import { useAppStore } from '../store/useAppStore'
 import type { Transaction } from '../types'
-import { createBoundedCache } from '../utils/bounded-cache'
-import {
-  extractCleanDescription,
-  formatMerchantDisplayName,
-  getTransactionCategory,
-  getTransactionMerchant,
-  isInformativeTransaction,
-  normalizeDescription,
-} from '../utils/category-utils'
 import { filterByPeriod, type PeriodFilter } from '../utils/period-utils'
+import {
+  buildRecurrenceGroups,
+  cleanDisplayName,
+  evaluateMonthlyRecurrence,
+} from '../utils/recurring-utils'
+
+export {
+  cleanDisplayName,
+  getRecurrenceGroupingKey,
+  evaluateMonthlyRecurrence,
+  clusterTxsByAmount,
+} from '../utils/recurring-utils'
 
 export interface RecurringExpense {
   id: string
@@ -28,280 +31,6 @@ export interface RecurringData {
   totalMonthly: number
 }
 
-const isGenericPaymentDesc = (desc?: string): boolean => {
-  if (!desc) {
-    return true
-  }
-  return /^(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|bank[- ]?transfer|wire[- ]?transfer|money[- ]?transfer|standing[- ]?order|direct[- ]?debit|lastschrift|payment|zahlung|abbuchung|umbuchung|transfer|online[- ]?banking)\b/i.test(
-    desc.trim(),
-  )
-}
-
-export const cleanDisplayName = (tx: Transaction): string => {
-  // 1. If description is generic payment type and partner is available, use partner
-  if (isGenericPaymentDesc(tx.description) && tx.partner && tx.partner.trim()) {
-    return formatMerchantDisplayName(extractCleanDescription(tx.partner) || tx.partner)
-  }
-
-  // 2. If description has heavy SEPA / bank reference noise, resolve clean merchant
-  const hasBankNoise =
-    /\b(?:end[-\s]?to[-\s]?end|ccb\.\d|eref|kref|mref|svwz|iban|bic|genodef\w*|[a-z]{2}\d{2}[a-z0-9]{11,30})\b/i.test(
-      tx.description,
-    )
-  if (hasBankNoise) {
-    const merchant = getTransactionMerchant(tx)
-    if (merchant && merchant.length >= 3) {
-      return merchant
-    }
-  }
-
-  // 3. Preserve existing clean description while removing dates, rates/months, & long numbers
-  let cleaned = extractCleanDescription(tx.description) || tx.description
-  cleaned = cleaned
-    .replace(
-      /^(?:(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|bank[- ]?transfer|wire[- ]?transfer|money[- ]?transfer|standing[- ]?order)(?:\s+(?:an|to|f[uü]r|for))?\s*[:.-]?\s*)+/i,
-      '',
-    )
-    .replace(
-      /\b(?:rate|rata|raten|instalment|installment|annuit[aä]t|monatsrate)\s*[:#.-]?\s*\d{1,3}\b/gi,
-      ' ',
-    )
-    .replace(
-      /\b(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|januar|februar|m[aä]rz|mai|juni|juli|oktober|dezember|mrz)\b/gi,
-      ' ',
-    )
-    .replace(/\b\d{1,2}[-./]\d{1,2}([-./]\d{2,4})?\b/g, '')
-    .replace(/\b\d{4,}\b/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-
-  return cleaned || tx.description
-}
-
-export const getRecurrenceGroupingKey = (t: Transaction): string => {
-  // 1. If transaction has partner and description is generic, group by partner
-  if (t.partner && t.partner.trim() && isGenericPaymentDesc(t.description)) {
-    const cleanPartner = normalizeDescription(t.partner)
-    if (cleanPartner.length >= 2) {
-      return cleanPartner
-    }
-  }
-
-  // 2. If transaction description has bank noise (IBAN, BIC, End-to-End-Ref, EREF, CCB), resolve merchant
-  const hasBankNoise =
-    /\b(?:end[-\s]?to[-\s]?end|ccb\.\d|eref\+|kref\+|mref\+|svwz\+|genodef\w*|[a-z]{2}\d{2}[a-z0-9]{11,30})\b/i.test(
-      t.description,
-    )
-  if (hasBankNoise) {
-    const merchant = getTransactionMerchant(t)
-    if (merchant && merchant.length >= 3) {
-      return normalizeDescription(merchant)
-    }
-  }
-
-  // 3. Strip credit transfer prefixes, rate/installment counters, month names, and reference tags
-  let cleaned = extractCleanDescription(t.description) || t.description
-  cleaned = cleaned
-    .replace(
-      /^(?:(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|bank[- ]?transfer|wire[- ]?transfer|money[- ]?transfer|standing[- ]?order)(?:\s+(?:an|to|f[uü]r|for))?\s*[:.-]?\s*)+/i,
-      '',
-    )
-    .replace(
-      /\b(?:rate|rata|raten|instalment|installment|annuit[aä]t|monatsrate)\s*[:#.-]?\s*\d{1,3}\b/gi,
-      ' ',
-    )
-    .replace(
-      /\b(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|januar|februar|m[aä]rz|mai|juni|juli|oktober|dezember|mrz)\b/gi,
-      ' ',
-    )
-
-  let norm = normalizeDescription(cleaned)
-
-  // 4. If the normalized string is purely a generic payment description (e.g. "credit transfer", "ueberweisung"),
-  // bucket with rounded amount so distinct credit transfers without recipient info don't collide
-  if (isGenericPaymentDesc(norm)) {
-    norm = `${norm}_${Math.round(Math.abs(t.amount))}`
-  }
-
-  return norm
-}
-
-const recurrenceKeyCache = createBoundedCache<string>()
-const getCachedRecurrenceKey = (t: Transaction): string => {
-  const cacheKey = `${t.description}__${t.partner || ''}__${Math.round(Math.abs(t.amount))}`
-  let cached = recurrenceKeyCache.get(cacheKey)
-  if (cached === undefined) {
-    cached = getRecurrenceGroupingKey(t)
-    recurrenceKeyCache.set(cacheKey, cached)
-  }
-  return cached
-}
-
-interface RecurrenceResult {
-  isRecurring: boolean
-  avgAmount: number
-  displayName: string
-}
-
-export const evaluateMonthlyRecurrence = (txs: Transaction[]): RecurrenceResult => {
-  if (txs.length < 2) {
-    return { isRecurring: false, avgAmount: 0, displayName: '' }
-  }
-
-  let totalDays = 0
-  let prevTime = Date.parse(txs[0].date)
-  for (let i = 1; i < txs.length; i++) {
-    const currTime = Date.parse(txs[i].date)
-    const diffTime = Math.abs(currTime - prevTime)
-    totalDays += Math.ceil(diffTime / 86400000)
-    prevTime = currTime
-  }
-
-  const avgDays = totalDays / (txs.length - 1)
-  if (avgDays < 20 || avgDays > 40) {
-    return { isRecurring: false, avgAmount: 0, displayName: '' }
-  }
-
-  let totalAmount = 0
-  for (let i = 0; i < txs.length; i++) {
-    totalAmount += Math.abs(txs[i].amount)
-  }
-  const avgAmount = totalAmount / txs.length
-
-  let maxDev = 0
-  for (let i = 0; i < txs.length; i++) {
-    const dev = Math.abs(Math.abs(txs[i].amount) - avgAmount)
-    if (dev > maxDev) {
-      maxDev = dev
-    }
-  }
-
-  if (maxDev / avgAmount > 0.2) {
-    return { isRecurring: false, avgAmount: 0, displayName: '' }
-  }
-
-  const recentTx = txs[txs.length - 1]
-  const displayName = cleanDisplayName(recentTx)
-
-  return { isRecurring: true, avgAmount, displayName }
-}
-
-interface AmountCluster {
-  avgAmount: number
-  txs: Transaction[]
-}
-
-export const clusterTxsByAmount = (items: Transaction[]): Transaction[][] => {
-  if (items.length <= 1) {
-    return [items]
-  }
-  const clusters: AmountCluster[] = []
-  // Sort by amount descending to establish primary amount anchors
-  const sorted = [...items].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
-  for (const t of sorted) {
-    const amt = Math.abs(t.amount)
-    if (amt === 0) {
-      continue
-    }
-    let bestCluster: AmountCluster | null = null
-    let bestDiff = Infinity
-    for (const c of clusters) {
-      const diffPct = Math.abs(amt - c.avgAmount) / c.avgAmount
-      if (diffPct <= 0.2 && diffPct < bestDiff) {
-        bestDiff = diffPct
-        bestCluster = c
-      }
-    }
-    if (bestCluster) {
-      bestCluster.txs.push(t)
-      const sum = bestCluster.txs.reduce((acc, curr) => acc + Math.abs(curr.amount), 0)
-      bestCluster.avgAmount = sum / bestCluster.txs.length
-    } else {
-      clusters.push({ avgAmount: amt, txs: [t] })
-    }
-  }
-  return clusters.map((c) => c.txs)
-}
-
-/** Minimum length of a grouping key to be considered meaningful. */
-const MIN_GROUP_KEY_LENGTH = 3
-
-interface RecurrenceGroup {
-  normName: string
-  /** Amount clusters with at least 2 transactions, each sorted by date ascending */
-  clusters: Transaction[][]
-}
-
-interface RecurrenceGroupingResult {
-  groups: RecurrenceGroup[]
-  maxTime: number
-  totalTimeframeDays: number
-}
-
-/**
- * Period-independent preparation: categorizes expenses, groups them by recurrence key
- * and splits each group into date-sorted amount clusters.
- */
-const buildRecurrenceGroups = (
-  allRawTransactions: Transaction[],
-  customKeywords: Record<string, string[]>,
-  manualCategories: Record<string, string>,
-): RecurrenceGroupingResult | null => {
-  const expenses = allRawTransactions
-    .filter((t) => t.type === 'expense' && !t.isGhost && !isInformativeTransaction(t))
-    .map((t) => ({
-      ...t,
-      category: getTransactionCategory(t, customKeywords, manualCategories),
-    }))
-
-  if (expenses.length === 0) {
-    return null
-  }
-
-  // Determine overall dataset timeframe boundaries for multi-year checks
-  let minTime = Infinity
-  let maxTime = -Infinity
-  for (let i = 0; i < expenses.length; i++) {
-    const time = Date.parse(expenses[i].date)
-    if (time < minTime) {
-      minTime = time
-    }
-    if (time > maxTime) {
-      maxTime = time
-    }
-  }
-  const totalTimeframeDays =
-    minTime !== Infinity && maxTime !== -Infinity ? Math.ceil((maxTime - minTime) / 86400000) : 0
-
-  const byKey: Record<string, Transaction[]> = {}
-  for (const t of expenses) {
-    const key = getCachedRecurrenceKey(t)
-    if (key.length < MIN_GROUP_KEY_LENGTH) {
-      continue
-    }
-    if (!byKey[key]) {
-      byKey[key] = []
-    }
-    byKey[key].push(t)
-  }
-
-  const groups: RecurrenceGroup[] = []
-  for (const [normName, allTxs] of Object.entries(byKey)) {
-    if (allTxs.length < 2) {
-      continue
-    }
-    const clusters = clusterTxsByAmount(allTxs)
-      .filter((cluster) => cluster.length >= 2)
-      // Sort by date ascending (fast ASCII comparison for YYYY-MM-DD)
-      .map((cluster) => cluster.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)))
-    if (clusters.length > 0) {
-      groups.push({ normName, clusters })
-    }
-  }
-
-  return { groups, maxTime, totalTimeframeDays }
-}
-
 export const useRecurringTransactions = (
   allRawTransactions: Transaction[],
   period?: PeriodFilter,
@@ -309,42 +38,30 @@ export const useRecurringTransactions = (
   const customKeywords = useAppStore((s) => s.customKeywords)
   const manualCategories = useAppStore((s) => s.manualCategories)
 
-  // Expensive grouping only reruns when the transactions or categorization rules change
-  const grouping = useMemo(
-    () => buildRecurrenceGroups(allRawTransactions, customKeywords, manualCategories),
-    [allRawTransactions, customKeywords, manualCategories],
-  )
+  const grouping = useMemo(() => {
+    return buildRecurrenceGroups(allRawTransactions, customKeywords, manualCategories)
+  }, [allRawTransactions, customKeywords, manualCategories])
 
   return useMemo(() => {
     if (!grouping) {
       return { recurringExpenses: [], totalMonthly: 0 }
     }
+
     const { groups, maxTime, totalTimeframeDays } = grouping
-
+    const isAllTime = !period || period.mode === 'all'
     const recurringExpenses: RecurringExpense[] = []
-    const isAllPeriod = !period || period.mode === 'all'
 
-    // Analyze each group and its amount clusters
     for (const { normName, clusters } of groups) {
       const recurringInGroup: RecurringExpense[] = []
 
-      for (let clusterIdx = 0; clusterIdx < clusters.length; clusterIdx++) {
-        const cluster = clusters[clusterIdx]
+      for (const cluster of clusters) {
+        const txsInPeriod = isAllTime ? cluster : filterByPeriod(cluster, period)
 
-        // Filter transactions that fall into the selected period
-        const txsInPeriod = isAllPeriod ? cluster : filterByPeriod(cluster, period)
-        if (txsInPeriod.length === 0) {
-          continue
-        }
-
-        if (isAllPeriod) {
-          // Multi-year rule: If the dataset spans a few years (>= 365 days) and an expense
-          // only had a few recurring transactions at the start and then stopped long ago (> 90 days before end),
-          // exclude it as it was only a temporary past occurrence, not an active recurring expense across the timeframe.
+        if (isAllTime) {
+          const mostRecentTxTime = Date.parse(cluster[cluster.length - 1].date)
+          const daysSinceLastTx = Math.ceil((maxTime - mostRecentTxTime) / 86400000)
           const firstTxTime = Date.parse(cluster[0].date)
-          const lastTxTime = Date.parse(cluster[cluster.length - 1].date)
-          const spanDays = Math.ceil((lastTxTime - firstTxTime) / 86400000)
-          const daysSinceLastTx = Math.ceil((maxTime - lastTxTime) / 86400000)
+          const spanDays = Math.ceil((mostRecentTxTime - firstTxTime) / 86400000)
 
           if (
             totalTimeframeDays >= 365 &&
@@ -394,8 +111,6 @@ export const useRecurringTransactions = (
               transactionIds: txsInPeriod.map((t) => t.id),
             })
           } else if (txsInPeriod.length === 1) {
-            // Exactly 1 transaction occurred in this selected period (typical for single month views)
-            // Verify that this transaction belongs to an ongoing monthly recurrence in this cluster
             const targetTx = txsInPeriod[0]
             const idx = cluster.findIndex((t) => t.id === targetTx.id)
             const targetAmount = Math.abs(targetTx.amount)
@@ -450,7 +165,6 @@ export const useRecurringTransactions = (
       if (recurringInGroup.length === 1) {
         recurringExpenses.push(recurringInGroup[0])
       } else if (recurringInGroup.length > 1) {
-        // Merge multiple recurring streams for the same counterparty/merchant
         const combinedAmount =
           Math.round(recurringInGroup.reduce((sum, item) => sum + item.amount, 0) * 100) / 100
         const combinedCount = recurringInGroup.reduce((sum, item) => sum + item.transactionCount, 0)

@@ -1,0 +1,304 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.95rem 1.05rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  position: relative;
+  overflow: visible !important;
+  z-index: 1;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+[data-theme='light'] .card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.07);
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--card-accent-color, rgba(139, 92, 246, 0.4));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  z-index: 2;
+}
+
+[data-theme='light'] .card:hover {
+  background: rgba(0, 0, 0, 0.035);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Elevate card above grid when category dropdown is open */
+.cardWithOpenDropdown {
+  z-index: 100 !important;
+  border-color: var(--card-accent-color, var(--primary)) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Card Header */
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.cardInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.brandIconBox {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(125, 125, 125, 0.2);
+  background: rgba(125, 125, 125, 0.1);
+  transition: transform 0.2s ease;
+  overflow: hidden;
+  padding: 0;
+}
+
+.brandIconBox img,
+.brandIconBox svg[data-brand-logo='true'],
+.brandIconBox :global(.brand-logo-full),
+.brandIconBox svg[aria-label] {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+  display: block !important;
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .brandIconBox {
+    border-color: color-mix(in srgb, var(--card-accent-color, var(--primary)) 25%, transparent);
+    background: color-mix(in srgb, var(--card-accent-color, var(--primary)) 12%, transparent);
+  }
+}
+
+.card:hover .brandIconBox {
+  transform: scale(1.08);
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.expenseName {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.frequencyTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  width: fit-content;
+  border: 1px solid rgba(125, 125, 125, 0.2);
+  background: rgba(125, 125, 125, 0.08);
+  color: var(--card-accent-color, var(--text-muted));
+  letter-spacing: 0.01em;
+  transition: all 0.2s ease;
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .frequencyTag {
+    border-color: color-mix(in srgb, var(--card-accent-color, var(--primary)) 30%, transparent);
+    background: color-mix(in srgb, var(--card-accent-color, var(--primary)) 10%, transparent);
+    color: var(--card-accent-color, var(--text-main));
+  }
+}
+
+/* Card Pricing / Amounts */
+.cardPricing {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.15rem;
+}
+
+.amountBox {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.monthlyAmount {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.perMonth {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.projectionMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.yearlyEst {
+  font-weight: 600;
+}
+
+.bulletDot {
+  color: var(--text-dim);
+  font-size: 0.6rem;
+}
+
+.chargesCount {
+  color: var(--text-dim);
+}
+
+/* Card Footer & Current Spend Line (with Rich Hover Effects) */
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.2rem;
+}
+
+.weightBarContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.15rem 0;
+  cursor: default;
+}
+
+.weightBarBg {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+  transition:
+    height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+[data-theme='light'] .weightBarBg {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.weightBarFill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--card-accent-color, var(--primary));
+  transition:
+    width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .weightBarFill {
+    background: linear-gradient(
+      90deg,
+      var(--card-accent-color, var(--primary)) 0%,
+      color-mix(in srgb, var(--card-accent-color, var(--primary)) 75%, transparent) 100%
+    );
+  }
+}
+
+/* Interactive Hover effect on current spend line */
+.card:hover .weightBarBg,
+.weightBarContainer:hover .weightBarBg {
+  height: 9px;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='light'] .card:hover .weightBarBg,
+[data-theme='light'] .weightBarContainer:hover .weightBarBg {
+  background: rgba(0, 0, 0, 0.14);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover .weightBarFill,
+.weightBarContainer:hover .weightBarFill {
+  filter: brightness(1.25);
+  box-shadow:
+    0 0 12px var(--card-accent-color, var(--primary)),
+    0 0 4px var(--card-accent-color, var(--primary));
+}
+
+.weightPctText {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  min-width: 32px;
+  text-align: right;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease,
+    font-weight 0.2s ease;
+}
+
+.card:hover .weightPctText,
+.weightBarContainer:hover .weightPctText {
+  color: var(--card-accent-color, var(--text-main));
+  transform: scale(1.1);
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 0.85rem 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .frequencyTag {
+    padding: 0.18rem 0.45rem;
+    font-size: 0.64rem;
+    gap: 0.25rem;
+  }
+
+  .cardPricing {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}

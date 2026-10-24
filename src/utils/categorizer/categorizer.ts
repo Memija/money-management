@@ -1,15 +1,39 @@
-import { POPULAR_MERCHANTS } from '../../data/merchants'
-import { categoryTermsByLocale } from '../../i18n/category-terms'
 import type { CategoryKeywords } from '../../i18n/types'
 import { createBoundedCache } from '../bounded-cache'
-import { getCandidateMerchants } from '../merchant-index'
-import { escapeRegExp, matchesLowercaseTerm } from '../regex-utils'
 import {
   isPaymentProcessorIntermediary,
-  isPaymentProcessorOnly,
-  NON_RETAIL_OTTO_REGEX,
   repairBrokenWords,
 } from './description-cleaning'
+import {
+  matchCustomKeywords,
+  toDisplayCategory,
+} from './keyword-compiler'
+import {
+  AI_AND_SOFTWARE_SUBSCRIPTION_REGEX,
+  BUTCHER_MEAT_SHOP_REGEX,
+  CARD_OR_BANK_FEE_REGEX,
+  CAR_OR_EQUIPMENT_RENTAL_REGEX,
+  categoryRegexes,
+  CHILDCARE_FEE_REGEX,
+  COMMERCIAL_SEPA_REGEX,
+  CREDIT_INSURANCE_REGEX,
+  DINING_ESTABLISHMENT_REGEX,
+  EXPLICIT_TAX_AUTHORITY_OR_DUTY_REGEX,
+  findPopularMerchantCategory,
+  GERMAN_CITY_ESSEN_REGEX,
+  GERMAN_COMMUNICATION_PURPOSE_REGEX,
+  GERMAN_HEALTH_INSURANCE_REGEX,
+  GERMAN_INSURANCE_PURPOSE_REGEX,
+  GERMAN_TRAVEL_PURPOSE_REGEX,
+  INCOME_TAX_REGEX,
+  POLISH_ATM_WITHDRAWAL_REGEX,
+  REMITTANCE_TRANSFER_REGEX,
+  SEPA_TRANSFER_REGEX,
+  transferMerchantsRegex,
+} from './category-patterns'
+
+export * from './keyword-compiler'
+export * from './category-patterns'
 
 export interface CategorizeOptions {
   customKeywords?: Record<string, string[]>
@@ -25,405 +49,7 @@ export interface CategorizeOptions {
  */
 export const CATEGORIZER_RULES_VERSION = 5
 
-const WORD_CHAR_START = /^[\p{L}\p{N}]/u
-const WORD_CHAR_END = /[\p{L}\p{N}]$/u
-const LEADING_BOUNDARY = '(?<![\\p{L}\\p{N}])'
-const TRAILING_BOUNDARY = '(?![\\p{L}\\p{N}])'
-
-interface KeywordParts {
-  escaped: string
-  hasLeading: boolean
-  hasTrailing: boolean
-}
-
-function toKeywordParts(keyword: string): KeywordParts | undefined {
-  const trimmed = keyword.trim()
-  if (!trimmed) {
-    return undefined
-  }
-
-  // Strip existing explicit boundary markers like \b and wrap uniformly
-  const stripped = trimmed.replace(/^\\b|\\b$/g, '').trim()
-  if (!stripped) {
-    return undefined
-  }
-
-  return {
-    escaped: escapeRegExp(stripped),
-    hasLeading: WORD_CHAR_START.test(stripped),
-    hasTrailing: WORD_CHAR_END.test(stripped),
-  }
-}
-
-/**
- * Converts a keyword string into a Unicode-aware regular expression pattern.
- * Uses lookbehind (?<![\p{L}\p{N}]) and lookahead (?![\p{L}\p{N}]) to enforce
- * strict token/word boundaries, preventing false positives like 'car' in 'Mastercard',
- * 'rent' in 'Current', 'weg' in 'Bewegung', 'tax' in 'Contactless', etc.
- */
-export function keywordToPattern(keyword: string): string {
-  const parts = toKeywordParts(keyword)
-  if (!parts) {
-    return ''
-  }
-  const leading = parts.hasLeading ? LEADING_BOUNDARY : ''
-  const trailing = parts.hasTrailing ? TRAILING_BOUNDARY : ''
-  return `${leading}${parts.escaped}${trailing}`
-}
-
-/**
- * Compiles a list of keywords into one boundary-aware regex, equivalent to joining
- * `keywordToPattern` results with `|`, but with the lookarounds factored out per boundary group.
- * This lets the engine reject mid-word positions once instead of once per keyword,
- * which is dramatically faster for large dictionaries (thousands of merchant aliases).
- */
-export function buildKeywordRegex(keywords: string[]): RegExp | undefined {
-  const groups = new Map<string, string[]>()
-  for (const keyword of new Set(keywords)) {
-    const parts = toKeywordParts(keyword)
-    if (!parts) {
-      continue
-    }
-    const groupKey = `${parts.hasLeading ? LEADING_BOUNDARY : ''}|${parts.hasTrailing ? TRAILING_BOUNDARY : ''}`
-    const group = groups.get(groupKey)
-    if (group) {
-      group.push(parts.escaped)
-    } else {
-      groups.set(groupKey, [parts.escaped])
-    }
-  }
-  if (groups.size === 0) {
-    return undefined
-  }
-
-  const alternatives = [...groups].map(([groupKey, escapedWords]) => {
-    const [leading, trailing] = groupKey.split('|')
-    return `${leading}(?:${escapedWords.join('|')})${trailing}`
-  })
-  return new RegExp(alternatives.join('|'), 'iu')
-}
-
-// Pre-compile regular expressions for categorization
-const categoryRegexes: Partial<Record<keyof CategoryKeywords, RegExp>> = {}
-const aggregatedKeywords: Record<string, string[]> = {}
-
-// 1. Build aggregated keywords across all locales
-for (const terms of Object.values(categoryTermsByLocale)) {
-  const keywords = terms.keywords
-  if (keywords) {
-    for (const [cat, words] of Object.entries(keywords)) {
-      if (!aggregatedKeywords[cat]) {
-        aggregatedKeywords[cat] = []
-      }
-      aggregatedKeywords[cat].push(...words)
-    }
-  }
-}
-
-// 2. Separate specific POPULAR_MERCHANTS into distinct high-precedence merchant patterns
-const merchantCategoryPatterns: Record<string, string[]> = {}
-const transferMerchantPatterns: string[] = []
-
-for (const merchant of POPULAR_MERCHANTS) {
-  const cat =
-    merchant.category === 'Dining Out'
-      ? 'DiningOut'
-      : merchant.category === 'Bank Fees'
-        ? 'BankFees'
-        : merchant.category
-  const words = [merchant.keyword, ...(merchant.aliases || [])]
-  if (cat === 'Transfers') {
-    transferMerchantPatterns.push(...words)
-  } else {
-    if (!merchantCategoryPatterns[cat]) {
-      merchantCategoryPatterns[cat] = []
-    }
-    merchantCategoryPatterns[cat].push(...words)
-  }
-}
-
-const transferMerchantsRegex = buildKeywordRegex(transferMerchantPatterns)
-
-const PAYMENT_PROCESSOR_IDS = new Set<string>([
-  'paypal',
-  'klarna',
-  'stripe',
-  'sumup',
-  'payoneer',
-  'payone',
-])
-
-function findPopularMerchantCategory(textLower: string): string | undefined {
-  let bestDirectCategory: string | undefined
-  let bestDirectScore = 0
-  let bestProcessorCategory: string | undefined
-  let bestProcessorScore = 0
-
-  for (const { merchant, keywordLower: kw, aliasesLower, nameLower } of getCandidateMerchants(
-    textLower,
-  )) {
-    if (merchant.category === 'Transfers' && !REMITTANCE_TRANSFER_REGEX.test(merchant.keyword)) {
-      continue
-    }
-    if (merchant.id === 'otto' && NON_RETAIL_OTTO_REGEX.test(textLower)) {
-      continue
-    }
-    let score = 0
-    if (matchesLowercaseTerm(textLower, kw)) {
-      score = kw.length
-    }
-
-    for (const a of aliasesLower) {
-      if (matchesLowercaseTerm(textLower, a)) {
-        score = Math.max(score, a.length)
-      }
-    }
-
-    if (score > 0 && (kw === textLower || nameLower === textLower)) {
-      score += 1000
-    }
-
-    if (score > 0) {
-      if (PAYMENT_PROCESSOR_IDS.has(merchant.id)) {
-        if (score > bestProcessorScore) {
-          bestProcessorScore = score
-          bestProcessorCategory = merchant.category
-        }
-      } else if (score > bestDirectScore) {
-        bestDirectScore = score
-        bestDirectCategory = merchant.category
-      }
-    }
-  }
-
-  return bestDirectCategory || bestProcessorCategory
-}
-
-// Also integrate POPULAR_MERCHANTS into aggregatedKeywords as fallback
-for (const [cat, words] of Object.entries(merchantCategoryPatterns)) {
-  if (!aggregatedKeywords[cat]) {
-    aggregatedKeywords[cat] = []
-  }
-  aggregatedKeywords[cat].push(...words)
-}
-if (!aggregatedKeywords.Transfers) {
-  aggregatedKeywords.Transfers = []
-}
-aggregatedKeywords.Transfers.push(...transferMerchantPatterns)
-
-// 3. Compile high-precision boundary regexes per category
-for (const [cat, words] of Object.entries(aggregatedKeywords)) {
-  const regex = buildKeywordRegex(words)
-  if (regex) {
-    categoryRegexes[cat as keyof CategoryKeywords] = regex
-  }
-}
-
-// Regex to detect city 'Essen' context (e.g. 'Essen Hbf', 'Sparkasse Essen', 'Messe Essen')
-// to prevent misclassifying German bank statements from the city Essen as Dining Out.
-const GERMAN_CITY_ESSEN_REGEX =
-  /(?:\b(?:hbf|hauptbahnhof|sparkasse|stadt|messe|klinikum|uni|universit[aä]t|rathaus|amtsgericht)\s+essen\b|\bessen\s+(?:hbf|hauptbahnhof|messe|klinikum|rathaus)\b)/i
-
-// Regex to detect car or equipment rental context (e.g. 'Sixt Rent a Car', 'Car Rental', 'Autovermietung')
-// to prevent vehicle and equipment rentals from misclassifying as apartment/housing Rent.
-const CAR_OR_EQUIPMENT_RENTAL_REGEX =
-  /(?:\b(?:car[- ]?rent(?:al)?|rent[- ]?a[- ]?car|rental[- ]?car|autovermietung|auto[- ]?miete|fahrzeug(?:ver)?miete|equipment[- ]?rent(?:al)?|tool[- ]?rent(?:al)?|uber[- ]?rent)\b)/i
-
-// Regex to detect income tax context (e.g. 'Income Tax', 'Einkommensteuer')
-// to prevent tax payments/refunds from misclassifying as personal Salary.
-const INCOME_TAX_REGEX =
-  /(?:\b(?:income\s+tax|einkommensteuer|podatek\s+dochodowy|porez\s+na\s+dohodak|pajak\s+penghasilan|pph)\b)/i
-
-// Regex to detect cash withdrawal in Polish context (e.g. 'Wypłata z bankomatu', 'Wypłata gotówki')
-// to prevent ATM withdrawals from misclassifying as personal Salary (wypłata).
-const POLISH_ATM_WITHDRAWAL_REGEX =
-  /(?:\b(?:wyp[lł]ata|wyplata)\s+(?:z\s+bankomatu|got[oó]wki|w\s+bankomacie)\b)/i
-
-// Regex to detect SEPA and credit transfer / standing order reference patterns
-// (e.g. 'CCB.321.UE.328580', 'MOB.210.EE.POS00026333', 'CD-SCT-12345', 'SEPA-Überweisung', 'Dauerauftrag', 'Umbuchung', 'End-to-End-Ref ... Kundenreferenz ...')
-const SEPA_TRANSFER_REGEX =
-  /(?:\b[a-z0-9_-]+\.\d+\.(?:ue|da|ee|ta|sct|inst)(?:\.[a-z0-9_-]+)?\b|\bcd-sct-[a-z0-9_-]+\b|\b(?:end-to-end-ref\b.*\bkundenreferenz\b|\bkundenreferenz\b.*\bend-to-end-ref\b)|\b(?:end-to-end-ref|kundenreferenz)\s*:\s*(?:notprovided|null|\d{8}-[a-z0-9_-]+|[a-z0-9_.-]*(?:ue|da|ee|ta|sct|inst|mob|si)[a-z0-9_.-]*)\b|\b(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|umbuchung|bank[uü]berweisung|bank[- ]?transfer|wire[- ]?transfer|money[- ]?(?:transfer|back)|geld[- ]?zur[uü]ck|sent\s+from|echtzeit[uü]berweisung|echtzeit[- ]?[uü]berweisung|instant[- ]?transfer|instant[- ]?payment)\b|(?:\b[a-z]{4}[a-z]{2}[a-z0-9]{2}(?:[a-z0-9]{3})?\s+[a-z]{2}\d{2}[a-z0-9]{11,30}\b|\b[a-z]{2}\d{2}[a-z0-9]{11,30}\b).*\b(?:end-to-end-ref|kundenreferenz)\b|\b(?:max(?:\s+mustermann)?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*erika\s*mustermann|erika(?:\s+mustermann)?\s*(?:o\.?|oder|u\.?|und|i|ili|\/|&|,)\s*max\s*mustermann)\b)/i
-
-// Regex to detect commercial purchase / order indicators in SEPA payments
-// to prevent business invoices, orders, and corporate collections with End-to-End-Ref from falling into Transfers.
-const COMMERCIAL_SEPA_REGEX =
-  /(?:\b(?:order|bestellung|auftrag|rechnung|invoice|rg\.?)\s*[:#.-]?\s*\d|\b(?:citideffxxx)\b|\bde\d{2}50210900\d{10}\b|\b(?:mandatsref|mandatsreferenz|gl[aä]ubiger[- ]?id|sepa[- ]?(?:basis|firmen)?[- ]?lastschrift|lastschrift\b))/i
-
-// Regex to detect explicit tax authority or specific tax duty/assessment context
-// to prevent regular bank transfers with tax-related memos/references from misclassifying as Taxes.
-const EXPLICIT_TAX_AUTHORITY_OR_DUTY_REGEX =
-  /(?:\b(?:finanzamt|finanzkasse|bundeskasse|steuerverwaltung|steuerbeh[oö]rde|irs|hmrc|cra|belastingdienst|dgfip|agenzia\s+delle\s+entrate|agencia\s+tributaria|receita\s+federal|porezn[ae]|poresk[ae]|urzad\s+skarbowy|urząd\s+skarbowy|dirjen\s+pajak|wundertax|taxfix|smartsteuer|elster|wiso\s*steuer|buhl\s*data|gerichtkasse|gerichtskasse|justizkasse|landesjustizkasse|oberlandesgerichtskasse|zentrale\s+gerichtskasse|grundbuchamt|notar|notariat|f[aä]rber\s*(?:und|&)\s*hutzel|fa\s+[a-zäöüß]+|stadtkasse|gemeindekasse|stadtverwaltung|gemeindeverwaltung|standesamt|standesamtskasse|konsulat|generalkonsulat|generalkosulat|botschaft|embassy|consulate)\b|\b(?:einkommensteuer|grundsteuer|gewerbesteuer|umsatzsteuer|kirchensteuer|hundesteuer|zweitwohnungs?steuer|grundbesitzabgaben|vorabpauschale|invstg|kapitalertragsteuer|quellensteuer|solidarit[aä]tszuschlag|steuernummer|steuer[- ]?id|steuerbescheid|steuererkl[aä]rung|steuererstattung|est-veranl(?:\.|agung)?|grunderwerbsteuer|grunderwerbssteuer|grundbuchgeb[uü]hr(?:en)?|gerichtsgeb[uü]hr(?:en)?|notarkosten|notargeb[uü]hr(?:en)?|standesamtsgeb[uü]hr(?:en)?|geburtsurkunde|passgeb[uü]hr(?:en)?|ausweisgeb[uü]hr(?:en)?|visageb[uü]hr(?:en)?|visumgeb[uü]hr(?:en)?|tax\s+payment|tax\s+assessment|tax\s+bill|tax\s+return|tax\s+refund|tax\s+office|tax\s+authority|income\s+tax|property\s+tax|sales\s+tax|corporate\s+tax|capital\s+gains\s+tax|council\s+tax|advance\s+tax)\b)/i
-
 const defaultCategoryCache = createBoundedCache<string>()
-
-interface CompiledCustomKeyword {
-  category: string
-  word: string
-  regex?: RegExp
-}
-
-interface CompiledCustomKeywords {
-  entries: CompiledCustomKeyword[]
-  /** Single combined regex matching if ANY keyword matches; used to reject most descriptions in one test. */
-  anyMatch?: RegExp
-}
-
-// Compiled custom keyword regexes, keyed by the (immutable) customKeywords object from the store.
-const compiledCustomKeywordsCache = new WeakMap<Record<string, string[]>, CompiledCustomKeywords>()
-
-function buildCombinedPrefilter(words: string[]): RegExp | undefined {
-  try {
-    return buildKeywordRegex(words)
-  } catch {
-    return undefined
-  }
-}
-
-function compileCustomKeywords(customKeywords: Record<string, string[]>): CompiledCustomKeywords {
-  const cached = compiledCustomKeywordsCache.get(customKeywords)
-  if (cached) {
-    return cached
-  }
-
-  const entries: CompiledCustomKeyword[] = []
-  const prefilterWords: string[] = []
-  let canPrefilter = true
-  for (const [category, words] of Object.entries(customKeywords)) {
-    if (!words || words.length === 0) {
-      continue
-    }
-    for (const word of words) {
-      if (!word || !word.trim()) {
-        continue
-      }
-      if (isPaymentProcessorOnly(word)) {
-        continue
-      }
-      const pattern = keywordToPattern(word)
-      let regex: RegExp | undefined
-      try {
-        regex = new RegExp(pattern, 'iu')
-      } catch {
-        regex = undefined
-      }
-      // Entries that fall back to substring matching (or match everything) can't be expressed in the prefilter
-      if (!regex || !pattern) {
-        canPrefilter = false
-      }
-      prefilterWords.push(word)
-      entries.push({ category, word: word.toLowerCase(), regex })
-    }
-  }
-  const compiled: CompiledCustomKeywords = {
-    entries,
-    anyMatch: canPrefilter ? buildCombinedPrefilter(prefilterWords) : undefined,
-  }
-  compiledCustomKeywordsCache.set(customKeywords, compiled)
-  return compiled
-}
-
-function toDisplayCategory(cat: string): string {
-  if (cat === 'DiningOut') {
-    return 'Dining Out'
-  }
-  if (cat === 'BankFees') {
-    return 'Bank Fees'
-  }
-  return cat
-}
-
-function matchCustomKeywords(
-  d: string,
-  customKeywords: Record<string, string[]>,
-): string | undefined {
-  const { entries, anyMatch } = compileCustomKeywords(customKeywords)
-  if (anyMatch && !anyMatch.test(d)) {
-    return undefined
-  }
-  for (const { category, word, regex } of entries) {
-    const isMatch = regex ? regex.test(d) : d.includes(word)
-    if (isMatch) {
-      return toDisplayCategory(category)
-    }
-  }
-  return undefined
-}
-
-// Regex to detect childcare / school-care fee purposes (e.g. 'KINDERTAGESSTAETTENBEITRAG', 'Kita-Gebuehr', 'Hortbeitrag').
-// Municipalities bill these too, so the purpose must win over the municipal authority's default 'Taxes' category.
-const CHILDCARE_FEE_REGEX =
-  /\b(?:kindertagesst(?:ä|ae|a)tte\w*|kita[- ]?(?:geb(?:ü|ue|u)hr\w*|beitr(?:ä|ae|a)g\w*)|(?:kindergarten|krippen|hort|betreuungs)(?:geb(?:ü|ue|u)hr\w*|beitr(?:ä|ae|a)g\w*)|schulkindbetreuung)/i
-
-// Regex to detect German health insurance context (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenvers', 'Krankenkasse', 'Zahnzusatzversicherung')
-// to categorize health insurance transactions as Healthcare rather than general Insurance even from multi-line insurers like AXA, Debeka, etc.
-export const GERMAN_HEALTH_INSURANCE_REGEX =
-  /(?:\b(?:kr(?:anke[-\s]*n|anken)[-\s]*vers\w*|kranken[-\s]*kasse\w*|krankenkasse\w*|zahn[-\s]*(?:zu[-\s]*)?satz\w*|zahn[-\s]*vers\w*|dental[-\s]*vers\w*)\b)/i
-
-// Regex to detect German vehicle or general insurance context (e.g. 'KFZ Versicherung', 'Kfz-Versicherung', 'Autoversicherung', 'Haftpflichtversicherung')
-// to categorize policy payments, fees, or broker/comparison portal cashback (e.g. CHECK24 Gutscheinauszahlung) as Insurance.
-export const GERMAN_INSURANCE_PURPOSE_REGEX =
-  /(?:\b(?:kfz[- ]?vers\w*|auto[- ]?vers\w*|fahrzeug[- ]?vers\w*|motorrad[- ]?vers\w*|haftpflicht\w*|hausrat\w*|rechtsschutz\w*|unfallvers\w*|lebensvers\w*|risikolv\w*|sterbegeld\w*|tierhalterhaftpflicht\w*|hundehaftpflicht\w*|wohngeb[aä]udevers\w*|geb[aä]udevers\w*|restkreditvers\w*|restschuldvers\w*|ratenschutz\w*|kreditschutz\w*|darlehensschutz\w*|kreditvers\w*|iptiq\w*|versicherungs?(?:auszahlung|beitrag|pr[aä]mie)?)\b|\b[a-z]{2}\d{2}ver\d{10,25}\b)/i
-
-/**
- * Regex to detect credit life, loan protection, and residual debt insurance
- * (e.g. 'Restkreditversicherung', 'Restschuldversicherung', 'Ratenschutzversicherung', 'Ratenschutz',
- * 'Kreditschutz', 'Darlehensschutz', 'Kreditversicherung', 'iptiQ Life', 'Aeguron', 'Cardif', 'Credit Life',
- * 'Check 24 Alpha Kredit - 2', or German insurance creditor IDs like 'DE08VER...')
- * to ensure loan protection policies categorize under Insurance rather than Loans even if they mention 'kredit'.
- */
-export const CREDIT_INSURANCE_REGEX =
-  /(?:\b(?:restkreditvers\w*|restschuldvers\w*|ratenschutz(?:vers\w*)?|kreditschutz\w*|darlehensschutz\w*|kreditvers\w*|darlehensvers\w*|kreditleben\w*|credit\s*life\w*|iptiq(?:\s+life)?\b|aeguron\b|cardif\b|alpha\s*kredit\s*-\s*2\b|alpha\s*kredit\s+ratenschutz\w*)\b|\b[a-z]{2}\d{2}ver\d{10,25}\b)/i
-
-// Regex to detect German travel, vacation, booking, flight, and lodging context (e.g. 'Reise', 'Reisen', 'Reisebuchung', 'Urlaub', 'Pauschalreise', 'Hotel', 'Flug')
-// to categorize travel bookings, tour operator packages, or comparison portal cashback/refunds (e.g. CHECK24 Auszahlung Guthaben - fuer Ihre Reise) as Travel.
-export const GERMAN_TRAVEL_PURPOSE_REGEX =
-  /(?:\b(?:(?:an|ab)?reise\b|reisen\b|reisebuchung\w*|reisedienst\w*|reisepartner\w*|urlaub\w*|pauschalreise\w*|flug(?:buchung|reise|ticket)?\w*|fl[uü]ge\b|hotel(?:buchung|reservierung)?\w*|resort\w*|ferien(?:wohnung|haus|resort)?\w*|kreuzfahrt\w*)\b)/i
-
-// Regex to detect telecommunication, mobile, broadband, and internet contract/cashback context
-// (e.g. 'Mobilfunk', 'Handyvertrag', 'Handytarif', 'DSL', 'Glasfaser', 'Internetanschluss', 'Festnetz', 'SIM-Karte', 'eSIM')
-// to categorize mobile tariffs, telecom contracts, and comparison portal cashback (e.g. CHECK24 Cashback Mobilfunk) as Communication.
-export const GERMAN_COMMUNICATION_PURPOSE_REGEX =
-  /(?:\b(?:mobilfunk\w*|handy[- ]?(?:vertrag|tarif|rechnung)\w*|mobil[- ]?funk[- ]?(?:vertrag|tarif)\w*|daten[- ]?tarif\w*|(?:a|v)?dsl\b|glasfaser\w*|festnetz\w*|breitband\w*|sim[- ]?karte\w*|e[- ]?sim\b|telekommunikation\w*|internet[- ]?(?:tarif|vertrag|anschluss|zugang|flatrate)\w*|telefon[- ]?(?:anschluss|rechnung|vertrag|tarif)\w*|mobile\s+(?:tariff|plan|contract)|cellular\s+(?:plan|service))\b)/i
-
-/**
- * Regex to detect explicit dining venue / establishment terms
- * (e.g. 'Restoran', 'Restaurant', 'Bistro', 'Pizzeria', 'Caffe & Restoran', 'Konoba', 'Gostionica', 'Ćevabdžinica', 'Kafana')
- * to ensure dining establishments located inside or affiliated with shopping centers or supermarket chains prioritize Dining Out over Groceries/Shopping.
- */
-export const DINING_ESTABLISHMENT_REGEX =
-  /(?:\b(?:restoran|restaurant|resto|restos|bistro|pizzeria|pizzaria|trattoria|osteria|konoba|gostionica|caffe\s*&?\s*restoran|kafana|[cć]evabd[zž]inica|grill\s*restoran|steakhouse|brasserie|bäckerei\w*|baeckerei\w*|feinbäckerei\w*|feinbaeckerei\w*|konditorei\w*|brotchen[- ]?macher\w*|brötchen[- ]?macher\w*|brothaus\w*|brot[- ]?haus\w*)\b)/i
-
-/**
- * Regex to detect butcher shops, meat markets, and charcuteries
- * (e.g. 'Metzgerei', 'Fleischerei', 'Schlachterei', 'Landmetzgerei', 'Feinkostmetzgerei', 'Butcher', 'Meat Market', 'Mesnica', 'Mesara')
- * to ensure meat shops processed through merchant terminals like SumUp prioritize Groceries over Shopping.
- */
-export const BUTCHER_MEAT_SHOP_REGEX =
-  /(?:\b(?:metzgerei\w*|feinkostmetzgerei\w*|landmetzgerei\w*|fleischerei\w*|schlachterei\w*|metzger\w*|fleischer\w*|schlachter\w*|fleischmarkt\w*|fleischwaren\w*|wurstwaren\w*|butcher(?:s|\s+shop)?|meat\s*(?:shop|market|store)|mesnica\w*|mesara\w*|rze[zź]nik\w*|sklep\s+mi[eę]sny|toko\s+daging)\b)/i
-
-/**
- * Regex to detect dedicated money transfer and remittance services
- * (e.g. 'Western Union', 'MoneyGram', 'Ria Money Transfer', 'Remitly', 'WorldRemit', 'TransferWise')
- * to ensure money transfers prioritize Transfers over generic payment terms like 'Kartenzahlung' or 'Kauf' in Shopping.
- */
-export const REMITTANCE_TRANSFER_REGEX =
-  /(?:\b(?:western\s*union\w*|westernunion\w*|wu\.com|money[- ]?gram\w*|remitly\w*|ria\s+money\w*|world\s*remit\w*|small\s*world\s*money\w*|transferwise\b|money\s*transfer\w*|geldtransfer\w*|bargeldtransfer\w*|auslands[uü]berweisung\w*|auslandsueberweisung\w*|international\s+money\s+transfer\w*|remittance\w*|slanje\s+novca\w*|przelew\s+zagraniczny\w*|transfer\s+uang\w*)\b)/i
-
-/**
- * Regex to detect dedicated AI, machine learning, and cloud software subscriptions
- * (e.g. 'Google Payment Ireland', 'Google Ireland', 'Google Cloud', 'Google Gemini', 'Google One', 'OpenAI', 'ChatGPT', 'Claude.ai', 'Anthropic', 'Midjourney', 'Perplexity', 'Cursor AI')
- * to ensure recurring AI and digital software tools prioritize Utilities over generic shopping terms like 'Einkauf' or payment processor defaults.
- */
-export const AI_AND_SOFTWARE_SUBSCRIPTION_REGEX =
-  /(?:\b(?:openai\w*|chatgpt\w*|anthropic\w*|claude\.ai\w*|midjourney\w*|perplexity(?:\.ai)?\w*|cursor(?:\.sh|\.com)?\b|anysphere\w*|google\s+p\s*ayment\s+ireland\w*|google\s+payment\s+ireland\w*|google\s+ireland(?:\s+ltd)?\b|google\s+(?:gemini|one|workspace|cloud|storage)\b)\b)/i
-
-/**
- * Regex to detect card payments, POS purchases, and bank/service fee contexts
- * (e.g. 'Entgelt Auslandseinsatz', 'Kartenzahlung', 'Virtual Debit Card', 'POS-Zahlung')
- * to prevent card charges and bank fees containing 'entgelt' from misclassifying as personal Salary.
- */
-export const CARD_OR_BANK_FEE_REGEX =
-  /(?:\b(?:kartenzahlung|karteneinkauf|pos[- ]?zahlung|pos[- ]?einkauf|virtual\s+debit|debit\s+card|credit\s+card|karte\s+nr|kartenabrechnung|auslandseinsatz|karteneinsatz)\b|\bentgelt\s+(?:auslands|karten|abschluss|konto|depot|info|buchung|service)\w*\b)/i
 
 /**
  * Infers a category from a transaction description and context.
@@ -471,8 +97,7 @@ export function categorize(
     }
   }
 
-  // Check cache for default evaluations. Everything below is independent of custom keywords,
-  // so results are safely cached regardless of whether custom keywords were supplied.
+  // Check cache for default evaluations
   const isExpense =
     options?.type === 'expense' || (typeof options?.amount === 'number' && options.amount < 0)
   const isIncome =
@@ -534,8 +159,7 @@ export function categorize(
     }
   }
 
-  // 3. Specific brand/merchant matching (airlines, hotel groups, OTAs, supermarkets, mobility)
-  // Higher precedence than generic dictionary terms like 'car' or payment processors
+  // 3. Specific brand/merchant matching
   const popularCat = findPopularMerchantCategory(d.toLowerCase())
   if (popularCat) {
     if (popularCat === 'Dining Out' && GERMAN_CITY_ESSEN_REGEX.test(d)) {
@@ -597,57 +221,49 @@ export function categorize(
     }
   }
 
-  // Health insurance priority check (e.g. 'Krankenvers.', 'Krankenversicherung', 'Krankenkasse', 'Zahnzusatzversicherung')
-  // categorized as Healthcare rather than falling into general Insurance or Other
+  // Health insurance priority check
   if (GERMAN_HEALTH_INSURANCE_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Healthcare')
     return 'Healthcare'
   }
 
-  // General/vehicle/credit insurance priority check (e.g. 'KFZ Versicherung', 'Kfz-Versicherung', 'Restkreditversicherung')
-  // categorized as Insurance rather than falling into general Shopping or Other
+  // General/vehicle/credit insurance priority check
   if (CREDIT_INSURANCE_REGEX.test(d) || GERMAN_INSURANCE_PURPOSE_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Insurance')
     return 'Insurance'
   }
 
-  // Travel priority check (e.g. 'Reise', 'Reisen', 'Urlaub', 'Pauschalreise', 'Hotel', 'Flug')
-  // categorized as Travel rather than falling into general Shopping or Other
+  // Travel priority check
   if (GERMAN_TRAVEL_PURPOSE_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Travel')
     return 'Travel'
   }
 
-  // Telecommunication / mobile / broadband priority check (e.g. 'Mobilfunk', 'Handyvertrag', 'DSL', 'Glasfaser')
-  // categorized as Communication rather than falling into general Shopping, Other, or generic dictionary matching
+  // Telecommunication / mobile / broadband priority check
   if (GERMAN_COMMUNICATION_PURPOSE_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Communication')
     return 'Communication'
   }
 
-  // Explicit dining establishment venue indicators (e.g. 'Restoran', 'Restaurant', 'Bistro', 'Pizzeria')
-  // take precedence over general grocery or shopping dictionaries
+  // Explicit dining establishment venue indicators
   if (DINING_ESTABLISHMENT_REGEX.test(d) && !GERMAN_CITY_ESSEN_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Dining Out')
     return 'Dining Out'
   }
 
-  // Explicit butcher and meat market venue indicators (e.g. 'Metzgerei', 'Fleischerei', 'Schlachterei', 'Mesnica')
-  // take precedence over general shopping dictionaries
+  // Explicit butcher and meat market venue indicators
   if (BUTCHER_MEAT_SHOP_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Groceries')
     return 'Groceries'
   }
 
-  // Explicit remittance and money transfer providers (e.g. 'Western Union', 'MoneyGram', 'Ria Money Transfer', 'Remitly')
-  // take precedence over generic payment terms like 'Kartenzahlung' or 'Kauf' in Shopping
+  // Explicit remittance and money transfer providers
   if (REMITTANCE_TRANSFER_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Transfers')
     return 'Transfers'
   }
 
-  // Explicit AI and cloud software subscriptions (e.g. 'Google Payment Ireland', 'OpenAI', 'ChatGPT', 'Claude.ai', 'Anthropic', 'Midjourney', 'Perplexity', 'Cursor')
-  // take precedence over generic shopping terms like 'Einkauf' or payment processor intermediaries
+  // Explicit AI and cloud software subscriptions
   if (AI_AND_SOFTWARE_SUBSCRIPTION_REGEX.test(d)) {
     defaultCategoryCache.set(cacheKey, 'Utilities')
     return 'Utilities'
@@ -695,7 +311,6 @@ export function categorize(
   for (const cat of order) {
     const rx = categoryRegexes[cat]
     if (rx?.test(d)) {
-      // Guard against German city Essen misclassifying as Dining Out
       if (cat === 'DiningOut' && GERMAN_CITY_ESSEN_REGEX.test(d)) {
         continue
       }
@@ -706,7 +321,7 @@ export function categorize(
     }
   }
 
-  // 5. Transfers & Payment processor fallback (e.g. direct PayPal/Klarna without specific retail merchant)
+  // 5. Transfers & Payment processor fallback
   if (isPaymentProcessorIntermediary(d)) {
     defaultCategoryCache.set(cacheKey, 'Shopping')
     return 'Shopping'

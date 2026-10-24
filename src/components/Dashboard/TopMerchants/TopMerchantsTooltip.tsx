@@ -10,7 +10,7 @@ import { getCategoryLabel } from '../../../utils/category-utils'
 import { CategoryIcon } from '../../shared/CategoryIcon'
 import { MerchantLogo } from './MerchantLogo'
 
-import styles from './TopMerchants.module.css'
+import styles from './TopMerchantsTooltip.module.css'
 
 const TOOLTIP_LOGO_SIZE = 18
 const TOOLTIP_CATEGORY_ICON_SIZE = 11

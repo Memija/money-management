@@ -1,0 +1,206 @@
+.categoryCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.75rem 0.95rem 0.75rem 0.85rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  outline: none;
+}
+
+[data-theme='light'] .categoryCard {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.categoryCard:hover,
+.categoryCard.activeCard {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+  border-color: var(--active-card-color, var(--primary));
+  box-shadow: 0 6px 18px -2px var(--active-card-glow, rgba(0, 0, 0, 0.25));
+}
+
+[data-theme='light'] .categoryCard:hover,
+[data-theme='light'] .categoryCard.activeCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 18px -2px rgba(0, 0, 0, 0.08);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .categoryCard:hover,
+  .categoryCard.activeCard {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--active-card-color, var(--primary)) 10%, transparent) 0%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+    border-color: color-mix(in srgb, var(--active-card-color, var(--primary)) 45%, transparent);
+  }
+
+  [data-theme='light'] .categoryCard:hover,
+  [data-theme='light'] .categoryCard.activeCard {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--active-card-color, var(--primary)) 8%, white) 0%,
+      white 100%
+    );
+    border-color: color-mix(in srgb, var(--active-card-color, var(--primary)) 40%, transparent);
+  }
+}
+
+.categoryCard.activeCard {
+  border-color: var(--active-card-color, var(--primary));
+  box-shadow: 0 0 16px var(--active-card-glow, rgba(99, 102, 241, 0.3));
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cardCategoryInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.iconBox {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  background: rgba(125, 125, 125, 0.1);
+  border: 1px solid rgba(125, 125, 125, 0.2);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .iconBox {
+    background: color-mix(in srgb, var(--active-card-color, var(--primary)) 14%, transparent);
+    border-color: color-mix(in srgb, var(--active-card-color, var(--primary)) 30%, transparent);
+  }
+}
+
+.categoryCard:hover .iconBox {
+  transform: scale(1.08);
+}
+
+.categoryName {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 0.5rem;
+}
+
+/* Rank Badges */
+.rankPill {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.12rem 0.38rem;
+  border-radius: 6px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.rankGold {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.rankSilver {
+  background: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+[data-theme='light'] .rankSilver {
+  background: rgba(100, 116, 139, 0.12);
+  color: #475569;
+}
+
+.rankBronze {
+  background: rgba(217, 119, 6, 0.16);
+  color: #d97706;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+}
+
+.rankDefault {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+  border: 1px solid var(--card-border);
+}
+
+[data-theme='light'] .rankDefault {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.cardValue {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.cardBottom {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.progressBarBg {
+  flex: 1;
+  height: 6.5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+[data-theme='light'] .progressBarBg {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--active-card-color, var(--primary));
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+  .progressBarFill {
+    background: linear-gradient(
+      90deg,
+      var(--active-card-color, var(--primary)) 0%,
+      color-mix(in srgb, var(--active-card-color, var(--primary)) 85%, white) 100%
+    );
+  }
+}
+
+.percentText {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 38px;
+  text-align: right;
+}

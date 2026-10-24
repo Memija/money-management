@@ -8,7 +8,7 @@ import { getCategoryColor } from '../../../utils/category-colors'
 import { formatCategoryPercent, getCategoryLabel } from '../../../utils/category-utils'
 import { CategoryIcon } from '../../shared/CategoryIcon'
 
-import styles from './CategoryTrend.module.css'
+import styles from './CategoryTrendTooltip.module.css'
 
 interface TooltipPayloadItem {
   name: string

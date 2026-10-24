@@ -5,7 +5,7 @@ import { ClipboardPaste, FileSpreadsheet, FileType } from 'lucide-react'
 import type { TranslationStrings } from '../../i18n/types'
 import type { ImportMethod } from '../../types'
 
-import styles from './TransactionImporter.module.css'
+import styles from './ImportMethodSelector.module.css'
 
 interface ImportMethodSelectorProps {
   t: TranslationStrings

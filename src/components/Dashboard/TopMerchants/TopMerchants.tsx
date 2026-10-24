@@ -7,12 +7,9 @@ import { useFormatters } from '../../../hooks/useFormatters'
 import { useIsMobile } from '../../../hooks/useIsMobile'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
-import { getCategoryColor } from '../../../utils/category-colors'
 import { getMerchantBrandInfo, type MerchantBrandInfo } from '../../../utils/category-icons'
-import { getCategoryLabel } from '../../../utils/category-utils'
-import { CategoryIcon } from '../../shared/CategoryIcon'
-import { MerchantLogo } from './MerchantLogo'
 import { TopMerchantsChart } from './TopMerchantsChart'
+import { TopMerchantsRow } from './TopMerchantsRow'
 
 import styles from './TopMerchants.module.css'
 
@@ -24,28 +21,12 @@ interface TopMerchantsProps {
 }
 
 const MOBILE_BREAKPOINT_PX = 640
-const ROW_LOGO_SIZE = 18
-const ROW_CATEGORY_ICON_SIZE = 11
-const MIN_PROGRESS_PCT = 2
-
-const getRankClass = (idx: number): string => {
-  if (idx === 0) {
-    return styles.rankGold
-  }
-  if (idx === 1) {
-    return styles.rankSilver
-  }
-  if (idx === 2) {
-    return styles.rankBronze
-  }
-  return styles.rankDefault
-}
 
 export const TopMerchants: React.FC<TopMerchantsProps> = React.memo(
   ({ merchants, totalExpenses = 0, onMerchantClick, fullWidth }) => {
     const t = useLanguageStore((s) => s.t)
     const customCategories = useAppStore((s) => s.customCategories)
-    const { formatCurrency, formatChargesCount, formatPopularMerchantsCount } = useFormatters()
+    const { formatCurrency, formatPopularMerchantsCount } = useFormatters()
     const [viewMode, setViewMode] = useState<'list' | 'chart'>('list')
     const isMobile = useIsMobile(MOBILE_BREAKPOINT_PX)
 
@@ -141,117 +122,18 @@ export const TopMerchants: React.FC<TopMerchantsProps> = React.memo(
         {/* Main Body */}
         {viewMode === 'list' ? (
           <div className={styles.listContainer}>
-            {merchants.map((merchant, idx) => {
-              const brand = brandInfos.get(merchant.name) ?? getMerchantBrandInfo(merchant.name)
-              const category = merchant.category || brand.suggestedCategory || 'Other'
-              const categoryColor = getCategoryColor(category, customCategories)
-              const categoryLabel = getCategoryLabel(category, t)
-              const shareOfTopNum = totalTopSpend > 0 ? (merchant.amount / totalTopSpend) * 100 : 0
-              const shareOfTop = shareOfTopNum.toFixed(0)
-              const avgPerTx =
-                merchant.count > 0 ? merchant.amount / merchant.count : merchant.amount
-              const isClickable = Boolean(onMerchantClick)
-
-              return (
-                <div
-                  key={merchant.name}
-                  className={`${styles.merchantRow} ${isClickable ? styles.merchantRowClickable : ''}`}
-                  onClick={() => onMerchantClick?.(merchant.name)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      onMerchantClick?.(merchant.name)
-                    }
-                  }}
-                  role={isClickable ? 'button' : undefined}
-                  tabIndex={isClickable ? 0 : undefined}
-                  title={
-                    isClickable
-                      ? `${merchant.name} - ${t.allTransactions || 'View transactions'}`
-                      : merchant.name
-                  }
-                  style={
-                    {
-                      '--brand-color': brand.brandColor,
-                      '--progress-width': `${Math.max(MIN_PROGRESS_PCT, shareOfTopNum)}%`,
-                    } as React.CSSProperties
-                  }
-                >
-                  <div className={styles.rowMain}>
-                    <div className={styles.rowLeft}>
-                      <div className={`${styles.rankBadge} ${getRankClass(idx)}`}>{idx + 1}</div>
-
-                      <div className={styles.logoBox}>
-                        <MerchantLogo
-                          brand={brand}
-                          size={ROW_LOGO_SIZE}
-                          initialsClassName={styles.initialsAvatar}
-                        />
-                      </div>
-
-                      <div className={styles.merchantInfo}>
-                        <div className={styles.nameCategoryRow}>
-                          <span
-                            className={`${styles.merchantName} privacy-blur`}
-                            title={merchant.name}
-                          >
-                            {merchant.name}
-                          </span>
-                          <span
-                            className={styles.categoryBadge}
-                            style={{
-                              borderColor: `${categoryColor}40`,
-                              backgroundColor: `${categoryColor}12`,
-                            }}
-                          >
-                            <CategoryIcon
-                              category={category}
-                              size={ROW_CATEGORY_ICON_SIZE}
-                              customCategories={customCategories}
-                              description={merchant.name}
-                            />
-                            <span>{categoryLabel}</span>
-                          </span>
-                        </div>
-
-                        <div className={styles.metaRow}>
-                          <span>{formatChargesCount(merchant.count)}</span>
-                          <span className={styles.bulletDot}>•</span>
-                          <span className="privacy-blur">
-                            {merchant.count > 1
-                              ? `~${formatCurrency(avgPerTx)}`
-                              : formatCurrency(merchant.amount)}{' '}
-                            {t.perTransactionShort || '/ tx'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={styles.rowRight}>
-                      <span className={`${styles.merchantAmount} privacy-blur`}>
-                        {formatCurrency(merchant.amount)}
-                      </span>
-                      <span
-                        className={styles.shareBadge}
-                        title={`${shareOfTop}% ${t.ofTopSpend || 'of top spend'}`}
-                      >
-                        {shareOfTop}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Dedicated progress bar below row content */}
-                  <div
-                    className={styles.progressBarWrapper}
-                    title={`${shareOfTop}% ${t.ofTopSpend || 'of top spend'}`}
-                  >
-                    <div className={styles.progressBarTrack}>
-                      <div className={styles.progressBarFill} />
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+            {merchants.map((merchant, idx) => (
+              <TopMerchantsRow
+                key={merchant.name}
+                merchant={merchant}
+                brand={brandInfos.get(merchant.name) ?? getMerchantBrandInfo(merchant.name)}
+                idx={idx}
+                totalTopSpend={totalTopSpend}
+                customCategories={customCategories}
+                t={t}
+                onMerchantClick={onMerchantClick}
+              />
+            ))}
           </div>
         ) : (
           <TopMerchantsChart

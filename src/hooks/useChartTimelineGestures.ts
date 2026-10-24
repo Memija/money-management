@@ -1,5 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import {
+  computePinchRange,
+  DOUBLE_TAP_MS,
+  DOUBLE_TAP_RADIUS_PX,
+  DRAG_THRESHOLD_PX,
+  type DragState,
+  MOUSE_DRAG_THRESHOLD_PX,
+  type MouseDragState,
+  type PinchState,
+  toPixels,
+  WHEEL_ZOOM_THRESHOLD,
+} from '../utils/timeline-gesture-helpers'
 import { clampWindow, zoomWindow } from '../utils/timeline-window'
 
 export interface UseChartTimelineGesturesOptions {
@@ -19,55 +31,6 @@ export interface UseChartTimelineGesturesOptions {
   onZoomIn?: () => void
   /** Optional callback to reset zoom (double-tap on a zoomed chart) */
   onResetZoom?: () => void
-}
-
-interface DragState {
-  startX: number
-  startY: number
-  startIdx: number
-  endIdx: number
-  chartWidth: number
-  isLocked: boolean
-  isPan: boolean
-}
-
-interface PinchState {
-  initialDist: number
-  initialSpan: number
-  initialStart: number
-  initialEnd: number
-  centerRatio: number
-}
-
-interface MouseDragState {
-  startX: number
-  startIdx: number
-  endIdx: number
-  chartWidth: number
-  isDragging: boolean
-}
-
-/** Pixels of finger/mouse travel before a gesture is classified as a pan */
-const DRAG_THRESHOLD_PX = 8
-const MOUSE_DRAG_THRESHOLD_PX = 5
-const DOUBLE_TAP_MS = 320
-const DOUBLE_TAP_RADIUS_PX = 30
-/** Accumulated Ctrl+wheel delta required for one zoom step (one mouse-wheel notch ≈ 100) */
-const WHEEL_ZOOM_THRESHOLD = 50
-/** Pixel size of one "line" when the browser reports wheel deltas in lines (Firefox) */
-const WHEEL_LINE_HEIGHT_PX = 16
-
-/**
- * Normalizes wheel deltas to pixels regardless of the browser's delta mode.
- */
-const toPixels = (delta: number, deltaMode: number, pageSize: number): number => {
-  if (deltaMode === 1) {
-    return delta * WHEEL_LINE_HEIGHT_PX
-  }
-  if (deltaMode === 2) {
-    return delta * pageSize
-  }
-  return delta
 }
 
 /**
@@ -127,8 +90,6 @@ export function useChartTimelineGestures({
     let shouldSuppressClick = false
     let wheelZoomAccumulator = 0
     let wheelPanAccumulator = 0
-    // Last range emitted during the active gesture; move events that resolve to the same
-    // month window are dropped so the charts don't re-render for sub-month finger movement
     const lastEmitted = { start: -1, end: -1 }
 
     const resetEmitted = () => {
@@ -212,11 +173,8 @@ export function useChartTimelineGestures({
       }
 
       const { minWindow: minWin, totalCount: maxCount } = latestRef.current
-      const targetSpan = Math.round(p.initialSpan / scale)
-      const clampedSpan = Math.max(minWin ?? 3, Math.min(maxCount, targetSpan))
-      const anchor = p.initialStart + p.centerRatio * (p.initialSpan - 1)
-      const newStart = Math.round(anchor - p.centerRatio * (clampedSpan - 1))
-      emitRange(newStart, newStart + clampedSpan - 1)
+      const [newStart, newEnd] = computePinchRange(p, scale, minWin ?? 3, maxCount)
+      emitRange(newStart, newEnd)
     }
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -225,7 +183,6 @@ export function useChartTimelineGestures({
         return
       }
 
-      // 1-finger horizontal pan (preserving vertical page scroll)
       const drag = dragRef.current
       if (e.touches.length !== 1 || !drag) {
         return
@@ -235,7 +192,6 @@ export function useChartTimelineGestures({
       const dy = touch.clientY - drag.startY
 
       if (!drag.isLocked) {
-        // If vertical displacement is greater, lock out pan to let page scroll
         if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > DRAG_THRESHOLD_PX) {
           drag.isLocked = true
           drag.isPan = false
@@ -304,7 +260,6 @@ export function useChartTimelineGestures({
 
     const handlePointerUp = (e: PointerEvent) => {
       if (mouseDrag?.isDragging) {
-        // The click that follows a drag must not select a bar/category underneath the cursor
         shouldSuppressClick = true
         try {
           el.releasePointerCapture(e.pointerId)
@@ -329,7 +284,6 @@ export function useChartTimelineGestures({
         e.preventDefault()
       }
       const deltaY = toPixels(e.deltaY, e.deltaMode, rect.height)
-      // Restart accumulation when the scroll direction flips
       if (Math.sign(deltaY) !== Math.sign(wheelZoomAccumulator)) {
         wheelZoomAccumulator = 0
       }
