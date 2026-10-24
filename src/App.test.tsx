@@ -34,6 +34,9 @@ vi.mock('./store/useLanguageStore', () => ({
 vi.mock('./components/layout/AppHeader', () => ({
   default: () => <div data-testid="app-header" />,
 }))
+vi.mock('./components/layout/AppFooter', () => ({
+  default: () => <div data-testid="app-footer" />,
+}))
 vi.mock('./components/CountrySelector', () => ({
   default: () => <div data-testid="country-selector" />,
 }))
@@ -73,6 +76,7 @@ describe('App', () => {
     render(<App />)
     expect(await screen.findByTestId('country-selector')).toBeInTheDocument()
     expect(screen.getByTestId('app-header')).toBeInTheDocument()
+    expect(screen.getByTestId('app-footer')).toBeInTheDocument()
   })
 
   it('renders InstitutionSelector on institution step', async () => {
@@ -113,6 +117,7 @@ describe('App', () => {
 
     render(<App />)
     expect(await screen.findByTestId('dashboard')).toBeInTheDocument()
+    expect(screen.getByTestId('app-footer')).toBeInTheDocument()
     // In dashboard mode, it shouldn't render the onboarding layout (ambient glows, progress etc)
     expect(screen.queryByText('Country')).not.toBeInTheDocument()
   })

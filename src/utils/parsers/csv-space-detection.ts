@@ -1,5 +1,5 @@
-import { parseAmount } from './helpers'
 import type { ColumnIndices } from './csv-columns'
+import { parseAmount } from './helpers'
 
 /**
  * Identifies indices of rows that represent internal transfers between spaces/sub-accounts.

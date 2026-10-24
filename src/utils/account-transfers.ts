@@ -5,8 +5,8 @@ import {
   extractIbans,
 } from './transfer-matching'
 
-export * from './transfer-matching'
 export * from './space-transfers'
+export * from './transfer-matching'
 
 export interface MatchedTransferPair {
   txA: Transaction
@@ -80,7 +80,6 @@ export function reconcileCrossAccountTransfers(accounts: ImportedAccount[]): Imp
         list = []
         negativeByCents.set(cents, list)
       }
-      item.accIdx
       list.push(item)
     }
   }

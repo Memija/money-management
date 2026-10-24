@@ -1,5 +1,6 @@
 import type { Transaction } from '../../types'
 import { extractIbans } from '../account-transfers'
+import type { ColumnIndices } from './csv-header-detection'
 import {
   EXPLICIT_INCOME_KEYWORDS_REGEX,
   generateId,
@@ -7,7 +8,6 @@ import {
   parseAmount,
   parseDate,
 } from './helpers'
-import type { ColumnIndices } from './csv-header-detection'
 
 export * from './csv-header-detection'
 

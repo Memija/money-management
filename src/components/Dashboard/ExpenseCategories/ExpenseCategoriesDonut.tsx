@@ -6,6 +6,7 @@ import { useChartAnimation } from '../../../hooks/useChartAnimation'
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import { getCategoryLabel } from '../../../utils/category-utils'
+
 import styles from './ExpenseCategoriesDonut.module.css'
 
 const PIE_ANIMATION_MS = 600

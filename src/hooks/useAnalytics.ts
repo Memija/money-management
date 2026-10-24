@@ -23,6 +23,8 @@ import {
   type PeriodFilter,
 } from '../utils/period-utils'
 
+export type { MerchantEntry, MonthlyCategoryEntry } from '../utils/analytics-utils'
+export { getCategoryColorIndex } from '../utils/analytics-utils'
 export type { PeriodFilter, PeriodMode } from '../utils/period-utils'
 export {
   filterByPeriod,
@@ -30,8 +32,6 @@ export {
   getMonthsForPeriod,
   matchesPeriod,
 } from '../utils/period-utils'
-export { getCategoryColorIndex } from '../utils/analytics-utils'
-export type { MerchantEntry, MonthlyCategoryEntry } from '../utils/analytics-utils'
 
 const TOP_CATEGORIES_LIMIT = 2
 

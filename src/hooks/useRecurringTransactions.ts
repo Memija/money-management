@@ -11,9 +11,9 @@ import {
 
 export {
   cleanDisplayName,
-  getRecurrenceGroupingKey,
-  evaluateMonthlyRecurrence,
   clusterTxsByAmount,
+  evaluateMonthlyRecurrence,
+  getRecurrenceGroupingKey,
 } from '../utils/recurring-utils'
 
 export interface RecurringExpense {

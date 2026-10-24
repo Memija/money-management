@@ -7,7 +7,6 @@ import {
   parseAmount,
   parseDate,
 } from './helpers'
-
 import { htmlToClipboardText } from './html-clipboard-parser'
 export * from './html-clipboard-parser'
 

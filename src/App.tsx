@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
 
+import AppFooter from './components/layout/AppFooter'
 import AppHeader from './components/layout/AppHeader'
 import { ErrorBoundary } from './components/shared/ErrorBoundary'
 import { useAppStore } from './store/useAppStore'
@@ -19,7 +20,7 @@ const loadInstitutionSelector = () => import('./components/InstitutionSelector')
 const loadTransactionImporter = () => import('./components/TransactionImporter')
 const loadImportReview = () => import('./components/ImportReview')
 
-const LazyDashboard = React.lazy(() => import('./components/Dashboard/Dashboard'))
+const LazyDashboard = React.lazy(() => import('./components/Dashboard'))
 const Settings = React.lazy(() => import('./components/Settings'))
 const CountrySelector = React.lazy(loadCountrySelector)
 const InstitutionSelector = React.lazy(loadInstitutionSelector)
@@ -46,7 +47,7 @@ const preloadDashboard = (): Promise<void> => {
   if (preloadedDashboardComponent) {
     return Promise.resolve()
   }
-  return import('./components/Dashboard/Dashboard')
+  return import('./components/Dashboard')
     .then((mod) => {
       preloadedDashboardComponent = mod.default
     })
@@ -150,8 +151,11 @@ const App: React.FC = () => {
 
   if (!hasHydrated) {
     return (
-      <div className={`app-container ${styles['onboarding-layout']}`}>
-        <LoadingFallback />
+      <div className={styles['app-shell']}>
+        <div className={`app-container ${styles['onboarding-layout']}`}>
+          <LoadingFallback />
+        </div>
+        <AppFooter />
       </div>
     )
   }
@@ -162,8 +166,11 @@ const App: React.FC = () => {
     return (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <AppHeader />
-          <ActiveDashboard />
+          <div className={styles['app-shell']}>
+            <AppHeader />
+            <ActiveDashboard />
+            <AppFooter />
+          </div>
         </Suspense>
       </ErrorBoundary>
     )
@@ -174,15 +181,18 @@ const App: React.FC = () => {
     return (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <AppHeader />
-          <Settings />
+          <div className={styles['app-shell']}>
+            <AppHeader />
+            <Settings />
+            <AppFooter />
+          </div>
         </Suspense>
       </ErrorBoundary>
     )
   }
 
   return (
-    <>
+    <div className={styles['app-shell']}>
       <AppHeader />
       <div className={`app-container ${styles['onboarding-layout']}`}>
         {/* Background ambient effects */}
@@ -201,7 +211,8 @@ const App: React.FC = () => {
           </Suspense>
         </ErrorBoundary>
       </div>
-    </>
+      <AppFooter />
+    </div>
   )
 }
 

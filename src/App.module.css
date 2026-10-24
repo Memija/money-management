@@ -9,13 +9,21 @@
   gap: 0.5rem;
 }
 
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+}
+
 .onboarding-layout {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-height: 100vh;
-  min-height: 100dvh;
+  flex: 1 0 auto;
+  min-height: 0;
   padding: 1.5rem 1rem max(2rem, calc(2rem + env(safe-area-inset-bottom, 0px)));
   padding-left: max(1rem, env(safe-area-inset-left, 0px));
   padding-right: max(1rem, env(safe-area-inset-right, 0px));

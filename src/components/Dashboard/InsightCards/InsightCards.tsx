@@ -17,8 +17,8 @@ import { useLanguageStore } from '../../../store/useLanguageStore'
 import { getCategoryColor } from '../../../utils/category-colors'
 import { getCategoryLabel } from '../../../utils/category-utils'
 import { CategoryIcon } from '../../shared/CategoryIcon'
-
 import { AvgRow } from './AvgRow'
+
 import styles from './InsightCards.module.css'
 
 interface InsightCardsProps {

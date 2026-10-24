@@ -16,7 +16,12 @@ import { createDuplicateRuleSlice } from './slices/duplicateRuleSlice'
 import type { AppState } from './slices/types'
 import { createUISlice } from './slices/uiSlice'
 
-export type { AppState } from './slices/types'
+export {
+  migrateHealthInsuranceCategories,
+  recategorizeAccounts,
+  sanitizeCustomKeywords,
+  sanitizeManualCategories,
+} from './category-store-helpers'
 export {
   countDuplicateTransactionsInAccounts,
   isModifiedTransactionForRule,
@@ -25,12 +30,7 @@ export {
   sanitizeDuplicateOverrideRules,
   toCanonicalTransactionKey,
 } from './duplicate-helpers'
-export {
-  migrateHealthInsuranceCategories,
-  recategorizeAccounts,
-  sanitizeCustomKeywords,
-  sanitizeManualCategories,
-} from './category-store-helpers'
+export type { AppState } from './slices/types'
 
 export const useAppStore = create<AppState>()(
   persist(

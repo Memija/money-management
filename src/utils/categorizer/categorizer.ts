@@ -1,18 +1,10 @@
 import type { CategoryKeywords } from '../../i18n/types'
 import { createBoundedCache } from '../bounded-cache'
 import {
-  isPaymentProcessorIntermediary,
-  repairBrokenWords,
-} from './description-cleaning'
-import {
-  matchCustomKeywords,
-  toDisplayCategory,
-} from './keyword-compiler'
-import {
   AI_AND_SOFTWARE_SUBSCRIPTION_REGEX,
   BUTCHER_MEAT_SHOP_REGEX,
-  CARD_OR_BANK_FEE_REGEX,
   CAR_OR_EQUIPMENT_RENTAL_REGEX,
+  CARD_OR_BANK_FEE_REGEX,
   categoryRegexes,
   CHILDCARE_FEE_REGEX,
   COMMERCIAL_SEPA_REGEX,
@@ -31,9 +23,17 @@ import {
   SEPA_TRANSFER_REGEX,
   transferMerchantsRegex,
 } from './category-patterns'
+import {
+  isPaymentProcessorIntermediary,
+  repairBrokenWords,
+} from './description-cleaning'
+import {
+  matchCustomKeywords,
+  toDisplayCategory,
+} from './keyword-compiler'
 
-export * from './keyword-compiler'
 export * from './category-patterns'
+export * from './keyword-compiler'
 
 export interface CategorizeOptions {
   customKeywords?: Record<string, string[]>

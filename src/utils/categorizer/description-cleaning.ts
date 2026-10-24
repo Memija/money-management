@@ -2,8 +2,8 @@ import { memoizeStringFn } from '../bounded-cache'
 import { registerCleaningHelpers } from './merchant-extraction'
 import { repairBrokenWords } from './word-repair'
 
-export * from './word-repair'
 export * from './merchant-extraction'
+export * from './word-repair'
 
 /**
  * Checks whether a transaction is an informative entry with a value of 0 euro.
