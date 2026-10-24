@@ -215,8 +215,11 @@ const TransactionImporter: React.FC = () => {
         continue
       }
       const amt = Math.abs(tx.amount)
-      if (tx.type === 'income' || tx.amount > 0) inflows += amt
-      else outflows += amt
+      if (tx.type === 'income' || tx.amount > 0) {
+        inflows += amt
+      } else {
+        outflows += amt
+      }
     }
     return { inflows, outflows }
   }, [transactions, internalTransferStats, duplicateStats.duplicateIds])
@@ -233,12 +236,24 @@ const TransactionImporter: React.FC = () => {
     const modifiedTransactions: Transaction[] = []
 
     const isTxModified = (current: Transaction, original?: Transaction): boolean => {
-      if (current.isModified) return true
-      if (!original) return false
-      if (current.description !== original.description) return true
-      if (Math.abs(current.amount - original.amount) >= 0.005) return true
-      if (current.date !== original.date) return true
-      if (current.category !== original.category) return true
+      if (current.isModified) {
+        return true
+      }
+      if (!original) {
+        return false
+      }
+      if (current.description !== original.description) {
+        return true
+      }
+      if (Math.abs(current.amount - original.amount) >= 0.005) {
+        return true
+      }
+      if (current.date !== original.date) {
+        return true
+      }
+      if (current.category !== original.category) {
+        return true
+      }
       return false
     }
 

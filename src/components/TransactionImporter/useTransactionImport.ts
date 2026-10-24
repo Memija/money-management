@@ -53,8 +53,9 @@ export const useTransactionImport = (
               detectedAccountIbans: ibans,
               excludedSpaceTransactions: excludedTxs,
             } = rowsToTransactionsWithMeta(rows, institutionName, t)
-            if (txs.length === 0)
+            if (txs.length === 0) {
               throw new Error(t?.errorNoTransactionsInFile || 'No transactions found in the file.')
+            }
             setTransactions(txs)
             setDiscardedSpaceCount(spaceCount)
             setExcludedSpaceTransactions(excludedTxs ?? [])
@@ -88,8 +89,9 @@ export const useTransactionImport = (
               detectedAccountIbans: ibans,
               excludedSpaceTransactions: excludedTxs,
             } = rowsToTransactionsWithMeta(rows, institutionName, t)
-            if (txs.length === 0)
+            if (txs.length === 0) {
               throw new Error(t?.errorNoTransactionsInCSV || 'No transactions found in the CSV.')
+            }
             setTransactions(txs)
             setDiscardedSpaceCount(spaceCount)
             setExcludedSpaceTransactions(excludedTxs ?? [])

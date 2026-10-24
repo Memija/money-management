@@ -70,9 +70,14 @@ const ImportReview: React.FC = () => {
         ...(acc.modifiedTransactions || []),
       ]
       for (const t of all) {
-        if (t.isGhost) continue
-        if (t.type === 'income') inc += t.amount
-        else if (t.type === 'expense') exp += Math.abs(t.amount)
+        if (t.isGhost) {
+          continue
+        }
+        if (t.type === 'income') {
+          inc += t.amount
+        } else if (t.type === 'expense') {
+          exp += Math.abs(t.amount)
+        }
       }
     }
     return { totalIncome: inc, totalExpenses: exp }

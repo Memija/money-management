@@ -54,7 +54,9 @@ export const Modal: React.FC<ModalProps> = ({
     }
   }
 
-  if (typeof document === 'undefined') return null
+  if (typeof document === 'undefined') {
+    return null
+  }
 
   return createPortal(
     <AnimatePresence>

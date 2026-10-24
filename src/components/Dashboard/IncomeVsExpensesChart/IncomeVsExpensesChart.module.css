@@ -220,11 +220,19 @@
 }
 
 /* ── Privacy Mode: Hide Y-Axis Values ── */
-:global([data-privacy-mode='true']) .chartContainer :global(.income-expenses-y-axis .recharts-cartesian-axis-tick text),
-:global([data-privacy-mode='true']) .chartContainer :global(.income-expenses-y-axis .recharts-cartesian-axis-tick),
+:global([data-privacy-mode='true'])
+  .chartContainer
+  :global(.income-expenses-y-axis .recharts-cartesian-axis-tick text),
+:global([data-privacy-mode='true'])
+  .chartContainer
+  :global(.income-expenses-y-axis .recharts-cartesian-axis-tick),
 :global([data-privacy-mode='true']) .chartContainer :global(.income-expenses-y-axis text),
-:global([data-privacy-mode='true']) .chartContainer :global(.recharts-yAxis .recharts-cartesian-axis-tick text),
-:global([data-privacy-mode='true']) .chartContainer :global(.recharts-yAxis .recharts-cartesian-axis-tick),
+:global([data-privacy-mode='true'])
+  .chartContainer
+  :global(.recharts-yAxis .recharts-cartesian-axis-tick text),
+:global([data-privacy-mode='true'])
+  .chartContainer
+  :global(.recharts-yAxis .recharts-cartesian-axis-tick),
 :global([data-privacy-mode='true']) .chartContainer :global(.recharts-yAxis text) {
   display: none !important;
   opacity: 0 !important;

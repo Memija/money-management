@@ -144,7 +144,9 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
             scopeFilter === 'excluded' ? styles['excluded-filter-btn-active'] : ''
           } ${(excludedCount ?? 0) === 0 && scopeFilter !== 'excluded' ? styles['excluded-filter-btn-disabled'] : ''}`}
           onClick={() => {
-            if ((excludedCount ?? 0) === 0 && scopeFilter !== 'excluded') return
+            if ((excludedCount ?? 0) === 0 && scopeFilter !== 'excluded') {
+              return
+            }
             onScopeFilterChange?.(scopeFilter === 'excluded' ? 'all' : 'excluded')
           }}
           disabled={(excludedCount ?? 0) === 0 && scopeFilter !== 'excluded'}
@@ -171,8 +173,9 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
               scopeFilter === 'duplicates' ? styles['duplicate-filter-btn-active'] : ''
             } ${(duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates' ? styles['duplicate-filter-btn-disabled'] : ''}`}
             onClick={() => {
-              if ((duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates')
+              if ((duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates') {
                 return
+              }
               onScopeFilterChange?.(scopeFilter === 'duplicates' ? 'all' : 'duplicates')
             }}
             disabled={(duplicateCount ?? 0) === 0 && !hasDuplicates && scopeFilter !== 'duplicates'}
@@ -203,8 +206,9 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
                 : ''
             } ${(alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated' ? styles['already-duplicated-filter-btn-disabled'] : ''}`}
             onClick={() => {
-              if ((alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated')
+              if ((alreadyDuplicatedCount ?? 0) === 0 && scopeFilter !== 'already-duplicated') {
                 return
+              }
               onScopeFilterChange?.(
                 scopeFilter === 'already-duplicated' ? 'all' : 'already-duplicated',
               )
@@ -238,7 +242,9 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
               scopeFilter === 'space-transfers' ? styles['space-transfers-filter-btn-active'] : ''
             } ${(spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers' ? styles['space-transfers-filter-btn-disabled'] : ''}`}
             onClick={() => {
-              if ((spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers') return
+              if ((spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers') {
+                return
+              }
               onScopeFilterChange?.(scopeFilter === 'space-transfers' ? 'all' : 'space-transfers')
             }}
             disabled={(spaceTransferCount ?? 0) === 0 && scopeFilter !== 'space-transfers'}
@@ -270,7 +276,9 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
                 : ''
             } ${(internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers' ? styles['internal-transfers-filter-btn-disabled'] : ''}`}
             onClick={() => {
-              if ((internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers') return
+              if ((internalTransferCount ?? 0) === 0 && scopeFilter !== 'internal-transfers') {
+                return
+              }
               onScopeFilterChange?.(
                 scopeFilter === 'internal-transfers' ? 'all' : 'internal-transfers',
               )
@@ -302,7 +310,9 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
             scopeFilter === 'modified' ? styles['modified-filter-btn-active'] : ''
           } ${(modifiedCount ?? 0) === 0 && scopeFilter !== 'modified' ? styles['modified-filter-btn-disabled'] : ''}`}
           onClick={() => {
-            if ((modifiedCount ?? 0) === 0 && scopeFilter !== 'modified') return
+            if ((modifiedCount ?? 0) === 0 && scopeFilter !== 'modified') {
+              return
+            }
             onScopeFilterChange?.(scopeFilter === 'modified' ? 'all' : 'modified')
           }}
           disabled={(modifiedCount ?? 0) === 0 && scopeFilter !== 'modified'}
@@ -330,7 +340,9 @@ export const TransactionPreviewToolbar: React.FC<TransactionPreviewToolbarProps>
               scopeFilter === 'unlocked' ? styles['unlocked-filter-btn-active'] : ''
             } ${unlockedCount === 0 ? styles['unlocked-filter-btn-disabled'] : ''}`}
             onClick={() => {
-              if (unlockedCount === 0) return
+              if (unlockedCount === 0) {
+                return
+              }
               onScopeFilterChange?.(scopeFilter === 'unlocked' ? 'all' : 'unlocked')
             }}
             disabled={unlockedCount === 0}

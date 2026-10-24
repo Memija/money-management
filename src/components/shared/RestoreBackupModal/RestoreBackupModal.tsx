@@ -24,7 +24,9 @@ export const RestoreBackupModal: React.FC<RestoreBackupModalProps> = ({
 }) => {
   const t = useLanguageStore((s) => s.t)
 
-  if (!pendingRestore) return null
+  if (!pendingRestore) {
+    return null
+  }
 
   const accountsCount = pendingRestore.summary.accountsCount ?? 0
   const txCount = pendingRestore.summary.transactionsCount ?? 0

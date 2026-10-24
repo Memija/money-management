@@ -113,7 +113,9 @@ vi.mock('../Modal', () => ({
     title: React.ReactNode
     footer: React.ReactNode
   }) => {
-    if (!isOpen) return null
+    if (!isOpen) {
+      return null
+    }
     return (
       <div data-testid="mock-modal">
         <div data-testid="modal-title">{title}</div>

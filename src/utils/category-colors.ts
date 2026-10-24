@@ -115,7 +115,9 @@ export const getCategoryColor = (
   categoryName: string,
   customCategories?: { id: string; icon?: string }[],
 ): string => {
-  if (!categoryName) return '#94a3b8'
+  if (!categoryName) {
+    return '#94a3b8'
+  }
 
   // 1. Check custom categories first
   const custom = customCategories?.find((c) => c.id === categoryName)
@@ -138,7 +140,9 @@ export const getCategoryColor = (
  * Clamps RGB values between 0 and 255.
  */
 export const adjustColor = (hex: string, amount: number): string => {
-  if (!hex || typeof hex !== 'string') return hex
+  if (!hex || typeof hex !== 'string') {
+    return hex
+  }
   let col = hex.replace('#', '')
   if (col.length === 3) {
     col = col
@@ -147,7 +151,9 @@ export const adjustColor = (hex: string, amount: number): string => {
       .join('')
   }
   const num = parseInt(col, 16)
-  if (isNaN(num)) return hex
+  if (isNaN(num)) {
+    return hex
+  }
 
   const r = Math.min(255, Math.max(0, (num >> 16) + amount))
   const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount))

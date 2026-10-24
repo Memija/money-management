@@ -48,7 +48,9 @@ export const CopyButton: React.FC<CopyButtonProps> = React.memo(
         e.stopPropagation()
         e.preventDefault()
 
-        if (!text || disabled) return
+        if (!text || disabled) {
+          return
+        }
 
         const success = await copyToClipboard(text)
         if (success) {

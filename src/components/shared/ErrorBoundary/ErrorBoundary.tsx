@@ -40,7 +40,20 @@ export class ErrorBoundary extends Component<Props, State> {
             </p>
             <button
               className="primary-button"
-              onClick={() => this.setState({ hasError: false, error: undefined })}
+              onClick={() => {
+                const isChunkError =
+                  this.state.error?.message?.includes('dynamically imported module') ||
+                  this.state.error?.name === 'ChunkLoadError'
+                if (
+                  isChunkError &&
+                  typeof window !== 'undefined' &&
+                  typeof window.location?.reload === 'function'
+                ) {
+                  window.location.reload()
+                  return
+                }
+                this.setState({ hasError: false, error: undefined })
+              }}
             >
               Try again
             </button>

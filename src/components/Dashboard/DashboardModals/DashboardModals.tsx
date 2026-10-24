@@ -10,7 +10,6 @@ import { TransactionPreviewModal } from '../../shared/TransactionPreviewModal'
 import { AvgDetailModal } from '../AvgDetailModal/AvgDetailModal'
 import { SavingsTrendModal } from '../SavingsTrendModal'
 
-
 /** Drill-down shown in the transaction detail modal. */
 export type DetailModalState =
   | { type: 'filter'; filter: 'all' | 'income' | 'expense' }
@@ -66,9 +65,13 @@ const buildDetailModalConfig = (
   const { merchant } = modal
   const normalizedMerchant = normalizeMerchant(merchant)
   const transactions = periodTransactions.filter((tx) => {
-    if (tx.type !== 'expense') return false
+    if (tx.type !== 'expense') {
+      return false
+    }
     const txMerchant = normalizeMerchant(getTransactionMerchant(tx))
-    if (txMerchant === normalizedMerchant) return true
+    if (txMerchant === normalizedMerchant) {
+      return true
+    }
     return normalizeMerchant(tx.description) === normalizedMerchant
   })
   return { title: merchant || t.topMerchants, variant: 'expense' as const, transactions }

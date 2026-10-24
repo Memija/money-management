@@ -39,7 +39,9 @@ const resolveCustomBounds = (period: PeriodFilter): { start?: string; end?: stri
  * Checks whether a transaction date matches the specified period filter.
  */
 export const matchesPeriod = (date: string, period?: PeriodFilter): boolean => {
-  if (!period || period.mode === 'all') return true
+  if (!period || period.mode === 'all') {
+    return true
+  }
   const dateStr = date.substring(0, 10)
   switch (period.mode) {
     case 'year':
@@ -61,8 +63,12 @@ export const matchesPeriod = (date: string, period?: PeriodFilter): boolean => {
       const { start, end } = resolveCustomBounds(period)
       const s = start ? start.substring(0, 10) : ''
       const e = end ? end.substring(0, 10) : ''
-      if (s && dateStr < s) return false
-      if (e && dateStr > e) return false
+      if (s && dateStr < s) {
+        return false
+      }
+      if (e && dateStr > e) {
+        return false
+      }
       return true
     }
     default:
@@ -116,8 +122,12 @@ export const getMonthsForPeriod = (
     if (firstM && lastM) {
       return generateMonthRange(firstM, lastM)
     }
-    if (firstM) return [firstM]
-    if (lastM) return [lastM]
+    if (firstM) {
+      return [firstM]
+    }
+    if (lastM) {
+      return [lastM]
+    }
     return []
   }
 

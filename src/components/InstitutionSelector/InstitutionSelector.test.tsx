@@ -113,7 +113,9 @@ describe('InstitutionSelector', () => {
 
     // Click on Neobank category tag using ID to avoid matching the badge
     const neobankFilter = document.getElementById('filter-neobank')
-    if (neobankFilter) fireEvent.click(neobankFilter)
+    if (neobankFilter) {
+      fireEvent.click(neobankFilter)
+    }
 
     expect(screen.getByText('N26')).toBeInTheDocument()
     expect(screen.queryByText('Deutsche Bank')).not.toBeInTheDocument()

@@ -65,7 +65,9 @@ const cyrillicToLatinMap: Record<string, string> = {
  * Transliterates Cyrillic characters to Latin.
  */
 export function transliterateCyrillicToLatin(text: string): string {
-  if (!text) return ''
+  if (!text) {
+    return ''
+  }
   return text
     .split('')
     .map((char) => cyrillicToLatinMap[char] || char)
@@ -80,7 +82,9 @@ export function transliterateCyrillicToLatin(text: string): string {
  * 4. Lowercasing
  */
 export function normalizeForSearch(text: string): string {
-  if (!text) return ''
+  if (!text) {
+    return ''
+  }
 
   let latin = transliterateCyrillicToLatin(text)
 

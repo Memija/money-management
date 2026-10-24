@@ -141,7 +141,9 @@ export const matchesDuplicateOverrideRule = (
 
   if (amountsToMatch.length > 0 && tx.amount !== undefined) {
     const matchesAnyAmount = amountsToMatch.some((a) => Math.abs(Number(tx.amount) - a) < 0.005)
-    if (!matchesAnyAmount) return false
+    if (!matchesAnyAmount) {
+      return false
+    }
   }
 
   const txDesc = (tx.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
@@ -151,7 +153,9 @@ export const matchesDuplicateOverrideRule = (
     .toLowerCase()
     .replace(/\s+/g, ' ')
 
-  if (!rulePattern && !modPattern) return false
+  if (!rulePattern && !modPattern) {
+    return false
+  }
 
   const matchesDesc =
     (rulePattern && (txDesc.includes(rulePattern) || rulePattern.includes(txDesc))) ||
@@ -165,7 +169,9 @@ export const isModifiedTransactionForRule = (
   tx: { description?: string; amount?: number; date?: string; importedByRuleId?: string },
   institutionId?: string,
 ): boolean => {
-  if (!rule.modifications) return false
+  if (!rule.modifications) {
+    return false
+  }
   if (
     rule.institutionId &&
     institutionId &&
@@ -178,7 +184,9 @@ export const isModifiedTransactionForRule = (
 
   const mods = rule.modifications
   if (mods.amount !== undefined) {
-    if (tx.amount === undefined) return false
+    if (tx.amount === undefined) {
+      return false
+    }
     const modAmt = Number(mods.amount)
     if (Math.abs(Number(tx.amount) - modAmt) >= 0.005) {
       return false
@@ -194,7 +202,9 @@ export const isModifiedTransactionForRule = (
   }
 
   if (mods.amount === undefined && mods.description === undefined) {
-    if (tx.importedByRuleId === rule.id) return true
+    if (tx.importedByRuleId === rule.id) {
+      return true
+    }
     return false
   }
 
@@ -221,11 +231,15 @@ export const isOriginalTransactionMatchForRule = (
     const matchesOrigAmt =
       Math.abs(Number(tx.amount) - origAmt) < 0.005 ||
       Math.abs(Number(tx.amount) - -origAmt) < 0.005
-    if (!matchesOrigAmt) return false
+    if (!matchesOrigAmt) {
+      return false
+    }
   }
 
   const origPattern = (rule.descriptionPattern || '').trim().toLowerCase().replace(/\s+/g, ' ')
-  if (!origPattern) return false
+  if (!origPattern) {
+    return false
+  }
   const txDesc = (tx.description || '').trim().toLowerCase().replace(/\s+/g, ' ')
   return txDesc.includes(origPattern) || origPattern === txDesc
 }
@@ -233,7 +247,9 @@ export const isOriginalTransactionMatchForRule = (
 export const sanitizeDuplicateOverrideRules = (
   rules?: DuplicateOverrideRule[],
 ): DuplicateOverrideRule[] => {
-  if (!Array.isArray(rules)) return []
+  if (!Array.isArray(rules)) {
+    return []
+  }
   const seenIds = new Set<string>()
   return rules
     .filter((r): r is DuplicateOverrideRule => Boolean(r && typeof r === 'object'))
@@ -287,10 +303,14 @@ export const countDuplicateTransactionsInAccounts = (
 export const sanitizeCustomKeywords = (
   keywords?: Record<string, string[]>,
 ): Record<string, string[]> => {
-  if (!keywords || typeof keywords !== 'object') return {}
+  if (!keywords || typeof keywords !== 'object') {
+    return {}
+  }
   const sanitized: Record<string, string[]> = {}
   for (const [category, words] of Object.entries(keywords)) {
-    if (!Array.isArray(words)) continue
+    if (!Array.isArray(words)) {
+      continue
+    }
     const cleaned = words.filter(
       (w) => typeof w === 'string' && w.trim().length >= 2 && !isPaymentProcessorOnly(w),
     )
@@ -305,16 +325,24 @@ export const sanitizeManualCategories = (
   manualCategories?: Record<string, string>,
   importedAccounts?: ImportedAccount[],
 ): Record<string, string> => {
-  if (!manualCategories || typeof manualCategories !== 'object') return {}
+  if (!manualCategories || typeof manualCategories !== 'object') {
+    return {}
+  }
   if (!importedAccounts || !Array.isArray(importedAccounts) || importedAccounts.length === 0) {
     return manualCategories
   }
 
   const txMap = new Map<string, Transaction>()
   for (const acc of importedAccounts) {
-    for (const tx of acc.transactions || []) txMap.set(tx.id, tx)
-    for (const tx of acc.duplicateTransactions || []) txMap.set(tx.id, tx)
-    for (const tx of acc.modifiedTransactions || []) txMap.set(tx.id, tx)
+    for (const tx of acc.transactions || []) {
+      txMap.set(tx.id, tx)
+    }
+    for (const tx of acc.duplicateTransactions || []) {
+      txMap.set(tx.id, tx)
+    }
+    for (const tx of acc.modifiedTransactions || []) {
+      txMap.set(tx.id, tx)
+    }
   }
 
   const cleaned: Record<string, string> = {}
@@ -346,13 +374,21 @@ export function recategorizeAccounts(
   const updatedAccounts = accounts.map((account) => {
     let accountChanged = false
     const recatList = (txs?: Transaction[]) => {
-      if (!txs) return txs
+      if (!txs) {
+        return txs
+      }
       return txs.map((tx) => {
-        if (isInformativeTransaction(tx)) return tx
+        if (isInformativeTransaction(tx)) {
+          return tx
+        }
         // Preserve manual user categories
-        if (manualCategories && manualCategories[tx.id]) return tx
+        if (manualCategories && manualCategories[tx.id]) {
+          return tx
+        }
         // Preserve user-modified items with explicit category
-        if (tx.isModified && tx.category) return tx
+        if (tx.isModified && tx.category) {
+          return tx
+        }
 
         const newCategory = categorize(tx.description, {
           customKeywords,
@@ -391,7 +427,9 @@ export function recategorizeAccounts(
       changed = true
     }
 
-    if (!accountChanged) return account
+    if (!accountChanged) {
+      return account
+    }
     return {
       ...account,
       transactions: newTransactions,
@@ -490,7 +528,9 @@ export const useAppStore = create<AppState>()(
         set((state) => {
           const currentRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
           const pattern = (rule.descriptionPattern || '').trim()
-          if (!pattern) return state
+          if (!pattern) {
+            return state
+          }
 
           const patternLower = pattern.toLowerCase()
           const existingIdx = currentRules.findIndex(
@@ -560,7 +600,9 @@ export const useAppStore = create<AppState>()(
           const targetId = id.trim()
           const currentRules = sanitizeDuplicateOverrideRules(state.duplicateOverrideRules)
           const ruleToDelete = currentRules.find((r) => r.id === targetId)
-          if (!ruleToDelete) return state
+          if (!ruleToDelete) {
+            return state
+          }
 
           const shouldDeleteRule =
             mode === 'rule_only' || mode === 'both' || mode === false || mode === true

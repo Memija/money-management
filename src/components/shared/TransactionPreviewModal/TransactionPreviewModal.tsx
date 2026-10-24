@@ -114,7 +114,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }, [currentInstitutionName, currentAccountName])
 
   const existingInstitutions = useMemo(() => {
-    if (!existingAccountTransfers || existingAccountTransfers.length === 0) return []
+    if (!existingAccountTransfers || existingAccountTransfers.length === 0) {
+      return []
+    }
     const names = new Set<string>()
     for (const tx of existingAccountTransfers) {
       if (tx.institution) {
@@ -169,7 +171,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const getIsModified = React.useCallback((tx: Transaction): boolean => {
     const orig = initialTransactionsRef.current.get(tx.id)
-    if (!orig) return false
+    if (!orig) {
+      return false
+    }
     const descChanged = tx.description !== orig.description
     const dateChanged = tx.date !== orig.date
     const amountChanged = Math.abs(tx.amount - orig.amount) >= 0.005
@@ -200,7 +204,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }, [activeTransactions, getIsModified])
 
   const executeResetTransaction = (id: string, alsoLock: boolean = false) => {
-    if (alreadyDuplicatedIds.has(id)) return
+    if (alreadyDuplicatedIds.has(id)) {
+      return
+    }
     const orig = initialTransactionsRef.current.get(id)
     if (orig && onUpdateTransaction) {
       const resetData = {
@@ -226,10 +232,14 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }
 
   const executeResetAllModified = (alsoLock: boolean = false) => {
-    if (!onUpdateTransaction) return
+    if (!onUpdateTransaction) {
+      return
+    }
     const resetMap = new Map<string, Partial<Transaction>>()
     for (const tx of modifiedTransactions) {
-      if (alreadyDuplicatedIds.has(tx.id)) continue
+      if (alreadyDuplicatedIds.has(tx.id)) {
+        continue
+      }
       const orig = initialTransactionsRef.current.get(tx.id)
       if (orig) {
         const resetData = {
@@ -274,7 +284,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }
 
   const handleResetTransaction = (id: string) => {
-    if (alreadyDuplicatedIds.has(id)) return
+    if (alreadyDuplicatedIds.has(id)) {
+      return
+    }
     setPendingResetTxId(id)
   }
 
@@ -289,11 +301,17 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       unlockedTargetIds: string[]
       identicalTargetIds: string[]
     } | null => {
-      if (!effectiveUnlockedIds.has(txId)) return null
+      if (!effectiveUnlockedIds.has(txId)) {
+        return null
+      }
       const currentTx = activeTransactions.find((t) => t.id === txId)
-      if (!currentTx) return null
+      if (!currentTx) {
+        return null
+      }
       const orig = initialTransactionsRef.current.get(txId)
-      if (!orig) return null
+      if (!orig) {
+        return null
+      }
 
       const cumulativeMods: Partial<Transaction> = customUpdates ? { ...customUpdates } : {}
       if (customUpdates?.description !== undefined) {
@@ -326,7 +344,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
       // 1. Other unlocked transactions that don't already have all modifications applied
       const otherUnlockedTxs = activeTransactions.filter((other) => {
-        if (other.id === txId || !effectiveUnlockedIds.has(other.id)) return false
+        if (other.id === txId || !effectiveUnlockedIds.has(other.id)) {
+          return false
+        }
         const matchesDesc =
           cumulativeMods.description === undefined ||
           other.description === cumulativeMods.description
@@ -396,7 +416,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
 
   const handleUpdateTransaction = onUpdateTransaction
     ? (id: string, updates: Partial<Transaction>) => {
-        if (alreadyDuplicatedIds.has(id)) return
+        if (alreadyDuplicatedIds.has(id)) {
+          return
+        }
         onUpdateTransaction(id, updates)
         setLocalTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)))
 
@@ -411,7 +433,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     : undefined
 
   const handleApplyToAllUnlocked = () => {
-    if (!bulkApplyOffer) return
+    if (!bulkApplyOffer) {
+      return
+    }
     const { updates, unlockedTargetIds } = bulkApplyOffer
     for (const txId of unlockedTargetIds) {
       onUpdateTransaction?.(txId, updates)
@@ -420,7 +444,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }
 
   const handleConfirmBulkApply = () => {
-    if (!bulkApplyOffer) return
+    if (!bulkApplyOffer) {
+      return
+    }
     const { updates, unlockedTargetIds, identicalTargetIds } = bulkApplyOffer
     const allTargets = [...unlockedTargetIds, ...identicalTargetIds]
     for (const txId of allTargets) {
@@ -446,7 +472,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }
 
   const handleOpenAdjustModal = () => {
-    if (!bulkApplyOffer) return
+    if (!bulkApplyOffer) {
+      return
+    }
     setSelectedFieldsToApply({
       description: bulkApplyOffer.updates.description !== undefined,
       date: bulkApplyOffer.updates.date !== undefined,
@@ -458,7 +486,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }
 
   const handleConfirmCustomAdjust = () => {
-    if (!bulkApplyOffer) return
+    if (!bulkApplyOffer) {
+      return
+    }
     const filteredUpdates: Partial<Transaction> = {}
     if (selectedFieldsToApply.description && bulkApplyOffer.updates.description !== undefined) {
       filteredUpdates.description = bulkApplyOffer.updates.description
@@ -503,20 +533,30 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }
 
   const handleRequestUnlockDuplicate = (tx: Transaction) => {
-    if (alreadyDuplicatedIds.has(tx.id)) return
+    if (alreadyDuplicatedIds.has(tx.id)) {
+      return
+    }
     setUnlockedTxToWarn(tx)
   }
 
   const sameLockedDuplicates = useMemo(() => {
-    if (!unlockedTxToWarn) return []
+    if (!unlockedTxToWarn) {
+      return []
+    }
     const orig = initialTransactionsRef.current.get(unlockedTxToWarn.id) || unlockedTxToWarn
     const origDesc = orig.description.trim().toLowerCase()
     const origAmt = orig.amount
 
     return activeTransactions.filter((other) => {
-      if (other.id !== unlockedTxToWarn.id && effectiveUnlockedIds.has(other.id)) return false
-      if (!duplicateIds.has(other.id) && other.id !== unlockedTxToWarn.id) return false
-      if (alreadyDuplicatedIds.has(other.id)) return false
+      if (other.id !== unlockedTxToWarn.id && effectiveUnlockedIds.has(other.id)) {
+        return false
+      }
+      if (!duplicateIds.has(other.id) && other.id !== unlockedTxToWarn.id) {
+        return false
+      }
+      if (alreadyDuplicatedIds.has(other.id)) {
+        return false
+      }
       const otherOrig = initialTransactionsRef.current.get(other.id) || other
       return (
         otherOrig.description.trim().toLowerCase() === origDesc &&
@@ -536,7 +576,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
     rememberRule?: boolean,
     unlockAllIdentical?: boolean,
   ) => {
-    if (alreadyDuplicatedIds.has(tx.id)) return
+    if (alreadyDuplicatedIds.has(tx.id)) {
+      return
+    }
     if (unlockAllIdentical && sameLockedDuplicates.length > 1) {
       const idsToUnlock = sameLockedDuplicates.map((t) => t.id)
       setLocalUnlockedDuplicateIds((prev) => {
@@ -702,7 +744,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
       return [...draftExcluded, ...activeExcluded, ...(existingAccountTransfers || [])]
     }
     if (scopeFilter === 'space-transfers') {
-      if (subAccountFilter === 'all') return activeExcluded
+      if (subAccountFilter === 'all') {
+        return activeExcluded
+      }
       return activeExcluded.filter((tx) => tx.subAccount === subAccountFilter)
     }
     if (scopeFilter === 'internal-transfers') {
@@ -719,7 +763,9 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
         (tx) => !duplicateIds.has(tx.id) || effectiveUnlockedIds.has(tx.id),
       )
     }
-    if (hasSpaceTransfers) return combinedTransactions
+    if (hasSpaceTransfers) {
+      return combinedTransactions
+    }
     return activeTransactions
   }, [
     activeTransactions,
@@ -824,29 +870,38 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
   }
 
   const renderSortIcon = (key: SortColumn) => {
-    if (sortConfig?.key !== key) return <ArrowUpDown size={14} className={styles['sort-icon']} />
+    if (sortConfig?.key !== key) {
+      return <ArrowUpDown size={14} className={styles['sort-icon']} />
+    }
     const Icon = sortConfig.direction === 'asc' ? ArrowUp : ArrowDown
     return <Icon size={14} className={`${styles['sort-icon']} ${styles['sort-icon-active']}`} />
   }
 
   const effectiveTitle = useMemo(() => {
     let base = ''
-    if (scopeFilter === 'excluded') base = t.filterExcluded || 'Excluded'
-    else if (scopeFilter === 'space-transfers') {
+    if (scopeFilter === 'excluded') {
+      base = t.filterExcluded || 'Excluded'
+    } else if (scopeFilter === 'space-transfers') {
       base = t.filterSpaceTransfers || 'Sub-account Transfers'
       if (subAccountFilter !== 'all') {
         return `${base} • ${subAccountFilter}`
       }
       return base
-    } else if (scopeFilter === 'internal-transfers')
+    } else if (scopeFilter === 'internal-transfers') {
       base = t.filterInternalTransfers || 'Internal Transfers'
-    else if (scopeFilter === 'duplicates') base = t.filterDuplicates || 'Duplicates'
-    else if (scopeFilter === 'already-duplicated')
+    } else if (scopeFilter === 'duplicates') {
+      base = t.filterDuplicates || 'Duplicates'
+    } else if (scopeFilter === 'already-duplicated') {
       base = t.filterAlreadyDuplicated || t.alreadyDuplicated || 'Already Duplicated'
-    else if (scopeFilter === 'modified') base = t.filterModified || 'Modified'
-    else if (scopeFilter === 'unlocked') base = t.filterUnlocked || 'Unlocked'
-    else if (scopeFilter === 'all' && initialFilter !== 'all') base = t.transactions
-    else base = title ?? t.transactions
+    } else if (scopeFilter === 'modified') {
+      base = t.filterModified || 'Modified'
+    } else if (scopeFilter === 'unlocked') {
+      base = t.filterUnlocked || 'Unlocked'
+    } else if (scopeFilter === 'all' && initialFilter !== 'all') {
+      base = t.transactions
+    } else {
+      base = title ?? t.transactions
+    }
 
     if (
       accountFilter !== 'all' &&
@@ -1455,8 +1510,11 @@ export const TransactionPreviewModal: React.FC<TransactionPreviewModalProps> = (
             const handleToggleTarget = (txId: string) => {
               setSelectedTargetIds((prev) => {
                 const next = new Set(prev)
-                if (next.has(txId)) next.delete(txId)
-                else next.add(txId)
+                if (next.has(txId)) {
+                  next.delete(txId)
+                } else {
+                  next.add(txId)
+                }
                 return next
               })
             }

@@ -38,11 +38,15 @@ interface KeywordParts {
 
 function toKeywordParts(keyword: string): KeywordParts | undefined {
   const trimmed = keyword.trim()
-  if (!trimmed) return undefined
+  if (!trimmed) {
+    return undefined
+  }
 
   // Strip existing explicit boundary markers like \b and wrap uniformly
   const stripped = trimmed.replace(/^\\b|\\b$/g, '').trim()
-  if (!stripped) return undefined
+  if (!stripped) {
+    return undefined
+  }
 
   return {
     escaped: escapeRegExp(stripped),
@@ -59,7 +63,9 @@ function toKeywordParts(keyword: string): KeywordParts | undefined {
  */
 export function keywordToPattern(keyword: string): string {
   const parts = toKeywordParts(keyword)
-  if (!parts) return ''
+  if (!parts) {
+    return ''
+  }
   const leading = parts.hasLeading ? LEADING_BOUNDARY : ''
   const trailing = parts.hasTrailing ? TRAILING_BOUNDARY : ''
   return `${leading}${parts.escaped}${trailing}`
@@ -75,7 +81,9 @@ export function buildKeywordRegex(keywords: string[]): RegExp | undefined {
   const groups = new Map<string, string[]>()
   for (const keyword of new Set(keywords)) {
     const parts = toKeywordParts(keyword)
-    if (!parts) continue
+    if (!parts) {
+      continue
+    }
     const groupKey = `${parts.hasLeading ? LEADING_BOUNDARY : ''}|${parts.hasTrailing ? TRAILING_BOUNDARY : ''}`
     const group = groups.get(groupKey)
     if (group) {
@@ -84,7 +92,9 @@ export function buildKeywordRegex(keywords: string[]): RegExp | undefined {
       groups.set(groupKey, [parts.escaped])
     }
   }
-  if (groups.size === 0) return undefined
+  if (groups.size === 0) {
+    return undefined
+  }
 
   const alternatives = [...groups].map(([groupKey, escapedWords]) => {
     const [leading, trailing] = groupKey.split('|')
@@ -102,7 +112,9 @@ for (const terms of Object.values(categoryTermsByLocale)) {
   const keywords = terms.keywords
   if (keywords) {
     for (const [cat, words] of Object.entries(keywords)) {
-      if (!aggregatedKeywords[cat]) aggregatedKeywords[cat] = []
+      if (!aggregatedKeywords[cat]) {
+        aggregatedKeywords[cat] = []
+      }
       aggregatedKeywords[cat].push(...words)
     }
   }
@@ -123,7 +135,9 @@ for (const merchant of POPULAR_MERCHANTS) {
   if (cat === 'Transfers') {
     transferMerchantPatterns.push(...words)
   } else {
-    if (!merchantCategoryPatterns[cat]) merchantCategoryPatterns[cat] = []
+    if (!merchantCategoryPatterns[cat]) {
+      merchantCategoryPatterns[cat] = []
+    }
     merchantCategoryPatterns[cat].push(...words)
   }
 }
@@ -148,9 +162,12 @@ function findPopularMerchantCategory(textLower: string): string | undefined {
   for (const { merchant, keywordLower: kw, aliasesLower, nameLower } of getCandidateMerchants(
     textLower,
   )) {
-    if (merchant.category === 'Transfers' && !REMITTANCE_TRANSFER_REGEX.test(merchant.keyword))
+    if (merchant.category === 'Transfers' && !REMITTANCE_TRANSFER_REGEX.test(merchant.keyword)) {
       continue
-    if (merchant.id === 'otto' && NON_RETAIL_OTTO_REGEX.test(textLower)) continue
+    }
+    if (merchant.id === 'otto' && NON_RETAIL_OTTO_REGEX.test(textLower)) {
+      continue
+    }
     let score = 0
     if (matchesLowercaseTerm(textLower, kw)) {
       score = kw.length
@@ -184,10 +201,14 @@ function findPopularMerchantCategory(textLower: string): string | undefined {
 
 // Also integrate POPULAR_MERCHANTS into aggregatedKeywords as fallback
 for (const [cat, words] of Object.entries(merchantCategoryPatterns)) {
-  if (!aggregatedKeywords[cat]) aggregatedKeywords[cat] = []
+  if (!aggregatedKeywords[cat]) {
+    aggregatedKeywords[cat] = []
+  }
   aggregatedKeywords[cat].push(...words)
 }
-if (!aggregatedKeywords.Transfers) aggregatedKeywords.Transfers = []
+if (!aggregatedKeywords.Transfers) {
+  aggregatedKeywords.Transfers = []
+}
 aggregatedKeywords.Transfers.push(...transferMerchantPatterns)
 
 // 3. Compile high-precision boundary regexes per category
@@ -260,16 +281,24 @@ function buildCombinedPrefilter(words: string[]): RegExp | undefined {
 
 function compileCustomKeywords(customKeywords: Record<string, string[]>): CompiledCustomKeywords {
   const cached = compiledCustomKeywordsCache.get(customKeywords)
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
 
   const entries: CompiledCustomKeyword[] = []
   const prefilterWords: string[] = []
   let canPrefilter = true
   for (const [category, words] of Object.entries(customKeywords)) {
-    if (!words || words.length === 0) continue
+    if (!words || words.length === 0) {
+      continue
+    }
     for (const word of words) {
-      if (!word || !word.trim()) continue
-      if (isPaymentProcessorOnly(word)) continue
+      if (!word || !word.trim()) {
+        continue
+      }
+      if (isPaymentProcessorOnly(word)) {
+        continue
+      }
       const pattern = keywordToPattern(word)
       let regex: RegExp | undefined
       try {
@@ -294,8 +323,12 @@ function compileCustomKeywords(customKeywords: Record<string, string[]>): Compil
 }
 
 function toDisplayCategory(cat: string): string {
-  if (cat === 'DiningOut') return 'Dining Out'
-  if (cat === 'BankFees') return 'Bank Fees'
+  if (cat === 'DiningOut') {
+    return 'Dining Out'
+  }
+  if (cat === 'BankFees') {
+    return 'Bank Fees'
+  }
   return cat
 }
 
@@ -304,10 +337,14 @@ function matchCustomKeywords(
   customKeywords: Record<string, string[]>,
 ): string | undefined {
   const { entries, anyMatch } = compileCustomKeywords(customKeywords)
-  if (anyMatch && !anyMatch.test(d)) return undefined
+  if (anyMatch && !anyMatch.test(d)) {
+    return undefined
+  }
   for (const { category, word, regex } of entries) {
     const isMatch = regex ? regex.test(d) : d.includes(word)
-    if (isMatch) return toDisplayCategory(category)
+    if (isMatch) {
+      return toDisplayCategory(category)
+    }
   }
   return undefined
 }
@@ -397,7 +434,9 @@ export function categorize(
   customKeywordsOrOptions?: Record<string, string[]> | CategorizeOptions,
   maybeOptions?: CategorizeOptions,
 ): string {
-  if (!desc || typeof desc !== 'string') return 'Other'
+  if (!desc || typeof desc !== 'string') {
+    return 'Other'
+  }
 
   // Normalize options
   let customKeywords: Record<string, string[]> | undefined
@@ -427,7 +466,9 @@ export function categorize(
   // 1. First evaluate user's custom keywords (highest priority)
   if (customKeywords) {
     const customMatch = matchCustomKeywords(d, customKeywords)
-    if (customMatch) return customMatch
+    if (customMatch) {
+      return customMatch
+    }
   }
 
   // Check cache for default evaluations. Everything below is independent of custom keywords,
@@ -447,8 +488,12 @@ export function categorize(
   const structuralCategories: (keyof CategoryKeywords)[] = ['Salary', 'Rent', 'Loans', 'Taxes']
   for (const cat of structuralCategories) {
     if (cat === 'Salary') {
-      if (INCOME_TAX_REGEX.test(d)) continue
-      if (POLISH_ATM_WITHDRAWAL_REGEX.test(d)) continue
+      if (INCOME_TAX_REGEX.test(d)) {
+        continue
+      }
+      if (POLISH_ATM_WITHDRAWAL_REGEX.test(d)) {
+        continue
+      }
       const isExplicitSalaryPayment =
         /\b(?:salary\s+payment|monthly\s+salary|gehaltszahlung|lohnauszahlung|reisespesen|reisesp|reisekosten|spesenabrechnung|spesenerstattung|auslagenerstattung|r[uü]ck[uü]berweisung\w*|rueckueberweisung\w*)\b/i.test(
           d,

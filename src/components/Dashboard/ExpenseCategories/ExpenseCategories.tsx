@@ -22,9 +22,15 @@ interface ExpenseCategoriesProps {
 const CATEGORY_ICON_SIZE = 16
 
 const getRankBadgeClass = (index: number) => {
-  if (index === 0) return styles.rankGold
-  if (index === 1) return styles.rankSilver
-  if (index === 2) return styles.rankBronze
+  if (index === 0) {
+    return styles.rankGold
+  }
+  if (index === 1) {
+    return styles.rankSilver
+  }
+  if (index === 2) {
+    return styles.rankBronze
+  }
   return styles.rankDefault
 }
 

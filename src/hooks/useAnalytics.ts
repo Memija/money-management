@@ -27,9 +27,15 @@ export {
 const TOP_CATEGORIES_LIMIT = 2
 
 const sortCategories = (a: [string, number], b: [string, number]) => {
-  if (a[0] === 'Other' && b[0] !== 'Other') return 1
-  if (b[0] === 'Other' && a[0] !== 'Other') return -1
-  if (b[1] !== a[1]) return b[1] - a[1]
+  if (a[0] === 'Other' && b[0] !== 'Other') {
+    return 1
+  }
+  if (b[0] === 'Other' && a[0] !== 'Other') {
+    return -1
+  }
+  if (b[1] !== a[1]) {
+    return b[1] - a[1]
+  }
   return a[0].localeCompare(b[0])
 }
 
@@ -208,7 +214,9 @@ export const useAnalytics = (
     })
 
     const getMedian = (arr: number[]) => {
-      if (arr.length === 0) return 0
+      if (arr.length === 0) {
+        return 0
+      }
       arr.sort((a, b) => a - b)
       const mid = Math.floor(arr.length / 2)
       return arr.length % 2 !== 0 ? arr[mid] : (arr[mid - 1] + arr[mid]) / 2

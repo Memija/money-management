@@ -26,7 +26,9 @@ export const TranslationsModal: React.FC<TranslationsModalProps> = ({
   const t = useLanguageStore((s) => s.t)
   const currentLocale = useLanguageStore((s) => s.locale)
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   const modalContent = (
     <AnimatePresence>

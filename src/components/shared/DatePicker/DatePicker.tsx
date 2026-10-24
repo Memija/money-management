@@ -127,7 +127,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   // Check if a day is selected
   const isSelected = (day: number) => {
-    if (!value) return false
+    if (!value) {
+      return false
+    }
     const selected = new Date(value)
     return (
       selected.getDate() === day &&

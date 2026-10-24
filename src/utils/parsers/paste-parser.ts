@@ -38,7 +38,8 @@ export function extractAccountIbansFromPaste(rawText: string): string[] {
 
   // Fallback: search anywhere in cleanText if header prefix was not present
   if (result.size === 0) {
-    const fallbackMatch = cleanText.match(/\b(DE\d{2}(?:\s*\d{4}){4}\s*\d{2})\b/i) || cleanText.match(/\b(DE\d{20})\b/i)
+    const fallbackMatch =
+      cleanText.match(/\b(DE\d{2}(?:\s*\d{4}){4}\s*\d{2})\b/i) || cleanText.match(/\b(DE\d{20})\b/i)
     if (fallbackMatch) {
       result.add(fallbackMatch[1].replace(/\s+/g, '').toUpperCase())
     }
@@ -105,14 +106,23 @@ export function htmlToClipboardText(htmlContent: string): string {
       let activeDate = '01.01.2026'
       for (const child of cardList.children) {
         const dateMatch = child.textContent?.match(/\b(\d{1,2}\.\d{1,2}\.\d{2,4})\b/)
-        if (dateMatch && (child.classList.contains('mkp-list-subline') || child.querySelector('h3.groupdate, h3'))) {
+        if (
+          dateMatch &&
+          (child.classList.contains('mkp-list-subline') || child.querySelector('h3.groupdate, h3'))
+        ) {
           activeDate = dateMatch[1]
         }
-        const cards = child.querySelectorAll('.mkp-card-clickable, .mkp-card-debit, .mkp-card-credit, .mkp-card')
+        const cards = child.querySelectorAll(
+          '.mkp-card-clickable, .mkp-card-debit, .mkp-card-credit, .mkp-card',
+        )
         for (const card of cards) {
-          const partner = card.querySelector('.mkp-identifier-link, h4, strong')?.textContent?.trim()
+          const partner = card
+            .querySelector('.mkp-identifier-link, h4, strong')
+            ?.textContent?.trim()
           const desc = card.querySelector('p')?.textContent?.trim()
-          const amtMatch = card.textContent?.match(/([+-]?\s*\d{1,3}(?:[.,]\d{3})*[.,]\d{2}\s*EUR)/i)
+          const amtMatch = card.textContent?.match(
+            /([+-]?\s*\d{1,3}(?:[.,]\d{3})*[.,]\d{2}\s*EUR)/i,
+          )
           if (partner && amtMatch) {
             rows.push(activeDate)
             rows.push(partner)
@@ -154,7 +164,9 @@ export function htmlToClipboardText(htmlContent: string): string {
             continue
           }
 
-          const cellTexts = Array.from(tds).map((td) => td.textContent?.replace(/\s+/g, ' ').trim() || '')
+          const cellTexts = Array.from(tds).map(
+            (td) => td.textContent?.replace(/\s+/g, ' ').trim() || '',
+          )
 
           if (sollIdx !== -1 && habenIdx !== -1) {
             const sollVal = cellTexts[sollIdx]
@@ -175,7 +187,9 @@ export function htmlToClipboardText(htmlContent: string): string {
     }
 
     // 4. Feed cards & Timeline items (Neobanks)
-    const feedItems = doc.querySelectorAll('.feed-card, .timeline-item, .transaction-item, .activity-item')
+    const feedItems = doc.querySelectorAll(
+      '.feed-card, .timeline-item, .transaction-item, .activity-item',
+    )
     if (feedItems.length > 0) {
       for (const item of feedItems) {
         const text = item.textContent || ''
@@ -186,7 +200,9 @@ export function htmlToClipboardText(htmlContent: string): string {
         const amountEl = item.querySelector('.amount, .amt, .amt-neg, .amt-pos, [class*="amount"]')
         const amountText =
           amountEl?.textContent?.trim() ||
-          text.match(/([+-]?\s*(?:[A-Z]{3}|€|£|\$|zł)?\s*[\d.,]+\s*(?:[A-Z]{3}|€|£|\$|zł)?)/i)?.[1]?.trim()
+          text
+            .match(/([+-]?\s*(?:[A-Z]{3}|€|£|\$|zł)?\s*[\d.,]+\s*(?:[A-Z]{3}|€|£|\$|zł)?)/i)?.[1]
+            ?.trim()
 
         if (dateMatch && title && amountText) {
           rows.push(dateMatch[1])
@@ -215,10 +231,10 @@ import {
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   '€': 'EUR',
-  '$': 'USD',
+  $: 'USD',
   '£': 'GBP',
-  'zł': 'PLN',
-  'ZŁ': 'PLN',
+  zł: 'PLN',
+  ZŁ: 'PLN',
 }
 
 export interface ParsedAmount {
@@ -272,7 +288,6 @@ export function parseAmountLine(line: string): ParsedAmount | null {
 
 // Date header pattern: DD.MM.YYYY — standalone date line (day separator)
 const DATE_HEADER_RE = /^(\d{1,2}\.\d{1,2}\.\d{2,4})$/
-
 
 function getCleanLines(rawText: string): string[] {
   return rawText

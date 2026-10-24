@@ -160,12 +160,18 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
   const heroAccent = isPositive ? styles['hero-emerald'] : styles['hero-rose']
 
   const gradientOffset = useMemo(() => {
-    if (enriched.length === 0) return 0
+    if (enriched.length === 0) {
+      return 0
+    }
     const dataMax = Math.max(...enriched.map((m) => m.saved))
     const dataMin = Math.min(...enriched.map((m) => m.saved))
 
-    if (dataMax <= 0) return 0
-    if (dataMin >= 0) return 1
+    if (dataMax <= 0) {
+      return 0
+    }
+    if (dataMin >= 0) {
+      return 1
+    }
     return dataMax / (dataMax - dataMin)
   }, [enriched])
 
@@ -277,7 +283,9 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                     key?: React.Key | null
                   }) => {
                     const { cx, cy, payload, key } = props
-                    if (!payload || cx === undefined || cy === undefined) return null
+                    if (!payload || cx === undefined || cy === undefined) {
+                      return null
+                    }
                     return (
                       <circle
                         key={key ?? undefined}
@@ -296,7 +304,9 @@ export const SavingsTrendModal: React.FC<SavingsTrendModalProps> = ({
                     key?: React.Key | null
                   }) => {
                     const { cx, cy, payload, key } = props
-                    if (!payload || cx === undefined || cy === undefined) return null
+                    if (!payload || cx === undefined || cy === undefined) {
+                      return null
+                    }
                     return (
                       <circle
                         key={key ? `active-${key}` : undefined}

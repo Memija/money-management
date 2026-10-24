@@ -63,49 +63,63 @@ export const DertourLogo: IconComponent = ({ size = 16, className }) => (
 )
 DertourLogo.displayName = 'DertourLogo'
 
-export const AlltoursLogo = createImageLogo({
+const RawAlltoursLogo = createImageLogo({
   src: '/brands/alltours.svg',
   label: 'alltours',
   displayName: 'AlltoursLogo',
 })
+export const AlltoursLogo: IconComponent = (props) => <RawAlltoursLogo {...props} />
+AlltoursLogo.displayName = 'AlltoursLogo'
 
-export const SchauinslandLogo = createImageLogo({
+const RawSchauinslandLogo = createImageLogo({
   src: '/brands/schauinsland.svg',
   label: 'Schauinsland-Reisen',
   displayName: 'SchauinslandLogo',
 })
+export const SchauinslandLogo: IconComponent = (props) => <RawSchauinslandLogo {...props} />
+SchauinslandLogo.displayName = 'SchauinslandLogo'
 
-export const EurowingsLogo = createImageLogo({
+const RawEurowingsLogo = createImageLogo({
   src: '/brands/eurowings.svg',
   label: 'Eurowings',
   displayName: 'EurowingsLogo',
 })
+export const EurowingsLogo: IconComponent = (props) => <RawEurowingsLogo {...props} />
+EurowingsLogo.displayName = 'EurowingsLogo'
 
-export const CondorLogo = createImageLogo({
+const RawCondorLogo = createImageLogo({
   src: '/brands/condor.svg',
   label: 'Condor',
   displayName: 'CondorLogo',
 })
+export const CondorLogo: IconComponent = (props) => <RawCondorLogo {...props} />
+CondorLogo.displayName = 'CondorLogo'
 
-export const BookingLogo = createImageLogo({
+const RawBookingLogo = createImageLogo({
   src: '/brands/booking.png',
   label: 'Booking.com',
   displayName: 'BookingLogo',
 })
+export const BookingLogo: IconComponent = (props) => <RawBookingLogo {...props} />
+BookingLogo.displayName = 'BookingLogo'
 
 /** sander Hotel Koblenz — contemporary boutique hotel and gastronomy concept in Koblenz. */
-export const SanderHotelLogo = createImageLogo({
+const RawSanderHotelLogo = createImageLogo({
   src: '/brands/sander-hotel.png',
   label: 'sander Hotel Koblenz',
   displayName: 'SanderHotelLogo',
 })
+export const SanderHotelLogo: IconComponent = (props) => <RawSanderHotelLogo {...props} />
+SanderHotelLogo.displayName = 'SanderHotelLogo'
 
 /** Airport Parking Germany — professional airport parking & shuttle service (airport-parking-germany.de). */
-export const AirportParkingLogo = createImageLogo({
+const RawAirportParkingLogo = createImageLogo({
   src: '/brands/airport-parking.png',
   label: 'Airport Parking',
   displayName: 'AirportParkingLogo',
 })
+export const AirportParkingLogo: IconComponent = (props) => <RawAirportParkingLogo {...props} />
+AirportParkingLogo.displayName = 'AirportParkingLogo'
 
 /** Wizz Air (Wizz Air Hungary Ltd.) — ultra-low-cost airline serving Europe, Middle East, and beyond. */
 export const WizzAirLogo: IconComponent = ({ size = 16, className }) => (

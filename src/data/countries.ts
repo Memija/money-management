@@ -46,7 +46,11 @@ export const countries: Country[] = [
   { code: 'id', name: 'Indonesia', flag: '/flags/id.png', supported: false },
 ].sort((a, b) => {
   // Supported countries first, then alphabetical
-  if (a.supported && !b.supported) return -1
-  if (!a.supported && b.supported) return 1
+  if (a.supported && !b.supported) {
+    return -1
+  }
+  if (!a.supported && b.supported) {
+    return 1
+  }
   return a.name.localeCompare(b.name)
 })

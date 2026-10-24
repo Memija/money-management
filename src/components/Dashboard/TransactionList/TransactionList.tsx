@@ -386,10 +386,18 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
     // Filter transactions by Type (All / Income / Expense / Transfers / Duplicates / Modified)
     // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', 'expense', 'duplicates', or 'modified'!
     const effectiveTx = useMemo(() => {
-      if (typeFilter === 'all') return normalTx
-      if (typeFilter === 'transfers') return ghostTx
-      if (typeFilter === 'duplicates') return duplicateTx
-      if (typeFilter === 'modified') return modifiedTx
+      if (typeFilter === 'all') {
+        return normalTx
+      }
+      if (typeFilter === 'transfers') {
+        return ghostTx
+      }
+      if (typeFilter === 'duplicates') {
+        return duplicateTx
+      }
+      if (typeFilter === 'modified') {
+        return modifiedTx
+      }
       return normalTx.filter((tx) => tx.type === typeFilter)
     }, [normalTx, ghostTx, duplicateTx, modifiedTx, typeFilter])
 

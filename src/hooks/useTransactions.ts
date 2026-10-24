@@ -76,10 +76,18 @@ export function useTransactions(period?: PeriodFilter) {
     let count = 0
     for (let i = 0; i < allTransactions.length; i++) {
       const t = allTransactions[i]
-      if (period && !matchesPeriod(t.date, period)) continue
-      if (selectedInstitution !== 'all' && t.institution !== selectedInstitution) continue
-      if (selectedSubAccount !== 'all' && t.subAccount !== selectedSubAccount) continue
-      if (t.isGhost) count++
+      if (period && !matchesPeriod(t.date, period)) {
+        continue
+      }
+      if (selectedInstitution !== 'all' && t.institution !== selectedInstitution) {
+        continue
+      }
+      if (selectedSubAccount !== 'all' && t.subAccount !== selectedSubAccount) {
+        continue
+      }
+      if (t.isGhost) {
+        count++
+      }
     }
     return count
   }, [allTransactions, period, selectedInstitution, selectedSubAccount])
@@ -90,15 +98,25 @@ export function useTransactions(period?: PeriodFilter) {
 
     for (let i = 0; i < allTransactions.length; i++) {
       const t = allTransactions[i]
-      if (!showGhost && t.isGhost) continue
-      if (period && !matchesPeriod(t.date, period)) continue
-      if (selectedInstitution !== 'all' && t.institution !== selectedInstitution) continue
-      if (selectedSubAccount !== 'all' && t.subAccount !== selectedSubAccount) continue
+      if (!showGhost && t.isGhost) {
+        continue
+      }
+      if (period && !matchesPeriod(t.date, period)) {
+        continue
+      }
+      if (selectedInstitution !== 'all' && t.institution !== selectedInstitution) {
+        continue
+      }
+      if (selectedSubAccount !== 'all' && t.subAccount !== selectedSubAccount) {
+        continue
+      }
       if (term) {
         const descMatch = t.description.toLowerCase().includes(term)
         const partnerMatch = t.partner ? t.partner.toLowerCase().includes(term) : false
         const catMatch = t.category ? t.category.toLowerCase().includes(term) : false
-        if (!descMatch && !partnerMatch && !catMatch) continue
+        if (!descMatch && !partnerMatch && !catMatch) {
+          continue
+        }
       }
       result.push(t)
     }

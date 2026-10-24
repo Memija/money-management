@@ -72,12 +72,7 @@ describe('InsightCards', () => {
 
   it('renders Deficit Rate card with privacy-blur when savingsRate is negative', () => {
     render(
-      <InsightCards
-        {...defaultProps}
-        savingsRate={-35}
-        balance={-1050}
-        totalExpenses={4050}
-      />,
+      <InsightCards {...defaultProps} savingsRate={-35} balance={-1050} totalExpenses={4050} />,
     )
 
     expect(screen.getByText('Deficit Rate')).toBeInTheDocument()

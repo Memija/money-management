@@ -26,18 +26,30 @@ function getEasterSunday(year: number): Date {
  * Currently supports Germany ('DE') nationwide holidays.
  */
 export function getPublicHolidayName(date: Date, countryCode: string = 'DE'): string | null {
-  if (countryCode !== 'DE') return null
+  if (countryCode !== 'DE') {
+    return null
+  }
 
   const year = date.getFullYear()
   const month = date.getMonth() // 0-11
   const day = date.getDate()
 
   // Fixed nationwide holidays in Germany
-  if (month === 0 && day === 1) return 'newYear'
-  if (month === 4 && day === 1) return 'laborDay'
-  if (month === 9 && day === 3) return 'germanUnity'
-  if (month === 11 && day === 25) return 'christmas1'
-  if (month === 11 && day === 26) return 'christmas2'
+  if (month === 0 && day === 1) {
+    return 'newYear'
+  }
+  if (month === 4 && day === 1) {
+    return 'laborDay'
+  }
+  if (month === 9 && day === 3) {
+    return 'germanUnity'
+  }
+  if (month === 11 && day === 25) {
+    return 'christmas1'
+  }
+  if (month === 11 && day === 26) {
+    return 'christmas2'
+  }
 
   // Relative holidays based on Easter
   const easter = getEasterSunday(year)
@@ -51,22 +63,30 @@ export function getPublicHolidayName(date: Date, countryCode: string = 'DE'): st
   // Good Friday (Karfreitag): Easter - 2 days
   const goodFriday = new Date(easter)
   goodFriday.setDate(easter.getDate() - 2)
-  if (isSameDay(date, goodFriday)) return 'goodFriday'
+  if (isSameDay(date, goodFriday)) {
+    return 'goodFriday'
+  }
 
   // Easter Monday (Ostermontag): Easter + 1 day
   const easterMonday = new Date(easter)
   easterMonday.setDate(easter.getDate() + 1)
-  if (isSameDay(date, easterMonday)) return 'easterMonday'
+  if (isSameDay(date, easterMonday)) {
+    return 'easterMonday'
+  }
 
   // Ascension Day (Christi Himmelfahrt): Easter + 39 days
   const ascensionDay = new Date(easter)
   ascensionDay.setDate(easter.getDate() + 39)
-  if (isSameDay(date, ascensionDay)) return 'ascensionDay'
+  if (isSameDay(date, ascensionDay)) {
+    return 'ascensionDay'
+  }
 
   // Whit Monday (Pfingstmontag): Easter + 50 days
   const whitMonday = new Date(easter)
   whitMonday.setDate(easter.getDate() + 50)
-  if (isSameDay(date, whitMonday)) return 'whitMonday'
+  if (isSameDay(date, whitMonday)) {
+    return 'whitMonday'
+  }
 
   return null
 }

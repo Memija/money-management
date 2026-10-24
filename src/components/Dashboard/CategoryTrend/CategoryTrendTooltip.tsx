@@ -52,7 +52,9 @@ export const CustomTrendTooltip: React.FC<CustomTooltipProps> = ({
   onCategoryClick,
   onTooltipHoverChange,
 }) => {
-  if (!active || !payload || !payload.length) return null
+  if (!active || !payload || !payload.length) {
+    return null
+  }
 
   // Calculate total spend for this specific month
   const totalMonth = payload.reduce((acc, item) => acc + (Number(item.value) || 0), 0)

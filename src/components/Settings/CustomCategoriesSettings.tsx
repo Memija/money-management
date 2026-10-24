@@ -29,7 +29,9 @@ export const CustomCategoriesSettings: React.FC = () => {
 
   const handleAddCategory = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newCatName.trim()) return
+    if (!newCatName.trim()) {
+      return
+    }
 
     const id = `custom_${Date.now()}`
 
@@ -168,7 +170,9 @@ export const CustomCategoriesSettings: React.FC = () => {
                 </div>
                 <div className={styles.catTranslations}>
                   {Object.entries(cat.translations || {}).map(([loc, val]) => {
-                    if (loc === currentLocale) return null
+                    if (loc === currentLocale) {
+                      return null
+                    }
                     const langLoc = loc as keyof typeof localeLabels
                     return (
                       <span

@@ -80,7 +80,9 @@ export const DuplicateRulesSettings: React.FC = () => {
   }
 
   const handleConfirmRevoke = () => {
-    if (!ruleToRevoke) return
+    if (!ruleToRevoke) {
+      return
+    }
     const ruleId = ruleToRevoke.rule.id
     if (ruleId) {
       removeDuplicateOverrideRule(ruleId, singleDeleteMode)

@@ -50,7 +50,9 @@ export const Settings: React.FC = () => {
 
   const handleAddKeyword = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newKeyword.trim()) return
+    if (!newKeyword.trim()) {
+      return
+    }
     const categoryKeywords = customKeywords[selectedCategory] || []
     if (categoryKeywords.includes(newKeyword.trim().toLowerCase())) {
       setNewKeyword('')
@@ -315,7 +317,9 @@ export const Settings: React.FC = () => {
               <div className={styles.keywordsGrid}>
                 <AnimatePresence>
                   {Object.entries(customKeywords).map(([catKey, keywords]) => {
-                    if (!keywords || keywords.length === 0) return null
+                    if (!keywords || keywords.length === 0) {
+                      return null
+                    }
                     return (
                       <motion.div
                         key={catKey}

@@ -45,4 +45,10 @@ export default defineConfig([
     },
   },
   eslintConfigPrettier,
+  {
+    files: ['**/*.{ts,tsx}'],
+    rules: {
+      curly: ['error', 'all'],
+    },
+  },
 ])

@@ -515,4 +515,3 @@ describe('Dashboard', () => {
     expect(heroSection).toHaveTextContent(/1[.,]950/)
   })
 })
-

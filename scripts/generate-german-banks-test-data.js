@@ -204,27 +204,52 @@ const bankFiles = [
   {
     id: 'dz-bank',
     name: 'DZ Bank',
-    content: createVolksbankContent('Girokonto', 'DE12500600001234567890', 'GENODED1DZX', 'Frankfurt'),
+    content: createVolksbankContent(
+      'Girokonto',
+      'DE12500600001234567890',
+      'GENODED1DZX',
+      'Frankfurt',
+    ),
   },
   {
     id: 'berliner-volksbank',
     name: 'Berliner Volksbank',
-    content: createVolksbankContent('Girokonto privat', 'DE23100900001234567890', 'GENODED1BVB', 'Berlin'),
+    content: createVolksbankContent(
+      'Girokonto privat',
+      'DE23100900001234567890',
+      'GENODED1BVB',
+      'Berlin',
+    ),
   },
   {
     id: 'frankfurter-volksbank',
     name: 'Frankfurter Volksbank Rhein/Main',
-    content: createVolksbankContent('Girokonto Plus', 'DE34501900001234567890', 'FFVBDEFFXXX', 'Frankfurt'),
+    content: createVolksbankContent(
+      'Girokonto Plus',
+      'DE34501900001234567890',
+      'FFVBDEFFXXX',
+      'Frankfurt',
+    ),
   },
   {
     id: 'muenchner-bank',
     name: 'Münchner Bank',
-    content: createVolksbankContent('Muenchner Bank Giro', 'DE45701600001234567890', 'MBNKDEMMXXX', 'Muenchen'),
+    content: createVolksbankContent(
+      'Muenchner Bank Giro',
+      'DE45701600001234567890',
+      'MBNKDEMMXXX',
+      'Muenchen',
+    ),
   },
   {
     id: 'volksbank-other',
     name: 'Other Volksbank / Raiffeisenbank',
-    content: createVolksbankContent('VR-Girokonto', 'DE56200900001234567890', 'GENODED1XXX', 'Deutschland'),
+    content: createVolksbankContent(
+      'VR-Girokonto',
+      'DE56200900001234567890',
+      'GENODED1XXX',
+      'Deutschland',
+    ),
   },
 
   // ── Direct & Online Banks ────────────────────────────────────────────────────
@@ -745,11 +770,7 @@ function getBankBranding(bank) {
     }
   }
 
-  if (
-    bank.id.includes('volksbank') ||
-    bank.id === 'dz-bank' ||
-    bank.id === 'muenchner-bank'
-  ) {
+  if (bank.id.includes('volksbank') || bank.id === 'dz-bank' || bank.id === 'muenchner-bank') {
     return {
       primary: rgb(0.0, 0.25, 0.55),
       headerBg: rgb(0.92, 0.95, 0.99),
@@ -916,8 +937,8 @@ async function generatePdfForBank(bank) {
   const tableHeader = isDeutscheBankGroup
     ? 'Buchungstag   Wertstellung   Umsatzart / Verwendungszweck                           Soll / Haben (EUR)'
     : isNeobankOrBroker
-    ? 'Buchungstag   Buchungstext / Verwendungszweck                                       Betrag (EUR)'
-    : 'Buchungstag   Wertstellung   Buchungstext / Verwendungszweck                           Betrag (EUR)'
+      ? 'Buchungstag   Buchungstext / Verwendungszweck                                       Betrag (EUR)'
+      : 'Buchungstag   Wertstellung   Buchungstext / Verwendungszweck                           Betrag (EUR)'
 
   page.drawText(tableHeader, {
     x: 55,
@@ -2549,4 +2570,6 @@ npx vitest run src/utils/parsers/__tests__/german-banks-paste-test-data.test.ts
 `
 
 fs.writeFileSync(path.join(outputDir, 'README.md'), readmeContent, 'utf-8')
-console.log(`Generated ${bankFiles.length} bank CSV files, ${bankFiles.length} PDF statement files, and paste samples in ${outputDir}`)
+console.log(
+  `Generated ${bankFiles.length} bank CSV files, ${bankFiles.length} PDF statement files, and paste samples in ${outputDir}`,
+)

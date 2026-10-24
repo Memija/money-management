@@ -17,7 +17,9 @@ function getStoredTheme(): Theme {
 }
 
 function getResolvedTheme(theme: Theme): 'light' | 'dark' {
-  if (theme !== 'system') return theme
+  if (theme !== 'system') {
+    return theme
+  }
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 

@@ -1,6 +1,5 @@
 import React, { useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
-import { TrendingDown, TrendingUp } from 'lucide-react'
+import { useInView } from 'framer-motion'
 
 import { useAccountBalances } from '../../hooks/useAccountBalances'
 import {
@@ -9,22 +8,20 @@ import {
   type PeriodFilter as PeriodFilterType,
   useAnalytics,
 } from '../../hooks/useAnalytics'
-import { useFormatters } from '../../hooks/useFormatters'
 import { useRecurringTransactions } from '../../hooks/useRecurringTransactions'
 import { useTransactions } from '../../hooks/useTransactions'
 import { useAppStore } from '../../store/useAppStore'
-import { useLanguageStore } from '../../store/useLanguageStore'
 import { hasMerchantLogo } from '../../utils/category-icons'
 import { hasExtensiveCategoryData } from '../../utils/category-utils'
 import { getDateBounds } from '../../utils/period-utils'
+import { BalanceHero } from './BalanceHero'
 import { CategoryTrend } from './CategoryTrend'
 import { type AvgDetailType, DashboardModals, type DetailModalState } from './DashboardModals'
+import { DashboardSubheader } from './DashboardSubheader'
 import { ExpenseCategories } from './ExpenseCategories'
 import { IncomeVsExpensesChart } from './IncomeVsExpensesChart'
 import { InsightCards } from './InsightCards'
-import { PeriodFilter } from './PeriodFilter'
 import { RecurringExpenses } from './RecurringExpenses'
-import { StickyAccountSwitcher } from './StickyAccountSwitcher'
 import { TopMerchants } from './TopMerchants'
 import { TransactionList } from './TransactionList'
 
@@ -32,8 +29,6 @@ import styles from './Dashboard.module.css'
 
 const Dashboard: React.FC = () => {
   const importedAccounts = useAppStore((s) => s.importedAccounts)
-  const t = useLanguageStore((s) => s.t)
-  const { formatCurrency } = useFormatters()
 
   // Period filter state. `period` drives the filter UI immediately, while `deferredPeriod`
   // feeds the heavy analytics so React can recompute them in the background without
@@ -237,7 +232,9 @@ const Dashboard: React.FC = () => {
 
   const selectedAccountInfo = useMemo(() => {
     if (selectedInstitution === 'all') {
-      if (bankAccounts.length === 1) return bankAccounts[0]
+      if (bankAccounts.length === 1) {
+        return bankAccounts[0]
+      }
       return null
     }
     return bankAccounts.find((a) => a.id === selectedInstitution || a.name === selectedInstitution)
@@ -245,7 +242,9 @@ const Dashboard: React.FC = () => {
 
   // Determines if the active period encompasses the entire dataset domain
   const isPeriodAllTime = useMemo(() => {
-    if (deferredPeriod.mode === 'all') return true
+    if (deferredPeriod.mode === 'all') {
+      return true
+    }
     if (deferredPeriod.mode === 'custom') {
       const { startDate, endDate } = deferredPeriod
       const hasNoBounds = !startDate && !endDate
@@ -290,68 +289,28 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className={styles['dashboard-outer']}>
-      {/* Subheader — plain flex item above the scroll area, no position tricks needed */}
-      <div className={styles['subheader-bar']}>
-        <div className={styles['subheader-inner']}>
-          <div className={styles['subheader-left']}>
-            <PeriodFilter
-              period={period}
-              onPeriodChange={setPeriod}
-              availableYears={periodOptions.availableYears}
-              availableQuarters={periodOptions.availableQuarters}
-              availableMonths={periodOptions.availableMonths}
-              minDate={minDate}
-              maxDate={maxDate}
-            />
-          </div>
-
-          {bankAccounts.length > 0 && (
-            <div className={styles['sticky-stats']}>
-              <StickyAccountSwitcher
-                accounts={bankAccounts}
-                totalBalance={allAccountsBalance}
-                totalTransactionCount={allAccountsTxCount}
-                selectedInstitution={selectedInstitution}
-                onSelectInstitution={setSelectedInstitution}
-                selectedSubAccount={selectedSubAccount}
-                onSelectSubAccount={setSelectedSubAccount}
-                selectedAccountInfo={selectedAccountInfo}
-                displayBalance={displayBalance}
-                hasMultipleAccounts={hasMultipleAccounts}
-              />
-
-              <AnimatePresence>
-                {!isHeroInView && (
-                  <motion.div
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className={styles['sticky-metrics-group']}
-                  >
-                    <div className={styles['sticky-stat-divider']} />
-                    <div className={styles['sticky-stat-item']}>
-                      <TrendingUp size={14} className={styles['text-primary']} />
-                      <span className={styles['sticky-stat-label']}>{t.income}:</span>
-                      <span className={`${styles['sticky-stat-value']} privacy-blur`}>
-                        {formatCurrency(analytics.totalIncome)}
-                      </span>
-                    </div>
-                    <div className={styles['sticky-stat-divider']} />
-                    <div className={styles['sticky-stat-item']}>
-                      <TrendingDown size={14} className={styles['text-danger']} />
-                      <span className={styles['sticky-stat-label']}>{t.expenses}:</span>
-                      <span className={`${styles['sticky-stat-value']} privacy-blur`}>
-                        {formatCurrency(analytics.totalExpenses)}
-                      </span>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
-      </div>
+      <DashboardSubheader
+        period={period}
+        onPeriodChange={setPeriod}
+        availableYears={periodOptions.availableYears}
+        availableQuarters={periodOptions.availableQuarters}
+        availableMonths={periodOptions.availableMonths}
+        minDate={minDate}
+        maxDate={maxDate}
+        bankAccounts={bankAccounts}
+        allAccountsBalance={allAccountsBalance}
+        allAccountsTxCount={allAccountsTxCount}
+        selectedInstitution={selectedInstitution}
+        onSelectInstitution={setSelectedInstitution}
+        selectedSubAccount={selectedSubAccount}
+        onSelectSubAccount={setSelectedSubAccount}
+        selectedAccountInfo={selectedAccountInfo}
+        displayBalance={displayBalance}
+        hasMultipleAccounts={hasMultipleAccounts}
+        isHeroInView={isHeroInView}
+        totalIncome={analytics.totalIncome}
+        totalExpenses={analytics.totalExpenses}
+      />
 
       {/* Main content area */}
       <div className={styles['scroll-area']}>
@@ -365,41 +324,12 @@ const Dashboard: React.FC = () => {
           className={`container ${isAnalyticsStale ? styles.stale : ''}`}
           aria-busy={isAnalyticsStale}
         >
-          <motion.section
+          <BalanceHero
             ref={heroRef}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className={`${styles['balance-hero']} ${displayBalance < 0 ? styles.negative : ''}`}
-          >
-            <h1 className={`${styles['balance-amount']} privacy-blur`}>
-              {formatCurrency(displayBalance)}
-            </h1>
-            <div className={styles['balance-stats']}>
-              <div className={styles['stat-item']}>
-                <div className={`${styles['icon-box']} ${styles['icon-income']}`}>
-                  <TrendingUp size={18} />
-                </div>
-                <div className={styles['stat-text-container']}>
-                  <p className={styles['stat-label']}>{t.income}</p>
-                  <p className={`${styles['stat-value']} privacy-blur`}>
-                    {formatCurrency(analytics.totalIncome)}
-                  </p>
-                </div>
-              </div>
-              <div className={styles['stat-item']}>
-                <div className={`${styles['icon-box']} ${styles['icon-expense']}`}>
-                  <TrendingDown size={18} />
-                </div>
-                <div className={styles['stat-text-container']}>
-                  <p className={styles['stat-label']}>{t.expenses}</p>
-                  <p className={`${styles['stat-value']} privacy-blur`}>
-                    {formatCurrency(analytics.totalExpenses)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.section>
+            displayBalance={displayBalance}
+            totalIncome={analytics.totalIncome}
+            totalExpenses={analytics.totalExpenses}
+          />
 
           {/* Insight Cards */}
           <InsightCards

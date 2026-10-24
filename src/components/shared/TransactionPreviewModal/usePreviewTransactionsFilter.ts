@@ -43,7 +43,9 @@ export function usePreviewTransactionsFilter({
   }
 
   const handleSort = (key: SortColumn) => {
-    if (!hasMultipleTransactions) return
+    if (!hasMultipleTransactions) {
+      return
+    }
     setSortConfig((prev) => {
       if (prev && prev.key === key) {
         return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
@@ -118,9 +120,15 @@ export function usePreviewTransactionsFilter({
         if (aUnlocked !== bUnlocked) {
           return aUnlocked ? -1 : 1
         }
-        if (key === 'date') return (a.date < b.date ? -1 : a.date > b.date ? 1 : 0) * factor
-        if (key === 'description') return a.description.localeCompare(b.description) * factor
-        if (key === 'amount') return (a.amount - b.amount) * factor
+        if (key === 'date') {
+          return (a.date < b.date ? -1 : a.date > b.date ? 1 : 0) * factor
+        }
+        if (key === 'description') {
+          return a.description.localeCompare(b.description) * factor
+        }
+        if (key === 'amount') {
+          return (a.amount - b.amount) * factor
+        }
         return 0
       })
     } else if (unlockedDuplicateIds && unlockedDuplicateIds.size > 0) {

@@ -28,7 +28,9 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredGroups = useMemo(() => {
-    if (!searchQuery.trim()) return ICON_GROUPS
+    if (!searchQuery.trim()) {
+      return ICON_GROUPS
+    }
 
     const query = normalizeForSearch(searchQuery)
     return ICON_GROUPS.map((group) => {
@@ -57,7 +59,9 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
     }).filter((group) => group.icons.length > 0)
   }, [searchQuery, t])
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   const modalContent = (
     <AnimatePresence>
@@ -100,7 +104,9 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
                   <div className={styles.iconGrid}>
                     {group.icons.map((iconName) => {
                       const IconComp = AVAILABLE_ICONS[iconName]
-                      if (!IconComp) return null
+                      if (!IconComp) {
+                        return null
+                      }
                       const isSelected = selectedIcon === iconName
                       return (
                         <button

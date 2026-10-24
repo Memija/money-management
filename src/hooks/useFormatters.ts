@@ -69,7 +69,9 @@ export const useFormatters = () => {
 
   const formatDate = useCallback(
     (dateString: string) => {
-      if (!dateString) return ''
+      if (!dateString) {
+        return ''
+      }
       const key = `${dateString}_${intlLocale}`
       let formatted = formattedDateCache.get(key)
       if (formatted !== undefined) {

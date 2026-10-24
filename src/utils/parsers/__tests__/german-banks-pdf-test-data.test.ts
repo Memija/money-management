@@ -94,7 +94,9 @@ describe('German Banks PDF Test Data Suite', () => {
       const hasExpense = transactions.some((t) => t.type === 'expense' || t.amount < 0)
       const hasIncome = transactions.some((t) => t.type === 'income' || t.amount > 0)
       expect(hasExpense, `${inst.name} PDF should include at least one expense`).toBe(true)
-      expect(hasIncome, `${inst.name} PDF should include at least one income transaction`).toBe(true)
+      expect(hasIncome, `${inst.name} PDF should include at least one income transaction`).toBe(
+        true,
+      )
 
       // Verify that the account IBAN was extracted from the PDF statement header
       const detectedIbans = extractAccountIbansFromPdf(fullText, `${inst.id}.pdf`)

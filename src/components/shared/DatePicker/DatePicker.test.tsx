@@ -19,7 +19,9 @@ vi.mock('../../../store/useLanguageStore', () => ({
 
 vi.mock('../../../utils/holidays', () => ({
   getPublicHolidayName: vi.fn((date) => {
-    if (date.getMonth() === 0 && date.getDate() === 1) return 'New Year'
+    if (date.getMonth() === 0 && date.getDate() === 1) {
+      return 'New Year'
+    }
     return null
   }),
 }))

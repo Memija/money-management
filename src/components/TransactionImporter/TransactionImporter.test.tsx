@@ -821,7 +821,9 @@ Transfer from Bank B DE12345678901234567890
 
   it('shows duplicate-all-banner and disables import button when all transactions are duplicates', async () => {
     mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: unknown[]) => {
-      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+      if (!txs || txs.length === 0) {
+        return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+      }
       return {
         duplicateCount: txs.length,
         newCount: 0,
@@ -862,7 +864,9 @@ Transfer from Bank B DE12345678901234567890
   it('does not mark duplicates as internal transfers or space transfers', async () => {
     // Both transactions are duplicates
     mockGetDuplicateTransactionStats.mockImplementation((_instId: string, txs: unknown[]) => {
-      if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+      if (!txs || txs.length === 0) {
+        return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+      }
       return {
         duplicateCount: txs.length,
         newCount: 0,
@@ -928,7 +932,9 @@ Transfer from Bank B DE12345678901234567890
   it('shows duplicate-partial-banner and imports only non-duplicate transactions', async () => {
     mockGetDuplicateTransactionStats.mockImplementation(
       (_instId: string, txs: { id: string }[]) => {
-        if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        if (!txs || txs.length === 0) {
+          return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        }
         return {
           duplicateCount: 1,
           newCount: txs.length - 1,
@@ -1046,7 +1052,9 @@ Transfer from Bank B DE12345678901234567890
   it('proceeds directly with import after resolving duplicate warning even if space transfers exist', async () => {
     mockGetDuplicateTransactionStats.mockImplementation(
       (_instId: string, txs: { id: string }[]) => {
-        if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        if (!txs || txs.length === 0) {
+          return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        }
         return {
           duplicateCount: 1,
           newCount: txs.length - 1,
@@ -1133,7 +1141,9 @@ Transfer from Bank B DE12345678901234567890
   it('allows unlocking duplicate transactions, updating stats and enabling import with forceImport', async () => {
     mockGetDuplicateTransactionStats.mockImplementation(
       (_instId: string, txs: { id: string }[]) => {
-        if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        if (!txs || txs.length === 0) {
+          return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        }
         return {
           duplicateCount: txs.length,
           newCount: 0,
@@ -1237,7 +1247,9 @@ Transfer from Bank B DE12345678901234567890
   it('does not save duplicate override rules if the import is canceled or cleared', async () => {
     mockGetDuplicateTransactionStats.mockImplementation(
       (_instId: string, txs: { id: string }[]) => {
-        if (!txs || txs.length === 0) return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        if (!txs || txs.length === 0) {
+          return { duplicateCount: 0, newCount: 0, duplicateIds: [] }
+        }
         return {
           duplicateCount: txs.length,
           newCount: 0,
@@ -1300,8 +1312,9 @@ Transfer from Bank B DE12345678901234567890
   it('renders already duplicated transactions as non-interactable with disabled lock button and alreadyDuplicated badge', async () => {
     mockGetDuplicateTransactionStats.mockImplementation(
       (_instId: string, txs: { id: string }[]) => {
-        if (!txs || txs.length === 0)
+        if (!txs || txs.length === 0) {
           return { duplicateCount: 0, newCount: 0, duplicateIds: [], alreadyDuplicatedIds: [] }
+        }
         return {
           duplicateCount: txs.length,
           newCount: 0,

@@ -57,7 +57,9 @@ export const useBackupRestore = (options?: UseBackupRestoreOptions): UseBackupRe
   const handleFileChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0]
-      if (!file) return
+      if (!file) {
+        return
+      }
 
       try {
         const text = await file.text()
@@ -86,7 +88,9 @@ export const useBackupRestore = (options?: UseBackupRestoreOptions): UseBackupRe
   )
 
   const confirmRestore = useCallback(async () => {
-    if (!pendingRestore) return
+    if (!pendingRestore) {
+      return
+    }
 
     setIsRestoring(true)
     try {

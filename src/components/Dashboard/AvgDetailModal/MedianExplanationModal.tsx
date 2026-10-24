@@ -31,7 +31,9 @@ export const MedianExplanationModal: React.FC<MedianExplanationModalProps> = ({
     const sorted = [...filtered].sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount))
 
     const len = sorted.length
-    if (len === 0) return { sortedTransactions: [], medianValue: 0, medianIndices: [] }
+    if (len === 0) {
+      return { sortedTransactions: [], medianValue: 0, medianIndices: [] }
+    }
 
     const mid = Math.floor(len / 2)
     let medianValue = 0

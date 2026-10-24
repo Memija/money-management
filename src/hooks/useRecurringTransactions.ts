@@ -29,7 +29,9 @@ export interface RecurringData {
 }
 
 const isGenericPaymentDesc = (desc?: string): boolean => {
-  if (!desc) return true
+  if (!desc) {
+    return true
+  }
   return /^(?:sepa[- ]?)?(?:credit[- ]?transfer|ueberweisung|überweisung|dauerauftrag|bank[- ]?transfer|wire[- ]?transfer|money[- ]?transfer|standing[- ]?order|direct[- ]?debit|lastschrift|payment|zahlung|abbuchung|umbuchung|transfer|online[- ]?banking)\b/i.test(
     desc.trim(),
   )
@@ -190,13 +192,17 @@ interface AmountCluster {
 }
 
 export const clusterTxsByAmount = (items: Transaction[]): Transaction[][] => {
-  if (items.length <= 1) return [items]
+  if (items.length <= 1) {
+    return [items]
+  }
   const clusters: AmountCluster[] = []
   // Sort by amount descending to establish primary amount anchors
   const sorted = [...items].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
   for (const t of sorted) {
     const amt = Math.abs(t.amount)
-    if (amt === 0) continue
+    if (amt === 0) {
+      continue
+    }
     let bestCluster: AmountCluster | null = null
     let bestDiff = Infinity
     for (const c of clusters) {
@@ -257,8 +263,12 @@ const buildRecurrenceGroups = (
   let maxTime = -Infinity
   for (let i = 0; i < expenses.length; i++) {
     const time = Date.parse(expenses[i].date)
-    if (time < minTime) minTime = time
-    if (time > maxTime) maxTime = time
+    if (time < minTime) {
+      minTime = time
+    }
+    if (time > maxTime) {
+      maxTime = time
+    }
   }
   const totalTimeframeDays =
     minTime !== Infinity && maxTime !== -Infinity ? Math.ceil((maxTime - minTime) / 86400000) : 0
@@ -277,7 +287,9 @@ const buildRecurrenceGroups = (
 
   const groups: RecurrenceGroup[] = []
   for (const [normName, allTxs] of Object.entries(byKey)) {
-    if (allTxs.length < 2) continue
+    if (allTxs.length < 2) {
+      continue
+    }
     const clusters = clusterTxsByAmount(allTxs)
       .filter((cluster) => cluster.length >= 2)
       // Sort by date ascending (fast ASCII comparison for YYYY-MM-DD)
@@ -321,7 +333,9 @@ export const useRecurringTransactions = (
 
         // Filter transactions that fall into the selected period
         const txsInPeriod = isAllPeriod ? cluster : filterByPeriod(cluster, period)
-        if (txsInPeriod.length === 0) continue
+        if (txsInPeriod.length === 0) {
+          continue
+        }
 
         if (isAllPeriod) {
           // Multi-year rule: If the dataset spans a few years (>= 365 days) and an expense
@@ -342,7 +356,9 @@ export const useRecurringTransactions = (
           }
 
           const evaluation = evaluateMonthlyRecurrence(cluster)
-          if (!evaluation.isRecurring) continue
+          if (!evaluation.isRecurring) {
+            continue
+          }
 
           const amount = Math.round(evaluation.avgAmount * 100) / 100
           const recentTx = cluster[cluster.length - 1]
@@ -361,7 +377,9 @@ export const useRecurringTransactions = (
           if (txsInPeriod.length >= 2) {
             txsInPeriod.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
             const evaluation = evaluateMonthlyRecurrence(txsInPeriod)
-            if (!evaluation.isRecurring) continue
+            if (!evaluation.isRecurring) {
+              continue
+            }
 
             const amount = Math.round(evaluation.avgAmount * 100) / 100
             const recentTx = txsInPeriod[txsInPeriod.length - 1]
@@ -409,7 +427,9 @@ export const useRecurringTransactions = (
               }
             }
 
-            if (!isRecurringMonthly) continue
+            if (!isRecurringMonthly) {
+              continue
+            }
 
             const displayName = cleanDisplayName(targetTx)
             const amount = Math.round(targetAmount * 100) / 100

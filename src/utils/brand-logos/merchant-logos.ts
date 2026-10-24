@@ -340,7 +340,7 @@ import {
   KlarmobilLogo,
   SuewagLogo,
   VattenfallLogo,
-} from './utility-logos'
+} from './utility-logos' // Re-resolved utility logos
 import { VARIETY_STORE_LOGOS } from './variety-store-logos'
 
 export const MERCHANT_LOGOS: Record<string, IconComponent> = {

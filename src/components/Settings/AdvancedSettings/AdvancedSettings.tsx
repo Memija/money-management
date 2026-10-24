@@ -25,7 +25,9 @@ export const AdvancedSettings: React.FC = () => {
     let withoutLogo = 0
     let eligibleTotal = 0
     for (let i = 0; i < allTxs.length; i++) {
-      if (allTxs[i].isGhost) continue
+      if (allTxs[i].isGhost) {
+        continue
+      }
       eligibleTotal++
       if (!hasMerchantLogo(allTxs[i].description, allTxs[i].counterpartyIban)) {
         withoutLogo++

@@ -98,7 +98,9 @@ const GENERIC_STATEMENT_WORDS_REGEX = /\bpurchases?\b/g
  * Results are memoized since this scans every popular merchant and is called for each rendered row.
  */
 export function findMatchingMerchant(text: string): MerchantSuggestion | undefined {
-  if (!text) return undefined
+  if (!text) {
+    return undefined
+  }
   return memoizedFindMatchingMerchant(text)
 }
 
@@ -196,7 +198,9 @@ const memoizedFindMatchingMerchant = memoizeStringFn(computeMatchingMerchant)
  * Inspects description, and falls back to counterparty IBAN if no brand logo matches the description.
  */
 export function hasMerchantLogo(description?: string, counterpartyIban?: string): boolean {
-  if (!description && !counterpartyIban) return false
+  if (!description && !counterpartyIban) {
+    return false
+  }
   let merchant = description ? findMatchingMerchant(description) : undefined
   if ((!merchant || !merchant.logo) && counterpartyIban) {
     const ibanMerchant = findMatchingMerchant(counterpartyIban)

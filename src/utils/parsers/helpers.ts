@@ -27,7 +27,9 @@ export function parseCurrency(raw: string | undefined): string {
 }
 
 export function parseAmount(raw: string | number): number {
-  if (typeof raw === 'number') return raw
+  if (typeof raw === 'number') {
+    return raw
+  }
 
   // Normalize Unicode minus/dash variants
   const cleanedStr = raw
@@ -60,13 +62,17 @@ export function parseAmount(raw: string | number): number {
   }
 
   const num = parseFloat(cleaned)
-  if (isNaN(num)) return 0
+  if (isNaN(num)) {
+    return 0
+  }
 
   return isNegative ? -Math.abs(num) : Math.abs(num)
 }
 
 export function parseDate(raw: string): string {
-  if (!raw) return new Date().toISOString().split('T')[0]
+  if (!raw) {
+    return new Date().toISOString().split('T')[0]
+  }
   // Try to parse DD.MM.YYYY (common German format)
   const deMatch = raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/)
   if (deMatch) {
@@ -75,7 +81,9 @@ export function parseDate(raw: string): string {
   }
   // Try ISO format
   const isoMatch = raw.match(/^\d{4}-\d{2}-\d{2}/)
-  if (isoMatch) return isoMatch[0]
+  if (isoMatch) {
+    return isoMatch[0]
+  }
   // Try MM/DD/YYYY
   const usMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/)
   if (usMatch) {

@@ -70,7 +70,9 @@ const AvgRow: React.FC<AvgRowProps> = ({
     onKeyDown={
       onClick
         ? (e) => {
-            if (e.key === 'Enter' || e.key === ' ') onClick()
+            if (e.key === 'Enter' || e.key === ' ') {
+              onClick()
+            }
           }
         : undefined
     }

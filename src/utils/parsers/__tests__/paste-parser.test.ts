@@ -227,4 +227,3 @@ Saldo: 1.000,00 EUR
     expect(ibans).toContain('DE89370501981234567890')
   })
 })
-

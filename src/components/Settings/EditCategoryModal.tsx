@@ -195,7 +195,9 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   category,
   onSave,
 }) => {
-  if (!isOpen || !category) return null
+  if (!isOpen || !category) {
+    return null
+  }
 
   return createPortal(
     <AnimatePresence>

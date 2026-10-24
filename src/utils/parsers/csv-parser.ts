@@ -32,7 +32,9 @@ export function findHeaderRowIndex(rows: string[][]): number {
     const cells = rows[i].map((c) => c.toLowerCase().trim())
     const hasDate = cells.some((c) => DATE_HINTS.some((k) => c.includes(k)))
     const hasAmount = cells.some((c) => AMOUNT_HINTS.some((k) => c.includes(k)))
-    if (hasDate && hasAmount) return i
+    if (hasDate && hasAmount) {
+      return i
+    }
   }
   return 0 // fallback: treat row 0 as header
 }
@@ -45,7 +47,9 @@ export function findHeaderRowIndex(rows: string[][]): number {
  *                      (prevents 'wert' matching 'wertstellung', 'umsatz' matching 'umsatzart')
  */
 function headerMatches(h: string, keywords: string[], phrases: string[] = []): boolean {
-  if (phrases.some((p) => h === p || h.startsWith(p))) return true
+  if (phrases.some((p) => h === p || h.startsWith(p))) {
+    return true
+  }
   const tokens = h.split(/[^a-zäöüß0-9]+/).filter(Boolean)
   return keywords.some((k) => tokens.includes(k))
 }
@@ -306,17 +310,24 @@ function detectColumnIndices(header: string[]): ColumnIndices {
       h === 'gross' ||
       h.startsWith('gross'),
   )
-  if (betragIdx !== -1 && betragIdx !== amountIdx) amountIdx = betragIdx
+  if (betragIdx !== -1 && betragIdx !== amountIdx) {
+    amountIdx = betragIdx
+  }
 
   // ── Soll / Haben split columns (Deutsche Bank and some older formats) ────────
   const sollIdx = header.findIndex((h) => h === 'soll')
   const habenIdx = header.findIndex((h) => h === 'haben')
 
   // Fallbacks
-  if (dateIdx === -1) dateIdx = 0
-  if (descIdx === -1) descIdx = Math.min(1, header.length - 1)
-  if (amountIdx === -1 && sollIdx === -1 && habenIdx === -1)
+  if (dateIdx === -1) {
+    dateIdx = 0
+  }
+  if (descIdx === -1) {
+    descIdx = Math.min(1, header.length - 1)
+  }
+  if (amountIdx === -1 && sollIdx === -1 && habenIdx === -1) {
     amountIdx = Math.min(header.length - 1, 2)
+  }
 
   return {
     dateIdx,
@@ -335,7 +346,9 @@ function detectColumnIndices(header: string[]): ColumnIndices {
 }
 
 function parseRow(row: string[], indices: ColumnIndices, institution: string): Transaction | null {
-  if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) return null
+  if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) {
+    return null
+  }
 
   const {
     dateIdx,
@@ -510,7 +523,9 @@ export function findSpaceTransferRowIndices(
   // Step 1: Direct space transfers
   for (let i = 1; i < dataRows.length; i++) {
     const row = dataRows[i]
-    if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) continue
+    if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) {
+      continue
+    }
 
     const partner = row[pIdx]?.toString().trim().toLowerCase()
     if (partner && accountNames.has(partner)) {
@@ -537,14 +552,20 @@ export function findSpaceTransferRowIndices(
   }
 
   for (let i = 1; i < dataRows.length; i++) {
-    if (discarded.has(i)) continue
+    if (discarded.has(i)) {
+      continue
+    }
 
     const row = dataRows[i]
-    if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) continue
+    if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) {
+      continue
+    }
 
     const partnerIban = ibanIdx !== -1 ? row[ibanIdx]?.toString().trim() : ''
     // External transfers to third parties or other banks have an IBAN
-    if (partnerIban) continue
+    if (partnerIban) {
+      continue
+    }
 
     const account = row[accountIdx]?.toString().trim().toLowerCase()
     const date = row[dateIdx]?.toString().trim() ?? ''
@@ -552,10 +573,14 @@ export function findSpaceTransferRowIndices(
     const oppKey = `${date}|${Math.round(-amount * 100)}`
 
     const candidates = directByDateAndCents.get(oppKey)
-    if (!candidates) continue
+    if (!candidates) {
+      continue
+    }
 
     for (const otherIdx of candidates) {
-      if (pairedDirectSide.has(otherIdx)) continue
+      if (pairedDirectSide.has(otherIdx)) {
+        continue
+      }
 
       const other = dataRows[otherIdx]
       const otherPartner = other[pIdx]?.toString().trim().toLowerCase()
@@ -586,24 +611,26 @@ export function rowsToTransactionsWithMeta(
   institution: string,
   t?: TranslationStrings,
 ): ParsedCsvTransactionsResult {
-  if (rows.length < 2)
+  if (rows.length < 2) {
     return {
       transactions: [],
       discardedSpaceCount: 0,
       detectedAccountIbans: [],
       excludedSpaceTransactions: [],
     }
+  }
 
   // Skip preamble rows
   const headerRowIdx = findHeaderRowIndex(rows)
   const dataRows = rows.slice(headerRowIdx)
-  if (dataRows.length < 2)
+  if (dataRows.length < 2) {
     return {
       transactions: [],
       discardedSpaceCount: 0,
       detectedAccountIbans: [],
       excludedSpaceTransactions: [],
     }
+  }
 
   // Normalise header cells: lowercase, strip surrounding quotes
   const header = dataRows[0].map((h) => h?.toString().toLowerCase().trim() ?? '')
@@ -616,7 +643,9 @@ export function rowsToTransactionsWithMeta(
 
   for (let i = 1; i < dataRows.length; i++) {
     const row = dataRows[i]
-    if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) continue
+    if (!row || row.every((cell) => !cell || cell.toString().trim() === '')) {
+      continue
+    }
 
     if (spaceTransferIndices.has(i)) {
       const transaction = parseRow(row, indices, institution)

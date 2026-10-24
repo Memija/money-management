@@ -34,7 +34,9 @@ const CountrySelector: React.FC = () => {
   })
 
   const handleSelect = (country: Country) => {
-    if (!country.supported) return
+    if (!country.supported) {
+      return
+    }
     setSelected(country)
     setIsOpen(false)
     setSearch('')

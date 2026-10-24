@@ -63,7 +63,9 @@ export const TopMerchants: React.FC<TopMerchantsProps> = React.memo(
     }, [merchants])
 
     const topSharePct = useMemo(() => {
-      if (!totalExpenses || totalExpenses <= 0) return null
+      if (!totalExpenses || totalExpenses <= 0) {
+        return null
+      }
       return ((totalTopSpend / totalExpenses) * 100).toFixed(1)
     }, [totalTopSpend, totalExpenses])
 

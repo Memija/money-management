@@ -47,7 +47,9 @@ export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const trimmed = name.trim()
-    if (!trimmed) return
+    if (!trimmed) {
+      return
+    }
 
     const id = `custom_${Date.now()}`
     addCustomCategory({
@@ -116,7 +118,9 @@ export const QuickCategoryModal: React.FC<QuickCategoryModalProps> = ({
             <div className={styles.iconSelectorRow}>
               {QUICK_ICONS.map((iconKey) => {
                 const IconComp = AVAILABLE_ICONS[iconKey]
-                if (!IconComp) return null
+                if (!IconComp) {
+                  return null
+                }
                 const isSelected = selectedIcon === iconKey
                 const color = ICON_COLORS[iconKey] || '#8b5cf6'
                 const localizedTitle = t.icons?.[iconKey] || iconKey

@@ -56,7 +56,9 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
     }
   }, [isOpen, targetTransaction, newCategory, relatedTransactions])
 
-  if (!targetTransaction) return null
+  if (!targetTransaction) {
+    return null
+  }
 
   const targetCategoryLabel = getCategoryLabel(newCategory, t, locale, customCategories)
   const targetCategoryColor = getCategoryColor(newCategory, customCategories)
@@ -281,7 +283,9 @@ export const BatchCategoryModal: React.FC<BatchCategoryModalProps> = ({
                   className={`${styles.relatedItem} ${isSelected ? styles.relatedItemSelected : ''}`}
                   data-testid={`related-tx-${tx.id}`}
                   onClick={(e) => {
-                    if ((e.target as HTMLElement).closest('button')) return
+                    if ((e.target as HTMLElement).closest('button')) {
+                      return
+                    }
                     handleToggleTx(tx.id)
                   }}
                 >

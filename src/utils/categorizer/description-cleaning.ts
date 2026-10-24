@@ -6,7 +6,9 @@ import { createBoundedCache, memoizeStringFn } from '../bounded-cache'
  * Informative transactions have no impact on the balance and are never categorized.
  */
 export function isInformativeTransaction(tx?: { amount?: number } | null): boolean {
-  if (!tx || typeof tx.amount !== 'number') return false
+  if (!tx || typeof tx.amount !== 'number') {
+    return false
+  }
   return tx.amount === 0
 }
 
@@ -302,7 +304,9 @@ const memoizedApplyWordRepairRules = memoizeStringFn(applyWordRepairRules)
  * Results are memoized because the ~200 repair rules are costly to run per render.
  */
 export function repairBrokenWords(text: string): string {
-  if (!text || typeof text !== 'string') return ''
+  if (!text || typeof text !== 'string') {
+    return ''
+  }
   return memoizedApplyWordRepairRules(text)
 }
 
@@ -333,7 +337,9 @@ export const normalizeDescription = (desc: string): string => {
  * Results are memoized because the ~30 cleaning regexes are costly to run per render.
  */
 export function extractCleanDescription(desc: string): string {
-  if (!desc || typeof desc !== 'string') return ''
+  if (!desc || typeof desc !== 'string') {
+    return ''
+  }
   return memoizedComputeCleanDescription(desc)
 }
 
@@ -453,7 +459,9 @@ function computeCleanDescription(desc: string): string {
  * as opposed to a direct balance transfer, account debit, or fee with the processor itself.
  */
 export function isPaymentProcessorIntermediary(text: string): boolean {
-  if (!text || typeof text !== 'string') return false
+  if (!text || typeof text !== 'string') {
+    return false
+  }
   const t = repairBrokenWords(text)
 
   // Direct PayPal balance transfer or account debit actions are direct, not intermediary purchases
@@ -499,7 +507,9 @@ export function isPaymentProcessorIntermediary(text: string): boolean {
  * Such terms must never be learned as category rules or matched across different transactions as shared prefixes.
  */
 export function isPaymentProcessorOnly(text: string): boolean {
-  if (!text || typeof text !== 'string') return false
+  if (!text || typeof text !== 'string') {
+    return false
+  }
   const stripped = text
     .replace(
       /(?:\by?paypal(?:\s*\([^)]*\))?|\bklarna(?:\s+bank|\s+payments?)?|\bsumup(?:\s+payments?|\s+ltd\.?|\s+limited)?|\bstripe(?:\s+payments?)?|\bpayoneer\b|\bpayone\b|s\.?\s*a\.?\s*r\.?\s*l\.?|et\s*cie|s\.?\s*c\.?\s*a\.?|\bsc\b|\beurope\b|\beuropa\b|\bgmbh\b|\bag\b|\bse\b|\bltd\.?\b|\blimited\b|\bab\b|\bbv\b|\bpp\b|\bpp\.[0-9\s]*\.?pp\b|\b\d+\b|[.,/:\s*-])/giu,
@@ -515,11 +525,15 @@ export function isPaymentProcessorOnly(text: string): boolean {
  * Useful for learning smart category rules that match future transactions from the same merchant.
  */
 export function extractMerchantKeyword(desc: string): string {
-  if (!desc || typeof desc !== 'string') return ''
+  if (!desc || typeof desc !== 'string') {
+    return ''
+  }
 
   // Start with clean description
   let merchant = extractCleanDescription(desc)
-  if (!merchant) return ''
+  if (!merchant) {
+    return ''
+  }
 
   // Direct PayPal account debit or direct transaction with PayPal itself
   if (
@@ -672,7 +686,9 @@ export function extractMerchantKeyword(desc: string): string {
  */
 export function formatMerchantDisplayName(name: string): string {
   const trimmed = name.trim().replace(/\s+/g, ' ')
-  if (!trimmed) return ''
+  if (!trimmed) {
+    return ''
+  }
 
   // If already mixed case (contains both lowercase and uppercase letters), preserve as-is
   if (/[a-z]/.test(trimmed) && /[A-Z]/.test(trimmed)) {
@@ -688,8 +704,12 @@ export function formatMerchantDisplayName(name: string): string {
     }
     return words
       .map((word) => {
-        if (/^[A-Z]\.?$/.test(word)) return word
-        if (word.length <= 1) return word
+        if (/^[A-Z]\.?$/.test(word)) {
+          return word
+        }
+        if (word.length <= 1) {
+          return word
+        }
         return word
           .split('-')
           .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() : ''))
@@ -714,7 +734,9 @@ const merchantCache = createBoundedCache<string>()
 export function getTransactionMerchant(
   tx: Transaction | { description: string; partner?: string },
 ): string {
-  if (!tx) return ''
+  if (!tx) {
+    return ''
+  }
 
   const cacheKey = `${tx.partner ?? ''}${MERCHANT_CACHE_KEY_SEPARATOR}${tx.description ?? ''}`
   const cached = merchantCache.get(cacheKey)
@@ -775,7 +797,9 @@ function computeTransactionMerchant(tx: { description: string; partner?: string 
  * (e.g., same core merchant or recurring charge with different SEPA/card reference IDs).
  */
 export function isRelatedTransaction(descA: string, descB: string): boolean {
-  if (!descA || !descB) return false
+  if (!descA || !descB) {
+    return false
+  }
 
   const cleanA = extractCleanDescription(descA).toLowerCase()
   const cleanB = extractCleanDescription(descB).toLowerCase()
@@ -783,14 +807,18 @@ export function isRelatedTransaction(descA: string, descB: string): boolean {
   // 1. Exact match on clean description (if length >= 3)
   // Transactions that are purely generic payment processors without merchant must not match
   if (cleanA.length >= 3 && cleanA === cleanB) {
-    if (!isPaymentProcessorOnly(cleanA)) return true
+    if (!isPaymentProcessorOnly(cleanA)) {
+      return true
+    }
   }
 
   // 2. Normalized description fallback
   const normA = normalizeDescription(descA)
   const normB = normalizeDescription(descB)
   if (normA.length >= 3 && normA === normB) {
-    if (!isPaymentProcessorOnly(normA)) return true
+    if (!isPaymentProcessorOnly(normA)) {
+      return true
+    }
   }
 
   // 3. Prefix matching: if one clean string starts with the other on a word boundary
@@ -826,8 +854,9 @@ export function findRelatedTransactions(
     !allTransactions ||
     allTransactions.length === 0 ||
     isInformativeTransaction(targetTx)
-  )
+  ) {
     return []
+  }
 
   const seenIds = new Set<string>()
   const results: Transaction[] = []

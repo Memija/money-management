@@ -66,7 +66,9 @@ export const getLocalizedMonthNames = (locale: string, format: MonthFormat = 'sh
 
   const cacheKey = `${locale}_${format}`
   const cached = monthNamesCache.get(cacheKey)
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
 
   const names = Array.from({ length: 12 }, (_, i) => {
     const d = new Date(2023, i, 1)
@@ -84,7 +86,9 @@ export const getLocalizedWeekdays = (locale: string): string[] => {
   }
 
   const cached = weekdaysCache.get(locale)
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
 
   const days = Array.from({ length: 7 }, (_, i) => {
     // January 2, 2023 was a Monday
@@ -122,11 +126,15 @@ export const formatMonthYearLocalized = (
   locale: string,
   yearFormat: '2-digit' | 'numeric' = '2-digit',
 ): string => {
-  if (!dateString) return ''
+  if (!dateString) {
+    return ''
+  }
   const validYearFormat = yearFormat === 'numeric' ? 'numeric' : '2-digit'
   const cacheKey = `${dateString}_${locale}_${validYearFormat}`
   const cached = monthYearCache.get(cacheKey)
-  if (cached !== undefined) return cached
+  if (cached !== undefined) {
+    return cached
+  }
 
   if (!/^\d{4}-\d{2}/.test(dateString)) {
     monthYearCache.set(cacheKey, dateString)
@@ -162,8 +170,12 @@ export const formatMonthYearLocalized = (
  * e.g. generateMonthRange('2025-10', '2026-02') -> ['2025-10', '2025-11', '2025-12', '2026-01', '2026-02']
  */
 export function generateMonthRange(startMonth: string, endMonth: string): string[] {
-  if (!startMonth || !endMonth) return []
-  if (startMonth > endMonth) return [startMonth]
+  if (!startMonth || !endMonth) {
+    return []
+  }
+  if (startMonth > endMonth) {
+    return [startMonth]
+  }
 
   const [startYear, startM] = startMonth.split('-').map(Number)
   const [endYear, endM] = endMonth.split('-').map(Number)

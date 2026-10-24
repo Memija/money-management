@@ -108,7 +108,9 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
     const handleLegendClick = useCallback(
       (e: { dataKey?: unknown }) => {
         const dataKey = typeof e.dataKey === 'string' ? e.dataKey : undefined
-        if (!dataKey) return
+        if (!dataKey) {
+          return
+        }
 
         setHiddenSeries((prev) => {
           const isCurrentlyHidden = prev[dataKey]
@@ -168,24 +170,38 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
     }, [visibleData])
 
     const gradientOffset = useMemo(() => {
-      if (chartData.length === 0) return 0
+      if (chartData.length === 0) {
+        return 0
+      }
 
       let dataMax = -Infinity
       let dataMin = Infinity
       for (const d of chartData) {
-        if (d.cumulativeNet > dataMax) dataMax = d.cumulativeNet
-        if (d.cumulativeNet < dataMin) dataMin = d.cumulativeNet
+        if (d.cumulativeNet > dataMax) {
+          dataMax = d.cumulativeNet
+        }
+        if (d.cumulativeNet < dataMin) {
+          dataMin = d.cumulativeNet
+        }
       }
 
-      if (dataMax <= 0) return 0
-      if (dataMin >= 0) return 1
-      if (dataMax === dataMin) return 0
+      if (dataMax <= 0) {
+        return 0
+      }
+      if (dataMin >= 0) {
+        return 1
+      }
+      if (dataMax === dataMin) {
+        return 0
+      }
 
       return dataMax / (dataMax - dataMin)
     }, [chartData])
 
     const subtitleText = useMemo(() => {
-      if (monthlyData.length === 0) return ''
+      if (monthlyData.length === 0) {
+        return ''
+      }
       if (isZoomed) {
         const template = t.showingMonths || '{visible} of {total} months'
         const countText = template

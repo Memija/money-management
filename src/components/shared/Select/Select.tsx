@@ -56,7 +56,9 @@ export const Select = <T extends string | number = string>({
 
   // Close when clicking outside
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) {
+      return
+    }
 
     const handleClickOutside = (event: Event) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -76,7 +78,9 @@ export const Select = <T extends string | number = string>({
   }, [isOpen, onOpenChange])
 
   const handleToggle = () => {
-    if (disabled) return
+    if (disabled) {
+      return
+    }
     const next = !isOpen
     setIsOpen(next)
     onOpenChange?.(next)
@@ -94,7 +98,9 @@ export const Select = <T extends string | number = string>({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (disabled) return
+    if (disabled) {
+      return
+    }
 
     if (e.key === 'Escape') {
       if (isOpen) {

@@ -34,7 +34,9 @@ export const UnlockDuplicateModal: React.FC<UnlockDuplicateModalProps> = ({
   const t = useLanguageStore((s) => s.t)
   const [rememberRule, setRememberRule] = React.useState(true)
 
-  if (!transaction) return null
+  if (!transaction) {
+    return null
+  }
 
   const handleConfirm = (unlockAll = false) => {
     if (unlockAll) {

@@ -147,7 +147,9 @@ export const GERMAN_STATES: Record<GermanStateCode, GermanStateMetadata> = {
  * Normalizes an arbitrary state name or code to a 2-letter German state code.
  */
 export function normalizeGermanStateCode(input: string): GermanStateCode | undefined {
-  if (!input || typeof input !== 'string') return undefined
+  if (!input || typeof input !== 'string') {
+    return undefined
+  }
   const cleaned = input.toLowerCase().trim().replace(/^de-?/, '')
   if (cleaned in GERMAN_STATES) {
     return cleaned as GermanStateCode

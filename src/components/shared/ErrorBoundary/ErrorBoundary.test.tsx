@@ -82,4 +82,36 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Normal Content')).toBeInTheDocument()
     expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument()
   })
+
+  it('reloads the page when Try Again is clicked on a dynamically imported module error', async () => {
+    const user = userEvent.setup()
+    const originalReload = window.location.reload
+    const reloadMock = vi.fn()
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, reload: reloadMock },
+    })
+
+    const ThrowChunkError = () => {
+      throw new Error('Failed to fetch dynamically imported module: http://localhost:5173/src/components/Dashboard')
+    }
+
+    render(
+      <ErrorBoundary>
+        <ThrowChunkError />
+      </ErrorBoundary>,
+    )
+
+    const tryAgainButton = screen.getByRole('button', { name: /try again/i })
+    await user.click(tryAgainButton)
+
+    expect(reloadMock).toHaveBeenCalledTimes(1)
+
+    // Restore
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, reload: originalReload },
+    })
+  })
 })
+

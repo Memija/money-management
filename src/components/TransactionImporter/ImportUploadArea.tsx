@@ -44,7 +44,9 @@ export const ImportUploadArea: React.FC<ImportUploadAreaProps> = ({
       e.preventDefault()
       setDragOver(false)
       const file = e.dataTransfer.files[0]
-      if (file) onFileChange(file)
+      if (file) {
+        onFileChange(file)
+      }
     },
     [onFileChange],
   )
@@ -85,7 +87,9 @@ export const ImportUploadArea: React.FC<ImportUploadAreaProps> = ({
             accept={ACCEPT_TYPES[method]}
             onChange={(e) => {
               const file = e.target.files?.[0]
-              if (file) onFileChange(file)
+              if (file) {
+                onFileChange(file)
+              }
             }}
             className={styles['hidden']}
             id="file-input"

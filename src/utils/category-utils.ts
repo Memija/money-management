@@ -39,12 +39,18 @@ const canonicalCategoryCache = new Map<string, string>()
  * to its standardized canonical category key ('Salary', 'Rent', 'Groceries', 'Dining Out', etc.).
  */
 export function resolveCanonicalCategory(name: string): string {
-  if (!name || typeof name !== 'string') return 'Other'
+  if (!name || typeof name !== 'string') {
+    return 'Other'
+  }
   const trimmed = name.trim()
-  if (!trimmed) return 'Other'
+  if (!trimmed) {
+    return 'Other'
+  }
 
   const cached = canonicalCategoryCache.get(trimmed)
-  if (cached !== undefined) return cached
+  if (cached !== undefined) {
+    return cached
+  }
 
   let result = 'Other'
   // 1. Exact match against canonical category keys
@@ -157,7 +163,9 @@ export function propagateLoanCategories<T extends Transaction>(
   transactions: T[],
   manualCategories?: Record<string, string>,
 ): T[] {
-  if (!transactions || transactions.length === 0) return transactions
+  if (!transactions || transactions.length === 0) {
+    return transactions
+  }
 
   // 1. Identify all merchants / payees associated with explicit loan payments
   const loanMerchants = new Set<string>()
@@ -165,7 +173,9 @@ export function propagateLoanCategories<T extends Transaction>(
   const loanRawDescriptions: string[] = []
 
   for (const tx of transactions) {
-    if (isInformativeTransaction(tx)) continue
+    if (isInformativeTransaction(tx)) {
+      continue
+    }
     const cat = tx.category
     const desc = tx.description || ''
     const isExplicitLoan =
@@ -191,10 +201,18 @@ export function propagateLoanCategories<T extends Transaction>(
   // 2. Propagate 'Loans' to sibling transactions with stripped memos
   let hasChanges = false
   const updated = transactions.map((tx) => {
-    if (isInformativeTransaction(tx)) return tx
-    if (manualCategories && manualCategories[tx.id]) return tx
-    if (tx.isModified && tx.category) return tx
-    if (tx.category === 'Loans') return tx
+    if (isInformativeTransaction(tx)) {
+      return tx
+    }
+    if (manualCategories && manualCategories[tx.id]) {
+      return tx
+    }
+    if (tx.isModified && tx.category) {
+      return tx
+    }
+    if (tx.category === 'Loans') {
+      return tx
+    }
 
     // Only update transactions that defaulted to 'Transfers', 'Other', or unassigned
     if (tx.category && tx.category !== 'Transfers' && tx.category !== 'Other') {
@@ -390,9 +408,13 @@ export function formatCategoryPercent(
   total: number,
   locale: string = 'en',
 ): string {
-  if (amount <= 0 || total <= 0) return '0%'
+  if (amount <= 0 || total <= 0) {
+    return '0%'
+  }
   const pct = (amount / total) * 100
-  if (pct < 0.05) return '<0.1%'
+  if (pct < 0.05) {
+    return '<0.1%'
+  }
   if (pct < 0.95) {
     const isEuropean = locale === 'de' || locale === 'bs' || locale === 'sr' || locale === 'pl'
     const formatted = pct.toFixed(1)
@@ -414,7 +436,9 @@ export function hasExtensiveCategoryData(
   data?: Array<Record<string, unknown>> | null,
   categoriesCount?: number,
 ): boolean {
-  if (!data || data.length === 0) return false
+  if (!data || data.length === 0) {
+    return false
+  }
   const monthsCount = data.length
 
   let numCategories = categoriesCount

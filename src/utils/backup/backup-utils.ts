@@ -178,7 +178,9 @@ const validateAccount = (rawAcc: unknown, accIndex: number): ValidationErrorInfo
 
   for (let i = 0; i < acc.transactions.length; i++) {
     const err = validateTransaction(acc.transactions[i], name, i, 'transactions')
-    if (err) return err
+    if (err) {
+      return err
+    }
   }
 
   if (acc.duplicateTransactions !== undefined) {
@@ -198,7 +200,9 @@ const validateAccount = (rawAcc: unknown, accIndex: number): ValidationErrorInfo
         i,
         'duplicateTransactions',
       )
-      if (err) return err
+      if (err) {
+        return err
+      }
     }
   }
 
@@ -214,7 +218,9 @@ const validateAccount = (rawAcc: unknown, accIndex: number): ValidationErrorInfo
     }
     for (let i = 0; i < acc.modifiedTransactions.length; i++) {
       const err = validateTransaction(acc.modifiedTransactions[i], name, i, 'modifiedTransactions')
-      if (err) return err
+      if (err) {
+        return err
+      }
     }
   }
 

@@ -57,7 +57,9 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = React
 
     // Close on outside click
     useEffect(() => {
-      if (!isOpen) return
+      if (!isOpen) {
+        return
+      }
       const handleClickOutside = (event: Event) => {
         const target = event.target as Node
         if (
@@ -81,7 +83,9 @@ export const StickyAccountSwitcher: React.FC<StickyAccountSwitcherProps> = React
 
     // Close on escape key
     useEffect(() => {
-      if (!isOpen) return
+      if (!isOpen) {
+        return
+      }
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           setIsOpen(false)

@@ -203,7 +203,9 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
 
     // Selected day duration calculation
     const selectedDayCount = useMemo(() => {
-      if (!draftStart || !draftEnd) return 0
+      if (!draftStart || !draftEnd) {
+        return 0
+      }
       const d1 = new Date(draftStart)
       const d2 = new Date(draftEnd)
       const diffTime = Math.abs(d2.getTime() - d1.getTime())
@@ -419,16 +421,12 @@ export const CustomRangePicker: React.FC<CustomRangePickerProps> = React.memo(
                             ${isSingleDay ? styles.singleDayRange : ''}
                           `}
                           onClick={() => !isDisabled && handleDayClick(dateStr)}
-                          onMouseEnter={() =>
-                            draftStart && !draftEnd && setHoverDate(dateStr)
-                          }
+                          onMouseEnter={() => draftStart && !draftEnd && setHoverDate(dateStr)}
                           aria-label={`${d}`}
                           disabled={isDisabled}
                         >
                           <span className={styles.dayNum}>{d}</span>
-                          {isToday && !(isStart || isEnd) && (
-                            <span className={styles.todayDot} />
-                          )}
+                          {isToday && !(isStart || isEnd) && <span className={styles.todayDot} />}
                         </button>
                       </div>
                     )

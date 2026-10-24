@@ -31,12 +31,16 @@ export const useDropdownPosition = ({
   align = 'left',
 }: UseDropdownPositionOptions) => {
   useLayoutEffect(() => {
-    if (!isOpen || typeof window === 'undefined') return
+    if (!isOpen || typeof window === 'undefined') {
+      return
+    }
 
     const updatePosition = () => {
       const dropdown = dropdownRef.current
       const trigger = triggerRef.current
-      if (!dropdown || !trigger) return
+      if (!dropdown || !trigger) {
+        return
+      }
 
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
@@ -59,7 +63,9 @@ export const useDropdownPosition = ({
       if (typeof document !== 'undefined' && topObstructionSelector) {
         const stickyElements = document.querySelectorAll(topObstructionSelector)
         stickyElements.forEach((el) => {
-          if (el.contains(trigger)) return
+          if (el.contains(trigger)) {
+            return
+          }
           const rect = el.getBoundingClientRect()
           if (rect.bottom > headerBottom && rect.top >= 0 && rect.bottom < viewportHeight * 0.5) {
             headerBottom = rect.bottom

@@ -83,8 +83,12 @@ export const CustomPeriodPicker: React.FC<CustomPeriodPickerProps> = React.memo(
 
     // --- Display Label Formatting ---
     const displayLabel = useMemo(() => {
-      if (!value) return ''
-      if (mode === 'year') return value
+      if (!value) {
+        return ''
+      }
+      if (mode === 'year') {
+        return value
+      }
       if (mode === 'quarter') {
         const [y, q] = value.split('-')
         return `${q} ${y}`
