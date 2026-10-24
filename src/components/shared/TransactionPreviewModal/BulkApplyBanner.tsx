@@ -49,15 +49,13 @@ export const BulkApplyBanner: React.FC<BulkApplyBannerProps> = ({
         <span>
           {isUnlockedTarget
             ? bulkApplyOffer.unlockedTargetIds.length === 1
-              ? t.bulkApplyUnlockedOfferSingular ||
-                'Apply changes to 1 other unlocked transaction?'
+              ? t.bulkApplyUnlockedOfferSingular || 'Apply changes to 1 other unlocked transaction?'
               : (
                   t.bulkApplyUnlockedOffer ||
                   'Apply changes to {count} other unlocked transactions?'
                 ).replace('{count}', String(bulkApplyOffer.unlockedTargetIds.length))
             : (
-                t.bulkApplyOffer ||
-                'Apply this change to {count} other identical transaction(s)?'
+                t.bulkApplyOffer || 'Apply this change to {count} other identical transaction(s)?'
               ).replace('{count}', String(bulkApplyOffer.identicalTargetIds.length))}
         </span>
       </div>

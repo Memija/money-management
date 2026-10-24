@@ -81,7 +81,12 @@ export function findRelatedTransactions(
   const results: Transaction[] = []
 
   for (const candidate of allTransactions) {
-    if (!candidate || candidate.id === targetTx.id || candidate.isGhost || isInformativeTx(candidate)) {
+    if (
+      !candidate ||
+      candidate.id === targetTx.id ||
+      candidate.isGhost ||
+      isInformativeTx(candidate)
+    ) {
       continue
     }
 

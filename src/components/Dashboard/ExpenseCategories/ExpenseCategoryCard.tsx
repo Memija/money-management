@@ -70,9 +70,7 @@ export const ExpenseCategoryCard: React.FC<ExpenseCategoryCardProps> = React.mem
       >
         <div className={styles.cardTop}>
           <div className={styles.cardCategoryInfo}>
-            <span className={`${styles.rankPill} ${getRankBadgeClass(index)}`}>
-              #{index + 1}
-            </span>
+            <span className={`${styles.rankPill} ${getRankBadgeClass(index)}`}>#{index + 1}</span>
             <div className={styles.iconBox}>
               <CategoryIcon
                 category={cat.name}
@@ -84,9 +82,7 @@ export const ExpenseCategoryCard: React.FC<ExpenseCategoryCardProps> = React.mem
               {label}
             </span>
           </div>
-          <span className={`${styles.cardValue} privacy-blur`}>
-            {formatCurrency(cat.value)}
-          </span>
+          <span className={`${styles.cardValue} privacy-blur`}>{formatCurrency(cat.value)}</span>
         </div>
 
         <div className={styles.cardBottom}>

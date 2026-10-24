@@ -259,5 +259,3 @@ export function getCategoryIcon(
   const IconComponent = CANONICAL_CATEGORY_ICONS[canonical] || Package
   return React.createElement(IconComponent, { size, color: categoryColor })
 }
-
-

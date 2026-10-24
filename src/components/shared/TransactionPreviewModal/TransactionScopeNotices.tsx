@@ -48,10 +48,7 @@ export const TransactionScopeNotices: React.FC<TransactionScopeNoticesProps> = (
 
   if (scopeFilter === 'already-duplicated') {
     return (
-      <div
-        className={styles['already-duplicated-notice']}
-        data-testid="already-duplicated-notice"
-      >
+      <div className={styles['already-duplicated-notice']} data-testid="already-duplicated-notice">
         <Lock size={15} aria-hidden="true" />
         <span>
           {t.alreadyDuplicatedFilterNotice ||
@@ -80,10 +77,7 @@ export const TransactionScopeNotices: React.FC<TransactionScopeNoticesProps> = (
 
   if (scopeFilter === 'internal-transfers') {
     return (
-      <div
-        className={styles['internal-transfers-notice']}
-        data-testid="internal-transfers-notice"
-      >
+      <div className={styles['internal-transfers-notice']} data-testid="internal-transfers-notice">
         <Ghost size={15} aria-hidden="true" />
         <span>
           {accountFilter === 'current' || accountFilter === currentAccountName

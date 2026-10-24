@@ -21,11 +21,7 @@ import styles from './Settings.module.css'
 
 export const Settings: React.FC = () => {
   const t = useLanguageStore((s) => s.t)
-  const {
-    importedAccounts,
-    duplicateOverrideRules,
-    setStep,
-  } = useAppStore()
+  const { importedAccounts, duplicateOverrideRules, setStep } = useAppStore()
 
   const [activeTab, setActiveTab] = useState<
     'categories' | 'duplicate-rules' | 'advanced' | 'data'

@@ -2,20 +2,13 @@ import type { StateCreator } from 'zustand'
 
 import type { AppState, UISlice } from './types'
 
-export const createUISlice: StateCreator<
-  AppState,
-  [],
-  [],
-  UISlice
-> = (set, _get, store) => ({
+export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, _get, store) => ({
   filterTransactionsWithoutLogos: false,
   detachTransactionsFromDashboard: false,
 
-  setFilterTransactionsWithoutLogos: (enabled) =>
-    set({ filterTransactionsWithoutLogos: enabled }),
+  setFilterTransactionsWithoutLogos: (enabled) => set({ filterTransactionsWithoutLogos: enabled }),
 
-  setDetachTransactionsFromDashboard: (detach) =>
-    set({ detachTransactionsFromDashboard: detach }),
+  setDetachTransactionsFromDashboard: (detach) => set({ detachTransactionsFromDashboard: detach }),
 
   clearAllData: (resetPreferences = false) => {
     set({

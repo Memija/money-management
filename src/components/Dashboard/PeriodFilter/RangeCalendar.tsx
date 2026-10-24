@@ -1,10 +1,5 @@
 import React from 'react'
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/translations'
 
@@ -126,11 +121,7 @@ export const RangeCalendar: React.FC<RangeCalendarProps> = React.memo(
               draftStart && draftEnd && dateStr > draftStart && dateStr < draftEnd,
             )
             const isHoverPreview = Boolean(
-              draftStart &&
-              !draftEnd &&
-              hoverDate &&
-              dateStr > draftStart &&
-              dateStr <= hoverDate,
+              draftStart && !draftEnd && hoverDate && dateStr > draftStart && dateStr <= hoverDate,
             )
             const isToday = dateStr === todayStr
             const isDisabled = Boolean(

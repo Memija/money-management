@@ -17,11 +17,7 @@ import {
   isInformativeTransaction,
   propagateLoanCategories,
 } from '../utils/category-utils'
-import {
-  filterByPeriod,
-  getAvailablePeriods,
-  type PeriodFilter,
-} from '../utils/period-utils'
+import { filterByPeriod, getAvailablePeriods, type PeriodFilter } from '../utils/period-utils'
 
 export type { MerchantEntry, MonthlyCategoryEntry } from '../utils/analytics-utils'
 export { getCategoryColorIndex } from '../utils/analytics-utils'
@@ -220,20 +216,11 @@ export const useAnalytics = (
   }, [periodTransactions, formatMonthYear])
 
   // Top merchants
-  const topMerchants = useMemo(
-    () => computeTopMerchants(periodTransactions),
-    [periodTransactions],
-  )
+  const topMerchants = useMemo(() => computeTopMerchants(periodTransactions), [periodTransactions])
 
   // Monthly category stacked data
   const monthlyCategoryData = useMemo(
-    () =>
-      computeMonthlyCategoryData(
-        periodTransactions,
-        period,
-        formatMonthYear,
-        targetMonthRange,
-      ),
+    () => computeMonthlyCategoryData(periodTransactions, period, formatMonthYear, targetMonthRange),
     [periodTransactions, formatMonthYear, targetMonthRange, period],
   )
 

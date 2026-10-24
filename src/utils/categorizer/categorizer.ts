@@ -23,14 +23,8 @@ import {
   SEPA_TRANSFER_REGEX,
   transferMerchantsRegex,
 } from './category-patterns'
-import {
-  isPaymentProcessorIntermediary,
-  repairBrokenWords,
-} from './description-cleaning'
-import {
-  matchCustomKeywords,
-  toDisplayCategory,
-} from './keyword-compiler'
+import { isPaymentProcessorIntermediary, repairBrokenWords } from './description-cleaning'
+import { matchCustomKeywords, toDisplayCategory } from './keyword-compiler'
 
 export * from './category-patterns'
 export * from './keyword-compiler'

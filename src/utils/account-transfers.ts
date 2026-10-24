@@ -1,9 +1,5 @@
 import type { ImportedAccount, Transaction } from '../types'
-import {
-  calculateTransferCandidateScore,
-  dateDiffInDays,
-  extractIbans,
-} from './transfer-matching'
+import { calculateTransferCandidateScore, dateDiffInDays, extractIbans } from './transfer-matching'
 
 export * from './space-transfers'
 export * from './transfer-matching'

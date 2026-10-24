@@ -93,7 +93,9 @@ describe('ErrorBoundary', () => {
     })
 
     const ThrowChunkError = () => {
-      throw new Error('Failed to fetch dynamically imported module: http://localhost:5173/src/components/Dashboard')
+      throw new Error(
+        'Failed to fetch dynamically imported module: http://localhost:5173/src/components/Dashboard',
+      )
     }
 
     render(
@@ -114,4 +116,3 @@ describe('ErrorBoundary', () => {
     })
   })
 })
-

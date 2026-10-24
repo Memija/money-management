@@ -40,9 +40,7 @@ export const CrossAccountFilterBar: React.FC<CrossAccountFilterBarProps> = ({
 }) => {
   const showAccountFilter =
     hasMultipleAccounts &&
-    (scopeFilter === 'excluded' ||
-      scopeFilter === 'internal-transfers' ||
-      scopeFilter === 'all')
+    (scopeFilter === 'excluded' || scopeFilter === 'internal-transfers' || scopeFilter === 'all')
 
   const showSubAccountFilter = scopeFilter === 'space-transfers' && subAccounts.length > 1
 

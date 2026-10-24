@@ -153,7 +153,6 @@ export function getTransactionCategory(
 export * from './loan-propagation'
 export * from './plural-utils'
 
-
 /**
  * Formats a category's percentage of total spend.
  * Guarantees that any positive spend is never represented as 0%.

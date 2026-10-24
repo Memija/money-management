@@ -251,8 +251,7 @@ export const createAccountSlice: StateCreator<AppState, [], [], AccountSlice> = 
   removeImportedAccount: (institutionIdOrName: string) =>
     set((state) => {
       const updated = state.importedAccounts.filter(
-        (a) =>
-          a.institutionId !== institutionIdOrName && a.institutionName !== institutionIdOrName,
+        (a) => a.institutionId !== institutionIdOrName && a.institutionName !== institutionIdOrName,
       )
       const reconciled = reconcileCrossAccountTransfers(updated)
       const hasRemainingAccounts = reconciled.length > 0

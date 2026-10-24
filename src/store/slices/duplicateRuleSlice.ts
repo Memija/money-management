@@ -11,12 +11,10 @@ import {
 } from '../duplicate-helpers'
 import type { AppState, DuplicateRuleSlice } from './types'
 
-export const createDuplicateRuleSlice: StateCreator<
-  AppState,
-  [],
-  [],
-  DuplicateRuleSlice
-> = (set, get) => ({
+export const createDuplicateRuleSlice: StateCreator<AppState, [], [], DuplicateRuleSlice> = (
+  set,
+  get,
+) => ({
   duplicateOverrideRules: [],
 
   addDuplicateOverrideRule: (rule) =>

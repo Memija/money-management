@@ -4,12 +4,7 @@ import { CATEGORIZER_RULES_VERSION, isPaymentProcessorOnly } from '../../utils/c
 import { recategorizeAccounts } from '../category-store-helpers'
 import type { AppState, CategorySlice } from './types'
 
-export const createCategorySlice: StateCreator<
-  AppState,
-  [],
-  [],
-  CategorySlice
-> = (set, get) => ({
+export const createCategorySlice: StateCreator<AppState, [], [], CategorySlice> = (set, get) => ({
   customKeywords: {},
   manualCategories: {},
   customCategories: [],
@@ -59,9 +54,7 @@ export const createCategorySlice: StateCreator<
 
   updateCustomCategory: (category) =>
     set((state) => ({
-      customCategories: state.customCategories.map((c) =>
-        c.id === category.id ? category : c,
-      ),
+      customCategories: state.customCategories.map((c) => (c.id === category.id ? category : c)),
     })),
 
   deleteCustomCategory: (id) =>

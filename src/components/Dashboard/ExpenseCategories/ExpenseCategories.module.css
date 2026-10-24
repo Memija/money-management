@@ -344,8 +344,6 @@
   background: var(--text-dim);
 }
 
-
-
 .emptyState {
   display: flex;
   align-items: center;
@@ -354,8 +352,6 @@
   color: var(--text-dim);
   font-size: 0.9rem;
 }
-
-
 
 @media (max-width: 640px) {
   .header {

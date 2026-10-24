@@ -1,12 +1,6 @@
 import React, { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  Info,
-  Plus,
-  Tag,
-  Type,
-  X,
-} from 'lucide-react'
+import { Info, Plus, Tag, Type, X } from 'lucide-react'
 
 import { POPULAR_MERCHANTS } from '../../data/merchants'
 import { DEFAULT_CATEGORY_KEYS } from '../../i18n/categories'
@@ -23,11 +17,7 @@ import styles from './KeywordRulesSettings.module.css'
 export const KeywordRulesSettings: React.FC = () => {
   const t = useLanguageStore((s) => s.t)
   const currentLocale = useLanguageStore((s) => s.locale)
-  const {
-    customKeywords,
-    customCategories,
-    setCustomKeywords,
-  } = useAppStore()
+  const { customKeywords, customCategories, setCustomKeywords } = useAppStore()
 
   const [selectedCategory, setSelectedCategory] = useState<string>(DEFAULT_CATEGORY_KEYS[0])
   const [newKeyword, setNewKeyword] = useState('')
@@ -118,11 +108,7 @@ export const KeywordRulesSettings: React.FC = () => {
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     className={styles.inputKeyword}
                   />
-                  <button
-                    type="submit"
-                    className={styles.addButton}
-                    disabled={!newKeyword.trim()}
-                  >
+                  <button type="submit" className={styles.addButton} disabled={!newKeyword.trim()}>
                     <Plus size={18} /> {t.addRule}
                   </button>
                 </form>

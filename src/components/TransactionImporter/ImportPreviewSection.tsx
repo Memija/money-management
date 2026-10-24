@@ -143,7 +143,10 @@ export const ImportPreviewSection: React.FC<ImportPreviewSectionProps> = React.m
         )}
 
         {isPartialDuplicates && (
-          <div className={styles['duplicate-partial-banner']} data-testid="duplicate-partial-banner">
+          <div
+            className={styles['duplicate-partial-banner']}
+            data-testid="duplicate-partial-banner"
+          >
             <div className={styles['duplicate-banner-content']}>
               <AlertTriangle size={18} className={styles['duplicate-banner-icon']} />
               <span>
@@ -184,7 +187,11 @@ export const ImportPreviewSection: React.FC<ImportPreviewSectionProps> = React.m
             title={t.viewExcludedSpaceTransfers || 'View excluded'}
           >
             <div className={styles['transfer-info-content']}>
-              <Layers size={16} className={styles['space-transfers-banner-icon']} aria-hidden="true" />
+              <Layers
+                size={16}
+                className={styles['space-transfers-banner-icon']}
+                aria-hidden="true"
+              />
               <span>
                 {discardedSpaceCount === 1
                   ? t.spaceTransfersExcludedSingular

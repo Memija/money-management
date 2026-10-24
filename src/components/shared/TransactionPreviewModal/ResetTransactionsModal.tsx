@@ -42,9 +42,7 @@ export const ResetTransactionsModal: React.FC<ResetTransactionsModalProps> = ({
 
   const targetTx = activeTransactions.find((t) => t.id === pendingResetTxId)
   const isTargetUnlockedDuplicate = effectiveUnlockedIds.has(pendingResetTxId)
-  const hasAnyUnlockedDuplicates = modifiedTransactions.some((t) =>
-    effectiveUnlockedIds.has(t.id),
-  )
+  const hasAnyUnlockedDuplicates = modifiedTransactions.some((t) => effectiveUnlockedIds.has(t.id))
   const showLockCheckbox = isTargetUnlockedDuplicate || hasAnyUnlockedDuplicates
 
   return (
@@ -72,8 +70,7 @@ export const ResetTransactionsModal: React.FC<ResetTransactionsModalProps> = ({
             }}
             data-testid="confirm-reset-single-btn"
           >
-            {alsoLockAsDuplicate &&
-            effectiveUnlockedIds.has(pendingResetTxId)
+            {alsoLockAsDuplicate && effectiveUnlockedIds.has(pendingResetTxId)
               ? t.resetAndLockSingle || 'Reset and lock'
               : modifiedTransactions.length > 1
                 ? t.resetOnlyThis || 'Reset only this'

@@ -97,7 +97,9 @@ export function buildCombinedPrefilter(words: string[]): RegExp | undefined {
   }
 }
 
-export function compileCustomKeywords(customKeywords: Record<string, string[]>): CompiledCustomKeywords {
+export function compileCustomKeywords(
+  customKeywords: Record<string, string[]>,
+): CompiledCustomKeywords {
   const cached = compiledCustomKeywordsCache.get(customKeywords)
   if (cached) {
     return cached

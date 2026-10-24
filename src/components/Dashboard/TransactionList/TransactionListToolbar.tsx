@@ -193,9 +193,7 @@ export const TransactionListToolbar: React.FC<TransactionListToolbarProps> = ({
           id="sort-order"
           name="sort-order"
           value={sortOrder}
-          onChange={(val) =>
-            onSortOrderChange?.(val as 'newest' | 'oldest' | 'highest' | 'lowest')
-          }
+          onChange={(val) => onSortOrderChange?.(val as 'newest' | 'oldest' | 'highest' | 'lowest')}
           className={`${styles.txFilterSelectWrapper} ${styles.sortSelectWrapper}`}
           aria-label="Sort order"
           options={sortOptions}

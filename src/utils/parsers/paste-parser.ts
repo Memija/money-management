@@ -10,7 +10,6 @@ import {
 import { htmlToClipboardText } from './html-clipboard-parser'
 export * from './html-clipboard-parser'
 
-
 import {
   ALL_ICON_PREFIX_RE,
   ALL_PROJECTED_DATE_RE,

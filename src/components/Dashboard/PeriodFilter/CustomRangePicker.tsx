@@ -1,12 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import {
-  ArrowRight,
-  CalendarRange,
-  Check,
-  ChevronDown,
-  RotateCcw,
-} from 'lucide-react'
+import { ArrowRight, CalendarRange, Check, ChevronDown, RotateCcw } from 'lucide-react'
 
 import { useDropdownPosition } from '../../../hooks/useDropdownPosition'
 import { useFormatters } from '../../../hooks/useFormatters'

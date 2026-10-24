@@ -56,10 +56,7 @@ export const BulkAdjustModal: React.FC<BulkAdjustModalProps> = ({
     return null
   }
 
-  const allTargetIds = [
-    ...bulkApplyOffer.unlockedTargetIds,
-    ...bulkApplyOffer.identicalTargetIds,
-  ]
+  const allTargetIds = [...bulkApplyOffer.unlockedTargetIds, ...bulkApplyOffer.identicalTargetIds]
   const targetTxs = activeTransactions.filter((tx) => allTargetIds.includes(tx.id))
   const allSelected = targetTxs.length > 0 && selectedTargetIds.size === targetTxs.length
 
@@ -91,11 +88,7 @@ export const BulkAdjustModal: React.FC<BulkAdjustModalProps> = ({
       maxWidth="580px"
       footer={
         <div className={styles['adjust-modal-footer']}>
-          <button
-            type="button"
-            className={styles['adjust-cancel-btn']}
-            onClick={onClose}
-          >
+          <button type="button" className={styles['adjust-cancel-btn']} onClick={onClose}>
             {t.cancel || 'Cancel'}
           </button>
           <button
@@ -130,9 +123,7 @@ export const BulkAdjustModal: React.FC<BulkAdjustModalProps> = ({
             {bulkApplyOffer.updates.description !== undefined && (
               <label
                 className={`${styles['adjust-field-card']} ${
-                  selectedFieldsToApply.description
-                    ? styles['adjust-field-card-active']
-                    : ''
+                  selectedFieldsToApply.description ? styles['adjust-field-card-active'] : ''
                 }`}
               >
                 <input
@@ -204,9 +195,7 @@ export const BulkAdjustModal: React.FC<BulkAdjustModalProps> = ({
                   }
                 />
                 <div className={styles['adjust-field-info']}>
-                  <span className={styles['adjust-field-name']}>
-                    {t.amount || 'Amount'}
-                  </span>
+                  <span className={styles['adjust-field-name']}>{t.amount || 'Amount'}</span>
                   <span className={styles['adjust-field-val']}>
                     {formatCurrency(bulkApplyOffer.updates.amount)}
                   </span>
@@ -219,8 +208,8 @@ export const BulkAdjustModal: React.FC<BulkAdjustModalProps> = ({
         <div className={styles['adjust-section']}>
           <div className={styles['adjust-section-header']}>
             <span className={styles['adjust-section-title']}>
-              {t.targetTransactionsLabel || 'Target transactions'} ({selectedTargetIds.size}
-              /{targetTxs.length})
+              {t.targetTransactionsLabel || 'Target transactions'} ({selectedTargetIds.size}/
+              {targetTxs.length})
             </span>
             <button
               type="button"
@@ -257,9 +246,7 @@ export const BulkAdjustModal: React.FC<BulkAdjustModalProps> = ({
                       <span className={styles['adjust-tx-desc']} title={target.description}>
                         {target.description}
                       </span>
-                      <span className={styles['adjust-tx-date']}>
-                        {formatDate(target.date)}
-                      </span>
+                      <span className={styles['adjust-tx-date']}>{formatDate(target.date)}</span>
                     </div>
                     <div className={styles['adjust-tx-right']}>
                       <span className={styles['adjust-tx-amount']}>

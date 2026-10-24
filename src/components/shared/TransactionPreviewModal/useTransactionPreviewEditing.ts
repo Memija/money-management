@@ -151,8 +151,7 @@ export function useTransactionPreviewEditing({
         const matchesDesc =
           cumulativeMods.description === undefined ||
           other.description === cumulativeMods.description
-        const matchesDate =
-          cumulativeMods.date === undefined || other.date === cumulativeMods.date
+        const matchesDate = cumulativeMods.date === undefined || other.date === cumulativeMods.date
         const matchesAmount =
           cumulativeMods.amount === undefined ||
           Math.abs(other.amount - cumulativeMods.amount) < 0.005
@@ -224,9 +223,7 @@ export function useTransactionPreviewEditing({
           type: (orig.amount >= 0 ? 'income' : 'expense') as 'income' | 'expense',
         }
         onUpdateTransaction(id, resetData)
-        setLocalTransactions((prev) =>
-          prev.map((t) => (t.id === id ? { ...t, ...resetData } : t)),
-        )
+        setLocalTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...resetData } : t)))
         if (alsoLock && effectiveUnlockedIds.has(id)) {
           setLocalUnlockedDuplicateIds((prev) => {
             const next = new Set(prev)
