@@ -5,7 +5,7 @@ import type { TranslationStrings } from '../../../i18n/types'
 import { DatePicker } from '../DatePicker'
 import { Select, type SelectOption } from '../Select'
 
-import styles from './TransactionPreviewModal.module.css'
+import styles from './TransactionPreviewToolbar.module.css'
 
 export type SortColumn = 'date' | 'description' | 'amount'
 export type SortDirection = 'asc' | 'desc'

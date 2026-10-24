@@ -11,7 +11,7 @@ import { CategoryIcon } from '../CategoryIcon'
 import { CopyButton } from '../CopyButton'
 import { DatePicker } from '../DatePicker'
 
-import styles from './TransactionPreviewModal.module.css'
+import styles from './TransactionPreviewRow.module.css'
 
 const ROW_CATEGORY_ICON_SIZE = 11
 

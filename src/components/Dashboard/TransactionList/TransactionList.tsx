@@ -1,40 +1,21 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import {
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  Ghost,
-  ImageOff,
-  Link2,
-  Link2Off,
-  Receipt,
-  RotateCcw,
-  Search,
-  SearchX,
-  Sliders,
-  Tag,
-  X,
-} from 'lucide-react'
+import { Ghost, ImageOff, RotateCcw, SearchX, X } from 'lucide-react'
 
 import { useFormatters } from '../../../hooks/useFormatters'
 import { useAppStore } from '../../../store/useAppStore'
 import { useLanguageStore } from '../../../store/useLanguageStore'
 import type { Transaction } from '../../../types'
-import { getCategoryIcon, hasMerchantLogo } from '../../../utils/category-icons'
-import {
-  extractCleanDescription,
-  extractMerchantKeyword,
-  findRelatedTransactions,
-  getCategoryLabel,
-  isInformativeTransaction,
-  isPaymentProcessorOnly,
-} from '../../../utils/category-utils'
 import { isLocalEnvironment } from '../../../utils/env-utils'
 import { getVisiblePages } from '../../../utils/pagination-utils'
 import { BatchCategoryModal } from '../../shared/BatchCategoryModal'
-import { Select } from '../../shared/Select'
 import { TransactionItem } from './TransactionItem'
+import { TransactionListHeader } from './TransactionListHeader'
+import { TransactionListPagination } from './TransactionListPagination'
+import { TransactionListToolbar } from './TransactionListToolbar'
+import { useTransactionBatchCategory } from './useTransactionBatchCategory'
+import { useTransactionCategoryOptions } from './useTransactionCategoryOptions'
+import { useTransactionListStats } from './useTransactionListStats'
 
 import styles from './TransactionList.module.css'
 
@@ -108,11 +89,6 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
     const [internalCategory, setInternalCategory] = useState<string>('all')
     const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE)
     const [currentPage, setCurrentPage] = useState<number>(1)
-    const [pendingBatchCategory, setPendingBatchCategory] = useState<{
-      targetTx: Transaction
-      newCategory: string
-      relatedTx: Transaction[]
-    } | null>(null)
 
     const typeFilter = propTypeFilter !== undefined ? propTypeFilter : internalTypeFilter
 
@@ -158,230 +134,29 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
       modifiedCount,
       incomeCount,
       expenseCount,
-      incomeTotal,
-      expenseTotal,
-      netBalance,
-      totalGhostCount,
-    } = useMemo(() => {
-      const isAllCat = categoryFilter === 'all'
-      const isWithoutLogos = categoryFilter === 'without-logos'
-      const normal: Transaction[] = []
-      const ghost: Transaction[] = []
-      const duplicate: Transaction[] = []
-      const modified: Transaction[] = []
-
-      let incCount = 0
-      let expCount = 0
-      let incTot = 0
-      let expTot = 0
-      let totalGhosts = 0
-
-      for (let i = 0; i < filteredTx.length; i++) {
-        const tx = filteredTx[i]
-        if (tx.isGhost) {
-          totalGhosts++
-          if (isAllCat) {
-            ghost.push(tx)
-          }
-          continue
-        }
-
-        if (isWithoutLogos) {
-          if (hasMerchantLogo(tx.description, tx.counterpartyIban)) {
-            continue
-          }
-        } else if (!isAllCat) {
-          if (!tx.category || tx.category !== categoryFilter) {
-            continue
-          }
-        }
-
-        normal.push(tx)
-        const isMod = Boolean(tx.isModified)
-        const isDup = Boolean(tx.isDuplicate || tx.forceImport || tx.importedByRuleId)
-
-        if (isMod) {
-          modified.push(tx)
-        } else if (isDup) {
-          duplicate.push(tx)
-        }
-
-        const amt = Math.abs(tx.amount)
-        if (tx.type === 'income') {
-          incCount++
-          incTot += amt
-        } else {
-          expCount++
-          expTot += amt
-        }
-      }
-
-      return {
-        normalTx: normal,
-        ghostTx: ghost,
-        duplicateTx: duplicate,
-        modifiedTx: modified,
-        duplicateCount: duplicate.length,
-        modifiedCount: modified.length,
-        incomeCount: incCount,
-        expenseCount: expCount,
-        incomeTotal: incTot,
-        expenseTotal: expTot,
-        netBalance: incTot - expTot,
-        totalGhostCount: totalGhosts,
-      }
-    }, [filteredTx, categoryFilter])
-
-    const hasGhosts = ghostCount > 0 || totalGhostCount > 0
-    const effectiveGhostCount = categoryFilter === 'all' ? ghostCount || totalGhostCount : 0
-
-    // Dynamic stat pills reflecting active category and type filters
-    const statPillInfo = useMemo(() => {
-      let countLabel: string
-      let countValue: number
-
-      if (typeFilter === 'transfers') {
-        countLabel = t.internalTransfers || 'Transfers'
-      } else if (categoryFilter !== 'all') {
-        countLabel = getCategoryLabel(categoryFilter, t, locale, customCategories)
-      } else if (typeFilter === 'duplicates') {
-        countLabel = t.duplicate || 'Duplicates'
-      } else if (typeFilter === 'modified') {
-        countLabel = t.modified || 'Modified'
-      } else if (typeFilter === 'income') {
-        countLabel = t.income || 'Income'
-      } else if (typeFilter === 'expense') {
-        countLabel = t.expenses || 'Expenses'
-      } else {
-        countLabel = t.all || 'All'
-      }
-
-      if (typeFilter === 'transfers') {
-        countValue = effectiveGhostCount
-      } else if (typeFilter === 'duplicates') {
-        countValue = duplicateCount
-      } else if (typeFilter === 'modified') {
-        countValue = modifiedCount
-      } else if (typeFilter === 'income') {
-        countValue = incomeCount
-      } else if (typeFilter === 'expense') {
-        countValue = expenseCount
-      } else {
-        countValue = normalTx.length
-      }
-
-      let amountLabel: string
-      let amountClass: string
-      let formattedAmount: string
-
-      if (typeFilter === 'transfers') {
-        amountLabel = `${t.totalBalance || 'Total Balance'} (0 impact)`
-        amountClass = styles.statNeutral
-        formattedAmount = formatCurrency(0)
-      } else if (typeFilter === 'income') {
-        amountLabel = t.totalIncome || t.income || 'Income'
-        amountClass = styles.statIncome
-        formattedAmount = `${incomeTotal > 0 ? '+' : ''}${formatCurrency(incomeTotal)}`
-      } else if (typeFilter === 'expense') {
-        amountLabel = t.totalExpenses || t.expenses || 'Expenses'
-        amountClass = styles.statExpense
-        formattedAmount = `${expenseTotal > 0 ? '-' : ''}${formatCurrency(expenseTotal)}`
-      } else if (categoryFilter !== 'all') {
-        amountLabel = t.categoryBalance || 'Category Balance'
-        amountClass = netBalance >= 0 ? styles.statIncome : styles.statExpense
-        formattedAmount = `${netBalance >= 0 ? '+' : ''}${formatCurrency(netBalance)}`
-      } else {
-        amountLabel = t.totalBalance || 'Total Balance'
-        amountClass = netBalance >= 0 ? styles.statIncome : styles.statExpense
-        formattedAmount = `${netBalance >= 0 ? '+' : ''}${formatCurrency(netBalance)}`
-      }
-
-      return {
-        countLabel,
-        countValue,
-        amountLabel,
-        formattedAmount,
-        amountClass,
-      }
-    }, [
+      hasGhosts,
+      effectiveGhostCount,
+      statPillInfo,
+    } = useTransactionListStats({
+      filteredTx,
       categoryFilter,
       typeFilter,
+      ghostCount,
       t,
       locale,
       customCategories,
-      effectiveGhostCount,
-      duplicateCount,
-      modifiedCount,
-      incomeCount,
-      expenseCount,
-      normalTx.length,
-      incomeTotal,
-      expenseTotal,
-      netBalance,
       formatCurrency,
-    ])
+    })
 
-    // Collect available unique categories from unfiltered transactions in current scope (decoupled from categoryFilter)
-    const availableCategories = useMemo(() => {
-      const set = new Set<string>()
-      for (let i = 0; i < filteredTx.length; i++) {
-        if (filteredTx[i].isGhost) {
-          continue
-        }
-        const cat = filteredTx[i].category
-        if (cat) {
-          set.add(cat)
-        }
-      }
-      return Array.from(set).sort((a, b) => {
-        const labelA = getCategoryLabel(a, t, locale, customCategories)
-        const labelB = getCategoryLabel(b, t, locale, customCategories)
-        return labelA.localeCompare(labelB)
-      })
-    }, [filteredTx, t, locale, customCategories])
-
-    const categoryOptions = useMemo(() => {
-      const options = [
-        {
-          value: 'all',
-          label: t.allCategories || 'All Categories',
-          icon: <Tag size={14} />,
-        },
-        ...(filterTransactionsWithoutLogos
-          ? [
-              {
-                value: 'without-logos',
-                label: t.filterWithoutLogosBadge || 'Without logos',
-                icon: <ImageOff size={14} />,
-              },
-            ]
-          : []),
-        ...availableCategories.map((cat) => ({
-          value: cat,
-          label: getCategoryLabel(cat, t, locale, customCategories),
-          icon: getCategoryIcon(cat, 14, customCategories),
-        })),
-      ]
-      if (
-        categoryFilter !== 'all' &&
-        categoryFilter !== 'without-logos' &&
-        !availableCategories.includes(categoryFilter)
-      ) {
-        options.push({
-          value: categoryFilter,
-          label: getCategoryLabel(categoryFilter, t, locale, customCategories),
-          icon: getCategoryIcon(categoryFilter, 14, customCategories),
-        })
-      }
-      return options
-    }, [
-      availableCategories,
+    // Category options and unique available categories
+    const { categoryOptions } = useTransactionCategoryOptions({
+      filteredTx,
       categoryFilter,
-      filterTransactionsWithoutLogos,
+      filterTransactionsWithoutLogos: Boolean(filterTransactionsWithoutLogos),
       t,
       locale,
       customCategories,
-    ])
+    })
 
     // Filter transactions by Type (All / Income / Expense / Transfers / Duplicates / Modified)
     // GHOST TRANSACTIONS ARE NEVER SHOWN IN 'all', 'income', 'expense', 'duplicates', or 'modified'!
@@ -415,97 +190,21 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
       return effectiveTx.slice(start, start + pageSize)
     }, [effectiveTx, safeCurrentPage, pageSize])
 
-    const handleCategoryChange = useCallback(
-      (tx: Transaction, newCategory: string) => {
-        if (isInformativeTransaction(tx)) {
-          return
-        }
-        const currentCategory = tx.category || 'Other'
-        if (newCategory === currentCategory) {
-          return
-        }
-
-        // Check for related transactions across candidate pool
-        const candidatePool = allTransactions || filteredTx
-        const related = findRelatedTransactions(tx, candidatePool, newCategory)
-
-        if (related.length > 0) {
-          setPendingBatchCategory({
-            targetTx: tx,
-            newCategory,
-            relatedTx: related,
-          })
-          return
-        }
-
-        // If no related transactions exist, update directly without interrupting
-        setManualCategory(tx.id, newCategory)
-        const cleanDesc = extractCleanDescription(tx.description)
-        const merchantKeyword = extractMerchantKeyword(tx.description)
-        const candidates = [merchantKeyword, cleanDesc].filter(
-          (kw) => kw && kw.trim().length >= 3 && !isPaymentProcessorOnly(kw),
-        )
-        if (candidates.length > 0) {
-          const existingKeywords = customKeywords[newCategory] || []
-          const updated = [...existingKeywords]
-          let changed = false
-          for (const cand of candidates) {
-            if (!updated.some((k) => k.toLowerCase() === cand.toLowerCase())) {
-              updated.push(cand)
-              changed = true
-            }
-          }
-          if (changed) {
-            setCustomKeywords(newCategory, updated)
-          }
-        }
-      },
-      [allTransactions, filteredTx, setManualCategory, customKeywords, setCustomKeywords],
-    )
-
-    const handleConfirmBatchOnlyThis = useCallback(
-      (targetTx: Transaction, newCat: string) => {
-        setManualCategory(targetTx.id, newCat)
-      },
-      [setManualCategory],
-    )
-
-    const handleConfirmBatchAll = useCallback(
-      (targetTx: Transaction, relatedTx: Transaction[], newCat: string, rememberRule: boolean) => {
-        const mapping: Record<string, string> = {
-          [targetTx.id]: newCat,
-        }
-        for (let i = 0; i < relatedTx.length; i++) {
-          if (!isInformativeTransaction(relatedTx[i])) {
-            mapping[relatedTx[i].id] = newCat
-          }
-        }
-        setManualCategoriesBulk(mapping)
-
-        if (rememberRule) {
-          const cleanDesc = extractCleanDescription(targetTx.description)
-          const merchantKeyword = extractMerchantKeyword(targetTx.description)
-          const candidates = [merchantKeyword, cleanDesc].filter(
-            (kw) => kw && kw.trim().length >= 3 && !isPaymentProcessorOnly(kw),
-          )
-          if (candidates.length > 0) {
-            const existingKeywords = customKeywords[newCat] || []
-            const updated = [...existingKeywords]
-            let changed = false
-            for (const cand of candidates) {
-              if (!updated.some((k) => k.toLowerCase() === cand.toLowerCase())) {
-                updated.push(cand)
-                changed = true
-              }
-            }
-            if (changed) {
-              setCustomKeywords(newCat, updated)
-            }
-          }
-        }
-      },
-      [setManualCategoriesBulk, customKeywords, setCustomKeywords],
-    )
+    // Batch category change handlers and state
+    const {
+      pendingBatchCategory,
+      setPendingBatchCategory,
+      handleCategoryChange,
+      handleConfirmBatchOnlyThis,
+      handleConfirmBatchAll,
+    } = useTransactionBatchCategory({
+      allTransactions,
+      filteredTx,
+      setManualCategory,
+      setManualCategoriesBulk,
+      customKeywords,
+      setCustomKeywords,
+    })
 
     const handleResetFilters = () => {
       setSearchTerm('')
@@ -521,6 +220,16 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
       categoryFilter !== 'all' ||
       sortOrder !== 'newest'
 
+    const sortOptions = useMemo(
+      () => [
+        { value: 'newest', label: t.newestFirst },
+        { value: 'oldest', label: t.oldestFirst },
+        { value: 'highest', label: t.highestAmount },
+        { value: 'lowest', label: t.lowestAmount },
+      ],
+      [t],
+    )
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -529,241 +238,49 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
         className={`glass-card ${styles.colSpan12}`}
       >
         {/* Header with Icon, Title, and Stat Pills */}
-        <div className={styles.header}>
-          <div className={styles.titleArea}>
-            <div className={styles.iconBadge} aria-hidden="true">
-              <Receipt size={22} />
-            </div>
-            <div className={styles.titleTextContainer}>
-              <div className={styles.titleWithBadge}>
-                <h3 className={styles.title}>{t.allTransactions}</h3>
-                {detachTransactionsFromDashboard && (
-                  <span
-                    className={styles.detachedBadge}
-                    title={
-                      t.detachedBadgeTooltip ||
-                      'Filters in this list do not affect dashboard charts or metrics'
-                    }
-                    data-testid="transactions-detached-badge"
-                  >
-                    <Link2Off size={11} aria-hidden="true" />
-                    {t.detachedBadge || 'Detached'}
-                  </span>
-                )}
-              </div>
-              <p className={styles.subtitle}>{formatTransactionCount(effectiveTx.length)}</p>
-            </div>
-          </div>
-
-          <div className={styles.statPillsGroup}>
-            <div className={styles.statPill}>
-              <span className={styles.statLabel}>{statPillInfo.countLabel}</span>
-              <span className={styles.statValue}>{statPillInfo.countValue}</span>
-            </div>
-            <div className={styles.statPill}>
-              <span className={styles.statLabel}>{statPillInfo.amountLabel}</span>
-              <span className={`${styles.statValue} ${statPillInfo.amountClass} privacy-blur`}>
-                {statPillInfo.formattedAmount}
-              </span>
-            </div>
-          </div>
-        </div>
+        <TransactionListHeader
+          title={t.allTransactions}
+          countSubtitle={formatTransactionCount(effectiveTx.length)}
+          detachTransactionsFromDashboard={detachTransactionsFromDashboard}
+          detachedBadgeTooltip={
+            t.detachedBadgeTooltip ||
+            'Filters in this list do not affect dashboard charts or metrics'
+          }
+          detachedBadgeText={t.detachedBadge || 'Detached'}
+          statPillInfo={statPillInfo}
+        />
 
         {/* Toolbar with Segmented Filter Tabs, Search, and Selects */}
-        <div className={styles.toolbar}>
-          <div className={styles.typeFilters} role="tablist" aria-label="Transaction Type">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={typeFilter === 'all'}
-              onClick={() => {
-                handleTypeFilterChange('all')
-              }}
-              className={`${styles.typeFilterBtn} ${
-                typeFilter === 'all' ? styles.typeFilterBtnActive : ''
-              }`}
-            >
-              {t.all || 'All'}
-              <span className={styles.typeBadge}>{normalTx.length}</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={typeFilter === 'income'}
-              onClick={() => {
-                handleTypeFilterChange('income')
-              }}
-              className={`${styles.typeFilterBtn} ${
-                typeFilter === 'income' ? styles.typeFilterBtnActive : ''
-              }`}
-            >
-              {t.income || 'Income'}
-              <span className={styles.typeBadge}>{incomeCount}</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={typeFilter === 'expense'}
-              onClick={() => {
-                handleTypeFilterChange('expense')
-              }}
-              className={`${styles.typeFilterBtn} ${
-                typeFilter === 'expense' ? styles.typeFilterBtnActive : ''
-              }`}
-            >
-              {t.expenses || 'Expenses'}
-              <span className={styles.typeBadge}>{expenseCount}</span>
-            </button>
-            {hasGhosts && (
-              <button
-                type="button"
-                role="tab"
-                aria-selected={typeFilter === 'transfers'}
-                onClick={() => {
-                  setShowGhost?.(true)
-                  handleTypeFilterChange('transfers')
-                }}
-                className={`${styles.typeFilterBtn} ${
-                  typeFilter === 'transfers' ? styles.typeFilterBtnActive : ''
-                }`}
-              >
-                {t.internalTransfers || 'Transfers'}
-                <span className={styles.typeBadge}>{effectiveGhostCount}</span>
-              </button>
-            )}
-            {duplicateCount > 0 && (
-              <button
-                type="button"
-                role="tab"
-                aria-selected={typeFilter === 'duplicates'}
-                onClick={() => {
-                  handleTypeFilterChange('duplicates')
-                }}
-                className={`${styles.typeFilterBtn} ${
-                  typeFilter === 'duplicates' ? styles.typeFilterBtnActive : ''
-                } ${styles.duplicateFilterBtn}`}
-                data-testid="filter-duplicates-tab"
-              >
-                <Copy size={13} aria-hidden="true" />
-                {t.duplicate || 'Duplicates'}
-                <span className={`${styles.typeBadge} ${styles.duplicateTypeBadge}`}>
-                  {duplicateCount}
-                </span>
-              </button>
-            )}
-            {modifiedCount > 0 && (
-              <button
-                type="button"
-                role="tab"
-                aria-selected={typeFilter === 'modified'}
-                onClick={() => {
-                  handleTypeFilterChange('modified')
-                }}
-                className={`${styles.typeFilterBtn} ${
-                  typeFilter === 'modified' ? styles.typeFilterBtnActive : ''
-                } ${styles.modifiedFilterBtn}`}
-                data-testid="filter-modified-tab"
-              >
-                <Sliders size={13} aria-hidden="true" />
-                {t.modified || 'Modified'}
-                <span className={`${styles.typeBadge} ${styles.modifiedTypeBadge}`}>
-                  {modifiedCount}
-                </span>
-              </button>
-            )}
-          </div>
-
-          <div className={styles.controlsRight}>
-            <div className={styles.txSearchWrapper}>
-              <Search size={15} className={styles.searchIcon} aria-hidden="true" />
-              <input
-                type="text"
-                placeholder={t.search}
-                aria-label={t.search}
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  setCurrentPage(1)
-                }}
-                className={styles.txSearchInput}
-                id="tx-search"
-                name="tx-search"
-              />
-              {searchTerm.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchTerm('')
-                    setCurrentPage(1)
-                  }}
-                  className={styles.searchClearBtn}
-                  title="Clear search"
-                  aria-label="Clear search"
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-
-            <Select
-              id="category-filter"
-              name="category-filter"
-              value={categoryFilter}
-              onChange={(val) => handleCategoryFilterChange(val as string)}
-              className={`${styles.txFilterSelectWrapper} ${styles.categorySelectWrapper}`}
-              aria-label={t.filterByCategory || 'Filter by category'}
-              options={categoryOptions}
-            />
-
-            <Select
-              id="sort-order"
-              name="sort-order"
-              value={sortOrder}
-              onChange={(val) => setSortOrder?.(val as 'newest' | 'oldest' | 'highest' | 'lowest')}
-              className={`${styles.txFilterSelectWrapper} ${styles.sortSelectWrapper}`}
-              aria-label="Sort order"
-              options={[
-                { value: 'newest', label: t.newestFirst },
-                { value: 'oldest', label: t.oldestFirst },
-                { value: 'highest', label: t.highestAmount },
-                { value: 'lowest', label: t.lowestAmount },
-              ]}
-            />
-
-            <button
-              type="button"
-              onClick={() => setDetachTransactionsFromDashboard(!detachTransactionsFromDashboard)}
-              className={`${styles.detachBtn} ${
-                detachTransactionsFromDashboard ? styles.detachBtnActive : styles.detachBtnLinked
-              }`}
-              title={
-                detachTransactionsFromDashboard
-                  ? t.attachTransactionsAction || 'Filters detached from dashboard (click to link)'
-                  : t.detachTransactionsAction || 'Filters linked to dashboard (click to detach)'
-              }
-              aria-label={
-                detachTransactionsFromDashboard
-                  ? t.attachTransactionsAction || 'Filters detached from dashboard (click to link)'
-                  : t.detachTransactionsAction || 'Filters linked to dashboard (click to detach)'
-              }
-              data-testid="toggle-detach-transactions"
-            >
-              {detachTransactionsFromDashboard ? <Link2Off size={15} /> : <Link2 size={15} />}
-            </button>
-
-            {isFilterActive && (
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className={styles.resetBtn}
-                title={t.clear || 'Reset filters'}
-                aria-label="Reset all filters"
-              >
-                <RotateCcw size={15} />
-              </button>
-            )}
-          </div>
-        </div>
+        <TransactionListToolbar
+          typeFilter={typeFilter}
+          onTypeFilterChange={handleTypeFilterChange}
+          normalCount={normalTx.length}
+          incomeCount={incomeCount}
+          expenseCount={expenseCount}
+          hasGhosts={hasGhosts}
+          effectiveGhostCount={effectiveGhostCount}
+          duplicateCount={duplicateCount}
+          modifiedCount={modifiedCount}
+          onShowGhost={setShowGhost}
+          searchTerm={searchTerm}
+          onSearchTermChange={(val) => {
+            setSearchTerm(val)
+            setCurrentPage(1)
+          }}
+          categoryFilter={categoryFilter}
+          onCategoryFilterChange={handleCategoryFilterChange}
+          categoryOptions={categoryOptions}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
+          detachTransactionsFromDashboard={detachTransactionsFromDashboard}
+          onToggleDetach={() =>
+            setDetachTransactionsFromDashboard(!detachTransactionsFromDashboard)
+          }
+          isFilterActive={isFilterActive}
+          onResetFilters={handleResetFilters}
+          t={t}
+          sortOptions={sortOptions}
+        />
 
         {categoryFilter === 'without-logos' && (
           <div className={styles.noLogoNotice} data-testid="without-logos-filter-badge">
@@ -833,85 +350,21 @@ export const TransactionList: React.FC<TransactionListProps> = React.memo(
 
         {/* Pagination Bar */}
         {effectiveTx.length > 0 && (
-          <div className={styles.paginationBar}>
-            <div className={styles.paginationLeft}>
-              <p className={styles.moreRows}>
-                {(t.showingOf || 'Showing {shown} of {total}')
-                  .replace('{shown}', String(pagedTx.length))
-                  .replace('{total}', String(effectiveTx.length))}
-              </p>
-              <div className={styles.pageSizeWrapper}>
-                <label htmlFor="tx-page-size-select" className={styles.pageSizeLabel}>
-                  {t.perPage || 'Per page:'}
-                </label>
-                <Select
-                  id="tx-page-size-select"
-                  name="tx-page-size-select"
-                  value={pageSize}
-                  onChange={(val) => {
-                    setPageSize(Number(val))
-                    setCurrentPage(1)
-                  }}
-                  size="sm"
-                  className={styles.pageSizeSelectWrapper}
-                  aria-label={t.perPage || 'Per page:'}
-                  options={[
-                    { value: 10, label: '10' },
-                    { value: 25, label: '25' },
-                    { value: 50, label: '50' },
-                    { value: 100, label: '100' },
-                  ]}
-                />
-              </div>
-            </div>
-
-            {totalPages > 1 && (
-              <div className={styles.pageControls}>
-                <button
-                  type="button"
-                  disabled={safeCurrentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className={styles.pageBtn}
-                  aria-label="Previous page"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                {visiblePages.map((pageItem, index) =>
-                  pageItem === '...' ? (
-                    <span
-                      key={`ellipsis-${index}`}
-                      className={styles.pageEllipsis}
-                      aria-hidden="true"
-                    >
-                      &hellip;
-                    </span>
-                  ) : (
-                    <button
-                      key={pageItem}
-                      type="button"
-                      onClick={() => setCurrentPage(pageItem)}
-                      className={`${styles.pageBtn} ${
-                        safeCurrentPage === pageItem ? styles.pageBtnActive : ''
-                      }`}
-                      aria-label={`Page ${pageItem}`}
-                      aria-current={safeCurrentPage === pageItem ? 'page' : undefined}
-                    >
-                      {pageItem}
-                    </button>
-                  ),
-                )}
-                <button
-                  type="button"
-                  disabled={safeCurrentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className={styles.pageBtn}
-                  aria-label="Next page"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            )}
-          </div>
+          <TransactionListPagination
+            shownCount={pagedTx.length}
+            totalCount={effectiveTx.length}
+            pageSize={pageSize}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize)
+              setCurrentPage(1)
+            }}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            visiblePages={visiblePages}
+            onPageChange={setCurrentPage}
+            showingOfText={t.showingOf}
+            perPageLabel={t.perPage}
+          />
         )}
 
         {/* Batch Category Confirmation Modal */}

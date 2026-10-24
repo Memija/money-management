@@ -3,7 +3,7 @@ import { TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 
 import type { TranslationStrings } from '../../../i18n/types'
 
-import styles from './TransactionPreviewModal.module.css'
+import styles from './TransactionPreviewHeader.module.css'
 
 export interface TransactionPreviewHeaderProps {
   title?: string
