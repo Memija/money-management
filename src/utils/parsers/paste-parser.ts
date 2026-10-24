@@ -270,10 +270,9 @@ export function parseAmountLine(line: string): ParsedAmount | null {
   return null
 }
 
-// Amount pattern: optional leading comma and minus or plus, digits with . or , separators, ends with common currency
-const AMOUNT_RE = /^,?([+-]?\d{1,3}(?:[.,]\d{3})*[.,]\d{2})\s*([A-Z]{3}|€|£|\$|zł)$/i
 // Date header pattern: DD.MM.YYYY — standalone date line (day separator)
 const DATE_HEADER_RE = /^(\d{1,2}\.\d{1,2}\.\d{2,4})$/
+
 
 function getCleanLines(rawText: string): string[] {
   return rawText

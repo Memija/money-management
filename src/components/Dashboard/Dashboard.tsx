@@ -256,7 +256,8 @@ const Dashboard: React.FC = () => {
     return false
   }, [deferredPeriod, minDate, maxDate])
 
-  // Current display balance: ensures complete ledger balance for 'all' period matches AccountSelector exactly
+  // Current display balance: ensures complete ledger balance for 'all' period matches StickyAccountSwitcher exactly
+
   const displayBalance = useMemo(() => {
     if (isAnyFilterActive || !isPeriodAllTime) {
       return analytics.balance

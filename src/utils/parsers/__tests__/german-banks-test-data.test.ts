@@ -1,6 +1,6 @@
+import { act, renderHook } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { useTransactionImport } from '../../../components/TransactionImporter/useTransactionImport'
@@ -77,7 +77,8 @@ describe('German Banks Test Data Suite', () => {
       ).toBe(true)
 
       // End-to-end import validation via the useTransactionImport hook with real File object
-      const { result } = renderHook(() => useTransactionImport(inst.name, 'csv'))
+      const { result } = renderHook(() => useTransactionImport(inst.name, 'spreadsheet'))
+
       const file = new File([fileContent], `${inst.id}.csv`, { type: 'text/csv' })
 
       await act(async () => {

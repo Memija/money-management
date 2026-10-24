@@ -1,6 +1,6 @@
+import { act, renderHook } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { useTransactionImport } from '../../../components/TransactionImporter/useTransactionImport'

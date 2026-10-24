@@ -8,7 +8,8 @@ import type { Transaction } from '../../../types'
 import { getCategoryLabel, getTransactionMerchant } from '../../../utils/category-utils'
 import { TransactionPreviewModal } from '../../shared/TransactionPreviewModal'
 import { AvgDetailModal } from '../AvgDetailModal/AvgDetailModal'
-import { SavingsTrendModal } from '../SavingsTrendModal/SavingsTrendModal'
+import { SavingsTrendModal } from '../SavingsTrendModal'
+
 
 /** Drill-down shown in the transaction detail modal. */
 export type DetailModalState =

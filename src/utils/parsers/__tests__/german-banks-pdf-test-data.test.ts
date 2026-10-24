@@ -43,8 +43,9 @@ describe('German Banks PDF Test Data Suite', () => {
         const page = await doc.getPage(i)
         const textContent = await page.getTextContent()
         const pageText = textContent.items
-          .map((item: any) => item.str || '')
+          .map((item) => ('str' in item && typeof item.str === 'string' ? item.str : ''))
           .join(' ')
+
         fullText += pageText + '\n'
       }
 

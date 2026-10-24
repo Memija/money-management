@@ -30,8 +30,8 @@ import {
   isInformativeTransaction,
   isPaymentProcessorOnly,
 } from '../../../utils/category-utils'
-import { getVisiblePages } from '../../../utils/pagination-utils'
 import { isLocalEnvironment } from '../../../utils/env-utils'
+import { getVisiblePages } from '../../../utils/pagination-utils'
 import { BatchCategoryModal } from '../../shared/BatchCategoryModal'
 import { Select } from '../../shared/Select'
 import { TransactionItem } from './TransactionItem'
