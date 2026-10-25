@@ -165,27 +165,30 @@ money-management/
 
 ## 🛠️ Available Scripts
 
-| Category         | Script                      | Description                                                                      |
-| :--------------- | :-------------------------- | :------------------------------------------------------------------------------- |
-| **Development**  | `npm run dev`               | Launches local Vite development server                                           |
-|                  | `npm run build`             | Compiles TypeScript and builds production distribution bundle                    |
-|                  | `npm run preview`           | Serves production build locally for verification                                 |
-| **Code Quality** | `npm run lint`              | Lints TypeScript and TSX files via ESLint                                        |
-|                  | `npm run format`            | Auto-formats code with Prettier                                                  |
-|                  | `npm run format:check`      | Verifies code formatting without modifying files                                 |
-| **Testing**      | `npm test`                  | Starts Vitest in interactive watch mode                                          |
-|                  | `npm run test:run`          | Executes all unit tests once and exits                                           |
-|                  | `npm run test:coverage`     | Runs test suite with V8 code coverage report generation                          |
-| **Security**     | `npm run security:all`      | Executes full local security scan suite (Trivy, OSV, Gitleaks, Zizmor, SBOM)     |
-|                  | `npm run security:audit`    | Audits dependencies for critical vulnerabilities (`npm audit`)                   |
-|                  | `npm run security:secrets`  | Scans git staged changes for accidentally committed credentials & keys           |
-|                  | `npm run security:gitleaks` | Scans git history and workspace for secrets with Gitleaks                        |
-|                  | `npm run security:osv`      | Identifies open-source vulnerabilities via Google OSV-Scanner                    |
-|                  | `npm run security:sbom`     | Generates a CycloneDX Software Bill of Materials (`cyclonedx.sbom.json`)         |
-|                  | `npm run security:trivy`    | Scans repository filesystem and dependencies for known CVEs via Aqua Trivy       |
-|                  | `npm run security:zizmor`   | Audits GitHub Actions workflows with Zizmor                                      |
-|                  | `npm run audit:licenses`    | Validates dependency licenses against approved open-source list                  |
-| **Pre-Flight**   | `npm run validate`          | Runs formatting, linting, secret checks, license audit, build, and test coverage |
+| Category         | Script                      | Description                                                                         |
+| :--------------- | :-------------------------- | :---------------------------------------------------------------------------------- |
+| **Development**  | `npm run dev` / `npm start` | Launches local Vite development server                                              |
+|                  | `npm run build`             | Compiles TypeScript and builds production distribution bundle                       |
+|                  | `npm run preview`           | Serves production build locally for verification                                    |
+| **Code Quality** | `npm run typecheck`         | Validates TypeScript types without emitting build files                             |
+|                  | `npm run lint`              | Lints TypeScript and TSX files via ESLint                                           |
+|                  | `npm run format`            | Auto-formats code with Prettier                                                     |
+|                  | `npm run format:check`      | Verifies code formatting without modifying files                                    |
+| **Testing**      | `npm test`                  | Starts Vitest in interactive watch mode                                             |
+|                  | `npm run test:run`          | Executes all unit tests once and exits                                              |
+|                  | `npm run test:watch`        | Explicit watch mode alias for unit tests                                            |
+|                  | `npm run test:coverage`     | Runs test suite with V8 code coverage report generation                             |
+|                  | `npm run sonar:scan`        | Executes SonarScanner CLI against local codebase and coverage telemetry             |
+| **Security**     | `npm run security:all`      | Executes full local security scan suite (Trivy, OSV, Gitleaks, Zizmor, SBOM)        |
+|                  | `npm run security:audit`    | Audits dependencies for critical vulnerabilities (`npm audit`)                      |
+|                  | `npm run security:secrets`  | Scans git staged changes for accidentally committed credentials & keys              |
+|                  | `npm run security:gitleaks` | Scans git history and workspace for secrets with Gitleaks                           |
+|                  | `npm run security:osv`      | Identifies open-source vulnerabilities via Google OSV-Scanner                       |
+|                  | `npm run security:sbom`     | Generates a CycloneDX Software Bill of Materials (`cyclonedx.sbom.json`)            |
+|                  | `npm run security:trivy`    | Scans repository filesystem and dependencies for known CVEs via Aqua Trivy          |
+|                  | `npm run security:zizmor`   | Audits GitHub Actions workflows with Zizmor                                         |
+|                  | `npm run audit:licenses`    | Validates dependency licenses against approved open-source list                     |
+| **Pre-Flight**   | `npm run validate`          | Runs formatting, linting, typecheck, secret checks, license audit, build, and tests |
 
 ---
 

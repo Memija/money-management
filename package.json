@@ -5,14 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "sonar:scan": "npx sonarqube-scanner",
     "security:all": "node scripts/run-security-scan.js all",
     "security:audit": "npm audit --audit-level=critical",
     "security:secrets": "node scripts/check-secrets.js",
@@ -22,7 +26,7 @@
     "security:trivy": "node scripts/run-security-scan.js trivy",
     "security:zizmor": "node scripts/run-security-scan.js zizmor",
     "audit:licenses": "license-checker-rseidelsohn --production --summary --excludePrivatePackages --onlyAllow \"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;0BSD;Unlicense;Python-2.0;OFL-1.1\"",
-    "validate": "npm run format:check && npm run lint && npm run security:secrets && npm run security:audit && npm run audit:licenses && npm run build && npm run test:coverage",
+    "validate": "npm run format:check && npm run lint && npm run typecheck && npm run security:secrets && npm run security:audit && npm run audit:licenses && npm run build && npm run test:coverage",
     "prepare": "husky"
   },
   "dependencies": {
