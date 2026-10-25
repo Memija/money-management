@@ -1,11 +1,6 @@
 # OSV-Scanner Configuration
 # https://google.github.io/osv-scanner/configuration/
 
-# uuid: Transitive dev dependency in various dev/build tools
-[[IgnoredVulns]]
-id = "CVE-2026-41907"
-reason = "Dev-only dependency; vulnerable buffer APIs are never invoked (only uuid.v4 is called)."
-
 # xlsx (SheetJS): Local browser parser
 [[IgnoredVulns]]
 id = "CVE-2024-22363"
@@ -15,7 +10,7 @@ reason = "Mitigated: spreadsheets are parsed locally in browser memory without s
 id = "CVE-2023-30533"
 reason = "Mitigated: spreadsheets are parsed locally in browser memory without server execution."
 
-# sprintf-js: Transitive dev dependency of @cyclonedx/cyclonedx-npm
+# pdfjs-dist: Local client-side parser in Web Worker
 [[IgnoredVulns]]
-id = "CVE-2026-97058"
-reason = "Dev-only dependency in @cyclonedx/cyclonedx-npm for SBOM generation; not bundled in production."
+id = "GHSA-hq66-cqwq-w95j"
+reason = "Mitigated: PDF bank statements are parsed client-side inside an isolated Web Worker without access to privileged Node APIs."
