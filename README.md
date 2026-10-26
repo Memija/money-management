@@ -7,7 +7,7 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Memija_money-management&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Memija_money-management)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg?logo=react)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-8-646cff.svg?logo=vite)](https://vite.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Vitest](https://img.shields.io/badge/Tested%20with-Vitest-6e9f18.svg?logo=vitest)](https://vitest.dev)
 [![License: Prosperity-3.0.0](https://img.shields.io/badge/License-Prosperity%203.0.0-blue.svg)](./LICENSE.md)
 
@@ -116,6 +116,45 @@ money-management/
 ├── sonar-project.properties  # SonarCloud quality analysis rules
 └── vite.config.ts            # Vite bundler and Vitest test runner configuration
 ```
+
+---
+
+## 📖 How to Use
+
+### 1. Set Up Accounts & Spaces
+
+- Open the application and navigate to **Settings** (`/settings`) or the **Accounts** overview.
+- Add your primary checking accounts, savings accounts, credit cards, or cash spaces.
+- Set starting balances and assign designated color badges or icons for easy recognition.
+
+### 2. Import Bank Statements
+
+- Click **Import Transactions** in the navigation bar.
+- Choose your input method:
+  - **PDF Statement**: Drag and drop statements directly from your bank.
+  - **CSV File**: Upload spreadsheets with custom column mapping and delimiter detection.
+  - **Smart Clipboard**: Paste raw copied transaction text from online banking portals or SMS alerts.
+- Verify institution and country autodetection, or select your bank manually.
+
+### 3. Review & Auto-Categorization
+
+- Inspect the **Import Review Dialog**: duplicate transactions and repeated entries are automatically detected and flagged.
+- Apply intelligent auto-categorization rules to merchants and payees.
+- Use batch actions to adjust categories, transfer flags, or tax tags across multiple transactions at once.
+
+### 4. Analyze Spending & Inspect Trends
+
+- Explore the **Dashboard**:
+  - Filter by custom date ranges, billing months, quarters, or year-to-date.
+  - Inspect cash flow deltas, income vs. expense ratios, and net savings rates.
+  - Drill down into interactive category donut and timeline charts powered by Recharts.
+- Toggle **Privacy Mode** in the header whenever viewing balances in shared spaces or public screens.
+
+### 5. Encrypted Backups & Data Portability
+
+- Navigate to **Settings -> Backup & Export**.
+- Export your complete encrypted JSON database for safekeeping.
+- Download formatted Excel (`.xlsx`) or CSV reports for tax filing or external accounting.
 
 ---
 

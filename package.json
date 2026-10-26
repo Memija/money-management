@@ -2,6 +2,19 @@
   "name": "saldio",
   "private": true,
   "version": "1.0.0",
+  "description": "Modern local-first personal finance and money management application",
+  "license": "Prosperity-3.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Memija/money-management.git"
+  },
+  "homepage": "https://github.com/Memija/money-management#readme",
+  "bugs": {
+    "url": "https://github.com/Memija/money-management/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +22,7 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview",
