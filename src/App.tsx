@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
 
+import CountrySelector from './components/CountrySelector'
 import AppFooter from './components/layout/AppFooter'
 import AppHeader from './components/layout/AppHeader'
 import { ErrorBoundary } from './components/shared/ErrorBoundary'
@@ -12,29 +13,19 @@ if (typeof window !== 'undefined') {
   ;(window as unknown as { __store: unknown }).__store = useAppStore
 }
 
-/** Delay before warming onboarding chunks when the app starts outside onboarding. */
-const DEFERRED_PREFETCH_DELAY_MS = 3000
-
-const loadCountrySelector = () => import('./components/CountrySelector')
 const loadInstitutionSelector = () => import('./components/InstitutionSelector')
 const loadTransactionImporter = () => import('./components/TransactionImporter')
 const loadImportReview = () => import('./components/ImportReview')
 
 const LazyDashboard = React.lazy(() => import('./components/Dashboard'))
 const Settings = React.lazy(() => import('./components/Settings'))
-const CountrySelector = React.lazy(loadCountrySelector)
 const InstitutionSelector = React.lazy(loadInstitutionSelector)
 const TransactionImporter = React.lazy(loadTransactionImporter)
 const ImportReview = React.lazy(loadImportReview)
 
 /** Warms the module cache for all onboarding steps so step transitions don't suspend. */
 const prefetchOnboardingSteps = (): void => {
-  for (const load of [
-    loadCountrySelector,
-    loadInstitutionSelector,
-    loadTransactionImporter,
-    loadImportReview,
-  ]) {
+  for (const load of [loadInstitutionSelector, loadTransactionImporter, loadImportReview]) {
     load().catch((error: unknown) => {
       console.warn('Failed to prefetch onboarding step:', error)
     })
@@ -53,9 +44,6 @@ const preloadDashboard = (): Promise<void> => {
     })
     .catch(() => {})
 }
-
-// Preload dashboard immediately in the background
-preloadDashboard()
 
 const LoadingFallback: React.FC = () => {
   const loading = useLanguageStore((s) => s.t.loading)
@@ -129,36 +117,28 @@ const App: React.FC = () => {
     }
   }, [currentStep])
 
-  // Preload dashboard as soon as app is active
+  const isDashboardStep = currentStep === 'dashboard'
   React.useEffect(() => {
-    preloadDashboard()
-  }, [])
+    if (isDashboardStep) {
+      preloadDashboard()
+    }
+  }, [isDashboardStep])
 
-  const isOnboardingStep = currentStep !== 'dashboard' && currentStep !== 'settings'
   React.useEffect(() => {
     if (!hasHydrated) {
       return
     }
-    if (isOnboardingStep) {
+    const handleFirstInteraction = (): void => {
       prefetchOnboardingSteps()
-      return
+      preloadDashboard()
     }
-    const timer = window.setTimeout(prefetchOnboardingSteps, DEFERRED_PREFETCH_DELAY_MS)
+    window.addEventListener('pointerdown', handleFirstInteraction, { once: true, passive: true })
+    window.addEventListener('keydown', handleFirstInteraction, { once: true, passive: true })
     return () => {
-      window.clearTimeout(timer)
+      window.removeEventListener('pointerdown', handleFirstInteraction)
+      window.removeEventListener('keydown', handleFirstInteraction)
     }
-  }, [hasHydrated, isOnboardingStep])
-
-  if (!hasHydrated) {
-    return (
-      <div className={styles['app-shell']}>
-        <div className={`app-container ${styles['onboarding-layout']}`}>
-          <LoadingFallback />
-        </div>
-        <AppFooter />
-      </div>
-    )
-  }
+  }, [hasHydrated])
 
   // Dashboard has its own full layout
   if (currentStep === 'dashboard') {

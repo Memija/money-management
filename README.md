@@ -204,30 +204,38 @@ money-management/
 
 ## 🛠️ Available Scripts
 
-| Category         | Script                      | Description                                                                         |
-| :--------------- | :-------------------------- | :---------------------------------------------------------------------------------- |
-| **Development**  | `npm run dev` / `npm start` | Launches local Vite development server                                              |
-|                  | `npm run build`             | Compiles TypeScript and builds production distribution bundle                       |
-|                  | `npm run preview`           | Serves production build locally for verification                                    |
-| **Code Quality** | `npm run typecheck`         | Validates TypeScript types without emitting build files                             |
-|                  | `npm run lint`              | Lints TypeScript and TSX files via ESLint                                           |
-|                  | `npm run format`            | Auto-formats code with Prettier                                                     |
-|                  | `npm run format:check`      | Verifies code formatting without modifying files                                    |
-| **Testing**      | `npm test`                  | Starts Vitest in interactive watch mode                                             |
-|                  | `npm run test:run`          | Executes all unit tests once and exits                                              |
-|                  | `npm run test:watch`        | Explicit watch mode alias for unit tests                                            |
-|                  | `npm run test:coverage`     | Runs test suite with V8 code coverage report generation                             |
-|                  | `npm run sonar:scan`        | Executes SonarScanner CLI against local codebase and coverage telemetry             |
-| **Security**     | `npm run security:all`      | Executes full local security scan suite (Trivy, OSV, Gitleaks, Zizmor, SBOM)        |
-|                  | `npm run security:audit`    | Audits dependencies for critical vulnerabilities (`npm audit`)                      |
-|                  | `npm run security:secrets`  | Scans git staged changes for accidentally committed credentials & keys              |
-|                  | `npm run security:gitleaks` | Scans git history and workspace for secrets with Gitleaks                           |
-|                  | `npm run security:osv`      | Identifies open-source vulnerabilities via Google OSV-Scanner                       |
-|                  | `npm run security:sbom`     | Generates a CycloneDX Software Bill of Materials (`cyclonedx.sbom.json`)            |
-|                  | `npm run security:trivy`    | Scans repository filesystem and dependencies for known CVEs via Aqua Trivy          |
-|                  | `npm run security:zizmor`   | Audits GitHub Actions workflows with Zizmor                                         |
-|                  | `npm run audit:licenses`    | Validates dependency licenses against approved open-source list                     |
-| **Pre-Flight**   | `npm run validate`          | Runs formatting, linting, typecheck, secret checks, license audit, build, and tests |
+| Category         | Script                          | Description                                                                         |
+| :--------------- | :------------------------------ | :---------------------------------------------------------------------------------- |
+| **Development**  | `npm run dev` / `npm start`     | Launches local Vite development server                                              |
+|                  | `npm run watch`                 | Builds development bundle continuously on file changes                              |
+|                  | `npm run build`                 | Compiles TypeScript and builds production distribution bundle                       |
+|                  | `npm run preview`               | Serves production build locally for verification                                    |
+| **Code Quality** | `npm run typecheck`             | Validates TypeScript types without emitting build files                             |
+|                  | `npm run lint`                  | Lints TypeScript and TSX files via ESLint (including `eslint-plugin-security`)      |
+|                  | `npm run format`                | Auto-formats code with Prettier                                                     |
+|                  | `npm run format:check`          | Verifies code formatting without modifying files                                    |
+| **Testing**      | `npm test`                      | Starts Vitest in interactive watch mode                                             |
+|                  | `npm run test:run`              | Executes all unit tests once and exits                                              |
+|                  | `npm run test:watch`            | Explicit watch mode alias for unit tests                                            |
+|                  | `npm run test:coverage`         | Runs test suite with V8 code coverage and Sonar XML test execution report           |
+|                  | `npm run sonar:scan`            | Executes SonarScanner CLI against local codebase and coverage telemetry             |
+| **Performance**  | `npm run test:lighthouse`       | Runs Lighthouse CI (`lhci autorun`) for both mobile and desktop presets             |
+|                  | `npm run test:lighthouse:flows` | Runs Puppeteer/Lighthouse user flows across desktop/mobile and light/dark themes    |
+| **Security**     | `npm run security:all`          | Executes full local security scan suite (Trivy, OSV, Gitleaks, Zizmor, SBOM)        |
+|                  | `npm run security:audit`        | Audits dependencies for critical vulnerabilities (`npm audit`)                      |
+|                  | `npm run security:codeql`       | Runs local CodeQL database creation and static security analysis                    |
+|                  | `npm run security:dast`         | Runs local OWASP ZAP baseline DAST scan via Docker                                  |
+|                  | `npm run security:secrets`      | Scans git staged changes for accidentally committed credentials & keys              |
+|                  | `npm run security:gitleaks`     | Scans git history and workspace for secrets with Gitleaks                           |
+|                  | `npm run security:osv`          | Identifies open-source vulnerabilities via Google OSV-Scanner                       |
+|                  | `npm run security:sbom`         | Generates a CycloneDX Software Bill of Materials (`cyclonedx.sbom.json`)            |
+|                  | `npm run security:socket`       | Scans dependencies for supply-chain risks via Socket.dev CLI                        |
+|                  | `npm run security:trivy`        | Scans repository filesystem and dependencies for known CVEs via Aqua Trivy          |
+|                  | `npm run security:zizmor`       | Audits GitHub Actions workflows with Zizmor                                         |
+|                  | `npm run audit:licenses`        | Validates dependency licenses against approved open-source list                     |
+| **Deployment**   | `npm run deploy`                | Builds (`predeploy`) and deploys static bundle to Firebase Hosting                  |
+|                  | `npm run deploy:hosting`        | Explicit build and Firebase Hosting deployment                                      |
+| **Pre-Flight**   | `npm run validate`              | Runs formatting, linting, typecheck, secret checks, license audit, build, and tests |
 
 ---
 

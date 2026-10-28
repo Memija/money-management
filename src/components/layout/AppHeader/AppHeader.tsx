@@ -109,7 +109,15 @@ const AppHeader: React.FC = () => {
     <header className={styles['app-header']} id="app-header">
       <div className={styles['app-header-inner']}>
         <div className={styles['app-header-logo']}>
-          <img src="/logo/logo.png" alt="Saldio logo" className={styles['app-header-logo-icon']} />
+          <img
+            src="/logo/logo.png"
+            alt="Saldio logo"
+            width={40}
+            height={40}
+            decoding="async"
+            fetchPriority="low"
+            className={styles['app-header-logo-icon']}
+          />
           <span className={styles['app-header-logo-text']}>{t.appName}</span>
         </div>
 

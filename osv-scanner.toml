@@ -14,3 +14,16 @@ reason = "Mitigated: spreadsheets are parsed locally in browser memory without s
 [[IgnoredVulns]]
 id = "GHSA-hq66-cqwq-w95j"
 reason = "Mitigated: PDF bank statements are parsed client-side inside an isolated Web Worker without access to privileged Node APIs."
+
+# @lhci/cli / @puppeteer/browsers transitive dev-only dependencies
+[[IgnoredVulns]]
+id = "GHSA-7pqw-9j4j-h8q3"
+reason = "Mitigated: extract-zip is a dev-only transitive dependency of @puppeteer/browsers used only when downloading trusted Chromium binaries."
+
+[[IgnoredVulns]]
+id = "GHSA-jmr9-qjv8-65gv"
+reason = "Mitigated: extract-zip is a dev-only transitive dependency of @puppeteer/browsers used only when downloading trusted Chromium binaries."
+
+[[IgnoredVulns]]
+id = "GHSA-w5hq-g745-h8pq"
+reason = "Mitigated: uuid v8 is a dev-only transitive dependency of @lhci/cli which calls uuid.v4() without a custom buffer argument."

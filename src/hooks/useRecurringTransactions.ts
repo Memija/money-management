@@ -31,6 +31,137 @@ export interface RecurringData {
   totalMonthly: number
 }
 
+const MS_PER_DAY = 86400000
+
+const isAdjacentMonthlyMatch = (
+  targetTx: Transaction,
+  neighborTx: Transaction,
+  targetAmount: number,
+): boolean => {
+  const diffDays = Math.ceil(
+    Math.abs(Date.parse(targetTx.date) - Date.parse(neighborTx.date)) / MS_PER_DAY,
+  )
+  const neighborAmount = Math.abs(neighborTx.amount)
+  const dev = Math.abs(targetAmount - neighborAmount) / targetAmount
+  return diffDays >= 20 && diffDays <= 40 && dev <= 0.2
+}
+
+const evaluateClusterAllTime = (
+  cluster: Transaction[],
+  normName: string,
+  maxTime: number,
+  totalTimeframeDays: number,
+): RecurringExpense | null => {
+  const mostRecentTxTime = Date.parse(cluster[cluster.length - 1].date)
+  const daysSinceLastTx = Math.ceil((maxTime - mostRecentTxTime) / MS_PER_DAY)
+  const firstTxTime = Date.parse(cluster[0].date)
+  const spanDays = Math.ceil((mostRecentTxTime - firstTxTime) / MS_PER_DAY)
+
+  if (totalTimeframeDays >= 365 && cluster.length <= 4 && spanDays <= 120 && daysSinceLastTx > 90) {
+    return null
+  }
+
+  const evaluation = evaluateMonthlyRecurrence(cluster)
+  if (!evaluation.isRecurring) {
+    return null
+  }
+
+  const amount = Math.round(evaluation.avgAmount * 100) / 100
+  const recentTx = cluster[cluster.length - 1]
+
+  return {
+    id: normName,
+    name: evaluation.displayName,
+    amount,
+    category: recentTx.category || 'Other',
+    frequency: 'monthly',
+    transactionCount: cluster.length,
+    transactionIds: cluster.map((t) => t.id),
+  }
+}
+
+const evaluateClusterInPeriod = (
+  cluster: Transaction[],
+  txsInPeriod: Transaction[],
+  normName: string,
+): RecurringExpense | null => {
+  if (txsInPeriod.length >= 2) {
+    txsInPeriod.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
+    const evaluation = evaluateMonthlyRecurrence(txsInPeriod)
+    if (!evaluation.isRecurring) {
+      return null
+    }
+
+    const amount = Math.round(evaluation.avgAmount * 100) / 100
+    const recentTx = txsInPeriod[txsInPeriod.length - 1]
+
+    return {
+      id: normName,
+      name: evaluation.displayName,
+      amount,
+      category: recentTx.category || 'Other',
+      frequency: 'monthly',
+      transactionCount: txsInPeriod.length,
+      transactionIds: txsInPeriod.map((t) => t.id),
+    }
+  }
+
+  if (txsInPeriod.length !== 1) {
+    return null
+  }
+
+  const targetTx = txsInPeriod[0]
+  const idx = cluster.findIndex((t) => t.id === targetTx.id)
+  const targetAmount = Math.abs(targetTx.amount)
+  const matchesPrev = idx > 0 && isAdjacentMonthlyMatch(targetTx, cluster[idx - 1], targetAmount)
+  const matchesNext =
+    !matchesPrev &&
+    idx < cluster.length - 1 &&
+    isAdjacentMonthlyMatch(targetTx, cluster[idx + 1], targetAmount)
+
+  if (!matchesPrev && !matchesNext) {
+    return null
+  }
+
+  return {
+    id: normName,
+    name: cleanDisplayName(targetTx),
+    amount: Math.round(targetAmount * 100) / 100,
+    category: targetTx.category || 'Other',
+    frequency: 'monthly',
+    transactionCount: 1,
+    transactionIds: [targetTx.id],
+  }
+}
+
+const mergeGroupExpenses = (
+  normName: string,
+  recurringInGroup: RecurringExpense[],
+): RecurringExpense | null => {
+  if (recurringInGroup.length === 0) {
+    return null
+  }
+  if (recurringInGroup.length === 1) {
+    return recurringInGroup[0]
+  }
+
+  const combinedAmount =
+    Math.round(recurringInGroup.reduce((sum, item) => sum + item.amount, 0) * 100) / 100
+  const combinedCount = recurringInGroup.reduce((sum, item) => sum + item.transactionCount, 0)
+  const allIds = Array.from(new Set(recurringInGroup.flatMap((item) => item.transactionIds || [])))
+  const primaryItem = [...recurringInGroup].sort((a, b) => b.amount - a.amount)[0]
+
+  return {
+    id: normName,
+    name: primaryItem.name,
+    amount: combinedAmount,
+    category: primaryItem.category,
+    frequency: 'monthly',
+    transactionCount: combinedCount,
+    transactionIds: allIds,
+  }
+}
+
 export const useRecurringTransactions = (
   allRawTransactions: Transaction[],
   period?: PeriodFilter,
@@ -55,133 +186,18 @@ export const useRecurringTransactions = (
       const recurringInGroup: RecurringExpense[] = []
 
       for (const cluster of clusters) {
-        const txsInPeriod = isAllTime ? cluster : filterByPeriod(cluster, period)
+        const expense = isAllTime
+          ? evaluateClusterAllTime(cluster, normName, maxTime, totalTimeframeDays)
+          : evaluateClusterInPeriod(cluster, filterByPeriod(cluster, period), normName)
 
-        if (isAllTime) {
-          const mostRecentTxTime = Date.parse(cluster[cluster.length - 1].date)
-          const daysSinceLastTx = Math.ceil((maxTime - mostRecentTxTime) / 86400000)
-          const firstTxTime = Date.parse(cluster[0].date)
-          const spanDays = Math.ceil((mostRecentTxTime - firstTxTime) / 86400000)
-
-          if (
-            totalTimeframeDays >= 365 &&
-            cluster.length <= 4 &&
-            spanDays <= 120 &&
-            daysSinceLastTx > 90
-          ) {
-            continue
-          }
-
-          const evaluation = evaluateMonthlyRecurrence(cluster)
-          if (!evaluation.isRecurring) {
-            continue
-          }
-
-          const amount = Math.round(evaluation.avgAmount * 100) / 100
-          const recentTx = cluster[cluster.length - 1]
-
-          recurringInGroup.push({
-            id: normName,
-            name: evaluation.displayName,
-            amount,
-            category: recentTx.category || 'Other',
-            frequency: 'monthly',
-            transactionCount: cluster.length,
-            transactionIds: cluster.map((t) => t.id),
-          })
-        } else {
-          // A specific timeframe is selected (year, quarter, month)
-          if (txsInPeriod.length >= 2) {
-            txsInPeriod.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
-            const evaluation = evaluateMonthlyRecurrence(txsInPeriod)
-            if (!evaluation.isRecurring) {
-              continue
-            }
-
-            const amount = Math.round(evaluation.avgAmount * 100) / 100
-            const recentTx = txsInPeriod[txsInPeriod.length - 1]
-
-            recurringInGroup.push({
-              id: normName,
-              name: evaluation.displayName,
-              amount,
-              category: recentTx.category || 'Other',
-              frequency: 'monthly',
-              transactionCount: txsInPeriod.length,
-              transactionIds: txsInPeriod.map((t) => t.id),
-            })
-          } else if (txsInPeriod.length === 1) {
-            const targetTx = txsInPeriod[0]
-            const idx = cluster.findIndex((t) => t.id === targetTx.id)
-            const targetAmount = Math.abs(targetTx.amount)
-            let isRecurringMonthly = false
-
-            // Check predecessor
-            if (idx > 0) {
-              const prevTx = cluster[idx - 1]
-              const diffPrev = Math.ceil(
-                Math.abs(Date.parse(targetTx.date) - Date.parse(prevTx.date)) / 86400000,
-              )
-              const prevAmount = Math.abs(prevTx.amount)
-              const dev = Math.abs(targetAmount - prevAmount) / targetAmount
-              if (diffPrev >= 20 && diffPrev <= 40 && dev <= 0.2) {
-                isRecurringMonthly = true
-              }
-            }
-
-            // Check successor
-            if (!isRecurringMonthly && idx < cluster.length - 1) {
-              const nextTx = cluster[idx + 1]
-              const diffNext = Math.ceil(
-                Math.abs(Date.parse(nextTx.date) - Date.parse(targetTx.date)) / 86400000,
-              )
-              const nextAmount = Math.abs(nextTx.amount)
-              const dev = Math.abs(targetAmount - nextAmount) / targetAmount
-              if (diffNext >= 20 && diffNext <= 40 && dev <= 0.2) {
-                isRecurringMonthly = true
-              }
-            }
-
-            if (!isRecurringMonthly) {
-              continue
-            }
-
-            const displayName = cleanDisplayName(targetTx)
-            const amount = Math.round(targetAmount * 100) / 100
-
-            recurringInGroup.push({
-              id: normName,
-              name: displayName,
-              amount,
-              category: targetTx.category || 'Other',
-              frequency: 'monthly',
-              transactionCount: 1,
-              transactionIds: [targetTx.id],
-            })
-          }
+        if (expense) {
+          recurringInGroup.push(expense)
         }
       }
 
-      if (recurringInGroup.length === 1) {
-        recurringExpenses.push(recurringInGroup[0])
-      } else if (recurringInGroup.length > 1) {
-        const combinedAmount =
-          Math.round(recurringInGroup.reduce((sum, item) => sum + item.amount, 0) * 100) / 100
-        const combinedCount = recurringInGroup.reduce((sum, item) => sum + item.transactionCount, 0)
-        const allIds = Array.from(
-          new Set(recurringInGroup.flatMap((item) => item.transactionIds || [])),
-        )
-        const primaryItem = [...recurringInGroup].sort((a, b) => b.amount - a.amount)[0]
-
-        recurringExpenses.push({
-          id: normName,
-          name: primaryItem.name,
-          amount: combinedAmount,
-          category: primaryItem.category,
-          frequency: 'monthly',
-          transactionCount: combinedCount,
-          transactionIds: allIds,
-        })
+      const merged = mergeGroupExpenses(normName, recurringInGroup)
+      if (merged) {
+        recurringExpenses.push(merged)
       }
     }
 

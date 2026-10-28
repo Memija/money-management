@@ -1,7 +1,12 @@
 import type { TranslationStrings } from '../../i18n/types'
 import type { Transaction } from '../../types'
 import { filterInternalSpaceTransfers } from '../account-transfers'
-import { detectColumnIndices, findHeaderRowIndex, parseRow } from './csv-columns'
+import {
+  type ColumnIndices,
+  detectColumnIndices,
+  findHeaderRowIndex,
+  parseRow,
+} from './csv-columns'
 import { findSpaceTransferRowIndices } from './csv-space-detection'
 import { isValidDateRaw } from './helpers'
 
@@ -13,6 +18,31 @@ export interface ParsedCsvTransactionsResult {
   discardedSpaceCount: number
   detectedAccountIbans?: string[]
   excludedSpaceTransactions?: Transaction[]
+}
+
+const MAIN_ACCOUNT_LABELS = new Set(['main account', 'hauptkonto', 'glavni račun', 'glavni racun'])
+
+function isMainAccountLabel(value?: string): boolean {
+  return !value || MAIN_ACCOUNT_LABELS.has(value.toLowerCase())
+}
+
+function parseSpaceTransferRow(
+  row: string[],
+  indices: ColumnIndices,
+  institution: string,
+): Transaction | null {
+  const transaction = parseRow(row, indices, institution)
+  if (!transaction) {
+    return null
+  }
+  if (!transaction.subAccount && indices.accountIdx !== -1) {
+    const pIdx = indices.partnerIdx !== -1 ? indices.partnerIdx : indices.descIdx
+    const rawPartner = pIdx !== -1 ? (row[pIdx]?.toString().trim() ?? '') : ''
+    if (rawPartner && !isMainAccountLabel(rawPartner)) {
+      transaction.subAccount = rawPartner
+    }
+  }
+  return transaction
 }
 
 export function rowsToTransactionsWithMeta(
@@ -57,22 +87,9 @@ export function rowsToTransactionsWithMeta(
     }
 
     if (spaceTransferIndices.has(i)) {
-      const transaction = parseRow(row, indices, institution)
-      if (transaction) {
-        if (!transaction.subAccount && indices.accountIdx !== -1) {
-          const pIdx = indices.partnerIdx !== -1 ? indices.partnerIdx : indices.descIdx
-          const rawPartner = pIdx !== -1 ? (row[pIdx]?.toString().trim() ?? '') : ''
-          const isMain = (s?: string) =>
-            !s ||
-            s.toLowerCase() === 'main account' ||
-            s.toLowerCase() === 'hauptkonto' ||
-            s.toLowerCase() === 'glavni račun' ||
-            s.toLowerCase() === 'glavni racun'
-          if (rawPartner && !isMain(rawPartner)) {
-            transaction.subAccount = rawPartner
-          }
-        }
-        excludedSpaceTransactions.push(transaction)
+      const spaceTx = parseSpaceTransferRow(row, indices, institution)
+      if (spaceTx) {
+        excludedSpaceTransactions.push(spaceTx)
       }
       continue
     }

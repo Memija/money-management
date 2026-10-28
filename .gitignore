@@ -29,6 +29,8 @@ dist-ssr
 # Testing & Coverage
 coverage
 coverage-ts
+.lighthouseci/
+lighthouse-reports/
 
 # SonarQube
 .scannerwork/
@@ -39,6 +41,8 @@ cyclonedx.sbom.json
 spdx.sbom.json
 *.sarif
 sarif-results/
+zap-reports/
+codeql-db/
 
 data/*
 

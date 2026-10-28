@@ -74,7 +74,6 @@ export function recategorizeAccounts(
   accounts: ImportedAccount[],
   manualCategories?: Record<string, string>,
   customKeywords?: Record<string, string[]>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _customCategories?: CustomCategory[],
 ): { accounts: ImportedAccount[]; changed: boolean } {
   let changed = false

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { resolveRunner } from './run-security-scan'
 
 describe('run-security-scan', () => {
@@ -114,9 +115,11 @@ describe('run-security-scan', () => {
       const missingPlan = resolveRunner('dast', { hasDocker: () => false })
       expect(missingPlan.type).toBe('missing')
 
-      const dockerPlan = resolveRunner('dast', { hasDocker: () => true })
+      const dockerPlan = resolveRunner('dast', { hasDocker: () => true, cwd: '/mock/repo' })
       expect(dockerPlan.type).toBe('docker')
+      expect(dockerPlan.cmd).toContain('ghcr.io/zaproxy/zaproxy:stable')
       expect(dockerPlan.cmd).toContain('zap-baseline.py')
+      expect(dockerPlan.cmd).toContain('-c rules.tsv')
     })
 
     it('should check CodeQL CLI', () => {

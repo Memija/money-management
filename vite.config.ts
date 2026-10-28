@@ -26,23 +26,18 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (!id.includes('node_modules')) {
+          const normalizedId = id.replace(/\\/g, '/')
+          if (!normalizedId.includes('node_modules')) {
             return
           }
-          if (id.includes('recharts')) {
+          if (normalizedId.includes('recharts') || normalizedId.includes('d3-')) {
             return 'recharts'
           }
-          if (id.includes('framer-motion')) {
-            return 'framer-motion'
-          }
-          if (id.includes('lucide-react') || id.includes('react-icons')) {
-            return 'icons'
-          }
           if (
-            id.includes('/react/') ||
-            id.includes('/react-dom/') ||
-            id.includes('/zustand/') ||
-            id.includes('/react-virtuoso/')
+            normalizedId.includes('/react/') ||
+            normalizedId.includes('/react-dom/') ||
+            normalizedId.includes('/scheduler/') ||
+            normalizedId.includes('/zustand/')
           ) {
             return 'react-vendor'
           }
@@ -57,10 +52,20 @@ export default defineConfig({
     css: false,
     testTimeout: 15000,
     include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.{test,spec}.js'],
+    reporters: ['default', 'vitest-sonar-reporter'],
+    outputFile: {
+      'vitest-sonar-reporter': './coverage/sonar-report.xml',
+    },
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'lcov', 'json-summary'],
+      reporter: ['text', 'text-summary', 'lcov', 'json-summary'],
       reportsDirectory: './coverage',
+      thresholds: {
+        lines: 80,
+        statements: 80,
+        functions: 80,
+        branches: 70,
+      },
       exclude: [
         'node_modules/**',
         'dist/**',

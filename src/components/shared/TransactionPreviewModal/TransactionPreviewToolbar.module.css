@@ -364,12 +364,6 @@
       color: #9f1239;
     }
   }
-  .excluded-filter-btn-active {
-    background: #e11d48 !important;
-    border-color: #be123c !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(225, 29, 72, 0.3);
-  }
 
   .duplicate-filter-btn {
     background: #fffbeb;
@@ -380,12 +374,6 @@
       border-color: #f59e0b;
       color: #92400e;
     }
-  }
-  .duplicate-filter-btn-active {
-    background: #d97706 !important;
-    border-color: #b45309 !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
   }
 
   .already-duplicated-filter-btn {
@@ -398,12 +386,6 @@
       color: #1e293b;
     }
   }
-  .already-duplicated-filter-btn-active {
-    background: #475569 !important;
-    border-color: #334155 !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(71, 85, 105, 0.3);
-  }
 
   .space-transfers-filter-btn {
     background: #f0f9ff;
@@ -414,12 +396,6 @@
       border-color: #38bdf8;
       color: #075985;
     }
-  }
-  .space-transfers-filter-btn-active {
-    background: #0284c7 !important;
-    border-color: #0369a1 !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
   }
 
   .internal-transfers-filter-btn {
@@ -432,12 +408,6 @@
       color: #6b21a8;
     }
   }
-  .internal-transfers-filter-btn-active {
-    background: #9333ea !important;
-    border-color: #7e22ce !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
-  }
 
   .modified-filter-btn {
     background: #fff7ed;
@@ -449,12 +419,6 @@
       color: #9a3412;
     }
   }
-  .modified-filter-btn-active {
-    background: #ea580c !important;
-    border-color: #c2410c !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
-  }
 
   .unlocked-filter-btn {
     background: #fef2f2;
@@ -465,12 +429,6 @@
       border-color: #ef4444;
       color: #b91c1c;
     }
-  }
-  .unlocked-filter-btn-active {
-    background: #dc2626 !important;
-    border-color: #b91c1c !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
   }
 }
 

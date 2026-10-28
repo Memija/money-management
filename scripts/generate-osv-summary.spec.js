@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import { generateOsvSummary } from './generate-osv-summary'
 
 describe('generate-osv-summary', () => {

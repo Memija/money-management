@@ -88,6 +88,31 @@ export function isDockerAvailable() {
   }
 }
 
+function parseSocketConfigFile(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8').trim()
+    let jsonStr = raw
+    try {
+      const decoded = Buffer.from(raw, 'base64').toString('utf8')
+      if (decoded.includes('apiToken')) {
+        jsonStr = decoded
+      }
+    } catch {
+      // ignore
+    }
+    const parsed = JSON.parse(jsonStr)
+    if (!parsed.apiToken || parsed.apiToken === 'undefined') {
+      return null
+    }
+    if (parsed.defaultOrg === 'SocketDemo') {
+      return { authenticated: false, isDemoToken: true }
+    }
+    return { authenticated: true, isDemoToken: false }
+  } catch {
+    return null
+  }
+}
+
 /**
  * Checks if Socket API authentication is configured with valid scan permissions.
  * @returns {{ authenticated: boolean, isDemoToken: boolean }}
@@ -105,32 +130,177 @@ export function checkSocketAuth() {
   ].filter(Boolean)
 
   for (const p of candidates) {
-    if (fs.existsSync(p)) {
-      try {
-        const raw = fs.readFileSync(p, 'utf8').trim()
-        let jsonStr = raw
-        try {
-          const decoded = Buffer.from(raw, 'base64').toString('utf8')
-          if (decoded.includes('apiToken')) {
-            jsonStr = decoded
-          }
-        } catch {
-          // ignore
-        }
-        const parsed = JSON.parse(jsonStr)
-        if (parsed.apiToken && parsed.apiToken !== 'undefined') {
-          if (parsed.defaultOrg === 'SocketDemo') {
-            return { authenticated: false, isDemoToken: true }
-          }
-          return { authenticated: true, isDemoToken: false }
-        }
-      } catch {
-        // ignore
-      }
+    if (!fs.existsSync(p)) {
+      continue
+    }
+    const status = parseSocketConfigFile(p)
+    if (status) {
+      return status
     }
   }
 
   return { authenticated: false, isDemoToken: false }
+}
+
+function resolveTrivy({ hasCmd, hasDocker, normalizedCwd }) {
+  if (hasCmd('trivy')) {
+    return { type: 'cli', cmd: 'trivy fs . --severity CRITICAL,HIGH --ignore-unfixed' }
+  }
+  if (hasDocker()) {
+    return {
+      type: 'docker',
+      cmd: `docker run --rm -v "${normalizedCwd}:/src" aquasec/trivy fs /src --severity CRITICAL,HIGH --ignore-unfixed`,
+    }
+  }
+  return {
+    type: 'missing',
+    instructions: [
+      'Trivy is not found in PATH and Docker daemon is not active.',
+      'Install Trivy locally:',
+      '  • Windows (winget): winget install AquaSecurity.Trivy',
+      '  • macOS (Homebrew): brew install trivy',
+      '  • Or start Docker Desktop to run via container.',
+    ].join('\n'),
+  }
+}
+
+function resolveOsv({ hasCmd, hasDocker, normalizedCwd }) {
+  if (hasCmd('osv-scanner')) {
+    return {
+      type: 'cli',
+      cmd: 'osv-scanner --lockfile=package-lock.json --config=osv-scanner.toml',
+    }
+  }
+  if (hasDocker()) {
+    return {
+      type: 'docker',
+      cmd: `docker run --rm -v "${normalizedCwd}:/src" ghcr.io/google/osv-scanner:latest --lockfile=/src/package-lock.json --config=/src/osv-scanner.toml`,
+    }
+  }
+  return {
+    type: 'missing',
+    instructions: [
+      'Google OSV-Scanner is not found in PATH and Docker daemon is not active.',
+      'Install OSV-Scanner locally:',
+      '  • Go: go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest',
+      '  • Or download binary from: https://github.com/google/osv-scanner/releases',
+      '  • Or start Docker Desktop to run via container.',
+    ].join('\n'),
+  }
+}
+
+function resolveGitleaks({ hasCmd, hasDocker, normalizedCwd }) {
+  if (hasCmd('gitleaks')) {
+    return { type: 'cli', cmd: 'gitleaks detect --source . --config .gitleaks.toml --verbose' }
+  }
+  if (hasDocker()) {
+    return {
+      type: 'docker',
+      cmd: `docker run --rm -v "${normalizedCwd}:/path" zricethezav/gitleaks:latest detect --source=/path --config=/path/.gitleaks.toml --verbose`,
+    }
+  }
+  return {
+    type: 'fallback',
+    cmd: 'node scripts/check-secrets.js',
+    message:
+      'Gitleaks CLI not found in PATH. Falling back to built-in local secret scanner (scripts/check-secrets.js)...',
+  }
+}
+
+function resolveZizmor({ hasCmd }) {
+  if (hasCmd('zizmor')) {
+    return { type: 'cli', cmd: 'zizmor .' }
+  }
+  if (hasCmd('uvx')) {
+    return { type: 'cli', cmd: 'uvx zizmor .' }
+  }
+  if (hasCmd('pipx')) {
+    return { type: 'cli', cmd: 'pipx run zizmor .' }
+  }
+  return {
+    type: 'missing',
+    instructions: [
+      'zizmor is not installed.',
+      'Install zizmor locally:',
+      '  • uv: uvx zizmor .',
+      '  • Cargo: cargo install zizmor',
+      '  • pipx: pipx install zizmor',
+      '  • Or download binary from: https://github.com/zizmorcore/zizmor/releases',
+    ].join('\n'),
+  }
+}
+
+function resolveDast({ hasDocker, normalizedCwd }) {
+  if (hasDocker()) {
+    return {
+      type: 'docker',
+      cmd: `docker run --rm -v "${normalizedCwd}/.zap:/zap/wrk/:ro" -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://host.docker.internal:4173 -c rules.tsv -I`,
+    }
+  }
+  return {
+    type: 'missing',
+    instructions: [
+      'Docker daemon is required to run OWASP ZAP locally.',
+      'Start Docker Desktop and run `npm run preview` (port 4173), then re-run this command.',
+    ].join('\n'),
+  }
+}
+
+function resolveCodeql({ hasCmd }) {
+  if (hasCmd('codeql')) {
+    return {
+      type: 'cli',
+      cmd: 'codeql database create codeql-db --language=javascript-typescript && codeql database analyze codeql-db',
+    }
+  }
+  return {
+    type: 'missing',
+    instructions: [
+      'CodeQL CLI is not installed.',
+      'To run CodeQL locally:',
+      '  • Install the official "CodeQL" extension in VS Code / Cursor for interactive local queries.',
+      '  • Or install CodeQL CLI: https://docs.github.com/en/code-security/codeql-cli',
+    ].join('\n'),
+  }
+}
+
+function resolveSocket({ hasCmd, isSocketAuth, isDemoToken }) {
+  if (isSocketAuth) {
+    const cmd = hasCmd('socket')
+      ? 'socket scan create .'
+      : 'npx -y @socketsecurity/cli scan create .'
+    return { type: 'cli', cmd }
+  }
+  return {
+    type: 'missing',
+    instructions: isDemoToken
+      ? [
+          'Socket.dev is currently configured with the limited public demo token (SocketDemo),',
+          'which does not have the "full-scans:create" permission required for repository scans.',
+          'To run Socket supply chain security scans locally:',
+          '  • Create a free token at https://socket.dev/dashboard (Settings -> API Keys)',
+          '  • Run: npx @socketsecurity/cli login and enter your personal token, OR',
+          '  • Set: $env:SOCKET_CLI_API_TOKEN = "your_token"',
+          '  • Note: Supply chain protection also runs automatically in CI via .github/workflows/socket.yml.',
+        ].join('\n')
+      : [
+          'Socket.dev API token is not configured.',
+          'To run Socket supply chain security scans locally:',
+          '  • Run: npx @socketsecurity/cli login (to authenticate with your Socket.dev account)',
+          '  • Or set the SOCKET_CLI_API_TOKEN environment variable.',
+          '  • Note: Supply chain protection also runs automatically in CI via .github/workflows/socket.yml.',
+        ].join('\n'),
+  }
+}
+
+const TOOL_RESOLVERS = {
+  trivy: resolveTrivy,
+  osv: resolveOsv,
+  gitleaks: resolveGitleaks,
+  zizmor: resolveZizmor,
+  dast: resolveDast,
+  codeql: resolveCodeql,
+  socket: resolveSocket,
 }
 
 /**
@@ -150,160 +320,15 @@ export function resolveRunner(tool, envChecks = {}) {
   const cwd = envChecks.cwd ?? process.cwd()
   const normalizedCwd = cwd.replace(/\\/g, '/')
 
-  switch (tool) {
-    case 'trivy':
-      if (hasCmd('trivy')) {
-        return { type: 'cli', cmd: 'trivy fs . --severity CRITICAL,HIGH --ignore-unfixed' }
-      }
-      if (hasDocker()) {
-        return {
-          type: 'docker',
-          cmd: `docker run --rm -v "${normalizedCwd}:/src" aquasec/trivy fs /src --severity CRITICAL,HIGH --ignore-unfixed`,
-        }
-      }
-      return {
-        type: 'missing',
-        instructions: [
-          'Trivy is not found in PATH and Docker daemon is not active.',
-          'Install Trivy locally:',
-          '  • Windows (winget): winget install AquaSecurity.Trivy',
-          '  • macOS (Homebrew): brew install trivy',
-          '  • Or start Docker Desktop to run via container.',
-        ].join('\n'),
-      }
-
-    case 'osv':
-      if (hasCmd('osv-scanner')) {
-        return {
-          type: 'cli',
-          cmd: 'osv-scanner --lockfile=package-lock.json --config=osv-scanner.toml',
-        }
-      }
-      if (hasDocker()) {
-        return {
-          type: 'docker',
-          cmd: `docker run --rm -v "${normalizedCwd}:/src" ghcr.io/google/osv-scanner:latest --lockfile=/src/package-lock.json --config=/src/osv-scanner.toml`,
-        }
-      }
-      return {
-        type: 'missing',
-        instructions: [
-          'Google OSV-Scanner is not found in PATH and Docker daemon is not active.',
-          'Install OSV-Scanner locally:',
-          '  • Go: go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest',
-          '  • Or download binary from: https://github.com/google/osv-scanner/releases',
-          '  • Or start Docker Desktop to run via container.',
-        ].join('\n'),
-      }
-
-    case 'gitleaks':
-      if (hasCmd('gitleaks')) {
-        return { type: 'cli', cmd: 'gitleaks detect --source . --config .gitleaks.toml --verbose' }
-      }
-      if (hasDocker()) {
-        return {
-          type: 'docker',
-          cmd: `docker run --rm -v "${normalizedCwd}:/path" zricethezav/gitleaks:latest detect --source=/path --config=/path/.gitleaks.toml --verbose`,
-        }
-      }
-      return {
-        type: 'fallback',
-        cmd: 'node scripts/check-secrets.js',
-        message:
-          'Gitleaks CLI not found in PATH. Falling back to built-in local secret scanner (scripts/check-secrets.js)...',
-      }
-
-    case 'zizmor':
-      if (hasCmd('zizmor')) {
-        return { type: 'cli', cmd: 'zizmor .' }
-      }
-      if (hasCmd('uvx')) {
-        return { type: 'cli', cmd: 'uvx zizmor .' }
-      }
-      if (hasCmd('pipx')) {
-        return { type: 'cli', cmd: 'pipx run zizmor .' }
-      }
-      return {
-        type: 'missing',
-        instructions: [
-          'zizmor is not installed.',
-          'Install zizmor locally:',
-          '  • uv: uvx zizmor .',
-          '  • Cargo: cargo install zizmor',
-          '  • pipx: pipx install zizmor',
-          '  • Or download binary from: https://github.com/zizmorcore/zizmor/releases',
-        ].join('\n'),
-      }
-
-    case 'dast':
-      if (hasDocker()) {
-        return {
-          type: 'docker',
-          cmd: 'docker run --rm -t zaproxy/zap-stable zap-baseline.py -t http://localhost:5173',
-        }
-      }
-      return {
-        type: 'missing',
-        instructions: [
-          'Docker daemon is required to run OWASP ZAP locally.',
-          'Start Docker Desktop, then re-run this command.',
-        ].join('\n'),
-      }
-
-    case 'codeql':
-      if (hasCmd('codeql')) {
-        return {
-          type: 'cli',
-          cmd: 'codeql database create codeql-db --language=javascript-typescript && codeql database analyze codeql-db',
-        }
-      }
-      return {
-        type: 'missing',
-        instructions: [
-          'CodeQL CLI is not installed.',
-          'To run CodeQL locally:',
-          '  • Install the official "CodeQL" extension in VS Code / Cursor for interactive local queries.',
-          '  • Or install CodeQL CLI: https://docs.github.com/en/code-security/codeql-cli',
-        ].join('\n'),
-      }
-
-    case 'socket':
-      if (isSocketAuth) {
-        const cmd = hasCmd('socket')
-          ? 'socket scan create .'
-          : 'npx -y @socketsecurity/cli scan create .'
-        return {
-          type: 'cli',
-          cmd,
-        }
-      }
-      return {
-        type: 'missing',
-        instructions: isDemoToken
-          ? [
-              'Socket.dev is currently configured with the limited public demo token (SocketDemo),',
-              'which does not have the "full-scans:create" permission required for repository scans.',
-              'To run Socket supply chain security scans locally:',
-              '  • Create a free token at https://socket.dev/dashboard (Settings -> API Keys)',
-              '  • Run: npx @socketsecurity/cli login and enter your personal token, OR',
-              '  • Set: $env:SOCKET_CLI_API_TOKEN = "your_token"',
-              '  • Note: Supply chain protection also runs automatically in CI via .github/workflows/socket.yml.',
-            ].join('\n')
-          : [
-              'Socket.dev API token is not configured.',
-              'To run Socket supply chain security scans locally:',
-              '  • Run: npx @socketsecurity/cli login (to authenticate with your Socket.dev account)',
-              '  • Or set the SOCKET_CLI_API_TOKEN environment variable.',
-              '  • Note: Supply chain protection also runs automatically in CI via .github/workflows/socket.yml.',
-            ].join('\n'),
-      }
-
-    default:
-      return {
-        type: 'missing',
-        instructions: `Unknown security tool: "${tool}". Supported: trivy, osv, gitleaks, zizmor, dast, codeql, socket, all`,
-      }
+  const resolver = TOOL_RESOLVERS[tool]
+  if (!resolver) {
+    return {
+      type: 'missing',
+      instructions: `Unknown security tool: "${tool}". Supported: trivy, osv, gitleaks, zizmor, dast, codeql, socket, all`,
+    }
   }
+
+  return resolver({ hasCmd, hasDocker, isSocketAuth, isDemoToken, normalizedCwd })
 }
 
 /**
@@ -345,6 +370,7 @@ export function runAll() {
 
   const steps = [
     { name: 'Secrets Check', cmd: 'node scripts/check-secrets.js' },
+    { name: 'Gitleaks Scan', tool: 'gitleaks' },
     { name: 'NPM Audit', cmd: 'npm audit --audit-level=critical' },
     {
       name: 'CycloneDX SBOM',
