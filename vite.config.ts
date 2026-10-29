@@ -65,7 +65,7 @@ export default defineConfig({
     clearMocks: true,
     restoreMocks: true,
     testTimeout: 15000,
-    include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.{test,spec}.js'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.{test,spec}.{js,mjs}'],
     reporters: ['default', 'vitest-sonar-reporter'],
     outputFile: {
       'vitest-sonar-reporter': './coverage/sonar-report.xml',
