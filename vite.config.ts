@@ -1,46 +1,58 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+} as const
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    tsconfigPaths: true,
+  },
   server: {
     port: 5173,
-    headers: {
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-    },
+    headers: SECURITY_HEADERS,
   },
   preview: {
     port: 4173,
-    headers: {
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-    },
+    strictPort: true,
+    headers: SECURITY_HEADERS,
   },
   build: {
-    target: 'es2022',
+    target: 'baseline-widely-available',
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 500,
     sourcemap: false,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks(id) {
-          const normalizedId = id.replace(/\\/g, '/')
-          if (!normalizedId.includes('node_modules')) {
-            return
-          }
-          if (normalizedId.includes('recharts') || normalizedId.includes('d3-')) {
-            return 'recharts'
-          }
-          if (
-            normalizedId.includes('/react/') ||
-            normalizedId.includes('/react-dom/') ||
-            normalizedId.includes('/scheduler/') ||
-            normalizedId.includes('/zustand/')
-          ) {
-            return 'react-vendor'
-          }
+        codeSplitting: {
+          groups: [
+            {
+              name: 'react-vendor',
+              test: /node_modules[\\/](?:react|react-dom|scheduler|zustand)[\\/]/,
+              priority: 30,
+            },
+            {
+              name: 'motion-vendor',
+              test: /node_modules[\\/](?:framer-motion|motion-dom|motion-utils)[\\/]/,
+              priority: 25,
+            },
+            {
+              name: 'recharts',
+              test: /node_modules[\\/](?:recharts|d3-|victory-vendor|internmap|decimal\.js-light|eventemitter3|tiny-invariant|clsx)[\\/]/,
+              priority: 20,
+            },
+            {
+              name: 'icons-vendor',
+              test: /node_modules[\\/]react-icons[\\/]/,
+              priority: 15,
+            },
+          ],
         },
       },
     },
@@ -50,6 +62,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: false,
+    clearMocks: true,
+    restoreMocks: true,
     testTimeout: 15000,
     include: ['src/**/*.{test,spec}.{ts,tsx}', 'scripts/**/*.{test,spec}.js'],
     reporters: ['default', 'vitest-sonar-reporter'],
@@ -70,6 +84,7 @@ export default defineConfig({
         'node_modules/**',
         'dist/**',
         'src/test/**',
+        'src/types/**',
         '**/*.test.{ts,tsx}',
         '**/*.spec.{ts,tsx}',
         'scripts/**',

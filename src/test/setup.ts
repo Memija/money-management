@@ -5,7 +5,7 @@ import { registerTranslations } from '../i18n/locale-loader'
 import { translations } from '../i18n/translations'
 import { useTimelineSelectionStore } from '../store/useTimelineSelectionStore'
 
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 
 // Locales are lazy-loaded in the app; seed them all so `setLocale` stays synchronous in tests
 registerTranslations(translations)

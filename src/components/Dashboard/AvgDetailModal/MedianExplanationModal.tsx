@@ -51,18 +51,19 @@ export const MedianExplanationModal: React.FC<MedianExplanationModalProps> = ({
   }, [transactions, type])
 
   useEffect(() => {
-    if (isOpen && listRef.current) {
-      // Small timeout to allow Modal to render and display:block
-      const timer = setTimeout(() => {
-        if (listRef.current) {
-          const highlighted = listRef.current.querySelector(`.${styles['row-highlight']}`)
-          if (highlighted) {
-            highlighted.scrollIntoView({ behavior: 'smooth', block: 'center' })
-          }
-        }
-      }, 150)
-      return () => clearTimeout(timer)
+    if (!isOpen || !listRef.current) {
+      return
     }
+    // Small timeout to allow Modal to render and display:block
+    const timer = setTimeout(() => {
+      if (listRef.current) {
+        const highlighted = listRef.current.querySelector(`.${styles['row-highlight']}`)
+        if (highlighted) {
+          highlighted.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }
+    }, 150)
+    return () => clearTimeout(timer)
   }, [isOpen])
 
   return (
