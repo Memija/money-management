@@ -1,5 +1,5 @@
 {
-  "name": "saldio",
+  "name": "money-management",
   "private": true,
   "version": "1.0.0",
   "description": "Modern local-first personal finance and money management application",
@@ -13,60 +13,52 @@
     "url": "https://github.com/Memija/money-management/issues"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.13.0",
+    "npm": ">=10.0.0"
   },
   "packageManager": "npm@11.6.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start": "vite",
     "watch": "vite build --watch",
     "build": "tsc -b && vite build",
+    "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "vite preview",
+    "sonar:scan": "sonar-scanner-npm",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "sonar:scan": "sonar-scanner-npm",
-    "test:lighthouse": "npm run test:lighthouse:mobile && npm run test:lighthouse:desktop",
-    "test:lighthouse:mobile": "lhci autorun --upload.outputDir=./.lighthouseci/mobile",
-    "test:lighthouse:desktop": "lhci autorun --collect.settings.preset=desktop --upload.outputDir=./.lighthouseci/desktop",
-    "test:lighthouse:flows": "node scripts/lighthouse-flow.mjs",
-    "test:lighthouse:flows:quick": "node scripts/lighthouse-flow.mjs --quick",
-    "test:lighthouse:flows:desktop": "node scripts/lighthouse-flow.mjs --desktop",
-    "test:lighthouse:flows:desktop:light": "node scripts/lighthouse-flow.mjs --desktop --light",
-    "test:lighthouse:flows:desktop:dark": "node scripts/lighthouse-flow.mjs --desktop --dark",
-    "test:lighthouse:flows:mobile": "node scripts/lighthouse-flow.mjs --mobile",
-    "test:lighthouse:flows:mobile:light": "node scripts/lighthouse-flow.mjs --mobile --light",
-    "test:lighthouse:flows:mobile:dark": "node scripts/lighthouse-flow.mjs --mobile --dark",
+    "lighthouse": "npm run lighthouse:mobile && npm run lighthouse:desktop",
+    "lighthouse:mobile": "lhci autorun --upload.outputDir=./.lighthouseci/mobile",
+    "lighthouse:desktop": "lhci autorun --collect.settings.preset=desktop --upload.outputDir=./.lighthouseci/desktop",
+    "lighthouse:flows": "node scripts/lighthouse-flow.mjs",
+    "lighthouse:flows:quick": "node scripts/lighthouse-flow.mjs --quick",
     "security:all": "node scripts/run-security-scan.js all",
     "security:audit": "npm audit --audit-level=critical",
     "security:codeql": "node scripts/run-security-scan.js codeql",
     "security:dast": "node scripts/run-security-scan.js dast",
-    "security:secrets": "node scripts/check-secrets.js",
     "security:gitleaks": "node scripts/run-security-scan.js gitleaks",
+    "security:licenses": "license-checker-rseidelsohn --production --summary --excludePrivatePackages --onlyAllow \"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;0BSD;Unlicense;Python-2.0;OFL-1.1\"",
     "security:osv": "node scripts/run-security-scan.js osv",
     "security:sbom": "cyclonedx-npm --ignore-npm-errors --output-file cyclonedx.sbom.json",
+    "security:secrets": "node scripts/check-secrets.js",
     "security:socket": "node scripts/run-security-scan.js socket",
     "security:trivy": "node scripts/run-security-scan.js trivy",
     "security:zizmor": "node scripts/run-security-scan.js zizmor",
-    "audit:licenses": "license-checker-rseidelsohn --production --summary --excludePrivatePackages --onlyAllow \"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;0BSD;Unlicense;Python-2.0;OFL-1.1\"",
+    "validate": "npm run format:check && npm run lint && npm run typecheck && npm run security:secrets && npm run security:gitleaks && npm run security:audit && npm run security:licenses && npm run build && npm run test:coverage && npm run lighthouse",
     "predeploy": "npm run build",
     "deploy": "firebase deploy --only hosting",
-    "deploy:hosting": "npm run build && firebase deploy --only hosting",
-    "validate": "npm run format:check && npm run lint && npm run typecheck && npm run security:secrets && npm run security:gitleaks && npm run security:audit && npm run audit:licenses && npm run build && npm run test:coverage && npm run test:lighthouse",
     "prepare": "husky"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
-    "pdfjs-dist": "^5.6.205",
+    "pdfjs-dist": "^6.4.299",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-icons": "^5.7.0",
@@ -115,20 +107,20 @@
     "follow-redirects": "^1.16.1",
     "http-cache-semantics": "^4.3.0",
     "ip-address": "^10.7.4",
-    "js-yaml": "^3.15.2",
+    "js-yaml@^3": "^3.15.2",
+    "js-yaml@^4": "^4.1.1",
     "node-forge": "^1.4.2",
     "qs": "^6.16.0",
-    "shell-quote": "^1.12.0",
     "tmp": "^0.2.7",
     "undici": "^7.30.1",
     "zod": "^4.6.7"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,mjs}": [
-      "eslint --fix --max-warnings 0",
+    "*.{ts,tsx,js,mjs}": [
+      "eslint --fix --no-warn-ignored --max-warnings 0",
       "prettier --write"
     ],
-    "*.{css,json,md,html}": [
+    "*.{css,json,md,html,yml,yaml}": [
       "prettier --write"
     ]
   }

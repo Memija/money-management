@@ -1,29 +1,40 @@
 # OSV-Scanner Configuration
 # https://google.github.io/osv-scanner/configuration/
 
-# xlsx (SheetJS): Local browser parser
-[[IgnoredVulns]]
-id = "CVE-2024-22363"
-reason = "Mitigated: spreadsheets are parsed locally in browser memory without server execution."
+# ------------------------------------------------------------------------------
+# Production Dependencies (Client-Side Only)
+# ------------------------------------------------------------------------------
 
+# xlsx@0.18.5 (SheetJS) — CVE-2023-30533 (Prototype Pollution, no upstream npm fix)
 [[IgnoredVulns]]
-id = "CVE-2023-30533"
-reason = "Mitigated: spreadsheets are parsed locally in browser memory without server execution."
+id = "GHSA-4r6h-8v6p-xvw6"
+ignoreUntil = 2027-04-30
+reason = "Mitigated: spreadsheets are parsed strictly client-side in isolated browser memory with no server execution."
 
-# pdfjs-dist: Local client-side parser in Web Worker
+# xlsx@0.18.5 (SheetJS) — CVE-2024-22363 (ReDoS, no upstream npm fix)
 [[IgnoredVulns]]
-id = "GHSA-hq66-cqwq-w95j"
-reason = "Mitigated: PDF bank statements are parsed client-side inside an isolated Web Worker without access to privileged Node APIs."
+id = "GHSA-5pgg-2g8v-p4x9"
+ignoreUntil = 2027-04-30
+reason = "Mitigated: user-selected spreadsheets are parsed locally in browser memory with no multi-tenant server exposure."
 
-# @lhci/cli / @puppeteer/browsers transitive dev-only dependencies
+# ------------------------------------------------------------------------------
+# Dev-Only Transitive Dependencies (@lhci/cli & @puppeteer/browsers)
+# ------------------------------------------------------------------------------
+
+# extract-zip@2.0.1 — CVE-2026-26960 (Symlink Path Traversal, dev-only via @puppeteer/browsers)
 [[IgnoredVulns]]
 id = "GHSA-7pqw-9j4j-h8q3"
-reason = "Mitigated: extract-zip is a dev-only transitive dependency of @puppeteer/browsers used only when downloading trusted Chromium binaries."
+ignoreUntil = 2027-04-30
+reason = "Mitigated: dev-only transitive dependency of @puppeteer/browsers used solely to unpack official Chromium test binaries."
 
+# extract-zip@2.0.1 — Symlink Directory Escape (dev-only via @puppeteer/browsers)
 [[IgnoredVulns]]
 id = "GHSA-jmr9-qjv8-65gv"
-reason = "Mitigated: extract-zip is a dev-only transitive dependency of @puppeteer/browsers used only when downloading trusted Chromium binaries."
+ignoreUntil = 2027-04-30
+reason = "Mitigated: dev-only transitive dependency of @puppeteer/browsers used solely to unpack official Chromium test binaries."
 
+# uuid@8.3.2 — Buffer Bounds Check in v3/v5/v6 (dev-only via @lhci/cli)
 [[IgnoredVulns]]
 id = "GHSA-w5hq-g745-h8pq"
-reason = "Mitigated: uuid v8 is a dev-only transitive dependency of @lhci/cli which calls uuid.v4() without a custom buffer argument."
+ignoreUntil = 2027-04-30
+reason = "Mitigated: dev-only transitive dependency of @lhci/cli, which only invokes uuid.v4() without custom buffer arguments."

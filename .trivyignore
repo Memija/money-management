@@ -5,6 +5,3 @@ AVD-GHA-0050
 # xlsx (SheetJS): Local browser parser (matches osv-scanner.toml)
 CVE-2023-30533
 CVE-2024-22363
-
-# pdfjs-dist: Local client-side parser in isolated Web Worker (matches osv-scanner.toml GHSA-hq66-cqwq-w95j)
-CVE-2026-16633

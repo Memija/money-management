@@ -11,54 +11,46 @@
 [![Vitest](https://img.shields.io/badge/Tested%20with-Vitest-6e9f18.svg?logo=vitest)](https://vitest.dev)
 [![License: Prosperity-3.0.0](https://img.shields.io/badge/License-Prosperity%203.0.0-blue.svg)](./LICENSE.md)
 
-An enterprise-grade, privacy-first personal finance and expense tracking application built with **React 19**, **Vite**, **TypeScript**, and **Zustand**. Designed for maximum financial sovereignty, Saldio operates entirely client-side with offline-first persistence, automated statement ingestion (PDF, CSV, and clipboard text), customizable multi-account management, deep analytical visualisations, and a defense-in-depth security and quality verification pipeline.
+An enterprise-grade, privacy-first personal finance and expense tracking application built with **React 19**, **Vite 8 (Rolldown)**, **TypeScript 6**, and **Zustand**. Designed for maximum financial sovereignty, Saldio operates 100% client-side with offline-first persistence, automated bank statement ingestion (**Excel `.xlsx`/`.xls`**, **CSV**, **PDF**, and **clipboard tables/text**), multi-account transfer matching, deep analytical visualizations, and a defense-in-depth security and quality verification pipeline.
 
 ---
 
 ## ✨ Features
 
-### 🏦 Multi-Account & Space Management
+### 🏦 Multi-Account & Transfer Intelligence
 
-- **Accounts & Spaces**: Organize finances across checking accounts, savings accounts, credit cards, investment pockets, and cash spaces.
-- **Inter-Account Transfers**: Track money moving between accounts and spaces without skewing your net income or expense totals.
-- **Balance Projections & Reconciliation**: Real-time balance calculations with automated adjustments and reconciliation logs.
+- **Multi-Institution Overview**: Aggregate imported statements across multiple banks, savings accounts, credit cards, and payment services, or filter down to a single institution with the sticky account switcher.
+- **Internal & Space Transfer Matching**: Automatically detects IBAN-linked inter-account transfers and internal pocket/space movements so shifting money between your own accounts never skews net income or expense totals.
 
 ### 📄 Smart Bank Statement Ingestion
 
-- **Multi-Format Importer**: Seamlessly import bank statements via **PDF files**, **CSV spreadsheets**, or **unstructured copied text**.
-- **Institution & Country Detection**: Smart pattern matching for institutions across Germany, Bosnia, Serbia, and international banks.
-- **Duplicate Detection & Review**: Intelligent fingerprinting flags repeated transactions before importing, allowing one-click review and deduplication.
-- **Client-Side Parsing**: All PDF and text extractions execute directly inside your browser via web workers—no financial data is ever transmitted to remote servers.
+- **Multi-Format Importer**: Import statements via **Excel spreadsheets (`.xlsx`, `.xls`)**, **CSV files** (with automatic UTF-8 / ISO-8859-1 encoding and delimiter detection), **PDF statements**, or **copied clipboard content** (rich HTML tables and unstructured plain text).
+- **German Banking Presets**: Built-in support for **Germany** across 40+ institutions—including traditional banks, Sparkassen, Volksbanken, direct/neobanks, and payment providers—with 42 additional countries queued in the country selector.
+- **Duplicate Detection & Override Rules**: Intelligent transaction fingerprinting flags repeated imports for review and supports persistent duplicate override rules.
+- **100% Client-Side Parsing**: PDF text extraction runs locally via a `pdfjs-dist` Web Worker while spreadsheet and clipboard parsers execute directly in your browser—no financial data is ever sent to a server.
 
 ### 📊 Interactive Visualizations & Analytics
 
-- **Dynamic Charts (Recharts)**: Interactive timeline charts for income, expenses, and net cash flow trends.
-- **Category Breakdowns**: Visual donut and bar charts showing spending distribution across customizable categories.
-- **Flexible Period Filtering**: Seamlessly toggle between monthly, quarterly, yearly, year-to-date, or custom date ranges.
-- **Merchant & Category Insights**: Track recurring payees, identify spending spikes, and analyze category trends over time.
+- **Dynamic Charts (Recharts)**: Interactive income vs. expense timelines, category trend charts, and spending distribution breakdowns.
+- **Deep Financial Insights**: Drill down into mean-vs-median spending comparisons, recurring expense detection, savings rate trend modals, and top merchant rankings with brand logos.
+- **Custom Categories & Keyword Rules**: Create custom categories with bespoke icons and colors, and define merchant keyword rules to automatically categorize past and future transactions.
+- **Flexible Period & Timeline Filtering**: Filter across months, quarters, years, year-to-date, or interactive timeline selections.
 
 ### 🔒 100% Privacy & Offline-First
 
-- **Zero Cloud Tracking**: All transactions, accounts, and settings are stored locally in browser storage (IndexedDB / LocalStorage).
+- **Zero Cloud Storage**: All transactions, accounts, categories, and rules persist locally in your browser via IndexedDB (`saldio_db`) and LocalStorage.
 - **No Remote Telemetry**: Zero external tracking scripts, third-party analytics, or remote API calls.
-- **Privacy Masking**: Built-in privacy mode toggles to blur account balances and transaction amounts when viewing in public.
+- **Privacy Masking**: Built-in header toggle blurs balances and transaction amounts when viewing on shared or public screens.
 
-### 💾 Backup, Restore & Data Portability
+### 💾 Backup, Restore & Data Control
 
-- **Encrypted Local Backups**: Export your complete transaction history, account configurations, and categories to JSON backups.
-- **Excel & CSV Export**: Export historical records for tax preparation or external spreadsheet analysis.
-- **One-Click Restore**: Easily restore from previous backup files with data integrity validation.
+- **Schema-Validated JSON Backups**: Export your complete accounts, transactions, custom categories, keyword rules, and duplicate override rules to a portable `.json` backup file (`saldio-backup-YYYY-MM-DD.json`).
+- **One-Click Validated Restore**: Restore previous `.json` backups with strict schema validation, localized error reporting, and a confirmation preview before overwriting local state.
+- **Granular Data Deletion**: Delete transactions for individual imported banks or wipe all local data (with an optional toggle to preserve or reset theme and language preferences).
 
 ### 🌍 Multi-Language Internationalization (i18n)
 
-- Full multilingual support across 6 languages:
-  - 🇬🇧 **English** (`en`)
-  - 🇩🇪 **German** (`de`)
-  - 🇧🇦 **Bosnian** (`bs`)
-  - 🇷🇸 **Serbian** (`sr`)
-  - 🇮🇩 **Indonesian** (`id`)
-  - 🇵🇱 **Polish** (`pl`)
-- Complete localization of currencies, dates, decimal separators, number formats, and category naming.
+- Complete localization across **6 languages** (see [Supported Languages](#-supported-languages)) with lazy-loaded translation bundles, localized statement parser keywords, currency/number formatting, and regional date conventions.
 
 ---
 
@@ -66,19 +58,19 @@ An enterprise-grade, privacy-first personal finance and expense tracking applica
 
 The application follows clean-code principles, modular architecture, and modern React best practices:
 
-1. **React 19 & TypeScript Strict Mode**:
-   - Modern functional components with hooks (`useState`, `useMemo`, `useCallback`, `useTransition`).
-   - Strict TypeScript typing with zero `any` usage.
-2. **Modular Component Structure**:
-   - Every component enforces strict file separation (`.tsx` logic/markup and `.module.css` scoped styles) with target file sizes (< 300 lines) and DRY reusable components in `src/components/shared/`.
-3. **Zustand State Management**:
-   - Centralized, predictable UI and transaction state management with reactive selectors and debounced persistence.
-4. **Fast Local-First Storage**:
-   - Hybrid persistence leveraging IndexedDB for large transaction datasets and LocalStorage for user preferences.
+1. **React 19 & TypeScript 6 Strict Mode**:
+   - Modern functional components with hooks (`useState`, `useMemo`, `useCallback`, `useEffect`).
+   - Strict TypeScript configuration (`strict`, `noImplicitReturns`, `noImplicitOverride`, `verbatimModuleSyntax`, zero `any`) shared across DRY `tsconfig` project references.
+2. **Vite 8 (Rolldown) & On-Demand Code Splitting**:
+   - Dedicated vendor chunk groups (`react-vendor`, `motion-vendor`, `recharts`, `icons-vendor`), lazy-loaded views, lazy-loaded locale bundles, and dynamic `import()` for heavy parsers (`xlsx` and `pdfjs-dist`).
+3. **Modular Component Structure**:
+   - Every component enforces strict file separation (`.tsx` logic/markup and `.module.css` scoped styles with zero inline styles), small focused files (< 300 lines target), and reusable primitives in `src/components/shared/`.
+4. **Zustand State Management & Hybrid Local Storage**:
+   - Modular Zustand store slices backed by IndexedDB (`idb-storage.ts`) with debounced JSON persistence for large transaction datasets and LocalStorage for lightweight UI preferences.
 5. **High-Performance Virtualization**:
-   - Large transaction feeds use `react-virtuoso` to ensure 60fps scrolling performance regardless of history size.
+   - Large transaction feeds render via `react-virtuoso` to maintain smooth 60fps scrolling regardless of history size.
 6. **Comprehensive Vitest Suite**:
-   - Over 100 test suites and 1,600+ unit tests running via **Vitest** and **jsdom** with V8 code coverage.
+   - Over 105 test suites and 1,600+ unit tests running via **Vitest 4** and **jsdom** with V8 code coverage thresholds and SonarCloud execution reporting.
 
 ---
 
@@ -87,74 +79,87 @@ The application follows clean-code principles, modular architecture, and modern 
 ```text
 money-management/
 ├── .github/
-│   ├── ISSUE_TEMPLATE/       # Bug report and feature request templates
-│   ├── workflows/            # GitHub Actions CI/CD security and quality workflows
-│   ├── CODEOWNERS            # Repository code ownership rules
-│   ├── dependabot.yml        # Automated weekly dependency updates
-│   └── SECURITY.md           # Security vulnerability reporting policy
-├── .husky/                   # Git hooks (pre-commit, commit-msg, pre-push)
-├── scripts/                  # Security scanners (secrets, Gitleaks, OSV, Trivy, Zizmor)
+│   ├── ISSUE_TEMPLATE/         # Bug report and feature request templates
+│   ├── workflows/              # GitHub Actions CI/CD security and quality workflows
+│   ├── CODEOWNERS              # Repository code ownership rules
+│   ├── dependabot.yml          # Automated weekly dependency updates
+│   ├── PULL_REQUEST_TEMPLATE.md # Pull request checklist template
+│   └── SECURITY.md             # Security vulnerability reporting policy
+├── .husky/                     # Git hooks (pre-commit, commit-msg, pre-push)
+├── public/                     # Static assets, PWA manifest, bank logos, and country flags
+├── scripts/                    # Security, secret scanning, OSV, and Lighthouse flow scripts
 ├── src/
-│   ├── components/           # Feature and shared UI components
-│   │   ├── Dashboard/        # Dashboard metrics, period filters, and overview cards
-│   │   ├── layout/           # App navigation, header, and footer
-│   │   ├── Settings/         # Settings panel (categories, accounts, theme, i18n)
-│   │   └── shared/           # Reusable UI components (modals, dropdowns, buttons)
-│   ├── config/               # Application configuration constants
-│   ├── data/                 # Static financial institutions, merchants, and country data
-│   ├── hooks/                # Custom React hooks (analytics, transactions, formatters)
-│   ├── i18n/                 # Translation bundles (en, de, bs, sr, id, pl) and loaders
-│   ├── store/                # Zustand global state stores
-│   ├── types/                # TypeScript domain models and interfaces
-│   ├── utils/                # Pure utility functions (parsers, date-utils, storage)
-│   ├── App.tsx               # Root application component
-│   ├── index.css             # Global CSS tokens, resets, and design variables
-│   └── main.tsx              # React bootstrap entry point
-├── commitlint.config.js      # Conventional Commits lint configuration
-├── eslint.config.js          # ESLint flat config with React Hooks and TypeScript rules
-├── package.json              # Project dependencies and operational scripts
-├── sonar-project.properties  # SonarCloud quality analysis rules
-└── vite.config.ts            # Vite bundler and Vitest test runner configuration
+│   ├── components/             # Feature views and shared UI components
+│   │   ├── CountrySelector/    # Step 1: Country selection onboarding view
+│   │   ├── InstitutionSelector/ # Step 2: Bank & institution selection view
+│   │   ├── TransactionImporter/ # Step 3: Excel, CSV, PDF, and clipboard importer
+│   │   ├── ImportReview/       # Step 4: Duplicate detection and pre-import review
+│   │   ├── Dashboard/          # Analytics charts, insight modals, and virtualized feed
+│   │   ├── Settings/           # Categories, keyword/duplicate rules, backup, and data reset
+│   │   ├── layout/             # App header, controls, and footer
+│   │   └── shared/             # Reusable UI primitives (modals, brand logos, buttons)
+│   ├── config/                 # Application configuration constants
+│   ├── data/                   # Financial institutions, merchant registries, and countries
+│   ├── hooks/                  # Custom React hooks (analytics, backups, imports, formatters)
+│   ├── i18n/                   # Lazy-loaded locales (en, de, bs, sr, id, pl) and parser rules
+│   ├── store/                  # Zustand global state stores and slices
+│   ├── test/                   # Vitest global test setup
+│   ├── types/                  # TypeScript domain models and interfaces
+│   ├── utils/                  # Parsers, categorizer, brand logos, date/storage utilities
+│   ├── App.tsx                 # Root application shell and step orchestrator
+│   ├── index.css               # Global CSS custom properties, themes, and resets
+│   └── main.tsx                # React bootstrap entry point
+├── CODE_OF_CONDUCT.md          # Community code of conduct
+├── COMMERCIAL.md               # Commercial licensing terms beyond non-commercial/trial use
+├── CONTRIBUTING.md             # Contribution guidelines and workflow
+├── LICENSE.md                  # Prosperity Public License 3.0.0
+├── commitlint.config.js        # Conventional Commits lint configuration
+├── eslint.config.js            # ESLint 9 flat config with React Hooks, TS, and security rules
+├── firebase.json               # Firebase Hosting config and HTTP security headers
+├── lighthouserc.json           # Lighthouse CI performance and accessibility budgets
+├── package.json                # Dependencies, engine constraints, and operational scripts
+├── sonar-project.properties    # SonarCloud static analysis and coverage configuration
+├── tsconfig.json               # Shared base TypeScript compiler options & project references
+├── tsconfig.app.json           # Application & Vitest TypeScript configuration
+├── tsconfig.node.json          # Node/Vite tooling TypeScript configuration
+└── vite.config.ts              # Vite 8 (Rolldown) bundler and Vitest 4 runner configuration
 ```
 
 ---
 
 ## 📖 How to Use
 
-### 1. Set Up Accounts & Spaces
+### 1. Select Country & Financial Institution
 
-- Open the application and navigate to **Settings** (`/settings`) or the **Accounts** overview.
-- Add your primary checking accounts, savings accounts, credit cards, or cash spaces.
-- Set starting balances and assign designated color badges or icons for easy recognition.
+- Choose your country in the **Country Selector** (currently active for **Germany**, with additional countries queued) and pick your bank, Sparkasse, Volksbank, neobank, or payment provider.
 
 ### 2. Import Bank Statements
 
-- Click **Import Transactions** in the navigation bar.
-- Choose your input method:
-  - **PDF Statement**: Drag and drop statements directly from your bank.
-  - **CSV File**: Upload spreadsheets with custom column mapping and delimiter detection.
-  - **Smart Clipboard**: Paste raw copied transaction text from online banking portals or SMS alerts.
-- Verify institution and country autodetection, or select your bank manually.
+- Select your preferred import method:
+  - **Spreadsheet File**: Upload `.xlsx`, `.xls`, or `.csv` exports from your online banking portal.
+  - **PDF Statement**: Drag and drop official `.pdf` account statements.
+  - **Copy & Paste**: Paste copied transaction tables or raw text directly from your clipboard.
 
-### 3. Review & Auto-Categorization
+### 3. Review & Deduplicate
 
-- Inspect the **Import Review Dialog**: duplicate transactions and repeated entries are automatically detected and flagged.
-- Apply intelligent auto-categorization rules to merchants and payees.
-- Use batch actions to adjust categories, transfer flags, or tax tags across multiple transactions at once.
+- Inspect the **Import Review** screen before saving:
+  - Verify automatically cleaned merchant descriptions, detected categories, and excluded internal space movements.
+  - Review flagged duplicate transactions and choose which entries to import or skip.
 
-### 4. Analyze Spending & Inspect Trends
+### 4. Analyze Spending on the Dashboard
 
-- Explore the **Dashboard**:
-  - Filter by custom date ranges, billing months, quarters, or year-to-date.
-  - Inspect cash flow deltas, income vs. expense ratios, and net savings rates.
-  - Drill down into interactive category donut and timeline charts powered by Recharts.
-- Toggle **Privacy Mode** in the header whenever viewing balances in shared spaces or public screens.
+- Switch between an **All Accounts** combined view or individual imported banks using the sticky switcher.
+- Filter by custom periods or drag across the timeline chart to inspect specific date windows.
+- Open interactive detail modals for **Income vs. Expenses**, **Expense Categories**, **Mean vs. Median Spending**, **Savings Trends**, **Recurring Expenses**, and **Top Merchants**.
+- Toggle **Privacy Mode** in the header at any time to blur sensitive amounts.
 
-### 5. Encrypted Backups & Data Portability
+### 5. Customize Rules & Manage Backups
 
-- Navigate to **Settings -> Backup & Export**.
-- Export your complete encrypted JSON database for safekeeping.
-- Download formatted Excel (`.xlsx`) or CSV reports for tax filing or external accounting.
+- Open **Settings** from the header to manage:
+  - **Categories & Rules**: Create custom categories and merchant keyword rules for instant auto-categorization.
+  - **Duplicate Rules**: Manage saved duplicate override rules.
+  - **Advanced**: Configure specialized transaction display and logo filters.
+  - **Data Management**: Export a validated `.json` backup, restore from an existing backup file, delete an individual bank's transactions, or clear all local data.
 
 ---
 
@@ -162,8 +167,8 @@ money-management/
 
 ### 📋 Prerequisites
 
-- **Node.js**: `v20.x` or later (LTS recommended)
-- **npm**: `v10.x` or later
+- **Node.js**: `v22.13.0` or later (Node `v22` / `v24` LTS recommended)
+- **npm**: `v10.0.0` or later (`npm@11.6.2` configured in `packageManager`)
 
 ### 🚀 Getting Started
 
@@ -186,7 +191,7 @@ money-management/
    npm run dev
    ```
 
-   Open your browser at `http://localhost:5173/`. The app reloads automatically on code changes.
+   Open `http://localhost:5173/` in your browser. The app reloads automatically on code changes.
 
 4. **Build for production:**
 
@@ -194,65 +199,69 @@ money-management/
    npm run build
    ```
 
-5. **Preview production build locally:**
+5. **Preview the production build locally:**
 
    ```bash
    npm run preview
    ```
 
+   Serves the production bundle at `http://localhost:4173/`.
+
 ---
 
 ## 🛠️ Available Scripts
 
-| Category         | Script                          | Description                                                                         |
-| :--------------- | :------------------------------ | :---------------------------------------------------------------------------------- |
-| **Development**  | `npm run dev` / `npm start`     | Launches local Vite development server                                              |
-|                  | `npm run watch`                 | Builds development bundle continuously on file changes                              |
-|                  | `npm run build`                 | Compiles TypeScript and builds production distribution bundle                       |
-|                  | `npm run preview`               | Serves production build locally for verification                                    |
-| **Code Quality** | `npm run typecheck`             | Validates TypeScript types without emitting build files                             |
-|                  | `npm run lint`                  | Lints TypeScript and TSX files via ESLint (including `eslint-plugin-security`)      |
-|                  | `npm run format`                | Auto-formats code with Prettier                                                     |
-|                  | `npm run format:check`          | Verifies code formatting without modifying files                                    |
-| **Testing**      | `npm test`                      | Starts Vitest in interactive watch mode                                             |
-|                  | `npm run test:run`              | Executes all unit tests once and exits                                              |
-|                  | `npm run test:watch`            | Explicit watch mode alias for unit tests                                            |
-|                  | `npm run test:coverage`         | Runs test suite with V8 code coverage and Sonar XML test execution report           |
-|                  | `npm run sonar:scan`            | Executes SonarScanner CLI against local codebase and coverage telemetry             |
-| **Performance**  | `npm run test:lighthouse`       | Runs Lighthouse CI (`lhci autorun`) for both mobile and desktop presets             |
-|                  | `npm run test:lighthouse:flows` | Runs Puppeteer/Lighthouse user flows across desktop/mobile and light/dark themes    |
-| **Security**     | `npm run security:all`          | Executes full local security scan suite (Trivy, OSV, Gitleaks, Zizmor, SBOM)        |
-|                  | `npm run security:audit`        | Audits dependencies for critical vulnerabilities (`npm audit`)                      |
-|                  | `npm run security:codeql`       | Runs local CodeQL database creation and static security analysis                    |
-|                  | `npm run security:dast`         | Runs local OWASP ZAP baseline DAST scan via Docker                                  |
-|                  | `npm run security:secrets`      | Scans git staged changes for accidentally committed credentials & keys              |
-|                  | `npm run security:gitleaks`     | Scans git history and workspace for secrets with Gitleaks                           |
-|                  | `npm run security:osv`          | Identifies open-source vulnerabilities via Google OSV-Scanner                       |
-|                  | `npm run security:sbom`         | Generates a CycloneDX Software Bill of Materials (`cyclonedx.sbom.json`)            |
-|                  | `npm run security:socket`       | Scans dependencies for supply-chain risks via Socket.dev CLI                        |
-|                  | `npm run security:trivy`        | Scans repository filesystem and dependencies for known CVEs via Aqua Trivy          |
-|                  | `npm run security:zizmor`       | Audits GitHub Actions workflows with Zizmor                                         |
-|                  | `npm run audit:licenses`        | Validates dependency licenses against approved open-source list                     |
-| **Deployment**   | `npm run deploy`                | Builds (`predeploy`) and deploys static bundle to Firebase Hosting                  |
-|                  | `npm run deploy:hosting`        | Explicit build and Firebase Hosting deployment                                      |
-| **Pre-Flight**   | `npm run validate`              | Runs formatting, linting, typecheck, secret checks, license audit, build, and tests |
+| Category         | Script                           | Description                                                                                      |
+| :--------------- | :------------------------------- | :----------------------------------------------------------------------------------------------- |
+| **Development**  | `npm run dev`                    | Launches local Vite development server on port `5173`                                            |
+|                  | `npm run watch`                  | Rebuilds production bundle continuously on file changes                                          |
+|                  | `npm run build`                  | Typechecks (`tsc -b`) and builds production bundle (`vite build`)                                |
+|                  | `npm run preview`                | Serves production build locally on port `4173` for verification                                  |
+| **Code Quality** | `npm run typecheck`              | Validates TypeScript types across project references without emitting files                      |
+|                  | `npm run lint`                   | Lints codebase via ESLint (`--max-warnings 0`, including `eslint-plugin-security`)               |
+|                  | `npm run lint:fix`               | Auto-fixes ESLint issues with zero-warning enforcement                                           |
+|                  | `npm run format`                 | Auto-formats files with Prettier                                                                 |
+|                  | `npm run format:check`           | Verifies code formatting without modifying files                                                 |
+|                  | `npm run sonar:scan`             | Executes `sonar-scanner-npm` against local codebase and coverage telemetry                       |
+| **Testing**      | `npm test`                       | Starts Vitest in interactive watch mode                                                          |
+|                  | `npm run test:run`               | Executes all unit tests once and exits                                                           |
+|                  | `npm run test:coverage`          | Runs test suite with V8 code coverage and Sonar XML test execution report                        |
+| **Performance**  | `npm run lighthouse`             | Runs Lighthouse CI (`lhci autorun`) for both mobile and desktop presets                          |
+|                  | `npm run lighthouse:flows`       | Runs Lighthouse user flows (supports `-- --quick`, `--desktop`, `--mobile`, `--light`, `--dark`) |
+|                  | `npm run lighthouse:flows:quick` | Runs quick desktop light-theme user-flow verification                                            |
+| **Security**     | `npm run security:all`           | Executes full local security scan suite (Trivy, OSV, Gitleaks, Zizmor, SBOM, etc.)               |
+|                  | `npm run security:audit`         | Audits dependencies for critical vulnerabilities (`npm audit`)                                   |
+|                  | `npm run security:codeql`        | Runs local CodeQL database creation and static security analysis                                 |
+|                  | `npm run security:dast`          | Runs local OWASP ZAP baseline DAST scan via Docker                                               |
+|                  | `npm run security:gitleaks`      | Scans git history and workspace for secrets with Gitleaks                                        |
+|                  | `npm run security:licenses`      | Validates production dependency licenses against approved open-source list                       |
+|                  | `npm run security:osv`           | Identifies open-source vulnerabilities via Google OSV-Scanner                                    |
+|                  | `npm run security:sbom`          | Generates a CycloneDX Software Bill of Materials (`cyclonedx.sbom.json`)                         |
+|                  | `npm run security:secrets`       | Scans git staged changes for accidentally committed credentials & keys                           |
+|                  | `npm run security:socket`        | Scans dependencies for supply-chain risks via Socket.dev CLI                                     |
+|                  | `npm run security:trivy`         | Scans repository filesystem and dependencies for known CVEs via Aqua Trivy                       |
+|                  | `npm run security:zizmor`        | Audits GitHub Actions workflows with Zizmor                                                      |
+| **Pre-Flight**   | `npm run validate`               | Runs formatting, linting, typecheck, secret/license audits, build, coverage & Lighthouse CI      |
+| **Deployment**   | `npm run deploy`                 | Builds (`predeploy`) and deploys static bundle to Firebase Hosting                               |
 
 ---
 
 ## 🛡️ Security & Quality Assurance Pipeline
 
-This project employs a defense-in-depth security approach integrated into GitHub Actions CI/CD:
+This project employs a defense-in-depth security and performance pipeline enforced via GitHub Actions CI/CD:
 
-- **SonarCloud**: Static analysis, quality gate evaluation, code duplication, and maintainability metrics.
-- **CodeQL**: Semantic analysis detecting security vulnerabilities, data leaks, and injection risks.
+- **SonarCloud**: Static analysis, quality gate enforcement, code coverage, duplication (CPD), and maintainability metrics.
+- **CodeQL**: Semantic code analysis detecting security vulnerabilities, data leaks, and injection risks.
+- **OWASP ZAP (DAST)**: Dynamic application security testing against the built web application and HTTP security headers.
+- **Lighthouse CI**: Automated mobile, desktop, and interactive user-flow audits for performance, accessibility, best practices, and SEO.
 - **Aqua Trivy**: Scans repository filesystem and dependencies for known CVEs.
 - **Google OSV-Scanner**: Identifies open-source vulnerabilities via the Google OSV database.
 - **GitLeaks**: Prevents hardcoded secrets, credentials, and API tokens from entering git history.
-- **OpenSSF Scorecard**: Automated evaluation of supply-chain security and repo hygiene.
-- **Socket.dev**: Detects malicious supply-chain package risks and typosquatting.
-- **Zizmor**: Security audit and misconfiguration analyzer for GitHub Actions workflows.
-- **CycloneDX & SPDX SBOM**: Automated generation of Software Bill of Materials for dependency transparency.
-- **Husky & Lint-Staged**: Enforces pre-commit secret screening, formatting, and Conventional Commits.
+- **OpenSSF Scorecard**: Automated evaluation of supply-chain security and repository hygiene.
+- **Socket.dev**: Detects malicious supply-chain package behavior and typosquatting.
+- **Zizmor**: Static security audit and misconfiguration analyzer for GitHub Actions workflows.
+- **CycloneDX & SPDX SBOM**: Automated generation of Software Bills of Materials for dependency transparency.
+- **Husky, Lint-Staged & Commitlint**: Enforces pre-commit secret checks, zero-warning linting, Prettier formatting, and Conventional Commits.
 
 ---
 
@@ -269,6 +278,14 @@ This project employs a defense-in-depth security approach integrated into GitHub
 
 ---
 
+## 🤝 Contributing & Security
+
+- **Contributions**: Please read [CONTRIBUTING.md](./CONTRIBUTING.md) and our [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) before submitting pull requests.
+- **Security Vulnerabilities**: Please follow the responsible disclosure instructions in [.github/SECURITY.md](./.github/SECURITY.md) rather than opening a public issue.
+
+---
+
 ## 📄 License
 
-This project is licensed under the **Prosperity Public License 3.0.0** - see the [LICENSE.md](./LICENSE.md) file for details.
+- **Non-Commercial & 30-Day Trial**: Licensed under the **Prosperity Public License 3.0.0** — see [LICENSE.md](./LICENSE.md) for full details.
+- **Commercial Use**: Commercial usage beyond the trial period is governed by the terms in [COMMERCIAL.md](./COMMERCIAL.md).
