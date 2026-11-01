@@ -79,7 +79,7 @@ export const RecurringExpenses: React.FC<RecurringExpensesProps> = React.memo(
               <RefreshCw size={20} className={styles.spinIcon} />
             </div>
             <div>
-              <h3 className={styles.title}>{t.recurringTitle}</h3>
+              <h2 className={styles.title}>{t.recurringTitle}</h2>
               <p className={styles.subtitle}>
                 {recurringExpenses.length === 1
                   ? t.activeSubscriptionsSingular || t.activeSubscriptions.replace('{count}', '1')

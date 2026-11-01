@@ -152,7 +152,7 @@ export const CategoryTrend: React.FC<CategoryTrendProps> = React.memo(
               <TrendingUp size={20} />
             </div>
             <div>
-              <h3 className={styles.title}>{t.categoryTrend || 'Spending by Category'}</h3>
+              <h2 className={styles.title}>{t.categoryTrend || 'Spending by Category'}</h2>
               <p className={styles.subtitle}>{subtitleText}</p>
             </div>
           </div>

@@ -5,5 +5,10 @@
     "source.fixAll.eslint": "explicit"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
+  "files.associations": {
+    "LICENSE": "plaintext",
+    "NOTICE": "plaintext"
+  },
+  "markdownlint.ignore": ["LICENSE"],
   "telemetry.feedback.enabled": false
 }

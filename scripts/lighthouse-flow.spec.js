@@ -122,7 +122,7 @@ describe('lighthouse-flow', () => {
           category: 'accessibility',
           title: 'Accessibility',
           actual: 82,
-          expected: 90,
+          expected: 100,
         },
       ])
     })

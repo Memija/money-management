@@ -9,7 +9,7 @@
 [![Vite](https://img.shields.io/badge/Vite-8-646cff.svg?logo=vite)](https://vite.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Vitest](https://img.shields.io/badge/Tested%20with-Vitest-6e9f18.svg?logo=vitest)](https://vitest.dev)
-[![License: Prosperity-3.0.0](https://img.shields.io/badge/License-Prosperity%203.0.0-blue.svg)](./LICENSE.md)
+[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-blue.svg)](./LICENSE)
 
 An enterprise-grade, privacy-first personal finance and expense tracking application built with **React 19**, **Vite 8 (Rolldown)**, **TypeScript 6**, and **Zustand**. Designed for maximum financial sovereignty, Saldio operates 100% client-side with offline-first persistence, automated bank statement ingestion (**Excel `.xlsx`/`.xls`**, **CSV**, **PDF**, and **clipboard tables/text**), multi-account transfer matching, deep analytical visualizations, and a defense-in-depth security and quality verification pipeline.
 
@@ -110,9 +110,10 @@ money-management/
 │   ├── index.css               # Global CSS custom properties, themes, and resets
 │   └── main.tsx                # React bootstrap entry point
 ├── CODE_OF_CONDUCT.md          # Community code of conduct
-├── COMMERCIAL.md               # Commercial licensing terms beyond non-commercial/trial use
+├── COMMERCIAL.md               # Commercial licensing terms (separate contract required)
 ├── CONTRIBUTING.md             # Contribution guidelines and workflow
-├── LICENSE.md                  # Prosperity Public License 3.0.0
+├── LICENSE                     # PolyForm Noncommercial License 1.0.0
+├── NOTICE                      # PolyForm required attribution notice
 ├── commitlint.config.js        # Conventional Commits lint configuration
 ├── eslint.config.js            # ESLint 9 flat config with React Hooks, TS, and security rules
 ├── firebase.json               # Firebase Hosting config and HTTP security headers
@@ -287,5 +288,6 @@ This project employs a defense-in-depth security and performance pipeline enforc
 
 ## 📄 License
 
-- **Non-Commercial & 30-Day Trial**: Licensed under the **Prosperity Public License 3.0.0** — see [LICENSE.md](./LICENSE.md) for full details.
-- **Commercial Use**: Commercial usage beyond the trial period is governed by the terms in [COMMERCIAL.md](./COMMERCIAL.md).
+- **Personal & Non-Commercial Use**: Licensed under the **PolyForm Noncommercial License 1.0.0** — see [LICENSE](./LICENSE) for full details.
+- **Commercial Use**: Any commercial use requires signing a separate written contract negotiated on a specific, case-by-case basis with the Owner — see [COMMERCIAL.md](./COMMERCIAL.md).
+- **Attribution Notice**: Downstream redistributions must preserve the required plain-text attribution in [NOTICE](./NOTICE).

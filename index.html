@@ -2,22 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Saldio" />
     <meta name="theme-color" content="#0b0d13" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f1f5f9" media="(prefers-color-scheme: light)" />
     <meta
       name="description"
       content="Saldio — Modern local-first personal finance and money management application."
     />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Saldio" />
+    <meta
+      property="og:description"
+      content="Saldio — Modern local-first personal finance and money management application."
+    />
+    <meta property="og:image" content="/android-chrome-512x512.png" />
     <title>Saldio</title>
+    <script>
+      try {
+        const storedTheme = localStorage.getItem('mm-theme-preference')
+        const systemTheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        const resolvedTheme =
+          storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : systemTheme
+        document.documentElement.setAttribute('data-theme', resolvedTheme)
+
+        const supportedLang = /^(en|de|bs|sr|id|pl)$/
+        const storedLang = localStorage.getItem('mm-language-preference')
+        const systemLang = (navigator.language || '').split('-')[0].toLowerCase()
+        if (storedLang && supportedLang.test(storedLang)) {
+          document.documentElement.lang = storedLang
+        } else if (supportedLang.test(systemLang)) {
+          document.documentElement.lang = systemLang
+        }
+      } catch {}
+    </script>
   </head>
 
   <body>
+    <noscript>Saldio requires JavaScript to run locally in your browser.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

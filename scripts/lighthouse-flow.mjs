@@ -26,9 +26,9 @@ const OUTPUT_DIR = path.resolve(process.cwd(), '.lighthouseci', 'flows')
 
 export const DEFAULT_FLOW_THRESHOLDS = {
   performance: 0.8,
-  accessibility: 0.9,
-  'best-practices': 0.9,
-  seo: 0.9,
+  accessibility: 1,
+  'best-practices': 1,
+  seo: 1,
 }
 
 export function parseFlowFlags(rawArgs = process.argv.slice(2)) {

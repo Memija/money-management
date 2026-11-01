@@ -71,7 +71,7 @@ export const TopMerchants: React.FC<TopMerchantsProps> = React.memo(
               <Building2 size={20} />
             </div>
             <div>
-              <h3 className={styles.title}>{t.topMerchants}</h3>
+              <h2 className={styles.title}>{t.topMerchants}</h2>
               <p className={styles.subtitle}>{formatPopularMerchantsCount(merchants.length)}</p>
             </div>
           </div>

@@ -1,32 +1,31 @@
 # Commercial License Terms
 
-For people or companies that use **Saldio** for commercial purposes (as defined in `LICENSE.md`) beyond the 30-day trial period, the following standard commercial terms apply.
+**Saldio** is licensed for free personal and noncommercial use under the **PolyForm Noncommercial License 1.0.0** (see [LICENSE](./LICENSE) and required attribution in [NOTICE](./NOTICE)). There is **no free commercial trial period**.
 
-## Commercial License & Revenue Share
+## Commercial Licensing (Case-by-Case Contract Required)
 
-A separate Commercial License Agreement is required for any commercial application. The fee structure for this license is:
+**Any commercial use** of this software — in whole or in part, modified or unmodified — is prohibited under [LICENSE](./LICENSE) unless a **separate, written Commercial License Agreement** has been negotiated on a specific, case-by-case basis and signed with the **Owner** prior to such use.
 
-1. **Revenue Threshold**: The commercial license is only required if the gross revenue generated, either directly or indirectly, from the application exceeds **$50,000 USD** per year.
+Activities requiring a signed Commercial License Agreement include, without limitation:
 
-2. **Revenue Share (The "Cut")**: For revenue above the threshold, a **10% royalty** of the total gross revenue generated is required.
+- Offering the software or derivative works as a hosted or managed service (SaaS)
+- Selling, sublicensing, or commercially distributing the software or modified versions
+- Embedding or bundling the software into a commercial product or service
+- Using the software internally within a for-profit company, sole proprietorship, or commercial organization
 
-These terms apply to any commercial exploitation of the software, including:
+Commercial terms, scope of rights, and fees are agreed individually per contract based on the specific use case.
 
-- Offering the software as a service (SaaS)
-- Selling a modified version of the software
-- Using the software internally within a for-profit organization
+## How to Obtain a Commercial Contract
 
-## How to Get Licensed
-
-To enter into a Commercial License Agreement, please contact:
+To request and negotiate a Commercial License Agreement, please contact:
 
 - **Owner**: Repository Owner
-- **Contact**: Reach out through [GitHub Issues](https://github.com/Memija/money-management/issues) or my GitHub profile.
+- **Contact**: Reach out via [GitHub Issues](https://github.com/Memija/money-management/issues) or through the Owner's GitHub profile (<https://github.com/Memija>).
 
-## Exceptions
+## Permitted Free Uses (No Commercial Contract Required)
 
-The following types of uses are explicitly **exempted** from these commercial terms and can continue to use the software for free under `LICENSE.md`:
+The following uses remain free of charge without a separate contract:
 
-- Non-commercial personal use
-- Use by charitable, educational, or governmental organizations
-- The process of developing and submitting contributions back to the original source code
+- **Personal & Non-Commercial Use**: Individual personal finance management, study, research, and hobby use without commercial application (as defined in [LICENSE](./LICENSE))
+- **Noncommercial Organizations**: Use by qualifying charitable, educational, public research, public safety/health, environmental protection, or government institutions (as defined in [LICENSE](./LICENSE))
+- **Upstream Contributions**: Developing and submitting bug fixes, feedback, or feature pull requests back to this repository under a standardized open-source contribution license (see [CONTRIBUTING.md](./CONTRIBUTING.md))

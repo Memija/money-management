@@ -55,7 +55,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(
               <div className={styles.iconBadge}>
                 <PieChartIcon size={20} />
               </div>
-              <h3 className={styles.title}>{t.expenseCategories}</h3>
+              <h2 className={styles.title}>{t.expenseCategories}</h2>
             </div>
           </div>
           <div className={styles.emptyState}>
@@ -79,7 +79,7 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(
               <PieChartIcon size={20} />
             </div>
             <div>
-              <h3 className={styles.title}>{t.expenseCategories}</h3>
+              <h2 className={styles.title}>{t.expenseCategories}</h2>
               <p className={styles.subtitle}>
                 {formatCategoryCount(sortedCategories.length)} •{' '}
                 <span className="privacy-blur">{formatCurrency(totalExpenses)}</span>
@@ -95,7 +95,6 @@ export const ExpenseCategories: React.FC<ExpenseCategoriesProps> = React.memo(
                   className={`${styles.statPill} ${styles.statPillClickable}`}
                   onClick={() => onCategoryClick(topCategory.name)}
                   title={getCategoryLabel(topCategory.name, t, locale, customCategories)}
-                  aria-label={`${t.insightTopCategory}: ${getCategoryLabel(topCategory.name, t, locale, customCategories)}`}
                 >
                   <span className={styles.statLabel}>{t.insightTopCategory}</span>
                   <span className={styles.statValue}>

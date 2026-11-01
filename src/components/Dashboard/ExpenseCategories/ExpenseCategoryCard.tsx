@@ -66,7 +66,6 @@ export const ExpenseCategoryCard: React.FC<ExpenseCategoryCardProps> = React.mem
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onClick={onClick}
-        aria-label={`${label}: ${formatCurrency(cat.value)}`}
       >
         <div className={styles.cardTop}>
           <div className={styles.cardCategoryInfo}>

@@ -6,11 +6,11 @@ Thank you for your interest in contributing to Saldio! We welcome contributions 
 
 ## ⚖️ Commercial Use & "Safe Harbor" for Contributors
 
-This project uses the **Prosperity Public License**, which generally restricts commercial use. However, we want to make it as easy as possible for developers to contribute!
+This project uses the **PolyForm Noncommercial License 1.0.0** (see [LICENSE](./LICENSE) and [COMMERCIAL.md](./COMMERCIAL.md)), which restricts commercial use unless a separate written contract is signed with the Owner. However, we want to make it as easy as possible for developers to contribute!
 
-**Important**: Developing feedback, changes, or additions that you contribute back to this repository under a standardized public software license (such as MIT, Apache 2.0, or BSD) **does not count as "commercial use"**.
+**Important**: The Owner explicitly authorizes developing feedback, bug fixes, changes, or additions solely for the purpose of contributing them back to this repository under a standardized public software license (such as MIT, Apache-2.0, or BSD-2-Clause) without requiring a commercial license.
 
-This means you and your company can fix bugs and add features without triggering any commercial licensing requirements for that specific activity. We value your help in making this software better for everyone!
+This means you and your company can fix bugs and submit pull requests without triggering commercial licensing requirements for that contribution activity. We value your help in making this software better for everyone!
 
 ---
 

@@ -35,6 +35,12 @@ function persistLocale(locale: Locale): void {
   }
 }
 
+function applyDocumentLang(locale: Locale): void {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = locale
+  }
+}
+
 /**
  * Loads the preferred locale, falling back to the default locale if its chunk fails to load.
  * @param preferred - Locale chosen by the user or detected from the browser
@@ -56,6 +62,7 @@ async function loadInitialLocale(
 
 // Only the active locale is downloaded before the app renders; the rest load on demand.
 const initial = await loadInitialLocale(getStoredLocale())
+applyDocumentLang(initial.locale)
 
 /** Most recently requested locale — guards against out-of-order async loads. */
 let requestedLocale: Locale = initial.locale
@@ -70,6 +77,7 @@ export interface LanguageState {
 export const useLanguageStore = create<LanguageState>((set) => {
   const apply = (locale: Locale, t: TranslationStrings): void => {
     persistLocale(locale)
+    applyDocumentLang(locale)
     set({ locale, t })
   }
 

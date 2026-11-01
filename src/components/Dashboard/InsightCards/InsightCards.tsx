@@ -103,7 +103,6 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(
                   onIncomeClick?.()
                 }}
                 title={onIncomeClick ? t.income : undefined}
-                aria-label={onIncomeClick ? `View ${incomeCount} income transactions` : undefined}
               >
                 {incomeCount} {t.income}
               </button>
@@ -115,9 +114,6 @@ export const InsightCards: React.FC<InsightCardsProps> = React.memo(
                   onExpenseClick?.()
                 }}
                 title={onExpenseClick ? t.expenses : undefined}
-                aria-label={
-                  onExpenseClick ? `View ${expenseCount} expense transactions` : undefined
-                }
               >
                 {expenseCount} {t.expenses}
               </button>

@@ -208,7 +208,7 @@ const AppHeader: React.FC = () => {
                 setIsLangOpen(!isLangOpen)
                 setIsThemeOpen(false)
               }}
-              aria-label={t.changeLanguage}
+              aria-label={`${t.changeLanguage}: ${localeLabels[locale].native}`}
               {...{ 'aria-expanded': isLangOpen ? 'true' : 'false' }}
               id="language-switcher-btn"
             >
@@ -271,7 +271,7 @@ const AppHeader: React.FC = () => {
                 setIsThemeOpen(!isThemeOpen)
                 setIsLangOpen(false)
               }}
-              aria-label={t.changeTheme}
+              aria-label={`${t.changeTheme}: ${currentThemeOption.label}`}
               {...{ 'aria-expanded': isThemeOpen ? 'true' : 'false' }}
               id="theme-switcher-btn"
             >

@@ -7,6 +7,7 @@ import { useLanguageStore } from './useLanguageStore'
 describe('useLanguageStore', () => {
   beforeEach(() => {
     localStorage.clear()
+    document.documentElement.lang = 'en'
     vi.clearAllMocks()
     // Force reset of store state since it's initialized on import
     useLanguageStore.setState({
@@ -21,12 +22,13 @@ describe('useLanguageStore', () => {
     expect(state.t.appName).toBeDefined()
   })
 
-  it('should change locale and update translations', () => {
+  it('should change locale, update translations, and sync documentElement.lang', () => {
     useLanguageStore.getState().setLocale('de')
 
     const state = useLanguageStore.getState()
     expect(state.locale).toBe('de')
     expect(state.t.appName).toBe('Saldio')
+    expect(document.documentElement.lang).toBe('de')
   })
 
   it('should persist locale to localStorage', () => {

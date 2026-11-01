@@ -39,7 +39,6 @@ export const AvgRow: React.FC<AvgRowProps> = ({
           }
         : undefined
     }
-    aria-label={onClick ? `View ${label} details` : undefined}
   >
     <div
       className={`${styles['avg-icon']} ${styles[`avg-icon-${color}`]}`}

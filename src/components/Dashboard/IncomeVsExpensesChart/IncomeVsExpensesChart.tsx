@@ -232,7 +232,7 @@ export const IncomeVsExpensesChart: React.FC<IncomeVsExpensesChartProps> = React
         <div className={styles.header}>
           <div className={styles.headerMain}>
             <div className={styles.titleGroup}>
-              <h3 className={styles.title}>{t.incomeVsExpenses || 'Income vs Expenses'}</h3>
+              <h2 className={styles.title}>{t.incomeVsExpenses || 'Income vs Expenses'}</h2>
               {monthlyData.length > 0 && <p className={styles.subtitle}>{subtitleText}</p>}
             </div>
 

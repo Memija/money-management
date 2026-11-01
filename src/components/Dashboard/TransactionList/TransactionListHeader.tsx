@@ -36,7 +36,7 @@ export const TransactionListHeader: React.FC<TransactionListHeaderProps> = ({
         </div>
         <div className={styles.titleTextContainer}>
           <div className={styles.titleWithBadge}>
-            <h3 className={styles.title}>{title}</h3>
+            <h2 className={styles.title}>{title}</h2>
             {detachTransactionsFromDashboard && (
               <span
                 className={styles.detachedBadge}

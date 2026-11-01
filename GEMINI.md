@@ -1,702 +1,261 @@
 # Coding Principles & Guidelines
 
-## DRY Principle (Don't Repeat Yourself)
+Saldio (`money-management`) is a **100% local-first, zero-backend** personal finance web application built with **React 19**, **TypeScript 6**, **Vite 8 (Rolldown)**, **Zustand 5** (`localStorage`-persisted), **Recharts**, **Framer Motion**, **Lucide React** / **React Icons**, **`pdfjs-dist`**, **`xlsx`**, **`react-virtuoso`**, and **CSS Modules**.
 
-**CRITICAL RULE:** Before writing ANY new code, you MUST check if similar functionality already exists in the codebase.
+---
+
+## 1. DRY Principle (Don't Repeat Yourself)
+
+**CRITICAL RULE:** Before writing ANY new code, verify whether similar functionality already exists in the codebase.
 
 ### Pre-Implementation Checklist
 
-Before creating new components, functions, or code blocks, complete this checklist:
-
-- [ ] **Search for existing implementations** - Use grep/codebase search to find similar functionality
-- [ ] **Check shared components** - Look in `src/components/shared/` for reusable components
-- [ ] **Review hooks/utilities** - Check if a custom hook or utility already provides similar functionality
-- [ ] **Examine API services** - Look for existing API calls that could be extended
-- [ ] **Consider abstraction** - If duplicating code, create a shared abstraction or custom hook instead
-
-### Decision Tree for New Code
-
-```text
-Need to implement feature X?
-│
-├─ Does similar code exist?
-│  ├─ YES → Can it be reused as-is?
-│  │         ├─ YES → Use it! ✓
-│  │         └─ NO → Can it be extended/modified?
-│  │                   ├─ YES → Extend it! ✓
-│  │                   └─ NO → Create abstraction, extract common parts
-│  └─ NO → Is this likely to be used elsewhere?
-│            ├─ YES → Create it in shared location
-│            └─ NO → Create it component-specific, but keep it modular
-```
-
-### Examples of Code Reuse Opportunities
-
-#### ✅ GOOD - Identified and Extracted
-
-- **Deletion Modal** - Was duplicated in transactions and budget components → Extracted to `DeleteConfirmationModal` shared component
-- **Date Formatting** - Duplicated in lists → Extracted to `useFormatters` hook or `date-utils.ts`
-
-#### ❌ BAD - Code Duplication to Avoid
-
-- Copying modal markup into multiple components
-- Duplicating validation logic across forms
-- Repeating API call patterns in multiple hooks
-- Copy-pasting styling rules
+- [ ] **Search existing code** — Use grep/codebase search before writing new utilities, parsers, or UI patterns
+- [ ] **Check shared components** — Inspect `src/components/shared/` (`Modal`, `DeleteConfirmationModal`, `Select`, `CategorySelect`, `CategoryIcon`, `DatePicker`, `CopyButton`, `ErrorBoundary`, `RenderWhenVisible`, `TimelineSlider`, `TimelineToolbar`, etc.)
+- [ ] **Check hooks & utilities** — Inspect `src/hooks/` and `src/utils/` (`date-utils.ts`, `period-utils.ts`, `category-utils.ts`, `analytics-utils.ts`, `string-utils.ts`, etc.)
+- [ ] **Check store slices & selectors** — Inspect `src/store/` and `src/store/slices/` before adding derived state
+- [ ] **Check existing translation keys** — Search `src/i18n/types.ts` and `src/i18n/locales/en.ts` before adding duplicate keys
 
 ### Shared Code Locations
 
-When creating reusable code, place it in:
-
-- **`src/components/shared/`** - For UI components used across multiple features
-- **`src/hooks/`** - For shared business logic and stateful behavior
-- **`src/utils/`** - For pure helper functions and data transformation
-- **`src/types/`** - For shared TypeScript type definitions and interfaces
-- **`src/i18n/`** - For translation files and localization logic
+- `src/components/shared/` — Reusable UI components used across features
+- `src/hooks/` — Shared stateful hooks and UI/analytics behavior
+- `src/utils/` — Pure helper functions, parsers, and data transformations
+- `src/store/` & `src/store/slices/` — Zustand stores and modular domain slices
+- `src/types/` — Shared TypeScript interfaces and type aliases
+- `src/i18n/` — Lazy-loaded translations, category terms, and parser locales
+- `src/data/` — Static regional datasets (countries, institutions, merchants)
 
 ### Refactoring Triggers
 
-If you notice ANY of these, stop and refactor:
+Stop and extract a shared abstraction whenever you see:
 
-1. **Copying code** from one component to another
-2. **Similar logic** in 2+ places
-3. **Identical JSX structure** in multiple components
-4. **Repeated patterns** in styling
-5. **Duplicate validation** or data transformation
-
-### Code Review Questions
-
-Before committing new code, ask:
-
-1. Does this code already exist somewhere?
-2. Could this be useful in other parts of the application?
-3. Is there a more general solution that would work here?
-4. Can I extract common functionality into a shared location?
-5. Am I introducing technical debt by duplicating this?
-
-## Component File Structure
-
-**CRITICAL RULE:** Components MUST use separate files for logic/markup and styles. No inline styles are allowed.
-
-### Required Structure
-
-```text
-ComponentName/
-├── ComponentName.tsx        # Logic and Markup (JSX)
-├── ComponentName.module.css # Scoped Styles
-└── index.ts                # (Optional) Clean export
-```
-
-### ❌ NEVER DO THIS
-
-```typescript
-const MyComponent = () => {
-  return (
-    <div style={{ color: 'red', padding: '10px' }}> // ❌ Inline styles - FORBIDDEN
-      Hello World
-    </div>
-  );
-};
-```
-
-### ✅ ALWAYS DO THIS
-
-```typescript
-// ComponentName.tsx
-import styles from './ComponentName.module.css';
-
-export const ComponentName = () => {
-  return <div className={styles.container}>Hello World</div>;
-};
-```
-
-### Why This Matters
-
-- **Separation of concerns** - Logic and styling are distinct responsibilities
-- **Better tooling** - IDEs provide better syntax highlighting and linting for separate files
-- **Easier reviews** - Changes to CSS are clearly visible in diffs
-- **Maintainability** - Large components with inline styles become unreadable quickly
-- **Consistency** - All components follow the same structure
+1. Identical or near-identical logic in 2+ places
+2. Copied JSX structures (modals, cards, filter bars, form controls)
+3. Duplicated date/currency formatting, validation, or transaction parsing rules
+4. Repeated CSS declarations that belong in `src/index.css` tokens or a shared component
 
 ---
 
-## Implementation Guidelines
-
-### When Creating Shared Components
-
-**Must have:**
-
-- Clear, descriptive name reflecting its purpose (PascalCase)
-- Documented props (via TypeScript interfaces)
-- Flexible enough for multiple use cases
-- Proper TypeScript typing
-- Functional component with Hooks
-
-**Example Structure:**
-
-```typescript
-interface ReusableThingProps {
-  config: SomeConfig;
-  variant?: 'primary' | 'secondary';
-  onActionCompleted: () => void;
-}
-
-export const ReusableThing = ({
-  config,
-  variant = 'primary',
-  onActionCompleted
-}: ReusableThingProps) => {
-  // ... implementation
-  return (
-    <div className={variant}>
-      {/* ... */}
-    </div>
-  );
-};
-```
-
-### When Creating Hooks
-
-Prefer:
-
-- Using custom hooks to encapsulate complex state logic
-- Keeping hooks focused on a single responsibility
-- Using `useMemo` and `useCallback` for stability in shared hooks
-
-### Code Organization Priority
-
-1. **Reuse existing** code
-2. **Extend/modify** existing code to be more flexible
-3. **Extract common** patterns into shared utilities/hooks
-4. **Create new** code only when necessary
-5. **Document** for future reuse
-
----
-
-## Automation Reminders
-
-- Always run `grep` or `codebase_search` before creating new functionality
-- Check `src/components/shared/` directory contents before creating components
-- Use `view_file_outline` to understand existing component structure
-- Search for existing translation keys in `src/i18n/locales/` before adding new ones
-
----
-
-## Project-Specific Patterns
-
-### This Project Uses
-
-- **React Hooks** (useState, useMemo, useEffect) for state management
-- **Functional Components** (no Class components)
-- **Zustand** for global state management
-- **Lucide React** for icons
-- **Recharts** for data visualisation
-- **CSS Modules** (`.module.css`) and a global `index.css` for styling
-
-### Common Reusable Patterns to Use
-
-- Modal components with configurable content (using a Modal Manager or Portal)
-- Data display components with custom sorting/filtering hooks
-- Custom hooks that read from and write to Zustand stores
-- Shared form inputs with built-in validation
-
----
-
-## File Size & Component Extraction
-
-### Keep Files Small and Focused
-
-**CRITICAL RULE:** Large files are hard to maintain, test, and understand. Extract functionality early and often.
-
-#### File Size Guidelines
-
-- **Components (TSX):** Target < 300 lines, max 500 lines (includes JSX + Logic)
-- **Stylesheets (CSS):** Target < 300 lines, max 500 lines
-- **Hooks/Utilities:** Target < 200 lines, max 400 lines
-
-#### When to Extract
-
-Extract to a new component/hook when:
-
-1. **File exceeds target size** - Don't wait for max size
-2. **Distinct sections** - Code has clear, separable responsibilities
-3. **Reusability potential** - Section could be used elsewhere
-4. **Testing complexity** - Too many test cases for one file
-5. **Multiple concerns** - Component handles more than one main purpose
-
-#### Extraction Checklist
-
-Before extracting code:
-
-- [ ] **Identify boundaries** - Find natural separation points (e.g., a table, a form, a complex filter)
-- [ ] **Name clearly** - New component/hook should have descriptive, focused name
-- [ ] **Define interface** - Props/Return values should be minimal and clear
-- [ ] **Move related code** - Include all related logic, styles, and types
-- [ ] **Update tests** - Create tests for new unit
-- [ ] **Verify functionality** - Ensure everything works after extraction
-
-#### Example: Dashboard Extraction
-
-Good example from this project:
-
-**Before:** `Dashboard.tsx` was 520 lines with transaction list, filtering, sorting, pagination, chart logic, and data management.
-
-**After:**
-
-- `Dashboard.tsx`: ~200 lines (orchestration + charts)
-- `TransactionList.tsx`: ~200 lines (display + filtering + pagination)
-- `useTransactions.ts`: ~100 lines (data access and transformation logic)
-
-**Benefits:**
-
-- Each part has single responsibility
-- `TransactionList` can be reused across different views
-- Logic is testable in isolation (the hook)
-- Clearer code organization
-
-#### Component Extraction Priority
-
-1. **UI sections** that are self-contained (modals, cards, list items)
-2. **Repeated markup** across multiple components
-3. **Complex logic** that can be isolated into a custom hook
-4. **Feature-specific code** that might grow (wizards, multi-step forms)
-
-### Naming Extracted Components
-
-Use descriptive names that reflect single responsibility:
-
-✅ **Good:** `TransactionList`, `DeleteConfirmationModal`, `AmountInput`
-❌ **Bad:** `Records`, `Modal`, `Input` (too generic)
-❌ **Bad:** `DashboardTransactionListWithFilters` (too specific, should be generic)
-
----
-
-**Remember:** Every line of duplicated code is a future maintenance burden. Code reuse isn't just about reducing lines—it's about creating a maintainable, consistent, and scalable codebase.
-
----
-
-## Error Handling
-
-**CRITICAL:** Never let errors fail silently.
-
-- **Always handle async errors** - Use try/catch for promises and async operations
-- **Log errors meaningfully** - Technical details to console, user-friendly messages in UI
-- **Reset UI state on error** - Clear loading states, re-enable buttons, reset file inputs
-- **Provide actionable feedback** - Tell users what went wrong and how to fix it
-
-### Error Handling Pattern
-
-```typescript
-const handleAction = async () => {
-  try {
-    setIsLoading(true)
-    await apiService.doSomething()
-    showSuccess('Success!')
-  } catch (error) {
-    console.error('Action failed:', error)
-    showError('Failed to complete action. Please try again.')
-  } finally {
-    setIsLoading(false)
-  }
-}
-```
-
----
-
-## Naming Conventions
-
-Consistent naming improves readability and searchability.
-
-| Type              | Convention                                | Example                               |
-| ----------------- | ----------------------------------------- | ------------------------------------- |
-| Files             | kebab-case (non-comp) / PascalCase (comp) | `user-profile.ts` / `UserProfile.tsx` |
-| Components        | PascalCase                                | `UserProfile`                         |
-| Hooks             | camelCase (prefix `use`)                  | `useUserProfile`, `useLoading`        |
-| Methods/Variables | camelCase                                 | `getUserProfile`, `isLoading`         |
-| Constants         | SCREAMING_SNAKE_CASE                      | `MAX_FILE_SIZE`, `API_URL`            |
-| Booleans          | Prefix with `is`, `has`, `can`, `should`  | `isValid`, `hasChanges`               |
-
----
-
-## Code Quality
-
-### Must Avoid
-
-- ❌ **No `console.log` in production** - Remove or use proper logging
-- ❌ **No commented-out code** - Delete it; git has history
-- ❌ **No `any` type** - Always define proper types/interfaces
-- ❌ **No magic numbers** - Extract to named constants
-- ❌ **No deep nesting** - Max 3 levels; extract to smaller components/functions
-
-### Must Follow
-
-- ✅ **Single Responsibility** - One component/function does one thing
-- ✅ **Early returns** - Reduce nesting with guard clauses in hooks/functions
-- ✅ **Descriptive names** - Code should read like prose
-- ✅ **Small functions** - Target < 30 lines per function
-- ✅ **Use curly braces for all control structures** - Even for single-line `if`/`else` statements
-
----
-
-## Accessibility (A11y)
-
-**CRITICAL:** Accessibility is not optional.
-
-- **All buttons must have discernible text** - Use `title`, `aria-label`, or visible text
-- **All images must have `alt` attributes** - Empty string for decorative images
-- **All form inputs must have labels** - Use `<label htmlFor="">` or `aria-label`
-- **Interactive elements must be keyboard accessible** - Tab navigation must work
-- **Color is not the only indicator** - Use icons/text alongside color
-
-### Quick Check
-
-```jsx
-// ❌ BAD
-<button onClick={close}><LucideIcon name="X" /></button>
-
-// ✅ GOOD
-<button onClick={close} title="Close" aria-label="Close modal">
-  <XIcon size={20} />
-</button>
-```
-
----
-
-## Performance
-
-### Code Splitting & Lazy Loading
-
-- **Lazy load routes** - Use `React.lazy` and `Suspense` for page-level components
-- **Dynamic imports** - Load heavy libraries on demand (e.g., chart.js, xlsx) using `await import()`
-
-### React-Specific
-
-- **Use `key` prop correctly** - Never use index as key if items can change order
-- **Stabilize references** - Use `useCallback` for functions passed to memoized components
-- **Memoize expensive calculations** - Use `useMemo` for heavy data processing
-- **React.memo** - Wrap heavy UI components that receive stable props
-
-### General
-
-- **Minimize bundle size** - Check for duplicate imports and large libraries
-- **Optimize images** - Use WebP, lazy load images below the fold
-- **Debounce user input** - Use a debounce hook for search or frequent updates
-
-### Memory Management
-
-- **Effect Cleanups** - Always return a cleanup function in `useEffect` to remove listeners or cancel subscriptions
-- **AbortController** - Use to cancel pending API requests on component unmount
-- **Avoid closures capturing large objects** in long-lived hooks
-
-### Rendering Performance
-
-- **Avoid unnecessary state updates** - Batch updates or use `useReducer` for complex state
-- **Virtual scrolling** - For long lists (100+ items), use `react-window` or `react-virtuoso`
-- **Avoid layout thrashing** - Measure DOM only when necessary (e.g., `useLayoutEffect`)
-
----
-
-## React Best Practices
-
-### Hooks & Reactivity
-
-- **Keep hooks at the top level** - Never call hooks inside loops or conditions
-- **Dependencies array** - Always include all used variables in `useEffect`, `useMemo`, `useCallback`
-- **Prefer custom hooks** for logic that involves multiple built-in hooks
-
-### Component Architecture
-
-- **Composition over Inheritance** - Use `children` prop to create flexible layouts
-- **Controlled vs Uncontrolled** - Prefer controlled components for forms
-- **Single Source of Truth** - Lift state up when multiple components need the same data
-- **Prop Drilling** - Use React Context or a State Management library (Zustand/Redux) if drilling exceeds 3 levels
-
-### JSX Rules
-
-- **No complex logic in JSX** - Extract to variables or helper functions above the `return`
-- **Conditional Rendering** - Use `condition && <Component />` or ternary operators
-- **Fragments** - Use `<></>` to avoid unnecessary DOM nodes
-
-### State & Data Access
-
-- **Use Zustand stores** - The app is local-storage-backed; read and write via store actions, not raw `localStorage`
-- **Loading/Error States** - Always handle and display loading and error indicators
-- **Derive data in selectors** - Prefer `useMemo` or store selectors over recomputing in JSX
-
----
-
-## TypeScript Best Practices
-
-### Type Safety
-
-- **Never use `any`** - Use `unknown` or specific interfaces
-- **Define interfaces for Props** - Every component should have a Props interface
-- **Strict Mode** - Ensure `strict: true` in `tsconfig.json`
-- **Discriminated Unions** - Use for complex state or API responses
-
-### Modern Syntax
-
-```typescript
-// ✅ GOOD
-const name = user?.profile?.name ?? 'Anonymous'
-const message = `Hello, ${name}!`
-
-// ❌ BAD
-const name = (user && user.profile && user.profile.name) || 'Anonymous'
-```
-
-### Functions
-
-- **Type all parameters and return values**
-- **Use arrow functions** for component definitions and callbacks
-- **Keep functions small** - Max ~30 lines
-
----
-
-## CSS Best Practices
-
-### Global Styles Architecture
-
-```text
-src/
-├── index.css          # Global styles, CSS custom properties, resets
-└── components/
-    └── ComponentName/
-        └── ComponentName.module.css  # Scoped component styles
-```
-
-### CSS Rules
-
-- **Use CSS Modules** (`.module.css`) - Prevent style leaking between components
-- **Use `index.css` for globals** - CSS custom properties, resets, typography
-- **Don't duplicate global styles** in component modules
-- **Nesting** - Use the native CSS nesting syntax (`& .child {}`) or keep selectors flat
-
-### CSS Custom Properties
-
-```css
-/* index.css — define global tokens */
-:root {
-  --color-primary: #007bff;
-  --border-radius: 8px;
-}
-
-/* ComponentName.module.css — consume tokens */
-.button {
-  background: var(--color-primary);
-  border-radius: var(--border-radius);
-}
-```
-
----
-
-## Security Best Practices
-
-### Input Validation
-
-- **Validate all user input** - Use libraries like `zod` or `yup` with forms
-- **Sanitize imported data** - Check JSON/Excel structure before processing
-
-### Storage Security
-
-- **No sensitive data in localStorage**
-- **No secrets in client-side code** (API keys should be behind a proxy if sensitive)
-
-### Code Security
-
-- **Avoid `dangerouslySetInnerHTML`** - If needed, sanitize with `DOMPurify` first
-- **Keep dependencies updated** - Run `npm audit`
-
----
-
-## Resilience Best Practices
-
-### Graceful Degradation
-
-- **Error Boundaries** - Use React Error Boundaries to catch crashes in specific UI trees
-- **Fallback values** - Provide defaults for missing data
-
-### Error Recovery
-
-- **Retry logic** - For API calls (React Query handles this well)
-- **Preserve input** - Don't clear forms on submission failure
-
----
-
-## Testing
-
-### What to Test
-
-- **Critical user flows** - Using React Testing Library
-- **Hook logic** - Using `@testing-library/react-hooks`
-- **Edge cases** - Empty states, invalid inputs
-
-### Test Naming
-
-```typescript
-it('should display error message when form is invalid', () => {})
-it('should call onSave when button is clicked', () => {})
-```
-
-### Testing Best Practices
-
-- **Test behavior, not implementation** - Don't test internal state, test what the user sees
-- **Mock API calls** - Use MSW (Mock Service Worker) for network mocking
-
----
-
-## Documentation
-
-### JSDoc Standards
-
-```typescript
-/**
- * Calculates the total amount spent in a given category.
- * @param transactions - List of transactions to filter
- * @param category - The category to sum
- * @returns Total amount spent, or 0 if no matching transactions
- */
-export const sumByCategory = (transactions: Transaction[], category: string): number => {
-  return transactions.filter((t) => t.category === category).reduce((sum, t) => sum + t.amount, 0)
-}
-```
-
----
-
-## Internationalization (i18n)
-
-### i18n Pattern
-
-The project uses a custom i18n solution via `useLanguageStore` (Zustand).
-
-### Usage
-
-```typescript
-const { t } = useLanguageStore();
-
-return <h1>{t.dashboard.title}</h1>;
-```
-
-### i18n Rules
-
-- **Never hardcode user-facing strings** - Always use the `t` object
-- **Hierarchical keys** - Maintain the structure in `src/i18n/locales/`
-- **German Compound Words** - Always use full forms (e.g., 'Kaltwasserverbrauch' instead of 'Kalt-')
-- **Add new keys to all locales** - Ensure consistency across `en`, `de`, `pl`, etc.
-
-### Adding a New Language Checklist
-
-When introducing a new language or locale:
-
-1. **Declare Locale**: Add code to `export type Locale` in `src/i18n/types.ts`
-2. **Translations**: Create `src/i18n/locales/<locale>.ts` implementing `TranslationStrings`
-3. **Register**: Add to `translations`, `localeLabels`, and `localeOrder` in `src/i18n/translations.ts`
-4. **Parser Locale**: Create `src/i18n/parser-locales/<locale>.ts` for transaction keywords and regex patterns
-5. **Date Fallbacks**: Check `src/utils/date-utils.ts` (`MONTH_FALLBACKS` & `WEEKDAY_FALLBACKS`). If the locale has incomplete or non-standard browser ICU output, register explicit fallbacks. The guardrail test in `date-utils.test.ts` automatically tests every locale in `localeOrder`.
-6. **Data Guardrails**: Run `src/data/` unit tests (`countries.test.ts`, `institutions.test.ts`, `merchants.test.ts`) to ensure country translation coverage, flag assets, and regional data integrity.
-
----
-
-## Project Structure
+## 2. Project Structure & Component Architecture
 
 ### Folder Organization
 
 ```text
+public/                 # Static assets served at root (/flags, icons, site.webmanifest)
+scripts/                # Node CLI scripts (Lighthouse flows, security orchestration, test data)
 src/
-├── assets/             # Images, fonts, static files
-├── components/         # UI components
-│   ├── shared/         # Reusable across features
-│   └── layout/         # Header, Footer, Sidebar
-├── data/               # Static data and seed files
-├── i18n/               # Localization files (locales, types, translations)
-├── store/              # Zustand stores (state management)
+├── components/         # Feature folders + shared/ + layout/ (AppHeader, AppFooter)
+├── config/             # App-level configuration constants
+├── data/               # Countries, financial institutions, and merchant catalogs
 ├── hooks/              # Custom React hooks
-├── index.css           # Global styles and CSS custom properties
-├── types/              # TypeScript interfaces
-└── utils/              # Helper functions
+├── i18n/               # Locales, lazy loader, locale metadata, category terms, parser locales
+├── store/              # Zustand stores (useAppStore + slices/, useLanguageStore, useThemeStore, etc.)
+├── test/               # Vitest global test setup (setup.ts)
+├── types/              # Shared TypeScript types
+├── utils/              # Pure utilities, parsers, brand logos, analytics helpers
+├── App.tsx             # Step-based root shell & lazy view orchestration
+├── index.css           # Global CSS custom properties (dark/light themes) & resets
+└── main.tsx            # React root entry point
 ```
 
-### Guidelines
+### Component File Structure (No Inline Styles)
 
-- **Feature-based structure** - Group components and logic by feature
-- **Keep components and their styles together** in the same folder
-- **Export from index.ts** in each folder for cleaner imports
+**CRITICAL RULE:** Every styled component MUST separate logic/markup from styles using CSS Modules. Inline `style={{ ... }}` attributes are forbidden.
 
----
+```text
+ComponentName/
+├── ComponentName.tsx        # Logic and JSX markup
+├── ComponentName.module.css # Scoped CSS Module consuming tokens from src/index.css
+└── index.ts                 # Clean barrel export (when helpful)
+```
 
-## Routing Strategy
+```tsx
+// ❌ FORBIDDEN — inline styles
+export const BadBadge = () => <span style={{ color: 'red', padding: '8px' }}>Alert</span>
 
-### Routing Pattern
+// ✅ REQUIRED — CSS Module + global design tokens
+import styles from './StatusBadge.module.css'
 
-The project uses **React Router** (or similar) with lazy loading for page-level components.
+interface StatusBadgeProps {
+  label: string
+}
 
-### Routing Rules
+export const StatusBadge = ({ label }: StatusBadgeProps) => (
+  <span className={styles.badge}>{label}</span>
+)
+```
 
-- **Lazy Load Pages:** Always use `React.lazy` and `Suspense` for top-level routes to minimize the initial bundle size.
-- **Route Protection:** Wrap protected routes in an authentication/authorization wrapper component rather than checking state inside individual pages.
-- **Centralized Routes:** Define routes in a centralized configuration file (e.g., `src/App.tsx` or `src/routes.tsx`) to maintain a clear overview of the application's structure.
+### File Size & Extraction Limits
 
----
+Keep files small and focused on a single responsibility. ESLint enforces hard ceilings in `eslint.config.js`:
 
-## API & Data Fetching
+- **Components** (`src/components/**/*.tsx`): Target `< 300` lines, hard max **`500` lines** (`max-lines-per-function: 420`)
+- **Hooks, Stores & Utils** (`src/{hooks,store,utils}/**/*.ts`): Target `< 200` lines, hard max **`400` lines** (`max-lines-per-function: 350`)
+- **Scripts** (`scripts/**/*.{js,mjs}`): Hard max **`400` lines** (`max-lines-per-function: 80`, `complexity: 15`)
+- **Stylesheets** (`*.module.css`): Target `< 300` lines, max **`500` lines**
 
-### Server vs. Client State
+Extract sub-components, custom hooks, or pure helper modules early—do not wait until a file hits the ESLint ceiling.
 
-- **Client State:** Use **Zustand** strictly for UI state, form state, and client-only logic (e.g., theme, sidebar toggle, local filters).
-- **Server State:** Use **React Query** (or similar) for fetching, caching, synchronizing, and updating server data.
+### Naming Conventions
 
-### Data Fetching Rules
-
-- **No `useEffect` for Fetching:** Avoid raw `fetch` or `axios` calls inside `useEffect`. Always prefer React Query hooks (`useQuery`, `useMutation`).
-- **Cancellation:** Utilize `AbortController` in your API service functions to cancel pending requests when a component unmounts.
-- **Centralized API Service:** Keep all API call definitions in a dedicated service file or folder (e.g., `src/services/api.ts`), separated from UI components.
-
----
-
-## Environment Variables
-
-### Environment Variables Pattern
-
-Environment variables are handled via Vite's `import.meta.env`.
-
-### Env Rules
-
-- **Prefixing:** All client-facing environment variables MUST be prefixed with `VITE_` (e.g., `VITE_API_URL`).
-- **No Secrets:** Never store sensitive secrets (API keys for paid services, database credentials) in `.env` files used by the frontend.
-- **Type Safety:** Define types for environment variables in `src/vite-env.d.ts` to ensure TypeScript intellisense and safety.
-
----
-
-## Import Sorting Rules
-
-Consistent imports prevent merge conflicts and improve readability.
-
-### Preferred Order
-
-1. **React and Core Libraries:** `import React, { useState } from 'react';`
-2. **Third-Party Packages:** `import { useForm } from 'react-hook-form';`
-3. **Absolute Internal Imports (if configured):** `import { Button } from '@/components/shared/Button';`
-4. **Relative Internal Imports:** `import { useTransactions } from '../../hooks/useTransactions';`
-5. **Types and Interfaces:** `import type { User } from '@/types';`
-6. **Styles:** `import styles from './Component.module.css';`
-
-_Tip: Configure ESLint (`eslint-plugin-import`) or Prettier to auto-sort imports._
+| Artifact              | Convention                            | Example                                     |
+| --------------------- | ------------------------------------- | ------------------------------------------- |
+| Component files/dirs  | `PascalCase`                          | `TransactionList/TransactionList.tsx`       |
+| Hook files            | `camelCase` prefixed with `use`       | `useBackupRestore.ts`, `useAccountBalances` |
+| Utility / data files  | `kebab-case`                          | `date-utils.ts`, `import-fingerprint.ts`    |
+| Functions & variables | `camelCase`                           | `parseTransactions`, `resolvedTheme`        |
+| Constants             | `SCREAMING_SNAKE_CASE`                | `DEFAULT_LOCALE`, `SECURITY_HEADERS`        |
+| Booleans              | Prefixed `is`, `has`, `can`, `should` | `isCompleted`, `hasHydrated`, `shouldReset` |
 
 ---
 
-## Linting, Formatting & Commits
+## 3. State, Navigation & Performance (Local-First)
 
-### Code Consistency
+### Local-First State Management
 
-- **Prettier:** Use Prettier for all code formatting. Do not manually format code; rely on the IDE plugin or run the format script.
-- **ESLint:** Ensure there are no ESLint warnings or errors before committing code. Fix issues rather than disabling rules via `// eslint-disable-next-line` unless absolutely necessary.
+- **Zero Backend:** Saldio runs entirely in the browser with no backend server or external API calls. Do **not** introduce `react-query`, `axios`, `msw`, or `src/services/api.ts`.
+- **Zustand Stores Only:** Read and mutate persistent state exclusively through Zustand stores (`useAppStore`, `useLanguageStore`, `useThemeStore`, `usePrivacyStore`, `useTimelineSelectionStore`)—never scatter raw `localStorage` reads/writes across UI components.
+- **Fine-Grained Selectors:** Subscribe to the minimal slice needed (`const currentStep = useAppStore((s) => s.currentStep)`) to prevent unnecessary re-renders.
 
-### Commit Messages
+### Step-Based Lazy Navigation
 
-- **Conventional Commits:** Follow the conventional commit format for clearer history and automated changelog generation:
-  - `feat:` for new features
-  - `fix:` for bug fixes
-  - `refactor:` for code refactoring
-  - `docs:` for documentation updates
-  - `chore:` for maintenance tasks (e.g., dependency updates)
-  - _Example:_ `feat(dashboard): add transaction summary chart`
+- Navigation is controlled by `currentStep` (`'country' | 'institution' | 'import' | 'review' | 'dashboard' | 'settings'`) in `src/App.tsx` (no `react-router`).
+- Keep top-level views (`Dashboard`, `Settings`, onboarding steps) and heavy file parsers (`pdfjs-dist`, `xlsx`) lazy-loaded via `React.lazy` + `Suspense` or dynamic `import()`, wrapped in `ErrorBoundary`.
+
+### Rendering & Memory Performance
+
+- Use `react-virtuoso` for large transaction lists and `RenderWhenVisible` to defer offscreen chart/section work.
+- Use `useMemo` for expensive aggregations over transactions and `useCallback` for handlers passed to memoized children (`React.memo`).
+- Always return cleanup functions in `useEffect` (event listeners, `matchMedia`, timers, observers).
+- Never use array index as `key` when list items can reorder, filter, or delete.
+
+---
+
+## 4. TypeScript, Code Quality & Formatting
+
+### Strict TypeScript (`tsconfig.json`)
+
+- `strict: true`, `noUnusedLocals: true`, `noUnusedParameters: true`, `noImplicitReturns: true`, `noImplicitOverride: true`, `noFallthroughCasesInSwitch: true`.
+- `verbatimModuleSyntax: true` — Always use `import type { ... }` for type-only imports.
+- `erasableSyntaxOnly: true` — Do **not** use TypeScript `enum`, runtime `namespace`, or constructor parameter properties; use union literal types (`type Theme = 'system' | 'light' | 'dark'`) or `as const` objects instead.
+- `@/*` path alias maps to `./src/*` (`tsconfig.app.json` + Vite `tsconfigPaths: true`).
+
+### Mandatory ESLint & Quality Rules (`eslint.config.js`)
+
+- **No `any` (`@typescript-eslint/no-explicit-any`):** Use concrete interfaces, generics, or `unknown` with type guards.
+- **Curly braces always (`curly: ['error', 'all']`):** Every `if`, `else`, `for`, and `while` block MUST use `{ ... }`, even for a single line.
+- **Strict equality (`eqeqeq`):** Always use `===` / `!==` (`== null` check is permitted).
+- **Bounded complexity:** Max nesting depth `4` (`max-depth`), max function parameters `6` (`max-params` — group into an options object when > 3–4). Prefer early-return guard clauses and small functions (`< 30` lines where practical).
+- **No `console.log` in `src/`:** `no-console` permits only `console.warn`, `console.error`, and `console.debug` in application code.
+- **No dead code:** Delete commented-out code and unused exports; extract magic numbers into named constants.
+
+### Prettier Formatting (`.prettierrc`)
+
+All files use Prettier (`npm run format`): **`semi: false`**, **`singleQuote: true`**, **`trailingComma: 'all'`**, **`printWidth: 100`**, **`tabWidth: 2`**.
+
+### Import Sorting (`eslint-plugin-simple-import-sort`)
+
+Imports are auto-sorted into **4 blank-line-separated groups** (`npm run lint:fix`):
+
+```tsx
+// 1. React, node: built-ins, and third-party packages
+import React, { useMemo } from 'react'
+import { Download } from 'lucide-react'
+
+// 2. @/ aliased internal imports (when used)
+import type { Transaction } from '@/types'
+
+// 3. Relative internal imports
+import { useLanguageStore } from '../../store/useLanguageStore'
+
+// 4. Stylesheets
+import styles from './SummaryCard.module.css'
+```
+
+---
+
+## 5. Error Handling, Security & Licensing
+
+### Error Handling
+
+- Never let async or storage/file operations fail silently (`try / catch / finally`).
+- Log technical context with `console.error` / `console.warn`, surface localized actionable feedback in the UI, and always reset loading/file-input states in `finally`.
+
+### Security & Data Integrity
+
+- **Untrusted Inputs:** Treat all imported files (CSV, XLSX, PDF, JSON backups) and `localStorage` data as untrusted—validate structure, types, and bounds before updating state.
+- **XSS Prevention:** Never use `dangerouslySetInnerHTML`.
+- **Secrets & Environment Variables:** Prefix public Vite variables with `VITE_` and never store secrets or tokens in the repo (`npm run security:secrets` and `npm run security:gitleaks` must pass).
+
+### Licensing & Author Privacy
+
+- Licensed under **PolyForm Noncommercial License 1.0.0** (`PolyForm-Noncommercial-1.0.0` in `LICENSE`, attribution in `NOTICE`, commercial terms in `COMMERCIAL.md`).
+- **Author Privacy Rule:** Never insert a personal author name into source files, documentation, or package metadata—always use `Owner` or `Repository Owner`.
+
+---
+
+## 6. Accessibility (A11y) & Lighthouse Gates (100% Rule)
+
+**CRITICAL:** CI and local Lighthouse budgets (`lighthouserc.json` & `scripts/lighthouse-flow.mjs`) require **`100` (`1.0`)** on **Accessibility**, **Best Practices**, and **SEO** (`Performance >= 80`) across mobile, desktop, and user flows.
+
+- **WCAG AA Color Contrast:** Every text/background token pair in `src/index.css` must meet WCAG AA (`>= 4.5:1` normal text, `>= 3:1` large text & UI components) in **both** dark (`:root` / `[data-theme='dark']`) and light (`[data-theme='light']`) themes.
+- **WCAG 2.5.3 Label in Name:** Never attach an `aria-label` that overrides or omits a control's visible text. Omit `aria-label` when visible text is already descriptive, or ensure `aria-label` contains the exact visible text string.
+- **Sequential Heading Order:** Follow strict `<h1>` → `<h2>` → `<h3>` hierarchy without skipping levels.
+- **Accessible Controls:** Icon-only buttons MUST have localized `aria-label` (and `title`); images MUST have `alt` (`alt=""` if decorative); inputs MUST have `<label htmlFor>` or `aria-label`; all interactive elements MUST be keyboard operable (`<button type="button">`, never `<div onClick>`).
+
+---
+
+## 7. Internationalization (i18n)
+
+### Usage & Rules
+
+Saldio uses a custom lazy-loaded i18n system via `useLanguageStore` (`en`, `id`, `pl`, `bs`, `sr`, `de`):
+
+```tsx
+const t = useLanguageStore((s) => s.t)
+
+return <h2>{t.catGroceries}</h2>
+```
+
+- **Zero hardcoded UI strings:** Every user-facing label, `aria-label`, `title`, placeholder, and error message must come from `t`.
+- **Flat typed keys:** Maintain key parity across all locales via `TranslationStrings` in `src/i18n/types.ts`.
+- **German compound words:** Always write complete compound words (e.g., `Kaltwasserverbrauch`, never truncated `Kalt-`).
+
+### Adding a New Language Checklist
+
+1. **Declare Locale:** Add the locale code to `export type Locale` in `src/i18n/types.ts`.
+2. **Category Terms:** Create `src/i18n/category-terms/<locale>.ts` and register it in `src/i18n/category-terms/index.ts`.
+3. **Translations:** Create `src/i18n/locales/<locale>.ts` implementing `TranslationStrings` (spreading `...<locale>Terms.labels` and reusing `<locale>Terms.keywords` / `coffee`).
+4. **Loader & Metadata:** Register the dynamic chunk loader in `src/i18n/locale-loader.ts` (`LOADERS`), picker metadata in `src/i18n/locale-meta.ts` (`localeLabels`, `localeOrder`), and static test map in `src/i18n/translations.ts` (verified by `src/i18n/locale-loader.test.ts`).
+5. **Pre-Paint HTML Bootstrap:** Add the locale code to `supportedLang` in `index.html` so `<html lang>` resolves before first paint.
+6. **Parser Locale:** Create transaction parser rules in `src/i18n/parser-locales/<locale>.ts`.
+7. **Date Fallbacks:** Check `MONTH_FALLBACKS` and `WEEKDAY_FALLBACKS` in `src/utils/date-utils.ts` (automatically tested for every `localeOrder` entry by `src/utils/date-utils.test.ts`).
+8. **Regional Data Guardrails:** Run `src/data/` tests (`countries.test.ts`, `institutions.test.ts`, `merchants.test.ts`) to verify translations and flag assets.
+
+---
+
+## 8. Testing, Validation & Commits
+
+### Testing (`Vitest` + React Testing Library)
+
+- Co-locate unit and component tests alongside source files (`*.test.ts`, `*.test.tsx`).
+- Test user-visible behavior, accessibility roles/labels, edge cases (empty/corrupt imports, locale switching, boundary dates), and store/hook contracts (`renderHook` from `@testing-library/react`).
+- Add concise JSDoc (`@param`, `@returns`) on exported utilities, parsers, and non-trivial hooks.
+
+### Quality Gate Commands
+
+- `npm run format:check` / `npm run format` — Prettier check / write
+- `npm run lint` — ESLint with `--max-warnings 0`
+- `npm run typecheck` — TypeScript project-references check (`tsc -b --noEmit`)
+- `npm run test:run` / `npm run test:coverage` — Vitest test suite & V8 coverage
+- `npm run lighthouse` / `npm run lighthouse:flows:quick` — Mobile, desktop & user-flow Lighthouse audits
+- `npm run validate` — Full gate (format, lint, typecheck, secrets, gitleaks, audit, licenses, build, coverage, Lighthouse)
+
+### Conventional Commits (`commitlint.config.js` + Husky)
+
+All commit messages are validated by Commitlint via Husky (`feat:`, `fix:`, `refactor:`, `perf:`, `test:`, `docs:`, `chore:`, `ci:`, `build:`, `style:`):
+
+```text
+feat(dashboard): add monthly category trend breakdown
+```

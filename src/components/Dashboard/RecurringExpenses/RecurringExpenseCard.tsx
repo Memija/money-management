@@ -80,9 +80,9 @@ export const RecurringExpenseCard: React.FC<RecurringExpenseCardProps> = React.m
               />
             </div>
             <div className={styles.nameBlock}>
-              <h4 className={`${styles.itemName} privacy-blur`} title={expense.name}>
+              <h3 className={`${styles.itemName} privacy-blur`} title={expense.name}>
                 {expense.name}
-              </h4>
+              </h3>
               <div className={styles.categorySelectWrapper}>
                 <CategorySelect
                   value={expense.category || 'Other'}
