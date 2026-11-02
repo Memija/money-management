@@ -1,4 +1,5 @@
-import React, { useLayoutEffect } from 'react'
+import type React from 'react'
+import { useLayoutEffect } from 'react'
 
 interface UseDropdownPositionOptions {
   isOpen: boolean

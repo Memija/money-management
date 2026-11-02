@@ -9,7 +9,17 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage', '.lighthouseci', 'lighthouse-reports', 'zap-reports']),
+  globalIgnores([
+    'dist',
+    'coverage',
+    'coverage-ts',
+    '.firebase',
+    '.lighthouseci',
+    'lighthouse-reports',
+    'zap-reports',
+    'sarif-results',
+    'codeql-db',
+  ]),
   {
     files: ['**/*.{ts,tsx,js,mjs}'],
     extends: [
@@ -33,6 +43,10 @@ export default defineConfig([
       'max-depth': ['error', 4],
       'max-params': ['error', 6],
       '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', disallowTypeAnnotations: false },
+      ],
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
@@ -43,7 +57,7 @@ export default defineConfig([
           groups: [
             // 1. React, Core Libraries, and Third-Party Packages
             ['^react', '^node:', '^@?\\w'],
-            // 2. Absolute Internal Imports (if configured with alias like @/)
+            // 2. Absolute Internal Imports (configured with @/ alias)
             ['^@/'],
             // 3. Relative Internal Imports
             ['^\\.'],
@@ -56,7 +70,7 @@ export default defineConfig([
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
     languageOptions: {
-      ecmaVersion: 2022,
+      ecmaVersion: 'latest',
       globals: globals.browser,
     },
   },
@@ -69,37 +83,14 @@ export default defineConfig([
   },
   {
     files: ['src/components/**/*.tsx'],
-    ignores: ['**/*.test.tsx', '**/*.spec.tsx', 'src/components/shared/BrandLogo/**'],
+    ignores: ['**/*.test.tsx', '**/*.spec.tsx'],
     rules: {
       'max-lines': ['error', { max: 500, skipBlankLines: true, skipComments: true }],
       'max-lines-per-function': ['error', { max: 420, skipBlankLines: true, skipComments: true }],
     },
   },
   {
-    files: ['src/{hooks,store,utils,services}/**/*.ts'],
-    ignores: ['**/*.test.ts', '**/*.spec.ts'],
-    rules: {
-      'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 350, skipBlankLines: true, skipComments: true }],
-    },
-  },
-  {
-    files: ['src/**/*.{ts,tsx}'],
-    ignores: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
-    rules: {
-      'no-console': ['error', { allow: ['warn', 'error', 'debug'] }],
-    },
-  },
-  {
-    files: ['src/components/**/*.tsx'],
-    ignores: ['**/*.test.tsx', '**/*.spec.tsx', '**/BrandLogo/**'],
-    rules: {
-      'max-lines': ['error', { max: 500, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 420, skipBlankLines: true, skipComments: true }],
-    },
-  },
-  {
-    files: ['src/{hooks,store,utils,services}/**/*.ts'],
+    files: ['src/{config,hooks,store,utils}/**/*.ts'],
     ignores: ['**/*.test.ts', '**/*.spec.ts', '**/brand-logos/**'],
     rules: {
       'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
@@ -109,7 +100,6 @@ export default defineConfig([
   {
     files: ['scripts/**/*.{js,mjs}', '*.config.{js,ts}'],
     languageOptions: {
-      ecmaVersion: 2022,
       globals: {
         ...globals.node,
         ...globals.browser,
