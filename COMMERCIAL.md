@@ -1,31 +1,62 @@
 # Commercial License Terms
 
-**Saldio** is licensed for free personal and noncommercial use under the **PolyForm Noncommercial License 1.0.0** (see [LICENSE](./LICENSE) and required attribution in [NOTICE](./NOTICE)). There is **no free commercial trial period**.
+**Saldio** (`money-management`) uses a dual-licensing model:
 
-## Commercial Licensing (Case-by-Case Contract Required)
+1. **Noncommercial Use**: Licensed free of charge under the **PolyForm Noncommercial License 1.0.0** (see [LICENSE](./LICENSE) and required attribution in [NOTICE](./NOTICE)).
+2. **Commercial Use**: Requires a separate, prior, written **Commercial License Agreement** negotiated on a case-by-case basis and countersigned by the **Owner**. There is **no free commercial trial or evaluation period**.
 
-**Any commercial use** of this software — in whole or in part, modified or unmodified — is prohibited under [LICENSE](./LICENSE) unless a **separate, written Commercial License Agreement** has been negotiated on a specific, case-by-case basis and signed with the **Owner** prior to such use.
+---
 
-Activities requiring a signed Commercial License Agreement include, without limitation:
+## 1. When a Commercial License Is Required
 
-- Offering the software or derivative works as a hosted or managed service (SaaS)
-- Selling, sublicensing, or commercially distributing the software or modified versions
-- Embedding or bundling the software into a commercial product or service
-- Using the software internally within a for-profit company, sole proprietorship, or commercial organization
+Under [LICENSE](./LICENSE), **any commercial use** of this software—in whole or in part, modified or unmodified—is strictly prohibited without a signed Commercial License Agreement in place **prior** to such use.
 
-Commercial terms, scope of rights, and fees are agreed individually per contract based on the specific use case.
+Activities that require a Commercial License Agreement include, without limitation:
 
-## How to Obtain a Commercial Contract
+- **Hosted or Managed Services (SaaS)**: Offering the software or any derivative work as a hosted, cloud, or managed service to third parties, whether subscription-based, usage-based, freemium, or ad-supported.
+- **Commercial Distribution & Sublicensing**: Selling, licensing, sublicensing, or distributing the software or modified versions for a fee or as part of a commercial transaction.
+- **Embedding & Bundling (OEM)**: Integrating or bundling any portion of the software—including its bank statement parsers, merchant categorization rules, analytics engine, or UI components—into a proprietary product, paid application, or client deliverable.
+- **Internal Business Use**: Using the software internally within a for-profit company, sole proprietorship, commercial partnership, consultancy, or other commercial entity (for example, for corporate bookkeeping, expense auditing, financial advisory services, or internal tooling).
 
-To request and negotiate a Commercial License Agreement, please contact:
+---
+
+## 2. Scope of a Commercial License Agreement
+
+Commercial licenses are tailored on an individual, case-by-case basis. Depending on what is agreed in writing, a Commercial License Agreement may grant:
+
+- **Commercial Usage Rights**: Authorization for internal business deployment, embedded/OEM distribution, or hosted SaaS operation for a defined organization, user count, and term.
+- **Custom Attribution Terms**: Optional relief from or customization of the notice requirements in [NOTICE](./NOTICE) for white-label or embedded deployments.
+- **Custom Legal & Support Terms**: Any additional terms, warranties, or support arrangements explicitly negotiated and included in the written contract.
+
+All fees, royalties, seat limits, territorial scope, and duration are determined individually per contract based on the specific use case.
+
+---
+
+## 3. Permitted Free Uses (No Commercial Contract Required)
+
+The following activities are permitted free of charge under [LICENSE](./LICENSE) and [CONTRIBUTING.md](./CONTRIBUTING.md) without a separate commercial contract:
+
+- **Personal & Household Use**: Individual personal finance tracking, personal study, private experimentation, and hobby projects without commercial application.
+- **Qualifying Noncommercial Organizations**: Use by charitable organizations, educational institutions, public research organizations, public safety or health organizations, environmental protection organizations, or government institutions (as defined in the _Noncommercial Organizations_ section of [LICENSE](./LICENSE)).
+- **Upstream Contributions ("Safe Harbor")**: Developing and submitting feedback, bug fixes, translations, or feature pull requests solely for contribution back to this repository under the contributor terms in [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+---
+
+## 4. How to Request a Commercial License
+
+To inquire about a Commercial License Agreement, please contact the Owner:
 
 - **Owner**: Repository Owner
-- **Contact**: Reach out via [GitHub Issues](https://github.com/Memija/money-management/issues) or through the Owner's GitHub profile (<https://github.com/Memija>).
+- **Contact Channels**: Open a licensing inquiry via [GitHub Issues](https://github.com/Memija/money-management/issues) or contact the Owner through GitHub (<https://github.com/Memija>).
 
-## Permitted Free Uses (No Commercial Contract Required)
+To expedite review, please include:
 
-The following uses remain free of charge without a separate contract:
+1. **Organization Details**: Legal entity name, country/jurisdiction, and primary industry.
+2. **Intended Use Case**: Internal business use, client consulting, embedded/OEM product, or hosted SaaS offering.
+3. **Deployment Scale & Term**: Estimated number of users, seats, or environments, and the desired license duration.
 
-- **Personal & Non-Commercial Use**: Individual personal finance management, study, research, and hobby use without commercial application (as defined in [LICENSE](./LICENSE))
-- **Noncommercial Organizations**: Use by qualifying charitable, educational, public research, public safety/health, environmental protection, or government institutions (as defined in [LICENSE](./LICENSE))
-- **Upstream Contributions**: Developing and submitting bug fixes, feedback, or feature pull requests back to this repository under a standardized open-source contribution license (see [CONTRIBUTING.md](./CONTRIBUTING.md))
+---
+
+## 5. Reservation of Rights & No Implied License
+
+Submitting an inquiry, opening an issue, or engaging in licensing discussions does **not** grant a temporary, evaluation, or implied commercial license. All rights not expressly granted in [LICENSE](./LICENSE) are reserved by the Owner, and any commercial use remains unauthorized unless and until a written Commercial License Agreement is executed by both parties.
