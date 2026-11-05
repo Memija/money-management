@@ -1,7 +1,8 @@
-# Trivy ignore configuration
-# AVD-GHA-0050: Harden-runner egress-policy is intentionally set to audit during deployment to monitor network calls
-AVD-GHA-0050
+# Trivy Ignore Configuration
+# https://trivy.dev/docs/latest/configuration/filtering/#trivyignore
 
-# xlsx (SheetJS): Local browser parser (matches osv-scanner.toml)
-CVE-2023-30533
-CVE-2024-22363
+# xlsx@0.18.5 (SheetJS) — Prototype Pollution (GHSA-4r6h-8v6p-xvw6) & ReDoS (GHSA-5pgg-2g8v-p4x9)
+# Mitigated: spreadsheets are parsed strictly client-side in isolated browser memory with no server execution,
+# and newer SheetJS versions are not published to the public npm registry.
+CVE-2023-30533 exp:2027-04-30
+CVE-2024-22363 exp:2027-04-30
