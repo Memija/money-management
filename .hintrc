@@ -1,12 +1,6 @@
 {
   "extends": ["development"],
   "hints": {
-    "axe/structure": [
-      "default",
-      {
-        "list": "off"
-      }
-    ],
     "compat-api/html": [
       "default",
       {
