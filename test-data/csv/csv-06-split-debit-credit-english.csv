@@ -1,0 +1,5 @@
+Transaction Date,Value Date,Counterparty,Payment Reference,Debit,Credit,Balance,Own IBAN
+2026-10-14,2026-10-14,Cornerstone Cafe,POS Card Purchase,12.50,,4210.50,DE75512108001245126199
+2026-10-12,2026-10-12,Metro Residential Ltd,Monthly Rent October,900.00,,4223.00,DE75512108001245126199
+2026-10-05,2026-10-05,City Transit Authority,Monthly Commuter Pass,58.00,,5123.00,DE75512108001245126199
+2026-10-01,2026-10-01,Global Systems Corp,Monthly Payroll Oct 2026,,3600.00,5181.00,DE75512108001245126199

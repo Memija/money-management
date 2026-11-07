@@ -33,9 +33,9 @@ export interface ParsedAmount {
 export function parseAmountLine(line: string): ParsedAmount | null {
   const clean = line.trim().replace(/[\u2212\u2013\u2014]/g, '-')
 
-  // Suffix currency: e.g. -50,00 EUR or - 21.00 USD or +1.200,50 €
+  // Suffix currency: e.g. -50,00 EUR or 50,00 S EUR or +1.200,50 € or (42,50) EUR
   const suffixMatch = clean.match(
-    /^,?([+-]?\s*\d{1,3}(?:[.,]\d{3})*[.,]\d{2})\s*([A-Z]{3}|€|£|\$|zł)$/i,
+    /^,?(\(?[+-]?\s*\d{1,3}(?:[.,'’]\d{3})*[.,]\d{2}\)?\s*[SH+-]?)\s*([A-Z]{3}|€|£|\$|zł)$/i,
   )
   if (suffixMatch) {
     const rawCurr = suffixMatch[2].toUpperCase()
@@ -46,7 +46,7 @@ export function parseAmountLine(line: string): ParsedAmount | null {
 
   // Prefix currency: e.g. - € 50,00 or - € 13.99 or +$1,200.50 or -£42.50
   const prefixMatch = clean.match(
-    /^([+-])?\s*([A-Z]{3}|€|£|\$|zł)\s*([+-]?\s*\d{1,3}(?:[.,]\d{3})*[.,]\d{2})$/i,
+    /^([+-])?\s*([A-Z]{3}|€|£|\$|zł)\s*([+-]?\s*\d{1,3}(?:[.,'’]\d{3})*[.,]\d{2})$/i,
   )
   if (prefixMatch) {
     const sign = prefixMatch[1] === '-' ? -1 : 1
@@ -60,8 +60,8 @@ export function parseAmountLine(line: string): ParsedAmount | null {
     return { amount: val, currency }
   }
 
-  // Pure signed number (e.g. -42,50 or - 42,50 or +1250,00) with default EUR
-  const numOnlyMatch = clean.match(/^([+-])?\s*(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})$/)
+  // Pure signed number (e.g. -42,50 or 42,50- or +1250,00) with default EUR
+  const numOnlyMatch = clean.match(/^([+-])?\s*(\d{1,3}(?:[.,'’]\d{3})*[.,]\d{2}[SH+-]?)$/)
   if (numOnlyMatch) {
     const sign = numOnlyMatch[1] === '-' ? -1 : 1
     let val = parseAmount(numOnlyMatch[2])
@@ -74,8 +74,10 @@ export function parseAmountLine(line: string): ParsedAmount | null {
   return null
 }
 
-// Date header pattern: DD.MM.YYYY — standalone date line (day separator)
-const DATE_HEADER_RE = /^(\d{1,2}\.\d{1,2}\.\d{2,4})$/
+// Date header pattern: DD.MM.YYYY, DD/MM/YYYY, or YYYY-MM-DD — standalone date line (day separator)
+const DATE_HEADER_RE = /^(\d{1,2}[./]\d{1,2}[./]\d{2,4}|\d{4}-\d{2}-\d{2})$/
+const CELL_DATE_RE =
+  /^(\d{1,2}[./]\d{1,2}[./]\d{2,4}|\d{4}-\d{2}-\d{2})(?:\s+(?:\d{1,2}[./]\d{1,2}[./]\d{2,4}|\d{4}-\d{2}-\d{2}))?$/
 
 function getCleanLines(rawText: string): string[] {
   return rawText
@@ -171,25 +173,28 @@ export function parseBankStatementPaste(rawText: string, institution: string): T
         .map((c) => c.trim())
         .filter(Boolean)
       if (cells.length >= 2) {
-        const dateCell = cells.find(
-          (c) => /^\d{1,2}\.\d{1,2}\.\d{2,4}$/.test(c) || /^\d{4}-\d{2}-\d{2}$/.test(c),
-        )
+        const dateCell = cells.find((c) => CELL_DATE_RE.test(c))
         const amtCell = cells.find(
           (c) =>
             parseAmountLine(c) !== null ||
-            /^[+-]?\d{1,3}(?:[.,]\d{3})*[.,]\d{2}(?:\s*(?:EUR|€|USD|\$|GBP|£|PLN|zł))?$/i.test(c),
+            /^[+-]?\d{1,3}(?:[.,]\d{3})*[.,]\d{2}(?:\s*(?:EUR|€|USD|\$|GBP|£|PLN|zł|CHF))?$/i.test(
+              c,
+            ),
         )
 
         if (dateCell && amtCell) {
           hasSeenDate = true
-          const remaining = cells.filter((c) => c !== dateCell && c !== amtCell)
+          const firstDate = dateCell.match(CELL_DATE_RE)?.[1] || dateCell
+          const remaining = cells.filter(
+            (c) => c !== dateCell && c !== amtCell && !CELL_DATE_RE.test(c),
+          )
           const typeCell = remaining.find((c) => ALL_TX_TYPES.has(c.toLowerCase()))
           const textCells = remaining.filter((c) => c !== typeCell)
           const partner = textCells[0] || ''
           const desc = textCells.slice(1).join(' ') || ''
           const parsed = parseAmountLine(amtCell)
           rawTxs.push({
-            date: parseDate(dateCell),
+            date: parseDate(firstDate),
             partner,
             desc,
             type: typeCell || '',

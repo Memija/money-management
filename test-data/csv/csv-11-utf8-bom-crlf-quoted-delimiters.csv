@@ -1,0 +1,5 @@
+﻿"Buchungstag";"Wertstellung";"Umsatzart";"Buchungstext";"Betrag";"Währung";"IBAN Kontoinhaber"
+"14.10.2026";"14.10.2026";"Lastschrift";"Feinkost Markt; Abt. Lebensmittel, Berlin";"-52,40";"EUR";"DE12500105170648489890"
+"12.10.2026";"12.10.2026";"Dauerauftrag";"Wohnbau Süd GmbH; Objekt: Ringstr. 14, München";"-875,00";"EUR";"DE12500105170648489890"
+"06.10.2026";"06.10.2026";"Überweisung";"Stadtbibliothek; Jahresgebühr, Ausweis 9021";"-20,00";"EUR";"DE12500105170648489890"
+"01.10.2026";"01.10.2026";"Gutschrift";"Bavaria Software GmbH; Lohn/Gehalt, Pers-Nr. 402";"3.550,00";"EUR";"DE12500105170648489890"

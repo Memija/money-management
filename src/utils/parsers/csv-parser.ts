@@ -1,11 +1,12 @@
 import type { TranslationStrings } from '../../i18n/types'
 import type { Transaction } from '../../types'
-import { filterInternalSpaceTransfers } from '../account-transfers'
+import { extractIbans, filterInternalSpaceTransfers } from '../account-transfers'
 import {
   type ColumnIndices,
   detectColumnIndices,
   findHeaderRowIndex,
   parseRow,
+  resolveRawDate,
 } from './csv-columns'
 import { findSpaceTransferRowIndices } from './csv-space-detection'
 import { isValidDateRaw } from './helpers'
@@ -94,8 +95,11 @@ export function rowsToTransactionsWithMeta(
       continue
     }
 
-    const rawDate = row[indices.dateIdx]?.toString() ?? ''
-    if (rawDate && !isValidDateRaw(rawDate)) {
+    const rawDate = resolveRawDate(row, indices)
+    if (!rawDate) {
+      continue
+    }
+    if (!isValidDateRaw(rawDate)) {
       const errTpl =
         t?.errorParsePasteInvalidDate ||
         'Line {line}: Invalid date format "{rawDate}" in position {pos}. Expected DD.MM.YYYY or YYYY-MM-DD.'
@@ -135,10 +139,19 @@ export function rowsToTransactionsWithMeta(
     excludedSpaceTransactions.push(...additionalExcluded)
   }
 
+  const preambleIbans =
+    headerRowIdx > 0
+      ? rows
+          .slice(0, headerRowIdx)
+          .flatMap((r) => extractIbans(r.join(' ')))
+          .filter(Boolean)
+      : []
+
   const detectedAccountIbans = Array.from(
-    new Set(
-      finalTransactions.map((tx) => tx.ownIban).filter((iban): iban is string => Boolean(iban)),
-    ),
+    new Set([
+      ...finalTransactions.map((tx) => tx.ownIban).filter((iban): iban is string => Boolean(iban)),
+      ...preambleIbans,
+    ]),
   )
 
   return {

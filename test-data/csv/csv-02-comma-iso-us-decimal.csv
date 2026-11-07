@@ -1,0 +1,5 @@
+"Booking Date","Value Date","Partner Name","Partner Iban","Type","Payment Reference","Account Iban","Amount (EUR)"
+"2026-10-14","2026-10-14","Fresh Market GmbH","","Card Payment","Weekly groceries","DE44500105175407324931","-42.50"
+"2026-10-12","2026-10-12","City Property Management","DE12500105170648489890","Standing Order","Apartment Rent Oct 2026","DE44500105175407324931","-850.00"
+"2026-10-08","2026-10-08","Cloud Music Ltd","","Direct Debit","Monthly Family Plan","DE44500105175407324931","-14.99"
+"2026-10-01","2026-10-01","Apex Engineering GmbH","DE21300500001020304050","Credit Transfer","Salary October 2026","DE44500105175407324931","3400.00"

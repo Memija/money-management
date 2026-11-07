@@ -40,36 +40,52 @@ export function extractAccountIbansFromPaste(rawText: string): string[] {
   return Array.from(result)
 }
 
+function getCellText(el: Element): string {
+  return (el.innerHTML || el.textContent || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 function extractCirrusRows(doc: Document, baseRows: string[]): string[] | null {
-  const cirrusRows = doc.querySelectorAll('db-list-row, cirrus-transactions-row-booked')
+  const cirrusRows = doc.querySelectorAll(
+    'db-list-row, cirrus-transactions-row-booked, tx-list-row',
+  )
   if (cirrusRows.length === 0) {
     return null
   }
 
   const rows = [...baseRows]
   let activeDate = '01.01.2026'
-  const nodes = doc.body.querySelectorAll('h3, h4, db-list-row')
+  const nodes = doc.body.querySelectorAll('h3, h4, db-list-row, tx-list-row')
   for (const node of nodes) {
     if (node.tagName === 'H3' || node.tagName === 'H4') {
-      const dateMatch = node.textContent?.match(/\b(\d{1,2}\.\d{1,2}\.\d{2,4})\b/)
+      const text = getCellText(node)
+      const dateMatch =
+        text.match(/\b(\d{1,2}[./]\d{1,2}[./]\d{2,4})\b/) || text.match(/\b(\d{4}-\d{2}-\d{2})\b/)
       if (dateMatch) {
         activeDate = dateMatch[1]
       }
       continue
     }
-    if (node.tagName.toLowerCase() !== 'db-list-row') {
+    const tag = node.tagName.toLowerCase()
+    if (tag !== 'db-list-row' && tag !== 'tx-list-row') {
       continue
     }
-    const highlight = node.querySelector('.db-text--highlight')?.textContent?.trim()
-    const mute = node.querySelector('.db-text--mute')?.textContent?.trim()
+    const highlight = node
+      .querySelector('.db-text--highlight, .tx-partner, strong')
+      ?.textContent?.trim()
+    const mute = node.querySelector('.db-text--mute, .tx-purpose, span')?.textContent?.trim()
     const amount =
-      node.querySelector('.db-amount, [slot="actions"]')?.textContent?.trim() ||
-      node.textContent?.match(/([+-]?\s*[\d.,]+\s*EUR)/i)?.[1]
+      node.querySelector('.db-amount, .tx-amount, [slot="actions"]')?.textContent?.trim() ||
+      getCellText(node).match(/([+-]?\s*[\d.,]+\s*(?:EUR|USD|GBP|PLN|CHF|€|\$|£|zł))/i)?.[1]
     if (!highlight || !amount) {
       continue
     }
     rows.push(activeDate, highlight)
-    if (mute) {
+    if (mute && mute !== highlight) {
       rows.push(mute)
     }
     rows.push(amount)
@@ -79,9 +95,13 @@ function extractCirrusRows(doc: Document, baseRows: string[]): string[] | null {
 }
 
 function appendSparkasseCardRow(card: Element, activeDate: string, rows: string[]) {
-  const partner = card.querySelector('.mkp-identifier-link, h4, strong')?.textContent?.trim()
-  const desc = card.querySelector('p')?.textContent?.trim()
-  const amtMatch = card.textContent?.match(/([+-]?\s*\d{1,3}(?:[.,]\d{3})*[.,]\d{2}\s*EUR)/i)
+  const partner = card
+    .querySelector('.mkp-identifier-link, .card-partner, h4, strong')
+    ?.textContent?.trim()
+  const desc = card.querySelector('p, .card-purpose')?.textContent?.trim()
+  const amtMatch = getCellText(card).match(
+    /([+-]?\s*\d{1,3}(?:[.,]\d{3})*[.,]\d{2}\s*(?:EUR|USD|GBP|PLN|CHF|€|\$|£|zł))/i,
+  )
   if (!partner || !amtMatch) {
     return
   }
@@ -93,7 +113,7 @@ function appendSparkasseCardRow(card: Element, activeDate: string, rows: string[
 }
 
 function extractSparkasseCards(doc: Document, baseRows: string[]): string[] | null {
-  const cardList = doc.querySelector('.mkp-card-list')
+  const cardList = doc.querySelector('.mkp-card-list, .day-card-list')
   if (!cardList) {
     return null
   }
@@ -101,15 +121,19 @@ function extractSparkasseCards(doc: Document, baseRows: string[]): string[] | nu
   const rows = [...baseRows]
   let activeDate = '01.01.2026'
   for (const child of cardList.children) {
-    const dateMatch = child.textContent?.match(/\b(\d{1,2}\.\d{1,2}\.\d{2,4})\b/)
+    const childText = getCellText(child)
+    const dateMatch =
+      childText.match(/\b(\d{1,2}[./]\d{1,2}[./]\d{2,4})\b/) ||
+      childText.match(/\b(\d{4}-\d{2}-\d{2})\b/)
     const isDateHeader =
       child.classList.contains('mkp-list-subline') ||
-      Boolean(child.querySelector('h3.groupdate, h3'))
+      child.classList.contains('day-header') ||
+      Boolean(child.querySelector('h3.groupdate, h3, h4'))
     if (dateMatch && isDateHeader) {
       activeDate = dateMatch[1]
     }
     const cards = child.querySelectorAll(
-      '.mkp-card-clickable, .mkp-card-debit, .mkp-card-credit, .mkp-card',
+      '.mkp-card-clickable, .mkp-card-debit, .mkp-card-credit, .mkp-card, .day-card',
     )
     for (const card of cards) {
       appendSparkasseCardRow(card, activeDate, rows)
@@ -119,50 +143,81 @@ function extractSparkasseCards(doc: Document, baseRows: string[]): string[] | nu
   return rows.length > 1 ? rows : null
 }
 
-function applySollHabenSigns(cellTexts: string[], sollIdx: number, habenIdx: number) {
-  if (sollIdx === -1 || habenIdx === -1) {
-    return
+function applySollHabenSigns(
+  cellTexts: string[],
+  sollIdx: number,
+  habenIdx: number,
+  shIndicatorIdx = -1,
+  amtIdx = -1,
+) {
+  if (sollIdx !== -1 && habenIdx !== -1) {
+    const sollVal = cellTexts[sollIdx]
+    const habenVal = cellTexts[habenIdx]
+    if (sollVal && /\d/.test(sollVal) && !habenVal) {
+      cellTexts[sollIdx] = sollVal.startsWith('-') ? sollVal : `-${sollVal}`
+    } else if (habenVal && /\d/.test(habenVal) && !sollVal) {
+      cellTexts[habenIdx] = habenVal.startsWith('+') ? habenVal : `+${habenVal}`
+    }
   }
-  const sollVal = cellTexts[sollIdx]
-  const habenVal = cellTexts[habenIdx]
-  if (sollVal && /\d/.test(sollVal) && !habenVal) {
-    cellTexts[sollIdx] = sollVal.startsWith('-') ? sollVal : `-${sollVal}`
-  } else if (habenVal && /\d/.test(habenVal) && !sollVal) {
-    cellTexts[habenIdx] = habenVal.startsWith('+') ? habenVal : `+${habenVal}`
+  if (shIndicatorIdx !== -1 && amtIdx !== -1) {
+    const ind = cellTexts[shIndicatorIdx]?.trim().toUpperCase() || ''
+    const amt = cellTexts[amtIdx]?.trim() || ''
+    if (amt && /^(?:S|SOLL|D|DR|DBIT|DEBIT|-)$/i.test(ind) && !amt.startsWith('-')) {
+      cellTexts[amtIdx] = `-${amt}`
+    }
   }
+}
+
+function isBalanceColumnHeader(text: string): boolean {
+  return /^(?:saldo|kontostand|balance|neuer saldo|running balance)(?:\s*\(.*\))?$/i.test(text)
 }
 
 function extractTableRows(table: Element, rows: string[]) {
   let sollIdx = -1
   let habenIdx = -1
-  const trs = table.querySelectorAll('tr')
+  let shIdx = -1
+  let amtIdx = -1
+  let balanceIdx = -1
+  const trs = table.querySelectorAll('tr, [role="row"]')
   for (const tr of trs) {
-    const ths = tr.querySelectorAll('th')
+    const ths = tr.querySelectorAll('th, [role="columnheader"]')
     if (ths.length > 0) {
-      const thTexts = Array.from(ths).map((th) => th.textContent?.trim().toLowerCase() || '')
-      sollIdx = thTexts.findIndex((t) => t.includes('soll') || t.includes('belastung'))
-      habenIdx = thTexts.findIndex((t) => t.includes('haben') || t.includes('gutschrift'))
-      rows.push(
-        Array.from(ths)
-          .map((th) => th.textContent?.replace(/\s+/g, ' ').trim() || '')
-          .join('\t'),
+      const thTexts = Array.from(ths).map((th) => getCellText(th).toLowerCase())
+      sollIdx = thTexts.findIndex(
+        (t) => t.includes('soll') || t.includes('belastung') || t === 'debit',
       )
+      habenIdx = thTexts.findIndex(
+        (t) => t.includes('haben') || t.includes('gutschrift') || t === 'credit',
+      )
+      shIdx = thTexts.findIndex((t) => t === 's/h' || t === 'soll/haben' || t === 'd/c')
+      amtIdx = thTexts.findIndex(
+        (t) =>
+          t.includes('betrag') || t.includes('amount') || t === 'umsatz' || t.includes('kwota'),
+      )
+      if (ths.length >= 4 && (amtIdx !== -1 || (sollIdx !== -1 && habenIdx !== -1))) {
+        balanceIdx = thTexts.findIndex((t) => isBalanceColumnHeader(t))
+      }
+      const headerCells = Array.from(ths)
+        .map((th) => getCellText(th))
+        .filter((_, idx) => idx !== balanceIdx && idx !== shIdx)
+      rows.push(headerCells.join('\t'))
       continue
     }
 
-    const tds = tr.querySelectorAll('td')
+    const tds = tr.querySelectorAll('td, [role="cell"], [role="gridcell"]')
     if (tds.length === 0) {
       continue
     }
 
-    const cellTexts = Array.from(tds).map((td) => td.textContent?.replace(/\s+/g, ' ').trim() || '')
-    applySollHabenSigns(cellTexts, sollIdx, habenIdx)
-    rows.push(cellTexts.join('\t'))
+    const cellTexts = Array.from(tds).map((td) => getCellText(td))
+    applySollHabenSigns(cellTexts, sollIdx, habenIdx, shIdx, amtIdx)
+    const filteredCells = cellTexts.filter((_, idx) => idx !== balanceIdx && idx !== shIdx)
+    rows.push(filteredCells.join('\t'))
   }
 }
 
 function extractHtmlTables(doc: Document, baseRows: string[]): string[] | null {
-  const tables = doc.querySelectorAll('table')
+  const tables = doc.querySelectorAll('table, [role="table"], [role="grid"]')
   if (tables.length === 0) {
     return null
   }
@@ -177,7 +232,7 @@ function extractHtmlTables(doc: Document, baseRows: string[]): string[] | null {
 
 function extractFeedItems(doc: Document, baseRows: string[]): string[] | null {
   const feedItems = doc.querySelectorAll(
-    '.feed-card, .timeline-item, .transaction-item, .activity-item',
+    '.feed-card, .timeline-item, .transaction-item, .activity-item, details, article, li',
   )
   if (feedItems.length === 0) {
     return null
@@ -185,16 +240,24 @@ function extractFeedItems(doc: Document, baseRows: string[]): string[] | null {
 
   const rows = [...baseRows]
   for (const item of feedItems) {
-    const text = item.textContent || ''
+    const text = getCellText(item)
     const dateMatch =
-      text.match(/\b(\d{1,2}\.\d{1,2}\.\d{2,4})\b/) || text.match(/\b(\d{4}-\d{2}-\d{2})\b/)
-    const title = item.querySelector('.title, h4, h5, strong, .partner')?.textContent?.trim()
-    const subtitle = item.querySelector('.subtitle, .desc, .cat, p')?.textContent?.trim()
-    const amountEl = item.querySelector('.amount, .amt, .amt-neg, .amt-pos, [class*="amount"]')
+      text.match(/\b(\d{1,2}[./]\d{1,2}[./]\d{2,4})\b/) || text.match(/\b(\d{4}-\d{2}-\d{2})\b/)
+    const title = item
+      .querySelector('.title, h4, h5, strong, .partner, [data-partner]')
+      ?.textContent?.trim()
+    const subtitle = item
+      .querySelector('.subtitle, .desc, .cat, p, em, [data-purpose]')
+      ?.textContent?.trim()
+    const amountEl = item.querySelector(
+      '.amount, .amt, .amt-neg, .amt-pos, [class*="amount"], [data-amount]',
+    )
     const amountText =
       amountEl?.textContent?.trim() ||
       text
-        .match(/([+-]?\s*(?:[A-Z]{3}|€|£|\$|zł)?\s*[\d.,]+\s*(?:[A-Z]{3}|€|£|\$|zł)?)/i)?.[1]
+        .match(
+          /([+-]?\s*(?:[A-Z]{3}|€|£|\$|zł)?\s*\d{1,3}(?:[.,]\d{3})*[.,]\d{2}\s*(?:[A-Z]{3}|€|£|\$|zł))/i,
+        )?.[1]
         ?.trim()
 
     if (!dateMatch || !title || !amountText) {

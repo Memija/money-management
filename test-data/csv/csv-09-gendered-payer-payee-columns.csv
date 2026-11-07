@@ -1,0 +1,7 @@
+"Konto";"Girokonto DE08 1203 0000 1020 3040 50"
+
+"Buchungsdatum";"Wertstellung";"Status";"Zahlungspflichtige*r";"Zahlungsempfänger*in";"Verwendungszweck";"Umsatztyp";"IBAN";"Betrag (€)"
+"14.10.2026";"14.10.2026";"Gebucht";"Max Mustermann";"Kaufhaus Mitte GmbH";"Kartenzahlung Haushalt";"Ausgang";"DE44500105175407324931";"-38,90"
+"12.10.2026";"12.10.2026";"Gebucht";"Max Mustermann";"Wohnpark Verwaltung GmbH";"Miete 10/2026";"Ausgang";"DE12500105170648489890";"-860,00"
+"05.10.2026";"05.10.2026";"Gebucht";"Max Mustermann";"Fitness Studio Aktiv";"Monatsbeitrag 10/2026";"Ausgang";"DE33100100100123456789";"-29,90"
+"01.10.2026";"01.10.2026";"Gebucht";"Solaris Engineering AG";"Max Mustermann";"Gehalt 10/2026";"Eingang";"DE98200505501234567890";"3.320,00"

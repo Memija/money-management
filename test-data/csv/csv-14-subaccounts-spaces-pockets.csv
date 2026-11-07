@@ -1,0 +1,6 @@
+"Booking Date","Value Date","Partner Name","Partner Iban","Type","Payment Reference","Account Name","Own IBAN","Amount (EUR)"
+"2026-10-15","2026-10-15","Vacation Pocket","","Debit Transfer","Monthly savings rule","Main Account","DE27100777770209299700","-150.00"
+"2026-10-15","2026-10-15","Main Account","","Credit Transfer","Monthly savings rule","Vacation Pocket","DE27100777770209299700","150.00"
+"2026-10-14","2026-10-14","Organic Supermarket","","MasterCard Payment","Groceries","Main Account","DE27100777770209299700","-46.80"
+"2026-10-12","2026-10-12","Urban Living GmbH","DE12500105170648489890","Standing Order","Rent 10/2026","Main Account","DE27100777770209299700","-850.00"
+"2026-10-01","2026-10-01","CloudTech Solutions AG","DE89370400440532013000","Credit Transfer","Salary 10/2026","Main Account","DE27100777770209299700","3350.00"

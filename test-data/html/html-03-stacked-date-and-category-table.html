@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>4-Column Stacked Date & Category Table – Synthetischer Online-Banking Testbeleg</title>
+  <style>
+    :root { --bg: #f6f8fa; --surface: #fff; --text: #1b2430; --border: #dde3ea; --pos: #0a7a42; --neg: #c42828; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
+    .container { max-width: 960px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .acct-meta { display: flex; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 18px; }
+    table, [role="table"] { width: 100%; border-collapse: collapse; }
+    th, td, [role="columnheader"], [role="cell"] { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    [role="row"] { display: grid; grid-template-columns: 120px 1fr 1fr 140px; }
+    .amt-pos { color: var(--pos); font-weight: 600; }
+    .amt-neg { color: var(--neg); font-weight: 600; }
+    .feed-card, .timeline-item, .mkp-card, details, li { padding: 10px; border-bottom: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="acct-meta">
+      <div>
+        <h1>4-Column Stacked Date & Category Table</h1>
+        <p>Konto: Girokonto | IBAN: <strong>DE12 5001 0517 0648 4898 90</strong> | Kontoinhaber: Max Mustermann</p>
+      </div>
+      <div>Kontostand: <strong>+3.850,00 EUR</strong></div>
+    </header>
+    <table>
+        <thead><tr><th>Buchungstag<br/>Wertstellung</th><th>Umsatzart</th><th>Buchungstext (gekürzt)<br/>Kategorie</th><th>Betrag</th></tr></thead>
+        <tbody>
+          <tr><td><div>14.10.2026</div><div>14.10.2026</div></td><td>Lastschrift</td><td><div>Frischemarkt Nord 104, Berlin DE Karte Nr. 4000</div><div>LEBENSHALTUNG</div></td><td>-42,60 EUR</td></tr>
+          <tr><td><div>12.10.2026</div><div>12.10.2026</div></td><td>Dauerauftrag</td><td><div>Hausverwaltung Musterstr. 10, 10115 Berlin</div><div>WOHNEN</div></td><td>-850,00 EUR</td></tr>
+          <tr><td><div>08.10.2026</div><div>08.10.2026</div></td><td>Lastschrift</td><td><div>Stadtwerke Energie GmbH Abschlag 10/26</div><div>WOHNEN</div></td><td>-95,00 EUR</td></tr>
+          <tr><td><div>01.10.2026</div><div>01.10.2026</div></td><td>Überweisung</td><td><div>MUSTERFIRMA AG LOHN/GEHALT 10/2026</div><div>EINNAHMEN</div></td><td>+3.420,00 EUR</td></tr>
+        </tbody>
+      </table>
+  </main>
+</body>
+</html>

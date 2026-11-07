@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Custom Web Components Transaction Feed – Synthetischer Online-Banking Testbeleg</title>
+  <style>
+    :root { --bg: #f6f8fa; --surface: #fff; --text: #1b2430; --border: #dde3ea; --pos: #0a7a42; --neg: #c42828; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
+    .container { max-width: 960px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .acct-meta { display: flex; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 18px; }
+    table, [role="table"] { width: 100%; border-collapse: collapse; }
+    th, td, [role="columnheader"], [role="cell"] { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    [role="row"] { display: grid; grid-template-columns: 120px 1fr 1fr 140px; }
+    .amt-pos { color: var(--pos); font-weight: 600; }
+    .amt-neg { color: var(--neg); font-weight: 600; }
+    .feed-card, .timeline-item, .mkp-card, details, li { padding: 10px; border-bottom: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="acct-meta">
+      <div>
+        <h1>Custom Web Components Transaction Feed</h1>
+        <p>Konto: Girokonto | IBAN: <strong>DE68 2105 0170 0012 3456 78</strong> | Kontoinhaber: Max Mustermann</p>
+      </div>
+      <div>Kontostand: <strong>+3.850,00 EUR</strong></div>
+    </header>
+    <section>
+        <h3>14.10.2026</h3>
+        <db-list-row><span class="db-text--highlight">BioMarkt Alnatura</span><span class="db-text--mute">Kartenzahlung Filiale Süd</span><span class="db-amount" slot="actions">-54,20 EUR</span></db-list-row>
+        <h3>12.10.2026</h3>
+        <db-list-row><span class="db-text--highlight">Hausverwaltung Zentrum</span><span class="db-text--mute">Dauerauftrag Warmmiete 10/2026</span><span class="db-amount" slot="actions">-820,00 EUR</span></db-list-row>
+        <h3>07.10.2026</h3>
+        <tx-list-row><strong class="tx-partner">Telekommunikation Netz AG</strong><span class="tx-purpose">Glasfaser Tarif 10/2026</span><span class="tx-amount">-39,99 EUR</span></tx-list-row>
+        <h3>01.10.2026</h3>
+        <tx-list-row><strong class="tx-partner">Musterbau Technik AG</strong><span class="tx-purpose">Lohn und Gehalt 10/2026</span><span class="tx-amount">+3.180,00 EUR</span></tx-list-row>
+      </section>
+  </main>
+</body>
+</html>

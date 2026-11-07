@@ -1,0 +1,7 @@
+Kontoauszug:;Girokonto;IBAN;DE19500700100987654321
+
+Buchungstag;Wert;Umsatzart;Begünstigter / Auftraggeber;Verwendungszweck;IBAN;BIC;Soll;Haben;Währung
+14.10.2026;14.10.2026;Kartenzahlung;Frischemarkt Zentrum;Einkauf Karte 4812;DE81300606010012345678;DAAEDEDDXXX;-48,60;;EUR
+12.10.2026;12.10.2026;Dauerauftrag;ImmoVerwaltung Süd GmbH;Miete Wohnung 10/2026;DE43500105179988776655;INGDDEFFXXX;850,00;;EUR
+06.10.2026;06.10.2026;SEPA-Lastschrift;Sportverein Eintracht e.V.;Mitgliedsbeitrag Q4;DE55500502010000123456;HELADEF1822;-25,00;;EUR
+01.10.2026;01.10.2026;Gutschrift;Industrie Werk GmbH;Gehaltsabrechnung 10/2026;DE91100000000123456789;MARKDEF1100;;3.450,00;EUR

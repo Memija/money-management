@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unsigned Amount + S/H Indicator Table – Synthetischer Online-Banking Testbeleg</title>
+  <style>
+    :root { --bg: #f6f8fa; --surface: #fff; --text: #1b2430; --border: #dde3ea; --pos: #0a7a42; --neg: #c42828; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
+    .container { max-width: 960px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .acct-meta { display: flex; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 18px; }
+    table, [role="table"] { width: 100%; border-collapse: collapse; }
+    th, td, [role="columnheader"], [role="cell"] { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    [role="row"] { display: grid; grid-template-columns: 120px 1fr 1fr 140px; }
+    .amt-pos { color: var(--pos); font-weight: 600; }
+    .amt-neg { color: var(--neg); font-weight: 600; }
+    .feed-card, .timeline-item, .mkp-card, details, li { padding: 10px; border-bottom: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="acct-meta">
+      <div>
+        <h1>Unsigned Amount + S/H Indicator Table</h1>
+        <p>Konto: Girokonto | IBAN: <strong>DE31 2004 0060 0555 6667 77</strong> | Kontoinhaber: Max Mustermann</p>
+      </div>
+      <div>Kontostand: <strong>+3.850,00 EUR</strong></div>
+    </header>
+    <table>
+        <thead><tr><th>Buchungstag</th><th>Zahlungsbeteiligter</th><th>Verwendungszweck</th><th>Umsatz</th><th>S/H</th></tr></thead>
+        <tbody>
+          <tr><td>14.10.2026</td><td>Drogeriemarkt Zentrum</td><td>Kartenzahlung Einkauf</td><td>24,85 EUR</td><td>S</td></tr>
+          <tr><td>12.10.2026</td><td>Wohnungsbau Nord eG</td><td>Miete Oktober 2026</td><td>790,00 EUR</td><td>S</td></tr>
+          <tr><td>08.10.2026</td><td>Versicherung Schutz AG</td><td>Haftpflicht Beitrag</td><td>18,40 EUR</td><td>S</td></tr>
+          <tr><td>01.10.2026</td><td>Hanseatische Logistik GmbH</td><td>Gehalt 10/2026</td><td>3.150,00 EUR</td><td>H</td></tr>
+        </tbody>
+      </table>
+  </main>
+</body>
+</html>

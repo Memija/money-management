@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARIA Role Data Grid (No <table> Tag) – Synthetischer Online-Banking Testbeleg</title>
+  <style>
+    :root { --bg: #f6f8fa; --surface: #fff; --text: #1b2430; --border: #dde3ea; --pos: #0a7a42; --neg: #c42828; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
+    .container { max-width: 960px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .acct-meta { display: flex; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 18px; }
+    table, [role="table"] { width: 100%; border-collapse: collapse; }
+    th, td, [role="columnheader"], [role="cell"] { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    [role="row"] { display: grid; grid-template-columns: 120px 1fr 1fr 140px; }
+    .amt-pos { color: var(--pos); font-weight: 600; }
+    .amt-neg { color: var(--neg); font-weight: 600; }
+    .feed-card, .timeline-item, .mkp-card, details, li { padding: 10px; border-bottom: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="acct-meta">
+      <div>
+        <h1>ARIA Role Data Grid (No <table> Tag)</h1>
+        <p>Konto: Girokonto | IBAN: <strong>DE75 5121 0800 1245 1261 99</strong> | Kontoinhaber: Max Mustermann</p>
+      </div>
+      <div>Kontostand: <strong>+3.850,00 EUR</strong></div>
+    </header>
+    <div role="table" aria-label="Umsatzliste">
+        <div role="rowgroup"><div role="row"><div role="columnheader">Datum</div><div role="columnheader">Zahlungsbeteiligter</div><div role="columnheader">Verwendungszweck</div><div role="columnheader">Betrag</div></div></div>
+        <div role="rowgroup">
+          <div role="row"><div role="cell">14.10.2026</div><div role="cell">Cornerstone Cafe</div><div role="cell">Kartenzahlung POS</div><div role="cell">-12,50 EUR</div></div>
+          <div role="row"><div role="cell">12.10.2026</div><div role="cell">Metro Residential Ltd</div><div role="cell">Miete Oktober 2026</div><div role="cell">-900,00 EUR</div></div>
+          <div role="row"><div role="cell">05.10.2026</div><div role="cell">City Transit Authority</div><div role="cell">Monatsticket Abo</div><div role="cell">-58,00 EUR</div></div>
+          <div role="row"><div role="cell">01.10.2026</div><div role="cell">Global Systems Corp</div><div role="cell">Gehalt Oktober 2026</div><div role="cell">+3.600,00 EUR</div></div>
+        </div>
+      </div>
+  </main>
+</body>
+</html>

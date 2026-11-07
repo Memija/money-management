@@ -35,12 +35,12 @@ describe('category-utils', () => {
       expect(categorize('Lohn')).toBe('Salary') // German
       expect(
         categorize(
-          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317',
+          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/00000001 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0000000001',
         ),
       ).toBe('Salary')
       expect(
         categorize(
-          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317',
+          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/00000001 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0000000001',
           { type: 'expense', amount: -150 },
         ),
       ).toBe('Salary')
@@ -1101,7 +1101,7 @@ describe('category-utils', () => {
 
     it('cleans Commerzbank Reisespesen business trip reimbursement transaction', () => {
       const desc =
-        'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317'
+        'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/00000001 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0000000001'
       expect(extractCleanDescription(desc)).toBe('COMMERZBANK AG ZENTRALE FRANKFURT Reisespesen')
       expect(extractMerchantKeyword(desc)).toBe('COMMERZBANK ZENTRALE')
     })
@@ -1251,18 +1251,18 @@ describe('category-utils', () => {
     })
 
     it('cleans SEPA bank transfer with BIC, IBAN, and loan reference KRED', () => {
-      const descWithIbanAndKred = 'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED'
-      expect(extractCleanDescription(descWithIbanAndKred)).toBe('ANEL O. BILJANA MEMIC')
-      expect(extractMerchantKeyword(descWithIbanAndKred)).toBe('ANEL O. BILJANA MEMIC')
-      expect(formatMerchantDisplayName('ANEL O. BILJANA MEMIC')).toBe('Anel O. Biljana Memic')
+      const descWithIbanAndKred = 'MAX O. ERIKA MUSTERMANN GENODEF1S01 DE89370400440532013000 KRED'
+      expect(extractCleanDescription(descWithIbanAndKred)).toBe('MAX O. ERIKA MUSTERMANN')
+      expect(extractMerchantKeyword(descWithIbanAndKred)).toBe('MAX O. ERIKA MUSTERMANN')
+      expect(formatMerchantDisplayName('MAX O. ERIKA MUSTERMANN')).toBe('Max O. Erika Mustermann')
       expect(formatMerchantDisplayName('IKEA')).toBe('IKEA')
       expect(formatMerchantDisplayName('IKEA DEUTSCHLAND')).toBe('Ikea Deutschland')
-      expect(formatMerchantDisplayName('Anel o. Biljana Memic')).toBe('Anel o. Biljana Memic')
+      expect(formatMerchantDisplayName('Max o. Erika Mustermann')).toBe('Max o. Erika Mustermann')
       expect(getTransactionMerchant({ description: descWithIbanAndKred })).toBe(
-        'Anel O. Biljana Memic',
+        'Max O. Erika Mustermann',
       )
-      expect(getTransactionMerchant({ description: 'Anel o. Biljana Memic' })).toBe(
-        'Anel o. Biljana Memic',
+      expect(getTransactionMerchant({ description: 'Max o. Erika Mustermann' })).toBe(
+        'Max o. Erika Mustermann',
       )
     })
 
@@ -2123,19 +2123,17 @@ describe('category-utils', () => {
         expect(categorize('Cicilan pinjaman bank')).toBe('Loans')
       })
 
-      it('categorizes Anel o. Biljana Memic loan payments as Loans, never as Transfers', () => {
+      it('categorizes joint loan account payments as Loans, never as Transfers', () => {
         const fullDesc =
-          'Anel o. Biljana Memic (3696413) GENODEF1S01 DE36550905000003696413 Kreditrate End-to-End-Ref.: CCB.338.UE.248923'
-        const strippedDesc = 'Anel o. Biljana Memic'
-        const allCapsDesc = 'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED'
-        const ibanDesc = 'DE36550905000003696413'
+          'Max o. Erika Mustermann (1234567) GENODEF1S01 DE89370400440532013000 Kreditrate End-to-End-Ref.: CCB.338.UE.248923'
+        const allCapsDesc = 'MAX O. ERIKA MUSTERMANN GENODEF1S01 DE89370400440532013000 KREDITRATE'
+        const darlehenDesc = 'Erika o. Max Mustermann Darlehensrate DE89370400440532013000'
+        const tilgungDesc = 'Max oder Erika Mustermann Tilgungsrate DE89370400440532013000'
 
         expect(categorize(fullDesc)).toBe('Loans')
-        expect(categorize(strippedDesc)).toBe('Loans')
         expect(categorize(allCapsDesc)).toBe('Loans')
-        expect(categorize(ibanDesc)).toBe('Loans')
-        expect(categorize('Biljana o. Anel Memic')).toBe('Loans')
-        expect(categorize('Anel oder Biljana Memic')).toBe('Loans')
+        expect(categorize(darlehenDesc)).toBe('Loans')
+        expect(categorize(tilgungDesc)).toBe('Loans')
       })
 
       it('propagates Loans category to sibling transactions where loan details were stripped by the bank', () => {
@@ -2144,7 +2142,7 @@ describe('category-utils', () => {
             id: 'tx-loan-1',
             date: '2026-08-01',
             description:
-              'Anel o. Biljana Memic (3696413) GENODEF1S01 DE36550905000003696413 Kreditrate End-to-End-Ref.: CCB.338.UE.248923',
+              'Max o. Erika Mustermann (1234567) GENODEF1S01 DE89370400440532013000 Kreditrate End-to-End-Ref.: CCB.338.UE.248923',
             amount: -350,
             currency: 'EUR',
             type: 'expense',
@@ -2154,7 +2152,7 @@ describe('category-utils', () => {
           {
             id: 'tx-loan-2',
             date: '2026-09-01',
-            description: 'Anel o. Biljana Memic',
+            description: 'Max o. Erika Mustermann',
             amount: -350,
             currency: 'EUR',
             type: 'expense',

@@ -341,7 +341,7 @@ describe('useRecurringTransactions hook', () => {
         id: 'tx-credit-1',
         date: '2026-06-01',
         description:
-          'Anel o. Biljana Memic (3696413) GENODEF1S01 DE36550905000003696413 Kreditrate End-to-End-Ref.: CCB.338.UE.248923',
+          'Max o. Erika Mustermann (1234567) GENODEF1S01 DE89370400440532013000 Kreditrate End-to-End-Ref.: CCB.338.UE.248923',
         amount: -350,
         currency: 'EUR',
         type: 'expense',
@@ -351,7 +351,7 @@ describe('useRecurringTransactions hook', () => {
         id: 'tx-credit-2',
         date: '2026-07-01',
         description:
-          'Anel o. Biljana Memic (3696413) GENODEF1S01 DE36550905000003696413 Kreditrate End-to-End-Ref.: CCB.369.UE.251234',
+          'Max o. Erika Mustermann (1234567) GENODEF1S01 DE89370400440532013000 Kreditrate End-to-End-Ref.: CCB.369.UE.251234',
         amount: -350,
         currency: 'EUR',
         type: 'expense',
@@ -362,7 +362,7 @@ describe('useRecurringTransactions hook', () => {
     const { result } = renderHook(() => useRecurringTransactions(transactions))
 
     expect(result.current.recurringExpenses).toHaveLength(1)
-    expect(result.current.recurringExpenses[0].name).toBe('Anel o. Biljana Memic')
+    expect(result.current.recurringExpenses[0].name).toBe('Max o. Erika Mustermann')
     expect(result.current.recurringExpenses[0].amount).toBe(350)
     expect(result.current.recurringExpenses[0].category).toBe('Loans')
     expect(result.current.recurringExpenses[0].frequency).toBe('monthly')
@@ -482,55 +482,75 @@ describe('useRecurringTransactions hook', () => {
   })
 
   it('detects multiple concurrent recurring credit transfers and loan payments to the same payee', async () => {
-    const fs = await import('fs')
-    const { splitCsvLine } = await import('../../utils/parsers/helpers')
+    const { parseCsvText } = await import('../../utils/parsers/helpers')
     const { rowsToTransactionsWithMeta } = await import('../../utils/parsers/csv-parser')
 
-    const buffer = fs.readFileSync('data/DE92500400000646293100_EUR_15-09-2026_2257.csv')
-    let text = new TextDecoder('utf-8').decode(buffer)
-    if (text.includes('\uFFFD')) {
-      text = new TextDecoder('iso-8859-1').decode(buffer)
+    const months = [
+      '04.2025',
+      '05.2025',
+      '06.2025',
+      '07.2025',
+      '08.2025',
+      '09.2025',
+      '10.2025',
+      '11.2025',
+      '12.2025',
+      '01.2026',
+      '02.2026',
+      '03.2026',
+      '04.2026',
+      '05.2026',
+      '06.2026',
+      '07.2026',
+      '08.2026',
+      '09.2026',
+    ]
+    const csvLines = [
+      'Buchungstag;Wertstellung;Umsatzart;Buchungstext;Betrag;Währung;IBAN Kontoinhaber;Kategorie',
+    ]
+    for (const m of months) {
+      csvLines.push(
+        `15.${m};15.${m};Dauerauftrag;MAX O. ERIKA MUSTERMANN GENODEF1S01 DE89370400440532013000 KREDITRATE End-to-End-Ref.: NOTPROVIDED Dauerauftrag;-1000;EUR;DE12500105170648489890;Banken & Kredite`,
+        `15.${m};15.${m};Dauerauftrag;MAX O. ERIKA MUSTERMANN GENODEF1S01 DE89370400440532013000 KREDITRATE End-to-End-Ref.: NOTPROVIDED Dauerauftrag;-500,50;EUR;DE12500105170648489890;Banken & Kredite`,
+      )
     }
-    text = text.replace(/^\uFEFF/, '')
-    const rows = text
-      .trim()
-      .split('\n')
-      .map((line) => splitCsvLine(line.replace(/\r$/, ''), ';'))
+
+    const rows = parseCsvText(csvLines.join('\n'), ';')
     const { transactions: txs } = rowsToTransactionsWithMeta(rows, 'Commerzbank')
 
     const { result } = renderHook(() => useRecurringTransactions(txs))
 
-    const loanExpenses = result.current.recurringExpenses.filter(
-      (r) => r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
+    const loanExpenses = result.current.recurringExpenses.filter((r) =>
+      r.name.toLowerCase().includes('erika mustermann'),
     )
     expect(loanExpenses).toHaveLength(1)
     const mergedLoan = loanExpenses[0]
     expect(mergedLoan).toBeDefined()
-    expect(mergedLoan.name).toBe('Anel O. Biljana Memic')
-    expect(mergedLoan.amount).toBe(1502.58)
+    expect(mergedLoan.name).toBe('Max O. Erika Mustermann')
+    expect(mergedLoan.amount).toBe(1500.5)
     expect(mergedLoan.frequency).toBe('monthly')
-    expect(mergedLoan.transactionCount).toBe(114) // 57 + 57
+    expect(mergedLoan.transactionCount).toBe(36) // 18 + 18
 
     // Single-month view (September 2026)
     const { result: monthResult } = renderHook(() =>
       useRecurringTransactions(txs, { mode: 'month', value: '2026-09' }),
     )
-    const monthLoan = monthResult.current.recurringExpenses.filter(
-      (r) => r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
+    const monthLoan = monthResult.current.recurringExpenses.filter((r) =>
+      r.name.toLowerCase().includes('erika mustermann'),
     )
     expect(monthLoan).toHaveLength(1)
-    expect(monthLoan[0].amount).toBe(1502.58)
+    expect(monthLoan[0].amount).toBe(1500.5)
     expect(monthLoan[0].transactionCount).toBe(2)
 
     // Year view (2026)
     const { result: yearResult } = renderHook(() =>
       useRecurringTransactions(txs, { mode: 'year', value: '2026' }),
     )
-    const yearLoan = yearResult.current.recurringExpenses.filter(
-      (r) => r.name.toLowerCase().includes('biljana') || r.name.toLowerCase().includes('anel o.'),
+    const yearLoan = yearResult.current.recurringExpenses.filter((r) =>
+      r.name.toLowerCase().includes('erika mustermann'),
     )
     expect(yearLoan).toHaveLength(1)
-    expect(yearLoan[0].amount).toBe(1502.58)
+    expect(yearLoan[0].amount).toBe(1500.5)
     expect(yearLoan[0].transactionCount).toBe(18) // 9 + 9
   })
 })

@@ -1,0 +1,5 @@
+"Datum","Uhrzeit","Zeitzone","Name","Typ","Status","Währung","Brutto","Gebühr","Netto","Guthaben","Artikelbezeichnung","Konto-IBAN"
+"14.10.2026","14:22:10","CEST","Elektro Versand GmbH","Express-Zahlung","Abgeschlossen","EUR","-69,90","0,00","-69,90","430,10","USB-C Dockingstation","DE88500105171122334455"
+"11.10.2026","09:15:00","CEST","Bahnverkehr AG","Abo-Zahlung","Abgeschlossen","EUR","-49,00","0,00","-49,00","500,00","Deutschlandticket 10/2026","DE88500105171122334455"
+"06.10.2026","19:40:33","CEST","Lieferdienst Express","Website-Zahlung","Abgeschlossen","EUR","-24,50","0,00","-24,50","549,00","Abendessen Bestellung","DE88500105171122334455"
+"01.10.2026","08:00:00","CEST","Design Studio Rückerstattung","Gutschrift","Abgeschlossen","EUR","450,00","0,00","450,00","573,50","Honorar Gutschrift","DE88500105171122334455"

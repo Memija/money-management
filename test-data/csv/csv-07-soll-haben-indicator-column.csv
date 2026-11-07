@@ -1,0 +1,5 @@
+IBAN Auftragskonto;Buchungstag;Valutadatum;Name Zahlungsbeteiligter;Verwendungszweck;Betrag;Soll/Haben;Währung
+DE31200400600555666777;14.10.2026;14.10.2026;Drogeriemarkt Zentrum;Kartenzahlung Einkauf;24,85;S;EUR
+DE31200400600555666777;12.10.2026;12.10.2026;Wohnungsbau Nord eG;Miete Oktober 2026;790,00;S;EUR
+DE31200400600555666777;08.10.2026;08.10.2026;Versicherung Schutz AG;Haftpflicht Beitrag;18,40;DBIT;EUR
+DE31200400600555666777;01.10.2026;01.10.2026;Hanseatische Logistik GmbH;Gehalt 10/2026;3.150,00;H;EUR

@@ -5,7 +5,7 @@ import type { TranslationStrings } from '../../i18n/types'
 import type { ImportMethod, Transaction } from '../../types'
 import { filterInternalSpaceTransfers } from '../../utils/account-transfers'
 import { computeImportFingerprint } from '../../utils/import-fingerprint'
-import { splitCsvLine } from '../../utils/parsers/helpers'
+import { parseCsvText } from '../../utils/parsers/helpers'
 import {
   extractAccountIbansFromPaste,
   extractAccountIbansFromPdf,
@@ -64,25 +64,16 @@ export const useTransactionImport = (
             // Read as binary buffer so we can detect and handle encoding ourselves
             const buffer = await file.arrayBuffer()
 
-            // Try UTF-8 first; fall back to ISO-8859-1 (Latin-1) if replacement chars appear.
-            // ING, Sparkasse, comdirect, Deutsche Bank, and older DKB exports use ISO-8859-1.
+            // Try UTF-8 first; fall back to Windows-1252 / ISO-8859-1 if replacement chars appear.
+            // ING, Sparkasse, comdirect, Deutsche Bank, and older DKB exports use Windows-1252 / Latin-1.
             let text = new TextDecoder('utf-8').decode(buffer)
             if (text.includes('\uFFFD')) {
-              text = new TextDecoder('iso-8859-1').decode(buffer)
+              text = new TextDecoder('windows-1252').decode(buffer)
             }
 
-            // Strip UTF-8 BOM (\uFEFF) — present in some ING and bank exports
-            text = text.replace(/^\uFEFF/, '')
-
-            // Detect separator using the first non-empty line
-            const firstMeaningfulLine = text.split('\n').find((l) => l.trim()) ?? ''
-            const cleanFirst = firstMeaningfulLine.replace(/\r$/, '')
-            const sep = cleanFirst.includes(';') ? ';' : cleanFirst.includes('\t') ? '\t' : ','
-            const rows = text
-              .trim()
-              .split('\n')
-              // Strip trailing \r (CRLF) and split into cells using quote-aware parser
-              .map((line) => splitCsvLine(line.replace(/\r$/, ''), sep))
+            // Strip UTF-8 BOM (\uFEFF), auto-detect separator across preamble rows,
+            // and merge multiline quoted cells into logical rows
+            const rows = parseCsvText(text)
             const {
               transactions: txs,
               discardedSpaceCount: spaceCount,
@@ -168,15 +159,13 @@ export const useTransactionImport = (
       }
 
       // Strategy 2: Structured CSV/TSV fallback (tab, semicolon, or comma separated)
-      const lines = pasteText.trim().split('\n')
-      if (lines.length < 2) {
+      const rows = parseCsvText(pasteText)
+      if (rows.length < 2) {
         throw new Error(
           t?.errorParsePasteOneRow ||
             'Only 1 row detected. Please make sure to include a header row (e.g. "Date, Description, Amount") and at least one transaction row with a valid date format like DD.MM.YYYY.',
         )
       }
-      const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ','
-      const rows = lines.map((l) => splitCsvLine(l.replace(/\r$/, ''), sep))
       const {
         transactions: csvTxs,
         discardedSpaceCount: spaceCount,

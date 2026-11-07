@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  detectCsvSeparator,
   generateId,
   inferType,
   isValidDateRaw,
   parseAmount,
+  parseCsvText,
   parseCurrency,
   parseDate,
 } from '../helpers'
@@ -40,7 +42,7 @@ describe('helpers', () => {
       expect(
         inferType(
           -150,
-          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317',
+          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/00000001 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0000000001',
         ),
       ).toBe('income')
       expect(inferType(-250, 'Reisekostenvergütung Geschäftsreise')).toBe('income')
@@ -204,6 +206,38 @@ describe('helpers', () => {
     it('returns current date string as fallback for unrecognised format', () => {
       const today = new Date().toISOString().split('T')[0]
       expect(parseDate('Yesterday')).toBe(today)
+    })
+
+    it('parses short German Kontoauszug date DD.MM. using defaultYear', () => {
+      expect(parseDate('14.10.', '2026')).toBe('2026-10-14')
+      expect(parseDate('5.3.', '2025')).toBe('2025-03-05')
+    })
+  })
+
+  describe('detectCsvSeparator & parseCsvText', () => {
+    it('detects semicolon delimiter even when row 1 is a single-cell title with commas', () => {
+      const raw = [
+        'Umsätze Girokonto (Stand: 4.512,30 EUR)',
+        '',
+        'Buchungstag;Wertstellung;Buchungstext;Betrag;Währung',
+        '14.10.2026;14.10.2026;Supermarkt;-36,80;EUR',
+      ].join('\n')
+
+      expect(detectCsvSeparator(raw)).toBe(';')
+      const rows = parseCsvText(raw)
+      expect(rows[2]).toEqual(['Buchungstag', 'Wertstellung', 'Buchungstext', 'Betrag', 'Währung'])
+    })
+
+    it('merges multiline quoted Verwendungszweck cells into single logical rows', () => {
+      const raw = [
+        'Buchungstag;Wertstellung;Empfänger;Verwendungszweck;Betrag;Währung',
+        '14.10.2026;14.10.2026;REWE Markt GmbH;"Kartenzahlung\nREWE SAGT DANKE\nFiliale 104";-36,80;EUR',
+      ].join('\n')
+
+      const rows = parseCsvText(raw)
+      expect(rows).toHaveLength(2)
+      expect(rows[1][3]).toBe('Kartenzahlung REWE SAGT DANKE Filiale 104')
+      expect(rows[1][4]).toBe('-36,80')
     })
   })
 

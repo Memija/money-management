@@ -1,0 +1,5 @@
+Buchungstag;Wertstellung;Umsatzart;Buchungstext;Betrag;Währung;IBAN Kontoinhaber
+14.10.2026;14.10.2026;Lastschrift;Supermarkt Nord Filiale 104 Einkauf;-36,80;EUR;DE89370400440532013000
+12.10.2026;12.10.2026;Dauerauftrag;Wohnbau Gesellschaft mbH Miete 10/2026;-850,00;EUR;DE89370400440532013000
+09.10.2026;09.10.2026;Lastschrift;Streaming Media Digital Abo;-11,99;EUR;DE89370400440532013000
+01.10.2026;01.10.2026;Gutschrift;Technik Werk AG Gehaltsabrechnung 10/2026;3250,00;EUR;DE89370400440532013000

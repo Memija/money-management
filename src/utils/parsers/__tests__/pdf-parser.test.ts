@@ -186,7 +186,7 @@ describe('parsePdfText', () => {
 
   it('parses Commerzbank REISESP business trip reimbursement with type income', () => {
     const rawText = `
-    09.05.2023 09.05.2023 COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317 150,00 EUR
+    09.05.2023 09.05.2023 COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/00000001 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0000000001 150,00 EUR
     `
     const result = parsePdfText(rawText, 'Commerzbank')
     expect(result).toHaveLength(1)
@@ -202,6 +202,21 @@ describe('parsePdfText', () => {
     expect(result).toHaveLength(1)
     expect(result[0].type).toBe('income')
     expect(result[0].amount).toBe(25)
+  })
+
+  it('parses classic German Kontoauszug short dates (DD.MM. DD.MM.) using statement year from header', () => {
+    const rawText = `
+    Kontoauszug 10/2026 vom 31.10.2026
+    Buchung Wert Buchungstext Betrag
+    14.10. 14.10. Kartenzahlung Supermarkt Nord 36,80 S
+    01.10. 01.10. Gehaltsgutschrift Technik Werk AG 3.250,00 H
+    `
+    const result = parsePdfText(rawText, 'Sparkasse')
+    expect(result).toHaveLength(2)
+    expect(result[0].date).toBe('2026-10-14')
+    expect(result[0].amount).toBe(-36.8)
+    expect(result[1].date).toBe('2026-10-01')
+    expect(result[1].amount).toBe(3250)
   })
 })
 

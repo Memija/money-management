@@ -38,16 +38,42 @@ function isSummaryLine(description: string): boolean {
   return ALL_SUMMARY_KEYWORDS.some((kw) => lower.includes(kw))
 }
 
+const PDF_DATE_SRC = '(?:\\d{1,2}[./]\\d{1,2}[./]\\d{2,4}|\\d{4}-\\d{2}-\\d{2})'
+const PDF_SHORT_DE_DATE_SRC = '(?:0?[1-9]|[12]\\d|3[01])\\.(?:0?[1-9]|1[0-2])\\.'
+const PDF_DOUBLE_DATE_TOKEN_SRC = `(?:${PDF_DATE_SRC}|${PDF_SHORT_DE_DATE_SRC})`
+const PDF_AMT_SRC =
+  "(?:[+-]?\\s?\\d{1,3}(?:[.'’]\\d{3})*,\\d{2}\\s*[SH+-]?|[+-]\\s?\\d{1,3}(?:,\\d{3})*\\.\\d{2}(?=\\s*(?:[A-Z]{3}|€|£|\\$|zł)))"
+const PDF_CURR_SRC = '([A-Z]{3}|€|£|\\$|zł)?'
+
+function extractStatementYear(text: string): string {
+  const fullDateMatch = text.match(/\b\d{1,2}[./]\d{1,2}[./](20\d{2})\b/)
+  if (fullDateMatch) {
+    return fullDateMatch[1]
+  }
+  const isoYearMatch = text.match(/\b(20\d{2})-\d{2}-\d{2}\b/)
+  if (isoYearMatch) {
+    return isoYearMatch[1]
+  }
+  const slashYearMatch = text.match(/\b(?:0?[1-9]|1[0-2])\s*\/\s*(20\d{2})\b/)
+  if (slashYearMatch) {
+    return slashYearMatch[1]
+  }
+  return String(new Date().getFullYear())
+}
+
 function parseDoubleDateStrategy(
   text: string,
   institution: string,
+  statementYear: string,
 ): { transactions: Transaction[]; remainingText: string } {
   const transactions: Transaction[] = []
   let remainingText = text
 
-  // German bank statement: BookingDate ValueDate Description Amount EUR
-  const deRegex =
-    /(\d{1,2}\.\d{1,2}\.\d{2,4})\s+\d{1,2}\.\d{1,2}\.\d{2,4}\s+(.*?)\s*([+-]?\s?\d{1,3}(?:\.\d{3})*,\d{2}\s*[SH+-]?)\s*([A-Z]{3}|€|£|\$|zł)?/gi
+  // Statement row with BookingDate + ValueDate + Description + Amount + Currency
+  const deRegex = new RegExp(
+    `(${PDF_DOUBLE_DATE_TOKEN_SRC})\\s+${PDF_DOUBLE_DATE_TOKEN_SRC}\\s+(.*?)\\s*(${PDF_AMT_SRC})\\s*${PDF_CURR_SRC}`,
+    'gi',
+  )
 
   let m
   while ((m = deRegex.exec(remainingText)) !== null) {
@@ -71,7 +97,7 @@ function parseDoubleDateStrategy(
 
     transactions.push({
       id: generateId(),
-      date: parseDate(m[1]),
+      date: parseDate(m[1], statementYear),
       description: desc || 'PDF Transaction',
       amount,
       currency: curr,
@@ -91,9 +117,11 @@ function parseSingleDateStrategy(
   const transactions: Transaction[] = []
   let remainingText = text
 
-  // Fallback: Single Date German bank statement: BookingDate Description Amount EUR
-  const deRegexSingleDate =
-    /(\d{1,2}\.\d{1,2}\.\d{2,4})\s+(.*?)\s*([+-]?\s?\d{1,3}(?:\.\d{3})*,\d{2}\s*[SH+-]?)\s*([A-Z]{3}|€|£|\$|zł)?/gi
+  // Statement row with Single Date + Description + Amount + Currency
+  const deRegexSingleDate = new RegExp(
+    `(${PDF_DATE_SRC})\\s+(.*?)\\s*(${PDF_AMT_SRC})\\s*${PDF_CURR_SRC}`,
+    'gi',
+  )
 
   let m
   while ((m = deRegexSingleDate.exec(remainingText)) !== null) {
@@ -184,11 +212,12 @@ export function parsePdfText(rawText: string, institution: string): Transaction[
     .replace(/\s+/g, ' ')
     .trim()
 
+  const statementYear = extractStatementYear(text)
   let remainingText = text
   let allTransactions: Transaction[] = []
 
   // Strategy 1: Double Date matches
-  const doubleDateResult = parseDoubleDateStrategy(remainingText, institution)
+  const doubleDateResult = parseDoubleDateStrategy(remainingText, institution, statementYear)
   if (doubleDateResult.transactions.length > 0) {
     allTransactions = allTransactions.concat(doubleDateResult.transactions)
     remainingText = doubleDateResult.remainingText

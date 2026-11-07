@@ -108,11 +108,7 @@ export default defineConfig([
   },
   {
     files: ['scripts/**/*.{js,mjs}'],
-    ignores: [
-      '**/*.test.{js,mjs}',
-      '**/*.spec.{js,mjs}',
-      'scripts/generate-german-banks-test-data.js',
-    ],
+    ignores: ['**/*.test.{js,mjs}', '**/*.spec.{js,mjs}'],
     rules: {
       'no-console': 'off',
       'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],

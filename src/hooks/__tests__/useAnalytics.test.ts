@@ -239,9 +239,9 @@ describe('useAnalytics hook', () => {
   it('aggregates composite SEPA statements and counter-varied descriptions into single top merchants', () => {
     const transactions: Transaction[] = [
       {
-        id: 'tx-memic-1',
+        id: 'tx-mustermann-1',
         date: '2026-08-01',
-        description: 'ANEL O. BILJANA MEMIC GENODEF1S01 DE36550905000003696413 KRED',
+        description: 'MAX O. ERIKA MUSTERMANN GENODEF1S01 DE89370400440532013000 KRED',
         amount: -150,
         currency: 'EUR',
         type: 'expense',
@@ -249,9 +249,9 @@ describe('useAnalytics hook', () => {
         institution: 'Volksbank',
       },
       {
-        id: 'tx-memic-2',
+        id: 'tx-mustermann-2',
         date: '2026-08-15',
-        description: 'Anel o. Biljana Memic',
+        description: 'Max o. Erika Mustermann',
         amount: -250,
         currency: 'EUR',
         type: 'expense',
@@ -284,14 +284,14 @@ describe('useAnalytics hook', () => {
 
     expect(result.current.topMerchants).toHaveLength(2)
 
-    const memic = result.current.topMerchants.find(
-      (m) => m.name.toLowerCase() === 'anel o. biljana memic',
+    const mustermann = result.current.topMerchants.find(
+      (m) => m.name.toLowerCase() === 'max o. erika mustermann',
     )
-    expect(memic).toBeDefined()
-    expect(memic?.name).toBe('Anel o. Biljana Memic')
-    expect(memic?.amount).toBe(400) // 150 + 250
-    expect(memic?.count).toBe(2)
-    expect(memic?.category).toBe('Loans')
+    expect(mustermann).toBeDefined()
+    expect(mustermann?.name).toBe('Max o. Erika Mustermann')
+    expect(mustermann?.amount).toBe(400) // 150 + 250
+    expect(mustermann?.count).toBe(2)
+    expect(mustermann?.category).toBe('Loans')
 
     const finanzkasse = result.current.topMerchants.find(
       (m) => m.name.toLowerCase() === 'finanzkasse schwalm-eder',

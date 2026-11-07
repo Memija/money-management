@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multi-Currency International Activity Stream – Synthetischer Online-Banking Testbeleg</title>
+  <style>
+    :root { --bg: #f6f8fa; --surface: #fff; --text: #1b2430; --border: #dde3ea; --pos: #0a7a42; --neg: #c42828; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
+    .container { max-width: 960px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .acct-meta { display: flex; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 18px; }
+    table, [role="table"] { width: 100%; border-collapse: collapse; }
+    th, td, [role="columnheader"], [role="cell"] { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    [role="row"] { display: grid; grid-template-columns: 120px 1fr 1fr 140px; }
+    .amt-pos { color: var(--pos); font-weight: 600; }
+    .amt-neg { color: var(--neg); font-weight: 600; }
+    .feed-card, .timeline-item, .mkp-card, details, li { padding: 10px; border-bottom: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="acct-meta">
+      <div>
+        <h1>Multi-Currency International Activity Stream</h1>
+        <p>Konto: Girokonto | IBAN: <strong>DE44 5001 0517 5407 3249 31</strong> | Kontoinhaber: Max Mustermann</p>
+      </div>
+      <div>Kontostand: <strong>+3.850,00 EUR</strong></div>
+    </header>
+    <div class="feed-list">
+        <div class="feed-card"><div class="title">Cloud Infrastructure Inc</div><div class="subtitle">14.10.2026 · Card Payment USD</div><div class="amount">-49.99 USD</div></div>
+        <div class="feed-card"><div class="title">London Rail Express</div><div class="subtitle">12.10.2026 · Contactless Transit</div><div class="amount">-24.50 GBP</div></div>
+        <div class="feed-card"><div class="title">Krakow Bistro Sp. z o.o.</div><div class="subtitle">09.10.2026 · POS Card Payment</div><div class="amount">-125,00 zł</div></div>
+        <div class="feed-card"><div class="title">European Consulting Partners</div><div class="subtitle">01.10.2026 · Monthly Retainer Transfer</div><div class="amount">+3.400,00 EUR</div></div>
+      </div>
+  </main>
+</body>
+</html>

@@ -393,7 +393,7 @@ describe('category-icons', () => {
 
     it('matches Commerzbank brand and suggests Salary for business trip expense reimbursement', () => {
       const txDesc =
-        'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317'
+        'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/00000001 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0000000001'
       const brand = getMerchantBrandInfo(txDesc)
       expect(brand.merchant?.id).toBe('commerzbank')
       expect(brand.merchant?.name).toBe('Commerzbank')

@@ -418,7 +418,7 @@ describe('csv-parser', () => {
         ['Buchungstag', 'Buchungstext', 'Betrag'],
         [
           '15.05.2023',
-          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/03700093 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0003461317',
+          'COMMERZBANK AG ZENTRALE FRANKFURT REISESP.09.05.2023/00000001 End-to-End-Ref.: NOTPROVIDED Kundenreferenz: 0000000001',
           '150,00',
         ],
       ]
@@ -453,6 +453,20 @@ describe('csv-parser', () => {
       expect(result).toHaveLength(2)
       expect(result[0].partner).toBe('Commerzbank AG Zentrale Frankfurt')
       expect(result[1].partner).toBe('NNT*shop portraitnet')
+    })
+
+    it('falls back to Wertstellung/Valuta date when Buchungstag is Offen or empty and skips empty-date footer rows', () => {
+      const rows = [
+        ['Buchungstag', 'Wertstellung', 'Buchungstext', 'Betrag'],
+        ['Offen', '16.10.2026', 'Vorgemerkte Kartenzahlung Supermarkt', '-42,80'],
+        ['14.10.2026', '14.10.2026', 'Gebuchte Zahlung', '-19,90'],
+        ['', '', 'Endsaldo', '4.120,00'],
+      ]
+      const result = rowsToTransactions(rows, 'TestBank')
+      expect(result).toHaveLength(2)
+      expect(result[0].date).toBe('2026-10-16')
+      expect(result[0].amount).toBe(-42.8)
+      expect(result[1].date).toBe('2026-10-14')
     })
   })
 })

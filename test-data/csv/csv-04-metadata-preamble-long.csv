@@ -1,0 +1,14 @@
+Umsatzanzeige;Datei erstellt am: 15.10.2026 09:15
+
+IBAN;DE68 2105 0170 0012 3456 78
+Kontoname;Girokonto Komfort
+Kontoinhaber;Max Mustermann
+Sortierung;Datum absteigend
+Zeitraum;01.10.2026 - 15.10.2026
+Kontostand;4.512,30;EUR
+
+Buchung;Valuta;Auftraggeber/Empfänger;Buchungstext;Verwendungszweck;Saldo;Währung;Betrag;Währung
+14.10.2026;14.10.2026;BioMarkt Alnatura;Lastschrift;Einkauf Filiale Süd;4.512,30;EUR;-54,20;EUR
+12.10.2026;12.10.2026;Hausverwaltung Zentrum;Dauerauftrag;Warmmiete 10/2026;4.566,50;EUR;-820,00;EUR
+07.10.2026;07.10.2026;Telekommunikation Netz AG;Lastschrift;Glasfaser Tarif 10/2026;5.386,50;EUR;-39,99;EUR
+01.10.2026;01.10.2026;Musterbau Technik AG;Gutschrift;Lohn und Gehalt 10/2026;5.426,49;EUR;3.180,00;EUR

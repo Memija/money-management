@@ -336,7 +336,7 @@ export function calculateTransferCandidateScore(
     score += 80
   }
 
-  // Shared name tokens (e.g. user's own name 'Anel Memic' present in counterparties)
+  // Shared name tokens (e.g. account owner's name 'Max Mustermann' present in counterparties)
   const wordsA = normDescA.split(' ').filter((w) => w.length >= 3)
   const wordsB = normDescB.split(' ').filter((w) => w.length >= 3)
   const sharedWords = wordsA.filter((w) => wordsB.includes(w))
